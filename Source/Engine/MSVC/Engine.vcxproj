@@ -94,8 +94,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Main\Engine.cpp" />
     <ClCompile Include="..\Main\Main.cpp" />
-    <ClCompile Include="Engine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Main\Engine.h" />

@@ -5,32 +5,44 @@ md ..\..\Lib\x64Debug
 md ..\..\Lib\x64Release
 md ..\..\Lib\x64Profile
 
-echo f | xcopy /D /y DXUT11\Core\Bin\Desktop_2013\Win32\Debug\dxut.lib ..\..\Lib\Win32Debug\dxut.lib
-echo f | xcopy /D /y DXUT11\Core\Bin\Desktop_2013\Win32\Debug\dxut.pdb ..\..\Lib\Win32Debug\dxut.pdb
-echo f | xcopy /D /y DXUT11\Core\Bin\Desktop_2013\Win32\Release\dxut.lib ..\..\Lib\Win32Release\dxut.lib
-echo f | xcopy /D /y DXUT11\Core\Bin\Desktop_2013\Win32\Release\dxut.pdb ..\..\Lib\Win32Release\dxut.pdb
-echo f | xcopy /D /y DXUT11\Core\Bin\Desktop_2013\Win32\Profile\dxut.lib ..\..\Lib\Win32Profile\dxut.lib
-echo f | xcopy /D /y DXUT11\Core\Bin\Desktop_2013\Win32\Profile\dxut.pdb ..\..\Lib\Win32Profile\dxut.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\Win32\Debug\SDL2.lib ..\..\Lib\Win32Debug\SDL2.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\Win32\Debug\SDL2.pdb ..\..\Lib\Win32Debug\SDL2.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\Win32\Release\SDL2.lib ..\..\Lib\Win32Release\SDL2.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\Win32\Release\SDL2.pdb ..\..\Lib\Win32Release\SDL2.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\Win32\Profile\SDL2.lib ..\..\Lib\Win32Profile\SDL2.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\Win32\Profile\SDL2.pdb ..\..\Lib\Win32Profile\SDL2.pdb
 
-echo f | xcopy /D /y DXUT11\Optional\Bin\Desktop_2013\Win32\Debug\dxutopt.lib ..\..\Lib\Win32Debug\dxutopt.lib
-echo f | xcopy /D /y DXUT11\Optional\Bin\Desktop_2013\Win32\Debug\dxutopt.pdb ..\..\Lib\Win32Debug\dxutopt.pdb
-echo f | xcopy /D /y DXUT11\Optional\Bin\Desktop_2013\Win32\Release\dxutopt.lib ..\..\Lib\Win32Release\dxutopt.lib
-echo f | xcopy /D /y DXUT11\Optional\Bin\Desktop_2013\Win32\Release\dxutopt.pdb ..\..\Lib\Win32Release\dxutopt.pdb
-echo f | xcopy /D /y DXUT11\Optional\Bin\Desktop_2013\Win32\Profile\dxutopt.lib ..\..\Lib\Win32Profile\dxutopt.lib
-echo f | xcopy /D /y DXUT11\Optional\Bin\Desktop_2013\Win32\Profile\dxutopt.pdb ..\..\Lib\Win32Profile\dxutopt.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2main\Desktop_2013\Win32\Debug\SDL2main.lib ..\..\Lib\Win32Debug\SDL2main.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2main\Desktop_2013\Win32\Debug\SDL2main.pdb ..\..\Lib\Win32Debug\SDL2main.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2main\Desktop_2013\Win32\Release\SDL2main.lib ..\..\Lib\Win32Release\SDL2main.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2main\Desktop_2013\Win32\Release\SDL2main.pdb ..\..\Lib\Win32Release\SDL2main.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2main\Desktop_2013\Win32\Profile\SDL2main.lib ..\..\Lib\Win32Profile\SDL2main.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2main\Desktop_2013\Win32\Profile\SDL2main.pdb ..\..\Lib\Win32Profile\SDL2main.pdb
 
-echo f | xcopy /D /y DXUT11\Core\Bin\Desktop_2013\x64\Debug\dxut.lib ..\..\Lib\x64Debug\dxut.lib
-echo f | xcopy /D /y DXUT11\Core\Bin\Desktop_2013\x64\Debug\dxut.pdb ..\..\Lib\x64Debug\dxut.pdb
-echo f | xcopy /D /y DXUT11\Core\Bin\Desktop_2013\x64\Release\dxut.lib ..\..\Lib\x64Release\dxut.lib
-echo f | xcopy /D /y DXUT11\Core\Bin\Desktop_2013\x64\Release\dxut.pdb ..\..\Lib\x64Release\dxut.pdb
-echo f | xcopy /D /y DXUT11\Core\Bin\Desktop_2013\x64\Profile\dxut.lib ..\..\Lib\x64Profile\dxut.lib
-echo f | xcopy /D /y DXUT11\Core\Bin\Desktop_2013\x64\Profile\dxut.pdb ..\..\Lib\x64Profile\dxut.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\Win32\Debug\SDL2test.lib ..\..\Lib\Win32Debug\SDL2test.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\Win32\Debug\SDL2test.pdb ..\..\Lib\Win32Debug\SDL2test.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\Win32\Release\SDL2test.lib ..\..\Lib\Win32Release\SDL2test.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\Win32\Release\SDL2test.pdb ..\..\Lib\Win32Release\SDL2test.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\Win32\Profile\SDL2test.lib ..\..\Lib\Win32Profile\SDL2test.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\Win32\Profile\SDL2test.pdb ..\..\Lib\Win32Profile\SDL2test.pdb
 
-echo f | xcopy /D /y DXUT11\Optional\Bin\Desktop_2013\x64\Debug\dxutopt.lib ..\..\Lib\x64Debug\dxutopt.lib
-echo f | xcopy /D /y DXUT11\Optional\Bin\Desktop_2013\x64\Debug\dxutopt.pdb ..\..\Lib\x64Debug\dxutopt.pdb
-echo f | xcopy /D /y DXUT11\Optional\Bin\Desktop_2013\x64\Release\dxutopt.lib ..\..\Lib\x64Release\dxutopt.lib
-echo f | xcopy /D /y DXUT11\Optional\Bin\Desktop_2013\x64\Release\dxutopt.pdb ..\..\Lib\x64Release\dxutopt.pdb
-echo f | xcopy /D /y DXUT11\Optional\Bin\Desktop_2013\x64\Profile\dxutopt.lib ..\..\Lib\x64Profile\dxutopt.lib
-echo f | xcopy /D /y DXUT11\Optional\Bin\Desktop_2013\x64\Profile\dxutopt.pdb ..\..\Lib\x64Profile\dxutopt.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\x64\Debug\SDL2.lib ..\..\Lib\x64Debug\SDL2.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\x64\Debug\SDL2.pdb ..\..\Lib\x64Debug\SDL2.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\x64\Release\SDL2.lib ..\..\Lib\x64Release\SDL2.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\x64\Release\SDL2.pdb ..\..\Lib\x64Release\SDL2.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\x64\Profile\SDL2.lib ..\..\Lib\x64Profile\SDL2.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\x64\Profile\SDL2.pdb ..\..\Lib\x64Profile\SDL2.pdb
 
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2main\Desktop_2013\x64\Debug\SDL2main.lib ..\..\Lib\x64Debug\SDL2main.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2main\Desktop_2013\x64\Debug\SDL2main.pdb ..\..\Lib\x64Debug\SDL2main.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2main\Desktop_2013\x64\Release\SDL2main.lib ..\..\Lib\x64Release\SDL2main.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2main\Desktop_2013\x64\Release\SDL2main.pdb ..\..\Lib\x64Release\SDL2main.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2main\Desktop_2013\x64\Profile\SDL2main.lib ..\..\Lib\x64Profile\SDL2main.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2main\Desktop_2013\x64\Profile\SDL2main.pdb ..\..\Lib\x64Profile\SDL2main.pdb
 
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\x64\Debug\SDL2test.lib ..\..\Lib\x64Debug\SDL2test.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\x64\Debug\SDL2test.pdb ..\..\Lib\x64Debug\SDL2test.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\x64\Release\SDL2test.lib ..\..\Lib\x64Release\SDL2test.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\x64\Release\SDL2test.pdb ..\..\Lib\x64Release\SDL2test.pdb
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\x64\Profile\SDL2test.lib ..\..\Lib\x64Profile\SDL2test.lib
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\x64\Profile\SDL2test.pdb ..\..\Lib\x64Profile\SDL2test.pdb

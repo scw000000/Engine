@@ -1,7 +1,20 @@
-devenv DXUT11\Core\DXUT_2013.sln /build Debug /project DXUT /projectconfig "Debug|Win32"
-devenv DXUT11\Optional\DXUTOpt_2013.sln /build Debug /project DXUTOpt /projectconfig "Debug|Win32"
+set origdir=%~dp0
 
-copyalllibs_vs2013
+set vardir=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
+
+chdir /d %vardir%
+
+call vcvarsall.bat
+
+chdir /d %origdir%
+
+devenv SDL\VisualC\SDL.sln /build Debug /project SDL2 /projectconfig "Debug|Win32"
+devenv SDL\VisualC\SDL.sln /build Debug /project SDL2main /projectconfig "Debug|Win32"
+devenv SDL\VisualC\SDL.sln /build Debug /project SDL2test /projectconfig "Debug|Win32"
+
+call copyalllibs_vs2013.bat
+
+pause
 
 
 

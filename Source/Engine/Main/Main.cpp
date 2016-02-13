@@ -11,6 +11,7 @@
 ///////////////////////
 #include "EngineStd.h"
 
+#include "Engine.h"
 
 #pragma comment(lib, "SDL2.lib")
 #pragma comment(lib, "SDL2main.lib")
@@ -35,8 +36,11 @@
 
 int main( int argc, char *argv[] )
    {
+   EngineApp();
 
-   SDL_Init(SDL_INIT_EVERYTHING);
-   system("PAUSE");
+   g_pApp->m_EngineOptions.Init();
+
+   g_pApp->Run();
+
    return 0;
    }

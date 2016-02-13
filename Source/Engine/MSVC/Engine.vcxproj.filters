@@ -7,14 +7,47 @@
     <Filter Include="Others">
       <UniqueIdentifier>{a0fc4f1a-d2f8-4b1d-a347-691c35924c98}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MainLoop">
+      <UniqueIdentifier>{6c556e95-fcea-4a86-a54f-b96455f9673f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UserInterface">
+      <UniqueIdentifier>{aec0f142-6a48-4cef-9437-c295f14c06be}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
       <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="EngineStd.cpp" />
+    <ClCompile Include="..\Main\Engine.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MainLoop\Initialization.cpp">
+      <Filter>MainLoop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\UserInterface\HumanView.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Main\BaseGameLogic.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
+    <ClInclude Include="..\Main\Engine.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MainLoop\Initialization.h">
+      <Filter>MainLoop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Main\Interfaces.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UserInterface\HumanView.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Main\BaseGameLogic.h">
+      <Filter>Main</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

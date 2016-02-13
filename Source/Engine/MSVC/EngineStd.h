@@ -3,16 +3,88 @@
 // Filename: EngineStd.h
 ////////////////////////////////////////////////////////////////////////////////
 
+#ifndef _ENGINESTD_H_
+#define _ENGINESTD_H_
+
 //////////////
 // INCLUDES //
 //////////////
-#include <stdio.h>
+
+// C RunTime Header Files
 #include <stdlib.h>
 
-#include <Windows.h>
+#include <malloc.h>
+
+#include <tchar.h>
+#include <iostream>
+#include <memory>
+#include <algorithm>
+#include <string>
+#include <list>
+#include <vector>
+#include <queue>
+#include <map>
+
+using std::tr1::shared_ptr;
+using std::tr1::weak_ptr;
+using std::tr1::static_pointer_cast;
+using std::tr1::dynamic_pointer_cast;
+
+
+///////////////////////
+//3rd party INCLUDES //
+///////////////////////
+#include "SDL.h"
+#include "GL\glew.h"
 
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
-#include "SDL.h"
-#include "GL\glew.h"
+#include "..\Main\Engine.h"
+#include "..\Main\Interfaces.h"
+
+// Useful #defines
+
+extern const float fOPAQUE;
+extern const int iOPAQUE;
+extern const float fTRANSPARENT;
+extern const int iTRANSPARENT;
+
+extern const int MEGABYTE;
+extern const float SIXTY_HERTZ;
+
+extern const int SCREEN_WIDTH;
+extern const int SCREEN_HEIGHT;
+
+#if defined(_DEBUG)
+#	define ENG_NEW new(_NORMAL_BLOCK,__FILE__, __LINE__)
+#else
+#	define ENG_NEW new
+#endif
+
+#if !defined(SAFE_DELETE)
+#define SAFE_DELETE(x) if(x) delete x; x=NULL;
+#endif
+
+#if !defined(SAFE_DELETE_ARRAY)
+#define SAFE_DELETE_ARRAY(x) if (x) delete [] x; x=NULL; 
+#endif
+
+#if !defined(SAFE_RELEASE)
+#define SAFE_RELEASE(x) if(x) x->Release(); x=NULL;
+#endif
+
+#ifdef UNICODE
+#define _tcssprintf wsprintf
+#define tcsplitpath _wsplitpath
+#else
+#define _tcssprintf sprintf
+#define tcsplitpath _splitpath
+#endif
+
+#define __STR2__(x) #x
+#define __STR1__(x) __STR2__(x)
+#define __LOC__ __FILE__ "("__STR1__(__LINE__)") : Warning Msg: "  
+
+
+#endif // !ENGINESTD

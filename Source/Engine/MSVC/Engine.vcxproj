@@ -59,6 +59,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>EngineStd.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -86,12 +87,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\MainLoop\Initialization.cpp" />
+    <ClCompile Include="..\Main\BaseGameLogic.cpp" />
+    <ClCompile Include="..\Main\Engine.cpp">
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EngineStd.h</PrecompiledHeaderFile>
+    </ClCompile>
     <ClCompile Include="..\Main\main.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EngineStd.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EngineStd.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\UserInterface\HumanView.cpp" />
     <ClCompile Include="EngineStd.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EngineStd.h</PrecompiledHeaderFile>
@@ -100,6 +107,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\MainLoop\Initialization.h" />
+    <ClInclude Include="..\Main\BaseGameLogic.h" />
+    <ClInclude Include="..\Main\Engine.h" />
+    <ClInclude Include="..\Main\Interfaces.h" />
+    <ClInclude Include="..\UserInterface\HumanView.h" />
     <ClInclude Include="EngineStd.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -9,7 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Windows.h>
+
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
 #include "SDL.h"
+#include "GL\glew.h"

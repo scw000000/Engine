@@ -48,3 +48,35 @@ echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\x64\Release\SDL2test.
 echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\x64\Release\SDL2test.pdb ..\..\Lib\x64Release\SDL2test.pdb
 echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\x64\Profile\SDL2test.lib ..\..\Lib\x64Profile\SDL2test.lib
 echo f | xcopy /D /y SDL\VisualC\Bin\SDL2test\Desktop_2013\x64\Profile\SDL2test.pdb ..\..\Lib\x64Profile\SDL2test.pdb
+
+
+
+
+echo f | xcopy /D /y GLEW\bin\glew_shared\Desktop_2013\Win32\Debug\glew32d.dll ..\..\Lib\Win32Debug\glew32d.dll
+echo f | xcopy /D /y GLEW\bin\glew_shared\Desktop_2013\Win32\Debug\glew32d.pdb ..\..\Lib\Win32Debug\glew32d.pdb
+echo f | xcopy /D /y GLEW\bin\glew_shared\Desktop_2013\Win32\Release\glew32d.dll ..\..\Lib\Win32Release\glew32d.dll
+echo f | xcopy /D /y GLEW\bin\glew_shared\Desktop_2013\Win32\Release\glew32d.pdb ..\..\Lib\Win32Release\glew32d.pdb
+echo f | xcopy /D /y GLEW\bin\glew_shared\Desktop_2013\Win32\Profile\glew32d.dll ..\..\Lib\Win32Profile\glew32d.dll
+echo f | xcopy /D /y GLEW\bin\glew_shared\Desktop_2013\Win32\Profile\glew32d.pdb ..\..\Lib\Win32Profile\glew32d.pdb
+
+echo f | xcopy /D /y GLEW\bin\glew_static\Desktop_2013\Win32\Debug\glew32sd.lib ..\..\Lib\Win32Debug\glew32sd.lib
+echo f | xcopy /D /y GLEW\bin\glew_static\Desktop_2013\Win32\Debug\glew32sd.pdb ..\..\Lib\Win32Debug\glew32sd.pdb
+echo f | xcopy /D /y GLEW\bin\glew_static\Desktop_2013\Win32\Release\glew32sd.lib ..\..\Lib\Win32Release\glew32sd.lib
+echo f | xcopy /D /y GLEW\bin\glew_static\Desktop_2013\Win32\Release\glew32sd.pdb ..\..\Lib\Win32Release\glew32sd.pdb
+echo f | xcopy /D /y GLEW\bin\glew_static\Desktop_2013\Win32\Profile\glew32sd.lib ..\..\Lib\Win32Profile\glew32sd.lib
+echo f | xcopy /D /y GLEW\bin\glew_static\Desktop_2013\Win32\Profile\glew32sd.pdb ..\..\Lib\Win32Profile\glew32sd.pdb
+
+
+echo f | xcopy /D /y GLEW\bin\glew_shared\Desktop_2013\x64\Debug\glew32d.dll ..\..\Lib\x64Debug\glew32d.dll
+echo f | xcopy /D /y GLEW\bin\glew_shared\Desktop_2013\x64\Debug\glew32d.pdb ..\..\Lib\x64Debug\glew32d.pdb
+echo f | xcopy /D /y GLEW\bin\glew_shared\Desktop_2013\x64\Release\glew32d.dll ..\..\Lib\x64Release\glew32d.dll
+echo f | xcopy /D /y GLEW\bin\glew_shared\Desktop_2013\x64\Release\glew32d.pdb ..\..\Lib\x64Release\glew32d.pdb
+echo f | xcopy /D /y GLEW\bin\glew_shared\Desktop_2013\x64\Profile\glew32d.dll ..\..\Lib\x64Profile\glew32d.dll
+echo f | xcopy /D /y GLEW\bin\glew_shared\Desktop_2013\x64\Profile\glew32d.pdb ..\..\Lib\x64Profile\glew32d.pdb
+
+echo f | xcopy /D /y GLEW\bin\glew_static\Desktop_2013\x64\Debug\glew32sd.lib ..\..\Lib\x64Debug\glew32sd.lib
+echo f | xcopy /D /y GLEW\bin\glew_static\Desktop_2013\x64\Debug\glew32sd.pdb ..\..\Lib\x64Debug\glew32sd.pdb
+echo f | xcopy /D /y GLEW\bin\glew_static\Desktop_2013\x64\Release\glew32sd.lib ..\..\Lib\x64Release\glew32sd.lib
+echo f | xcopy /D /y GLEW\bin\glew_static\Desktop_2013\x64\Release\glew32sd.pdb ..\..\Lib\x64Release\glew32sd.pdb
+echo f | xcopy /D /y GLEW\bin\glew_static\Desktop_2013\x64\Profile\glew32sd.lib ..\..\Lib\x64Profile\glew32sd.lib
+echo f | xcopy /D /y GLEW\bin\glew_static\Desktop_2013\x64\Profile\glew32sd.pdb ..\..\Lib\x64Profile\glew32sd.pdb

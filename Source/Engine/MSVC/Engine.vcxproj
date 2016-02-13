@@ -43,14 +43,14 @@
     <OutDir>$(ProjectDir)..\..\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)..\..\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

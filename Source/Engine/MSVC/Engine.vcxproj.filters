@@ -2,21 +2,19 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Main">
-      <UniqueIdentifier>{72e81f5c-0a33-4358-a7fe-1e09a53f4675}</UniqueIdentifier>
+      <UniqueIdentifier>{bac932db-dc98-4a15-b505-eac20c3f09aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Others">
+      <UniqueIdentifier>{a0fc4f1a-d2f8-4b1d-a347-691c35924c98}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Main\Main.cpp">
+    <ClCompile Include="..\Main\main.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\Main\Engine.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
+    <ClCompile Include="EngineStd.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
-    <ClInclude Include="..\Main\Engine.h">
-      <Filter>Main</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

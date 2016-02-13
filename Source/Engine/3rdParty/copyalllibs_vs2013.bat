@@ -5,6 +5,8 @@ md ..\..\Lib\x64Debug
 md ..\..\Lib\x64Release
 md ..\..\Lib\x64Profile
 
+echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\Win32\Debug\SDL2.dll ..\MSVC\SDL2.dll
+
 echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\Win32\Debug\SDL2.lib ..\..\Lib\Win32Debug\SDL2.lib
 echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\Win32\Debug\SDL2.pdb ..\..\Lib\Win32Debug\SDL2.pdb
 echo f | xcopy /D /y SDL\VisualC\Bin\SDL2\Desktop_2013\Win32\Release\SDL2.lib ..\..\Lib\Win32Release\SDL2.lib

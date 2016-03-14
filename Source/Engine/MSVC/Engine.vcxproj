@@ -43,8 +43,8 @@
     <OutDir>$(ProjectDir)..\..\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\tinyxml;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)..\..\Bin\$(PlatformName)$(Configuration)\</OutDir>
@@ -60,6 +60,8 @@
       <SDLCheck>true</SDLCheck>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>EngineStd.h</PrecompiledHeaderFile>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -87,6 +89,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\Debugging\Logger.cpp" />
     <ClCompile Include="..\MainLoop\Initialization.cpp" />
     <ClCompile Include="..\Main\BaseGameLogic.cpp" />
     <ClCompile Include="..\Main\Engine.cpp">
@@ -99,6 +102,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\UserInterface\HumanView.cpp" />
+    <ClCompile Include="..\Utilities\Random.cpp" />
+    <ClCompile Include="..\Utilities\String.cpp" />
     <ClCompile Include="EngineStd.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EngineStd.h</PrecompiledHeaderFile>
@@ -107,11 +112,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\Debugging\Logger.h" />
     <ClInclude Include="..\MainLoop\Initialization.h" />
     <ClInclude Include="..\Main\BaseGameLogic.h" />
     <ClInclude Include="..\Main\Engine.h" />
     <ClInclude Include="..\Main\Interfaces.h" />
+    <ClInclude Include="..\Memory\MemoryPool.h" />
+    <ClInclude Include="..\Multicore\CriticalSection.h" />
     <ClInclude Include="..\UserInterface\HumanView.h" />
+    <ClInclude Include="..\Utilities\Math.h" />
+    <ClInclude Include="..\Utilities\String.h" />
     <ClInclude Include="EngineStd.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

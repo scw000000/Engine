@@ -13,6 +13,15 @@
     <Filter Include="UserInterface">
       <UniqueIdentifier>{aec0f142-6a48-4cef-9437-c295f14c06be}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Utilities">
+      <UniqueIdentifier>{0007a43f-4ac1-404b-a5ad-96f2af239fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Memory">
+      <UniqueIdentifier>{0a7b5c5e-1076-4d64-b9f8-aa839cc62447}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Debugging">
+      <UniqueIdentifier>{0d3f9ad9-1c50-4a03-b52b-3d332ca32710}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
@@ -30,6 +39,15 @@
     </ClCompile>
     <ClCompile Include="..\Main\BaseGameLogic.cpp">
       <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Utilities\Random.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Debugging\Logger.cpp">
+      <Filter>Debugging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Utilities\String.cpp">
+      <Filter>Utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -49,5 +67,18 @@
     <ClInclude Include="..\Main\BaseGameLogic.h">
       <Filter>Main</Filter>
     </ClInclude>
+    <ClInclude Include="..\Utilities\Math.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Memory\MemoryPool.h">
+      <Filter>Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Debugging\Logger.h">
+      <Filter>Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Utilities\String.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Multicore\CriticalSection.h" />
   </ItemGroup>
 </Project>

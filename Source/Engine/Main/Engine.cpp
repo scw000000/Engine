@@ -37,6 +37,10 @@ void EngineApp::MsgProc()
             g_pApp->OnClose();
             break;
 
+            case SDL_KEYDOWN:
+            g_pApp->m_bQuitting = true;
+            break;
+
          }
       }
    }
@@ -71,6 +75,7 @@ void EngineApp::EngineLoop()
    while( !g_pApp->m_bReadyToQuit  )
       {
       MsgProc();
+      OnUpdateGame( 0.0f, 0.0f, NULL );
       }
    }
 

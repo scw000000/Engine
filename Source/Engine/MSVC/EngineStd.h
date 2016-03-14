@@ -10,6 +10,10 @@
 // INCLUDES //
 //////////////
 
+#define NOMINMAX
+#include <windows.h>
+#include <windowsx.h>
+
 // C RunTime Header Files
 #include <stdlib.h>
 
@@ -30,18 +34,34 @@ using std::tr1::weak_ptr;
 using std::tr1::static_pointer_cast;
 using std::tr1::dynamic_pointer_cast;
 
+/*
+this interface make the copy constructor and assignment operator to be private
+inorder to prevent copy
+*/
+class ENG_noncopyable 
+{  
+     private:  
+      ENG_noncopyable(const ENG_noncopyable& x);  
+      ENG_noncopyable& operator=(const ENG_noncopyable& x);  
+     public:  
+      ENG_noncopyable() {}; // Default constructor  
+};  
+
 
 ///////////////////////
 //3rd party INCLUDES //
 ///////////////////////
 #include "SDL.h"
 #include "GL\glew.h"
+#include <tinyxml.h>
 
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
+#include "..\Debugging\Logger.h"  // this should be the first of the gcc includes since it defines ENG_ASSERT()
 #include "..\Main\Engine.h"
 #include "..\Main\Interfaces.h"
+
 
 // Useful #defines
 

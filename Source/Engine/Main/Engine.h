@@ -16,10 +16,10 @@
 class EngineApp
    {
    public:
-      EngineApp();
       ~EngineApp();
+      static void Init( void );
+      void InitInstance( void );
 
-      
       void Run();
       void AbortGame() { m_bQuitting = true; }
 
@@ -31,6 +31,7 @@ class EngineApp
    protected:
 
    private:
+      EngineApp();
       void InitSystems();
       void EngineLoop();
       static void MsgProc();

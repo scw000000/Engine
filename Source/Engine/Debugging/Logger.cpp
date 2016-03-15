@@ -44,7 +44,10 @@
 
 using std::string;
 
-
+/*
+This pragma is for folding specific region of code to make it better structered
+Constants, Statics, and Globals are for comment useage
+*/
 #pragma region Constants, Statics, and Globals
 //------------------------------------------------------------------------------------------------------------------------------------
 // Some constants
@@ -86,7 +89,7 @@ public:
 		LOGMGR_ERROR_RETRY,
 		LOGMGR_ERROR_IGNORE
 	};
-
+   //first: tag name, second: tag setting(flags)
 	typedef std::map<string, unsigned char> Tags;
 	typedef std::list<Logger::ErrorMessenger*> ErrorMessengerList;
 	
@@ -122,10 +125,12 @@ private:
 #pragma region LogMgr class definition
 //------------------------------------------------------------------------------------------------------------------------------------
 // Constructor
+// This function will be triggered by namespace Logger::Init, after the singleton creation
 //------------------------------------------------------------------------------------------------------------------------------------
 LogMgr::LogMgr(void)
 {
 	// set up the default log tags
+   // these flags are always traced by default no matter how the config file is setted
 	SetDisplayFlags("ERROR", ERRORFLAG_DEFAULT);
 	SetDisplayFlags("WARNING", WARNINGFLAG_DEFAULT);
 	SetDisplayFlags("INFO", LOGFLAG_DEFAULT);
@@ -134,6 +139,7 @@ LogMgr::LogMgr(void)
 
 //------------------------------------------------------------------------------------------------------------------------------------
 // Destructor
+// Delete all of the errorMessenger in the loggermgr
 //------------------------------------------------------------------------------------------------------------------------------------
 LogMgr::~LogMgr(void)
 {
@@ -150,6 +156,8 @@ LogMgr::~LogMgr(void)
 
 //------------------------------------------------------------------------------------------------------------------------------------
 // Initializes the logger.
+// This function will be called by namespace Logger::Init, after the constructor of LogMgr
+// Read the loggingConfigFilename in order to decide what kind of tage should be traced, and bind the setting to flags
 //------------------------------------------------------------------------------------------------------------------------------------
 void LogMgr::Init(const char* loggingConfigFilename)
 {
@@ -168,6 +176,7 @@ void LogMgr::Init(const char* loggingConfigFilename)
                 unsigned char flags = 0;
                 std::string tag(pNode->Attribute("tag"));
 
+                //if the xml file exist debugger tag, enable debugger writing
                 int debugger = 0;
                 pNode->Attribute("debugger", &debugger);
                 if (debugger)
@@ -187,6 +196,8 @@ void LogMgr::Init(const char* loggingConfigFilename)
 
 //------------------------------------------------------------------------------------------------------------------------------------
 // This function builds up the log string and outputs it to various places based on the display flags (m_displayFlags).
+// message: desired message output. ex: ENG_WARNING("Adding existing PathPlanNode to open set");
+// functName, sourceFile and lineNum are called by __FUNCTION__, __FILE__, __LINE__
 //------------------------------------------------------------------------------------------------------------------------------------
 void LogMgr::Log(const string& tag, const string& message, const char* funcName, const char* sourceFile, unsigned int lineNum)
 {
@@ -197,10 +208,11 @@ void LogMgr::Log(const string& tag, const string& message, const char* funcName,
 		m_tagCriticalSection.Unlock();
 		
 		string buffer;
+      // output the formatted information to buffer
 		GetOutputBuffer(buffer, tag, message, funcName, sourceFile, lineNum);
 		OutputFinalBufferToLogs(buffer, findIt->second);
 	}
-	else
+	else// if this tag is not traced in the logger setting file, just skip it
 	{
 		// Critical section is exited in the if statement above, so we need to exit it here if that didn't 
 		// get executed.
@@ -219,13 +231,13 @@ void LogMgr::SetDisplayFlags(const std::string& tag, unsigned char flags)
 	{
 		Tags::iterator findIt = m_tags.find(tag);
 		if (findIt == m_tags.end())
-			m_tags.insert(std::make_pair(tag, flags));
+			m_tags.insert(std::make_pair(tag, flags));// insert the new pair of tag and flags
 		else
-			findIt->second = flags;
+			findIt->second = flags;//update the tag config if the tag already exist
 	}
 	else
 	{
-		m_tags.erase(tag);
+		m_tags.erase(tag);// if the flags options are setted to nothing, erased the pair in order to ignore the tag
 	}
 	m_tagCriticalSection.Unlock();
 }
@@ -244,6 +256,7 @@ void LogMgr::AddErrorMessenger(Logger::ErrorMessenger* pMessenger)
 
 //------------------------------------------------------------------------------------------------------------------------------------
 // Helper for ErrorMessenger.
+// This function is called by Logger::ErrorMessenger::Show
 //------------------------------------------------------------------------------------------------------------------------------------
 LogMgr::ErrorDialogResult LogMgr::Error(const std::string& errorMessage, bool isFatal, const char* funcName, const char* sourceFile, unsigned int lineNum)
 {
@@ -279,6 +292,8 @@ LogMgr::ErrorDialogResult LogMgr::Error(const std::string& errorMessage, bool is
 // 
 // IMPORTANT: The two places this function is called from wrap the code in the tag critical section (m_pTagCriticalSection), 
 // so that makes this call thread safe.  If you call this from anywhere else, make sure you wrap it in that critical section.
+//
+// Output the result of finalBuffer to file or debug window
 //------------------------------------------------------------------------------------------------------------------------------------
 void LogMgr::OutputFinalBufferToLogs(const string& finalBuffer, unsigned char flags)
 {
@@ -307,6 +322,7 @@ void LogMgr::WriteToLogFile(const string& data)
 
 //------------------------------------------------------------------------------------------------------------------------------------
 // Fills outOutputBuffer with the find error string.
+// Assemble the information and format it , output to outOutputBuffer
 //------------------------------------------------------------------------------------------------------------------------------------
 void LogMgr::GetOutputBuffer(std::string& outOutputBuffer, const string& tag, const string& message, const char* funcName, const char* sourceFile, unsigned int lineNum)
 {
@@ -341,13 +357,18 @@ void LogMgr::GetOutputBuffer(std::string& outOutputBuffer, const string& tag, co
 #pragma region ErrorMessenger definition
 //-----------------------------------------------------------------------------------------------------------------------
 // ErrorMessenger
+// This constructor let the errorMessenger add itself to logMgr automatically when it is newed
 //-----------------------------------------------------------------------------------------------------------------------
 Logger::ErrorMessenger::ErrorMessenger(void)
 {
 	s_pLogMgr->AddErrorMessenger(this);
 	m_enabled = true;
 }
-
+//-----------------------------------------------------------------------------------------------------------------------
+// ErrogMessenger are for critical errors, like fatal, error, and assert, onlt fatal error is isFatal
+// Assert and error are not fatal
+// If the message bos is choosed ignore the error, then turn off the error handling
+//-----------------------------------------------------------------------------------------------------------------------
 void Logger::ErrorMessenger::Show(const std::string& errorMessage, bool isFatal, const char* funcName, const char* sourceFile, unsigned int lineNum)
 {
 	if (m_enabled)

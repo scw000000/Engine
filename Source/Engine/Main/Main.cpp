@@ -59,12 +59,21 @@ int main( int argc, char *argv[] )
 
    _CrtSetDbgFlag(tmpDbgFlag);
 
-   EngineApp();
+   Logger::Init("logging.xml");
+		
+   EngineApp::Init();
 
-   g_pApp->m_EngineOptions.Init();
+   g_pApp->m_EngineOptions.Init("PlayerOptions.xml");
 
+   g_pApp->InitInstance();
+
+   
+   
    g_pApp->Run();
 
+  // g_pApp->Run();
+
+   Logger::Destroy();
   // ENG_NEW int();
 
    return 0;

@@ -29,6 +29,7 @@
 there are two different ways to inform an error 
 1.new the errirMessenger nested class and inform it to show disered message
 2.call the Log function directly
+The difference is that any error catched by errorMgr will make an additional windows message box 
 */
 
 //---------------------------------------------------------------------------------------------------------------------

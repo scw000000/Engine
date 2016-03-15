@@ -7,26 +7,26 @@
 #define _INITIALIZATION_H_
 
 
+
 extern bool CheckForJoystick(std::string hWnd);
 
 struct EngineOptions
 {
    EngineOptions();
-	~EngineOptions() {
-      }
-	// Level option
-	//std::string m_Level;
+	~EngineOptions() { SAFE_DELETE(m_pDoc); }
+
+   // TiXmlElement - look at this to find other options added by the developer
+	TiXmlDocument *m_pDoc;
+
 
 	// Rendering options
-	//std::string m_Renderer;
-	//bool m_runFullSpeed;
-   int m_ScreenWidth;
-   int m_ScreenHeight;
-	//Point m_ScreenSize;
+	std::string m_Renderer;
+	bool m_runFullSpeed;
+	Point m_ScreenSize;
 
 	
 
-   void Init();
+   void Init(const char* xmlFileName);
 };
 
 

@@ -122,6 +122,7 @@
     <ClInclude Include="..\UserInterface\HumanView.h" />
     <ClInclude Include="..\Utilities\Math.h" />
     <ClInclude Include="..\Utilities\String.h" />
+    <ClInclude Include="..\Utilities\Types.h" />
     <ClInclude Include="EngineStd.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

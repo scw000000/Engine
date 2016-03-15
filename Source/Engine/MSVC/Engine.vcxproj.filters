@@ -80,5 +80,8 @@
       <Filter>Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\Multicore\CriticalSection.h" />
+    <ClInclude Include="..\Utilities\Types.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

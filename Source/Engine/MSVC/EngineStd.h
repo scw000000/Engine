@@ -14,6 +14,8 @@
 #include <windows.h>
 #include <windowsx.h>
 
+#include <crtdbg.h>
+
 // C RunTime Header Files
 #include <stdlib.h>
 
@@ -47,6 +49,15 @@ class ENG_noncopyable
       ENG_noncopyable() {}; // Default constructor  
 };  
 
+//
+// Game Code Complete - Chapter 12, page 446-447
+//This macro must placed before all of the self-defined headers
+//
+#if defined(_DEBUG)
+#	define ENG_NEW new(_NORMAL_BLOCK,__FILE__, __LINE__)
+#else
+#	define ENG_NEW new
+#endif
 
 ///////////////////////
 //3rd party INCLUDES //
@@ -59,7 +70,7 @@ class ENG_noncopyable
 // MY CLASS INCLUDES //
 ///////////////////////
 #include "..\Debugging\Logger.h"  // this should be the first of the gcc includes since it defines ENG_ASSERT()
-#include "..\Main\Engine.h"
+#include "..\Utilities\types.h"
 #include "..\Main\Interfaces.h"
 
 
@@ -76,11 +87,7 @@ extern const float SIXTY_HERTZ;
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
 
-#if defined(_DEBUG)
-#	define ENG_NEW new(_NORMAL_BLOCK,__FILE__, __LINE__)
-#else
-#	define ENG_NEW new
-#endif
+
 
 #if !defined(SAFE_DELETE)
 #define SAFE_DELETE(x) if(x) delete x; x=NULL;
@@ -108,3 +115,5 @@ extern const int SCREEN_HEIGHT;
 
 
 #endif // !ENGINESTD
+
+#include "..\Main\Engine.h"

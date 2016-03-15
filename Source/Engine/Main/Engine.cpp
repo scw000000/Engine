@@ -25,6 +25,22 @@ EngineApp::~EngineApp()
 
    }
 
+void EngineApp::Init( void )
+   {
+   if( !g_pApp )
+      {
+      ENG_NEW EngineApp();
+      }
+   }
+
+void EngineApp::InitInstance( void )
+   {
+   SDL_Init(SDL_INIT_EVERYTHING);
+   m_pGame = VCreateGameAndView();
+   m_window = SDL_CreateWindow( "Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_EngineOptions.m_ScreenSize.GetX(), m_EngineOptions.m_ScreenSize.GetY(), SDL_WINDOW_OPENGL );
+   
+   }
+
 void EngineApp::MsgProc()
    {
    SDL_Event event;
@@ -64,9 +80,6 @@ BaseGameLogic *EngineApp::VCreateGameAndView()
 
 void EngineApp::InitSystems()
    {
-   SDL_Init(SDL_INIT_EVERYTHING);
-   m_pGame = VCreateGameAndView();
-   m_window = SDL_CreateWindow( "Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, m_EngineOptions.m_ScreenWidth, m_EngineOptions.m_ScreenHeight, SDL_WINDOW_OPENGL );
    
    }
 

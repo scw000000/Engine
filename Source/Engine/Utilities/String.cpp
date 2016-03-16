@@ -186,7 +186,6 @@ HRESULT WideToAnsiCch( CHAR* strDestination, const WCHAR* wstrSource,
 {
     if( strDestination==NULL || wstrSource==NULL || cchDestChar < 1 )
         return E_INVALIDARG;
-
     int nResult = WideCharToMultiByte( CP_ACP, 0, wstrSource, -1, strDestination, 
                                        cchDestChar*sizeof(CHAR), NULL, NULL );
     strDestination[cchDestChar-1] = 0;
@@ -211,7 +210,6 @@ HRESULT GenericToAnsiCch( CHAR* strDestination, const TCHAR* tstrSource,
 {
     if( strDestination==NULL || tstrSource==NULL || cchDestChar < 1 )
         return E_INVALIDARG;
-
 #ifdef _UNICODE
     return WideToAnsiCch( strDestination, tstrSource, cchDestChar );
 #else
@@ -365,6 +363,15 @@ string ToStr(bool val)
 {
     return (string( (val == true ? "true" : "false") ));
 }
+
+string ToStr( const TCHAR * src )
+   {
+   #ifndef UNICODE  
+   return string( src );
+   #else
+   return ws2s( std::wstring( src ) );
+   #endif
+   }
 /*
 string ToStr(const Vec3& vec)
 {

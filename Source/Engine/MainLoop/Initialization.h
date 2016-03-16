@@ -3,10 +3,19 @@
 // Filename: Initailzation.h
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef _INITIALIZATION_H_
-#define _INITIALIZATION_H_
 
-
+extern bool CheckStorage(const DWORDLONG diskSpaceNeeded);
+extern DWORD ReadCPUSpeed();
+extern bool CheckMemory(const DWORDLONG physicalRAMNeeded, const DWORDLONG virtualRAMNeeded);
+/*
+L:long
+P:pointer
+C:constant
+TSTR: T string
+-> long pointer to constant T string
+*/
+extern bool IsOnlyInstance(LPCTSTR gameTitle);
+extern const TCHAR *GetSaveGameDirectory(HWND hWnd, const TCHAR *gameAppDirectory);
 
 extern bool CheckForJoystick(std::string hWnd);
 
@@ -30,4 +39,3 @@ struct EngineOptions
 };
 
 
-#endif // !_INITIALIZATION_H_

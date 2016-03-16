@@ -38,7 +38,6 @@
 //========================================================================
 
 
-
 #define MAX_DIGITS_IN_INT 12  // max number of digits in an int (-2147483647 = 11 digits, +1 for the '\0')
 typedef std::vector<std::string> StringVec;
 
@@ -70,10 +69,13 @@ extern std::string ToStr(unsigned long num, int base = 10);
 extern std::string ToStr(float num);
 extern std::string ToStr(double num);
 extern std::string ToStr(bool val);
+extern std::string ToStr( const TCHAR * src );
 //extern std::string ToStr(const Vec3& vec);
 
 extern std::string ws2s(const std::wstring& s);
 extern std::wstring s2ws(const std::string &s);
+
+
 
 // Splits a string by the delimeter into a vector of strings.  For example, say you have the following string:
 // std::string test("one,two,three");

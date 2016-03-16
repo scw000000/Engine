@@ -36,6 +36,8 @@
 #pragma comment(lib, "tinyxml.lib")
 
 
+EngineApp engineApp;
+
 int main( int argc, char *argv[] )
    {
    // Set up checks for memory leaks.
@@ -60,16 +62,12 @@ int main( int argc, char *argv[] )
    _CrtSetDbgFlag(tmpDbgFlag);
 
    Logger::Init("logging.xml");
-		
-   EngineApp::Init();
 
    g_pApp->m_EngineOptions.Init("PlayerOptions.xml");
 
-   g_pApp->InitInstance();
-
+   g_pApp->InitInstance( 0, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
    
-   
-   g_pApp->Run();
+   g_pApp->MainLoop();
 
   // g_pApp->Run();
 

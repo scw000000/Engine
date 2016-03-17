@@ -16,17 +16,16 @@
 class EngineApp
    {
    public:
-      EngineApp();
-      ~EngineApp();
-
-      HWND EngineApp::GetHwnd( SDL_Window* window );
-      virtual TCHAR *VGetGameAppDirectory(){ return _T("Engine\\base\\0.1"); };
-      void MainLoop();
-      void AbortGame() { m_bQuitting = true; }
+      EngineApp( void );
+      ~EngineApp( void );
+      
+      void MainLoop( void );
+      void AbortGame( void ) { m_bQuitting = true; }
       bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );
-      
+      Uint32  GetWindowState( void );
+      virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
+      HWND EngineApp::GetHwnd( void );
 
-      
    public:
       struct EngineOptions m_EngineOptions;
       TCHAR m_saveGameDirectory[MAX_PATH];
@@ -41,10 +40,10 @@ class EngineApp
       SDL_Window *m_window;
 
    private:
-      
-      static void MsgProc();
-      static void OnUpdateGame( double fTime, float fElapsedTime, void* pUserContext  );
-      void OnClose();
+      void MsgProc( void );
+      void OnUpdateGame( double fTime, float fElapsedTime, void* pUserContext  );
+      void FlashWhileMinized( void );
+      void OnClose( void );
       
       /* 
       Why use TCHAR? because we may support multiple languages, some of them 

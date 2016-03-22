@@ -160,7 +160,7 @@ void EngineApp::MsgProc( void )
             
          break;
 
-         // I may have to filter it out and process it independtly to prevent SDL from
+         // To do: I may have to filter it out and process it independtly to prevent SDL from
          // Close the window directly...
          case SDL_QUIT:
             // Eat it if already servicing a close

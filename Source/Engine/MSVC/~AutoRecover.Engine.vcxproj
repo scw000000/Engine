@@ -92,7 +92,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\Actors\Actor.cpp" />
     <ClCompile Include="..\Actors\ActorFactory.cpp" />
     <ClCompile Include="..\Debugging\Logger.cpp" />
     <ClCompile Include="..\MainLoop\Initialization.cpp" />
@@ -117,8 +116,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Actors\Actor.h" />
-    <ClInclude Include="..\Actors\ActorComponent.h" />
     <ClInclude Include="..\Actors\ActorFactory.h" />
     <ClInclude Include="..\Debugging\Logger.h" />
     <ClInclude Include="..\MainLoop\Initialization.h" />
@@ -130,7 +127,6 @@
     <ClInclude Include="..\UserInterface\HumanView.h" />
     <ClInclude Include="..\Utilities\Math.h" />
     <ClInclude Include="..\Utilities\String.h" />
-    <ClInclude Include="..\Utilities\templates.h" />
     <ClInclude Include="..\Utilities\Types.h" />
     <ClInclude Include="EngineStd.h" />
   </ItemGroup>

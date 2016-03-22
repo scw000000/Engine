@@ -22,6 +22,9 @@
     <Filter Include="Debugging">
       <UniqueIdentifier>{0d3f9ad9-1c50-4a03-b52b-3d332ca32710}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Actors">
+      <UniqueIdentifier>{f5a7fbb8-d2b6-4e7b-9fe2-02d1dd055082}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
@@ -48,6 +51,12 @@
     </ClCompile>
     <ClCompile Include="..\Utilities\String.cpp">
       <Filter>Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Actors\ActorFactory.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Actors\Actor.cpp">
+      <Filter>Actors</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +91,18 @@
     <ClInclude Include="..\Multicore\CriticalSection.h" />
     <ClInclude Include="..\Utilities\Types.h">
       <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Actors\ActorFactory.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Utilities\templates.h">
+      <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Actors\ActorComponent.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Actors\Actor.h">
+      <Filter>Actors</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

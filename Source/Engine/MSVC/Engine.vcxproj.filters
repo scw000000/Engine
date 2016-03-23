@@ -25,6 +25,9 @@
     <Filter Include="Actors">
       <UniqueIdentifier>{f5a7fbb8-d2b6-4e7b-9fe2-02d1dd055082}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics">
+      <UniqueIdentifier>{872bd5c0-d545-4723-832a-5b5b18951dae}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
@@ -57,6 +60,9 @@
     </ClCompile>
     <ClCompile Include="..\Actors\Actor.cpp">
       <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Geometry.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -103,6 +109,12 @@
     </ClInclude>
     <ClInclude Include="..\Actors\Actor.h">
       <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Actors\TransformComponent.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Geometry.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

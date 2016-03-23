@@ -16,8 +16,9 @@
 StrongActorPtr ActorFactory::CreateActor( const char* actorResource )
    {
    // Todo: implement XmlResourceLoader 
-   TiXmlElement *pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( actorResource );
-   
+   //TiXmlElement *pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( actorResource );
+   TiXmlElement *pRoot = NULL;
+
    // Resource loading failed, return empty pointer
    if( !pRoot )
       {
@@ -31,14 +32,14 @@ StrongActorPtr ActorFactory::CreateActor( const char* actorResource )
       ENG_ERROR( "Failed to initialize actor " + std::string( actorResource ) );
       }
    
-   for( TiXmlElement* pNode = pRoot->FirstChildElement; pNode; pNode = pNode->NextSiblingElement() )
+   for( TiXmlElement* pNode = pRoot->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
       {
-      StrongActorComponentPtr pComponent( CreateComponenr( pNode ) );
+      StrongActorComponentPtr pComponent( CreateComponent( pNode ) );
 
       if( pComponent )
          {
          pActor->AddComponent( pComponent );
-         pComponenr->SerOwner( pActor );
+         pComponent->SetOwner( pActor );
          }
       else
          {
@@ -54,7 +55,7 @@ StrongActorPtr ActorFactory::CreateActor( const char* actorResource )
 
 StrongActorComponentPtr ActorFactory::CreateComponent( TiXmlElement* pData )
    {
-   std::string name( pData->Value );
+   std::string name( pData->Value() );
 
    // Create a component from componentFactory, the Create function take Id as argument
    // Which means it will search its creation function based on id -> id is mapping to creation function
@@ -62,7 +63,7 @@ StrongActorComponentPtr ActorFactory::CreateComponent( TiXmlElement* pData )
    // std::map<IdType, ObjectCreationFunction> m_creationFunctions -> the table of creation functions 
    // ( of course these functions should be registered first )
    // Before that, the id is translated from name to id by using hash string ( GetIdFromName )
-   StrongActorComponentPtr pComponent( m_componentFactory.Create( ActorComponent::GetIdFromName( name ) ) );
+   StrongActorComponentPtr pComponent( m_componentFactory.Create( ActorComponent::GetIdFromName( name.c_str() ) ) );
    if( !pComponent )
       {
       ENG_ERROR( "Cannot create componet due to lossing creation function: " + std::string( name ) );

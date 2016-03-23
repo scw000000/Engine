@@ -70,7 +70,9 @@ extern std::string ToStr(float num);
 extern std::string ToStr(double num);
 extern std::string ToStr(bool val);
 extern std::string ToStr( const TCHAR * src );
-//extern std::string ToStr(const Vec3& vec);
+extern std::string ToStr(const Vec3& vec);
+extern std::string ToStr(const Vec4& vec);
+extern std::string ToStr(const Mat4x4& mat);
 
 extern std::string ws2s(const std::wstring& s);
 extern std::wstring s2ws(const std::string &s);

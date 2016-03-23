@@ -122,6 +122,23 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 
 	m_screenSize = Point( screenWidth, screenHeight );
 
+   SDL_GLContext glContext = SDL_GL_CreateContext( m_window );
+   if( !glContext )
+      {
+      ENG_ERROR( SDL_GetError() );
+      }
+   
+   // Needed for core profile
+   glewExperimental = true; 
+   GLenum error = glewInit();
+
+   if( error != GLEW_OK )
+      {
+      ENG_ERROR( reinterpret_cast<const char *>( gluErrorString( error ) ) );
+      }
+   // set two buffer for rendering
+   SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+
    //--------------------------------- 
    // Create window
    //--------------------------------- 

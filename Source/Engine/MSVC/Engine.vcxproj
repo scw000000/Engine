@@ -43,14 +43,14 @@
     <OutDir>$(ProjectDir)..\..\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\tinyxml;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;E:\Workspace\Engine\Source\Engine\3rdParty\GLM;$(SolutionDir)..\3rdParty\tinyxml;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)..\..\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;E:\Workspace\Engine\Source\Engine\3rdParty\GLM;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -95,6 +95,7 @@
     <ClCompile Include="..\Actors\Actor.cpp" />
     <ClCompile Include="..\Actors\ActorFactory.cpp" />
     <ClCompile Include="..\Debugging\Logger.cpp" />
+    <ClCompile Include="..\Graphics\Geometry.cpp" />
     <ClCompile Include="..\MainLoop\Initialization.cpp" />
     <ClCompile Include="..\Main\BaseGameLogic.cpp" />
     <ClCompile Include="..\Main\Engine.cpp">
@@ -120,7 +121,9 @@
     <ClInclude Include="..\Actors\Actor.h" />
     <ClInclude Include="..\Actors\ActorComponent.h" />
     <ClInclude Include="..\Actors\ActorFactory.h" />
+    <ClInclude Include="..\Actors\TransformComponent.h" />
     <ClInclude Include="..\Debugging\Logger.h" />
+    <ClInclude Include="..\Graphics\Geometry.h" />
     <ClInclude Include="..\MainLoop\Initialization.h" />
     <ClInclude Include="..\Main\BaseGameLogic.h" />
     <ClInclude Include="..\Main\Engine.h" />

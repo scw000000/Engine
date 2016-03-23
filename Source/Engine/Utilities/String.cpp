@@ -68,7 +68,7 @@ void TrimLeft(std::wstring &s)
 			break;
 		++i;
 	}
-
+   
 	if (i<len)
 		s = s.substr(i);
 }
@@ -372,13 +372,21 @@ string ToStr( const TCHAR * src )
    return ws2s( std::wstring( src ) );
    #endif
    }
-/*
-string ToStr(const Vec3& vec)
-{
-    return string("(" + ToStr(vec.x) + "," + ToStr(vec.y) + "," + ToStr(vec.z) + ")");
-}
-*/
 
+string ToStr(const Vec3& vec)
+   {
+   return string("(" + ToStr(vec.x) + "," + ToStr(vec.y) + "," + ToStr(vec.z) + ")");
+   }
+
+string ToStr(const Vec4& vec)
+   {
+   return string("(" + ToStr(vec.x) + "," + ToStr(vec.y) + "," + ToStr(vec.z) + "," + ToStr(vec.w) + ")");
+   }
+
+std::string ToStr(const Mat4x4& mat)
+   {
+   return ToStr( mat[0] ) + "\n" + ToStr( mat[1] ) + "\n" + ToStr( mat[2] ) + "\n" + ToStr( mat[3] );
+   }
 
 //---------------------------------------------------------------------------------------------------------------------
 // This is basically like the Perl split() function.  It splits str into substrings by cutting it at each delimiter.  

@@ -65,6 +65,7 @@ class ENG_noncopyable
 #include "SDL.h"
 #include "SDL_syswm.h"
 #include "GL\glew.h"
+//#include "GL\wglew.h"
 #include <tinyxml.h>
 
 ///////////////////////
@@ -72,7 +73,10 @@ class ENG_noncopyable
 ///////////////////////
 #include "..\Debugging\Logger.h"  // this should be the first of the gcc includes since it defines ENG_ASSERT()
 #include "..\Utilities\types.h"
+#include "..\Utilities\templates.h"
+#include "..\Graphics\Geometry.h"
 #include "..\Utilities\String.h"
+
 #include "..\Main\Interfaces.h"
 
 

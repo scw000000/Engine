@@ -11,49 +11,49 @@
 #include "ActorFactory.h"
 
 Actor::Actor(ActorId id)
-{
-    m_id = id;
-    m_type = "Unknown";
+   {
+   m_id = id;
+   m_type = "Unknown";
 
 	// [mrmike] added post press - this is an editor helper
 	m_resource = "Unknown";
-}
+   }
 
 Actor::~Actor(void)
-{
-    ENG_LOG("Actor", std::string("Destroying Actor ") + ToStr(m_id));
-    ENG_ASSERT(m_components.empty());  // [rez] if this assert fires, the actor was destroyed without calling Actor::Destroy()
-}
+   {
+   ENG_LOG("Actor", std::string("Destroying Actor ") + ToStr(m_id));
+   ENG_ASSERT(m_components.empty());  // [rez] if this assert fires, the actor was destroyed without calling Actor::Destroy()
+   }
 
 bool Actor::Init(TiXmlElement* pData)
-{
-    ENG_LOG("Actor", std::string("Initializing Actor ") + ToStr(m_id));
+   {
+   ENG_LOG("Actor", std::string("Initializing Actor ") + ToStr( m_id ) );
 
 	m_type = pData->Attribute("type");
 	m_resource = pData->Attribute("resource");
-    return true;
-}
+   return true;
+   }
 
 void Actor::PostInit(void)
-{
-    for (ActorComponents::iterator it = m_components.begin(); it != m_components.end(); ++it)
-    {
-        it->second->VPostInit();
-    }
-}
+   {
+   for (ActorComponents::iterator it = m_components.begin(); it != m_components.end(); ++it)
+      {
+      it->second->VPostInit();
+      }
+   }
 
 void Actor::Destroy(void)
-{
-    m_components.clear();
-}
+   {
+   m_components.clear();
+   }
 
 void Actor::Update(int deltaMs)
-{
-    for (ActorComponents::iterator it = m_components.begin(); it != m_components.end(); ++it)
-    {
-        it->second->VUpdate(deltaMs);
-    }
-}
+   {
+   for (ActorComponents::iterator it = m_components.begin(); it != m_components.end(); ++it)
+      {
+      it->second->VUpdate(deltaMs);
+      }
+   }
 
 /* 
 Not used yet ( for editor )
@@ -83,7 +83,7 @@ std::string Actor::ToXML()
 
 
 void Actor::AddComponent(StrongActorComponentPtr pComponent)
-{
-    std::pair<ActorComponents::iterator, bool> success = m_components.insert(std::make_pair(pComponent->VGetId(), pComponent));
-    ENG_ASSERT(success.second);
-}
+   {
+   std::pair<ActorComponents::iterator, bool> success = m_components.insert(std::make_pair( pComponent->VGetId(), pComponent) );
+   ENG_ASSERT(success.second);
+   }

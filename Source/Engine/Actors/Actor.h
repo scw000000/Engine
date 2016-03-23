@@ -47,4 +47,5 @@ class Actor
       ActorId m_id;
       ActorType m_type;
       ActorComponents m_components;
+      std::string m_resource;
    };

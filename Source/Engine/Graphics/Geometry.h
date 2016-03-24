@@ -16,6 +16,7 @@
 const float  ENG_PI = glm::pi<float>();
 const float  ENG_2PI = glm::two_pi<float>();
 const float  ENG_HALFPI = glm::half_pi<float>();
+const float  ENG_QUARTERPI = glm::quarter_pi<float>();
 const float  ENG_DEGREE2RADIAN = ENG_PI / 180.f;
 const float  ENG_RADIAN2DEGREE = 180.f / ENG_PI;
 
@@ -23,7 +24,7 @@ class Vec3 : public glm::vec3
    {
    public:
       Vec3() : glm::vec3() { x = 0; y = 0; z = 0; }
-      Vec3( const glm::vec3 &v3 ) { x = v3.x; y = v3.y; z = v3.z; }
+      Vec3( const glm::vec3 &v3 ) : glm::vec3( v3 ) { /*x = v3.x; y = v3.y; z = v3.z;*/ }
 	   Vec3( const float _x, const float _y, const float _z ) { x=_x; y=_y; z=_z; }
       Vec3( const double _x, const double _y, const double _z ) { x = (float)_x; y = (float)_y; z = (float)_z; }
      // Vec3( const Vec4 &v4 ) { x = v4.x; y = v4.y; z = v4.z; }
@@ -55,8 +56,8 @@ class Vec4 : public glm::vec4
    {
    public:
       Vec4() : glm::vec4() { x = 0; y = 0; z = 0; w = 0; }
-      Vec4( const glm::vec4 &v4 ){ x = v4.x; y = v4.y; z = v4.z; w = v4.w; }
-      Vec4( const glm::vec3 &v3 ){ x = v3.x; y = v3.y; z = v3.z; w = 1.0f; }
+      Vec4( const glm::vec4 &v4 ) : glm::vec4( v4 ) { /*x = v4.x; y = v4.y; z = v4.z; w = v4.w;*/ }
+      Vec4( const glm::vec3 &v3 ) { x = v3.x; y = v3.y; z = v3.z; w = 1.0f; }
       Vec4( const float _x, const float _y, const float _z, const float _w ) { x = _x; y = _y; z = _z; w = _w; }
       Vec4( const double _x, const double _y, const double _z, const double _w ) { x = (float)_x; y = (float)_y; z = (float)_z; w = (float)_w; }
 
@@ -89,7 +90,7 @@ class Mat4x4 : public glm::mat4
    {
    public:
       Mat4x4() : glm::mat4() { }
-      Mat4x4( glm::mat4 &mat) {   memcpy( this, &mat[0][0], sizeof(mat)); }
+      Mat4x4( glm::mat4 &mat) : glm::mat4( mat ) { }
 
       inline void SetPosition( Vec3 const &pos )
          {
@@ -129,3 +130,57 @@ class Mat4x4 : public glm::mat4
    };
 
 inline void Quaternion::Build44Matrix( const Mat4x4& mat ) { *this = glm::quat_cast( mat ); }
+
+class Plane
+   {
+   public:
+      Plane() { };
+      Plane( const Vec3& p0, const Vec3& p1, const Vec3& p2 )
+         {
+         n = glm::cross( p1 - p0, p2 - p0 );
+         // for plane ax + by + cz + w = 0; w = -( ax + by + cz ) = - dot( n, point one plane )
+         float ddd = n.Dot( p0 );
+         Normalize();
+         }
+      // constructor based on coefficient
+      Plane( const float a, const float b, const float c, const float w ) : n( a, b, c ), d( w )  { }
+      void Normalize() { float lengthInv = n.Length(); n *= lengthInv; d *= lengthInv; }
+      // Inside is defined as same side of normal
+      bool Inside( Vec3 p );
+      // Inside is defined as same side of normal, radius means it is a sphere
+      bool Inside( Vec3 p, const float radius );
+
+   public:
+      // normatl vector
+      Vec3 n;
+      // distance
+      float d;
+   };
+
+class Frustum
+   {
+   public:
+      Frustum( void );
+      bool Inside( const Vec3 &point );
+      // return if a shpere is inside the frustum
+      bool Inside( const Vec3 &point, float radius );
+      void Init( const float fov, const float aspect, const float nearClipDis, const float farClipDis );
+   private:
+      enum Side { Near, Far, Top, Right, Bottom, Left, NumPlanes };
+
+      Plane m_Planes[ NumPlanes ];
+      // represent four vertices for near plane rectangle
+      Vec3 m_NearPlaneVerts[4];
+      // represenr four vertices for far plane rectangle 
+      Vec3 m_FarPlaneVerts[4];
+
+      // field of view in radians
+      float m_Fov;
+      // width divided by height
+      float m_Aspect;
+      // near plane distance
+      float m_NearDis;
+      // far plane distance
+      float m_FarDis;
+
+   };

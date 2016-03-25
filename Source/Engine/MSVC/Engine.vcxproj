@@ -94,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="..\Actors\Actor.cpp" />
     <ClCompile Include="..\Actors\ActorFactory.cpp" />
+    <ClCompile Include="..\Actors\TransformComponent.cpp" />
     <ClCompile Include="..\Debugging\Logger.cpp" />
     <ClCompile Include="..\Graphics\Geometry.cpp" />
     <ClCompile Include="..\MainLoop\Initialization.cpp" />

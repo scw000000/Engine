@@ -3,7 +3,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "EngineStd.h"
-/*
 
 //
 // Colors are discussed in Chapter 13, page 453
@@ -19,9 +18,6 @@ Color g_Gray40( 0.4f, 0.4f, 0.4f, fOPAQUE );
 Color g_Gray25( 0.25f, 0.25f, 0.25f, fOPAQUE );
 Color g_Gray65( 0.65f, 0.65f, 0.65f, fOPAQUE );
 Color g_Transparent (1.0f, 0.0f, 1.0f, fTRANSPARENT );
-
-
-*/
 
 // Note! If you change these direction vectors around to suit yourself
 // Make sure you change it so it retains a left handed

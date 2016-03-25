@@ -68,6 +68,8 @@ class ENG_noncopyable
 //#include "GL\wglew.h"
 #include <tinyxml.h>
 
+
+
 ///////////////////////
 // MY CLASS INCLUDES //
 ///////////////////////
@@ -78,6 +80,18 @@ class ENG_noncopyable
 #include "..\Utilities\String.h"
 
 #include "..\Main\Interfaces.h"
+
+extern Color g_White;
+extern Color g_Black;
+extern Color g_Cyan;
+extern Color g_Red;
+extern Color g_Green;
+extern Color g_Blue;
+extern Color g_Yellow;
+extern Color g_Gray40;
+extern Color g_Gray25;
+extern Color g_Gray65;
+extern Color g_Transparent;
 
 extern Vec3 g_Up;
 extern Vec3 g_Right;

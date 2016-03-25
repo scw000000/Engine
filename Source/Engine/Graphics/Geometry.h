@@ -17,8 +17,12 @@ const float  ENG_PI = glm::pi<float>();
 const float  ENG_2PI = glm::two_pi<float>();
 const float  ENG_HALFPI = glm::half_pi<float>();
 const float  ENG_QUARTERPI = glm::quarter_pi<float>();
-const float  ENG_DEGREE2RADIAN = ENG_PI / 180.f;
-const float  ENG_RADIAN2DEGREE = 180.f / ENG_PI;
+
+const float  ENG_DEGREES_OVER_RADIANS = 180.0f / ENG_PI;
+const float  ENG_RADIANS_OVER_DEGREES = ENG_PI / 180.0f;
+
+#define RADIANS_TO_DEGREES(x) ((x) * ENG_DEGREES_OVER_RADIANS )
+#define DEGREES_TO_RADIANS(x) ((x) * ENG_RADIANS_OVER_DEGREES )
 
 class Vec3 : public glm::vec3
    {
@@ -50,7 +54,9 @@ class Vec3 : public glm::vec3
    private:
    };
 
-
+extern Vec3 g_Up;
+extern Vec3 g_Right;
+extern Vec3 g_Forward;
 
 class Vec4 : public glm::vec4
    {
@@ -68,10 +74,14 @@ class Vec4 : public glm::vec4
 
 inline Vec3::Vec3( const class Vec4 &v4 ) { x = v4.x; y = v4.y; z = v4.z; }
 
+extern Vec4 g_Up4;
+extern Vec4 g_Right4;
+extern Vec4 g_Forward4;
+
 class Quaternion : public glm::fquat
    {
    public:
-      Quaternion() : glm::fquat() { }
+      Quaternion( void ) : glm::fquat() { }
       Quaternion( glm::fquat &q) : glm::fquat(q) { }
 
       void Normalize() { *this = glm::normalize<float, glm::highp>( *this ); }
@@ -81,7 +91,7 @@ class Quaternion : public glm::fquat
       void BuildAxisRadian( const Vec3& axis, const float& radian ) { *this = glm::angleAxis( radian, axis ); }
       void BuildYawPitchRoll( const float yawRadians, const float pitchRadians, const float rollRadians ) { *this = glm::fquat( Vec3( yawRadians, pitchRadians, rollRadians ) ); }
       void Build44Matrix( const class Mat4x4& mat );
-
+      
    public:
 	   static const Quaternion g_Identity;
    }; 
@@ -101,8 +111,10 @@ class Mat4x4 : public glm::mat4
          (*this)[3] = pos;
          }
       inline Vec3 GetPosition() const { return Vec3( (*this)[3] ); }
-      inline Vec4 Xfrom( const Vec4 &v ) const { return (*this) * v; }
-      inline Vec3 Xfrom( const Vec3 &v ) const { return Vec3( Xfrom( Vec4( v ) ) ); }
+      inline Vec3 GetDirection() const;
+      inline Vec3 Mat4x4::GetYawPitchRoll() const;
+      inline Vec4 Xform( const Vec4 &v ) const { return (*this) * v; }
+      inline Vec3 Xform( const Vec3 &v ) const { return Vec3( Xform( Vec4( v ) ) ); }
       inline Mat4x4 Inverse() const { return glm::inverse( *this ); }
       // glm matrix is column major order
       inline void BuildTranslation( const Vec3 &pos ) {
@@ -129,13 +141,88 @@ class Mat4x4 : public glm::mat4
       static const Mat4x4 g_Identity;
    };
 
+inline Vec3 Mat4x4::GetDirection() const
+   {
+   // Note - the following code can be used to double check the vector construction above.
+	Mat4x4 justRot = *this;
+	justRot.SetPosition(Vec3(0.f,0.f,0.f));
+	Vec3 forward = justRot.Xform(g_Forward);
+	return forward;
+   }
+
 inline void Quaternion::Build44Matrix( const Mat4x4& mat ) { *this = glm::quat_cast( mat ); }
+
+inline Vec3 Mat4x4::GetYawPitchRoll() const
+{
+   float yaw, pitch, roll;
+	
+   pitch = asin( -(*this)[2][3] );
+
+   double threshold = 0.001; // Hardcoded constant - burn him, he's a witch
+   double test = cos(pitch);
+
+   if(test > threshold) 
+   {
+      roll = atan2( (*this)[2][1] , (*this)[2][2] );
+      yaw = atan2(  (*this)[1][3] , (*this)[3][3] );
+   }
+   else 
+   {
+      roll = atan2( -(*this)[1][2] , (*this)[1][1]  );
+      yaw = 0.0;
+   }
+
+	return ( Vec3(yaw, pitch, roll) );
+}
+
+typedef struct Color
+   {
+   public:
+    Color();
+    Color( const Color& color );
+    Color( const float * );
+    Color( float red, float green, float blue, float alpha );
+
+    
+    // casting
+    operator DWORD () const;
+
+    // assignment operators
+    Color& operator += ( const Color& );
+    Color& operator -= ( const Color& );
+    Color& operator *= ( float );
+    Color& operator /= ( float );
+
+    // unary operators
+    Color operator + () const;
+    Color operator - () const;
+
+    // binary operators
+    Color operator + ( const Color& ) const;
+    Color operator - ( const Color& ) const;
+    Color operator * ( float ) const;
+    Color operator / ( float ) const;
+
+    friend Color operator * ( float, const Color& );
+
+    bool operator == ( const Color& ) const;
+    bool operator != ( const Color& ) const;
+
+   public:
+      float r;
+      float g;
+      float b;
+      float a;
+   
+   private:
+      void Satuate();
+   }Color;
 
 class Plane
    {
    public:
-      Plane() { };
-      Plane( const Vec3& p0, const Vec3& p1, const Vec3& p2 )
+      Plane( void ) { n = g_Up; d = 0.f; };
+      void Init( const Vec3& p0, const Vec3& p1, const Vec3& p2 )
          {
          n = glm::cross( p1 - p0, p2 - p0 );
          // for plane ax + by + cz + w = 0; w = -( ax + by + cz ) = - dot( n, point one plane )
@@ -144,7 +231,7 @@ class Plane
          }
       // constructor based on coefficient
       Plane( const float a, const float b, const float c, const float w ) : n( a, b, c ), d( w )  { }
-      void Normalize() { float lengthInv = n.Length(); n *= lengthInv; d *= lengthInv; }
+      void Normalize() { float lengthInv = 1.0f / n.Length(); n *= lengthInv; d *= lengthInv; }
       // Inside is defined as same side of normal
       bool Inside( Vec3 p );
       // Inside is defined as same side of normal, radius means it is a sphere
@@ -161,10 +248,16 @@ class Frustum
    {
    public:
       Frustum( void );
+      void Init( const float fov, const float aspect, const float nearClipDis, const float farClipDis );
       bool Inside( const Vec3 &point );
       // return if a shpere is inside the frustum
       bool Inside( const Vec3 &point, float radius );
-      void Init( const float fov, const float aspect, const float nearClipDis, const float farClipDis );
+      
+      void SetFOV(float fov) { m_Fov=fov; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
+	   void SetAspect(float aspect) { m_Aspect=aspect; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
+	   void SetNear(float nearClip) { m_NearDis=nearClip; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
+	   void SetFar(float farClip) { m_FarDis=farClip; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
+
    private:
       enum Side { Near, Far, Top, Right, Bottom, Left, NumPlanes };
 

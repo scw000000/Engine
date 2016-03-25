@@ -72,16 +72,23 @@ int main( int argc, char *argv[] )
    Vec3 v2( 1.0, 1.0, 1.0 );
   // std::cout << ToStr( v1 ) << std::endl;
    Mat4x4 m1( glm::mat4( 1.0f ) );
+   Quaternion aaa;
+   m1.BuildYawPitchRoll(  DEGREES_TO_RADIANS(0.0f), DEGREES_TO_RADIANS(0.f), DEGREES_TO_RADIANS(90.f) );
+   std::cout << ToStr( m1 ) << std::endl;
+  // m1.BuildYawPitchRoll(  DEGREES_TO_RADIANS(10.0f), DEGREES_TO_RADIANS(20.f), DEGREES_TO_RADIANS(30.f) );
+   Vec3 v3 = ENG_DEGREES_OVER_RADIANS * ( m1.GetYawPitchRoll() );
+   std::cout << ToStr( v3 ) << std::endl;
+   /*
    std::cout << ToStr( m1 ) << std::endl;
    m1.BuildTranslation( v1 );
    std::cout << ToStr( m1 ) << std::endl;
-   std::cout << ToStr( m1.Xfrom( v2 ) ) << std::endl;
-   m1.SetPosition( m1.Xfrom( v2 ) );
+   std::cout << ToStr( m1.Xform( v2 ) ) << std::endl;
+   m1.SetPosition( m1.Xform( v2 ) );
    std::cout << ToStr( m1 ) << std::endl;
    Mat4x4 m2( m1 );
    std::cout << ToStr( m2 ) << std::endl;
    m1.BuildRotationX( ENG_PI );
-   std::cout << ToStr( m1.Xfrom( Vec3( 0.0f, 1.0f, 0.0f ) ) ) << std::endl;
+   std::cout << ToStr( m1.Xform( Vec3( 0.0f, 1.0f, 0.0f ) ) ) << std::endl;*/
  //  std::cout << ToStr( v1.Cross( v2 ) ) << std::endl;
  //  std::cout << ToStr( v1.Dot( v2 ) ) << std::endl;
 //std::cout << ToStr( v1.Length() ) << std::endl;

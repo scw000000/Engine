@@ -9,7 +9,7 @@
 //---------------------------------------------------------------------------------------------------------------------
 
 // Todo: implement basic math structure matrix and vector
-/*
+
 class TransformComponent : public ActorComponent
    {
    
@@ -19,7 +19,7 @@ class TransformComponent : public ActorComponent
 
       TransformComponent(void) : m_transform(Mat4x4::g_Identity) { }
       virtual bool VInit(TiXmlElement* pData) override;
-      virtual TiXmlElement* VGenerateXml(void) override;
+   //   virtual TiXmlElement* VGenerateXml(void) override;
 
    // transform functions
       Mat4x4 GetTransform(void) const { return m_transform; }
@@ -31,4 +31,4 @@ class TransformComponent : public ActorComponent
    private:
       Mat4x4 m_transform;
    };
-*/
+

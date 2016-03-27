@@ -17,7 +17,7 @@ class TransformComponent : public ActorComponent
 	   static const char* g_Name;
 	   virtual const char* VGetName() const { return g_Name; }
 
-      TransformComponent(void) : m_transform(Mat4x4::g_Identity) { }
+      TransformComponent(void) : m_transform( Mat4x4::g_Identity ) { }
       virtual bool VInit(TiXmlElement* pData) override;
    //   virtual TiXmlElement* VGenerateXml(void) override;
 

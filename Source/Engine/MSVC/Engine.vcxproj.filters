@@ -67,6 +67,15 @@
     <ClCompile Include="..\Actors\TransformComponent.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
+    <ClCompile Include="..\MainLoop\Process.cpp">
+      <Filter>MainLoop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MainLoop\ProcessManager.cpp">
+      <Filter>MainLoop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\MainLoop\Timer.cpp">
+      <Filter>MainLoop</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -118,6 +127,15 @@
     </ClInclude>
     <ClInclude Include="..\Graphics\Geometry.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MainLoop\Process.h">
+      <Filter>MainLoop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MainLoop\ProcessManager.h">
+      <Filter>MainLoop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\MainLoop\Timer.h">
+      <Filter>MainLoop</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

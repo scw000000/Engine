@@ -143,6 +143,9 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    // Create window
    //--------------------------------- 
 
+   // Start global timer
+   GetGlobalTimer()->Reset();
+
    // initialize the directory location you can store save game files
 	_tcscpy_s( m_saveGameDirectory, GetSaveGameDirectory( GetHwnd(), VGetGameAppDirectory() ) );
    //--------------------------------- 
@@ -177,15 +180,8 @@ void EngineApp::MsgProc( void )
             
          break;
 
-         // To do: I may have to filter it out and process it independtly to prevent SDL from
-         // Close the window directly...
          case SDL_QUIT:
-            // Eat it if already servicing a close
-			   if ( m_bQuitRequested )
-               {
-               return;
-               }
-            OnClose();
+
             m_bQuitRequested = true;
             m_bQuitting = true;
 			   return;
@@ -212,6 +208,15 @@ void EngineApp::MsgProc( void )
       }// If poll event exist
    }// Function MsgProc
 
+int EngineApp::EventFilter( void* userdata, SDL_Event* event)
+   {
+   if( event->type == SDL_QUIT )
+      {
+      return 0;
+      }
+   return 1;
+   }
+
 BaseGameLogic *EngineApp::VCreateGameAndView( void )
    {
    m_pGame = ENG_NEW BaseGameLogic();
@@ -225,16 +230,23 @@ BaseGameLogic *EngineApp::VCreateGameAndView( void )
 
 void EngineApp::MainLoop( void )
    {
-   while( !m_bQuitRequested  )
+   double fAppTime = 0.0;
+   double fAbsoluteTime = 0.0;
+   float  fElapasedTime = 0.0f;
+   while( !m_bQuitting  )
       {
       MsgProc();
+      
+      GetGlobalTimer()->GetTimeValues( &fAppTime, &fAbsoluteTime, &fElapasedTime );
 
-      OnUpdateGame( 0.0f, 0.0f, NULL );
+      OnUpdateGame( fAppTime, fElapasedTime );
        
       }
+
+   OnClose();
    }
 
-void EngineApp::OnUpdateGame( double fTime, float fElapsedTime, void* pUserContext  )
+void EngineApp::OnUpdateGame( double fTime, float fElapsedTime )
    {
 	if ( m_bQuitting )
 	   {
@@ -316,8 +328,6 @@ void EngineApp::OnClose()
 	SAFE_DELETE( m_pGame );
    SDL_DestroyWindow( m_window );
    /*
-	DestroyWindow(GetHwnd());
-
 	VDestroyNetworkEventForwarder();
 
 	SAFE_DELETE(m_pBaseSocketManager);

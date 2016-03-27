@@ -68,13 +68,14 @@ int main( int argc, char *argv[] )
    g_pApp->m_EngineOptions.Init("PlayerOptions.xml");
 
    g_pApp->InitInstance( 0, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
-   Vec3 v1( 1.0, 2.0, 3.0 );
+   Vec3 v1( 1.0f, 0.0f, 0.0f );
    Vec3 v2( 1.0, 1.0, 1.0 );
   // std::cout << ToStr( v1 ) << std::endl;
    Mat4x4 m1( glm::mat4( 1.0f ) );
    Quaternion aaa;
-   m1.BuildYawPitchRoll(  DEGREES_TO_RADIANS(0.0f), DEGREES_TO_RADIANS(0.f), DEGREES_TO_RADIANS(90.f) );
-   std::cout << ToStr( m1 ) << std::endl;
+   m1.BuildYawPitchRoll(  DEGREES_TO_RADIANS(10.0f), DEGREES_TO_RADIANS(-20.f), DEGREES_TO_RADIANS(90.f) );
+   //std::cout << ToStr( m1 ) << std::endl;
+   std::cout << ToStr( m1.Xform( v1 ) ) << std::endl;
   // m1.BuildYawPitchRoll(  DEGREES_TO_RADIANS(10.0f), DEGREES_TO_RADIANS(20.f), DEGREES_TO_RADIANS(30.f) );
    Vec3 v3 = ENG_DEGREES_OVER_RADIANS * ( m1.GetYawPitchRoll() );
    std::cout << ToStr( v3 ) << std::endl;

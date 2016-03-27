@@ -78,8 +78,8 @@ class ENG_noncopyable
 #include "..\Utilities\templates.h"
 #include "..\Graphics\Geometry.h"
 #include "..\Utilities\String.h"
-
 #include "..\Main\Interfaces.h"
+#include "..\MainLoop\Timer.h"
 
 extern Color g_White;
 extern Color g_Black;

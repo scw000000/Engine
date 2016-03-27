@@ -20,9 +20,9 @@ Color g_Gray65( 0.65f, 0.65f, 0.65f, fOPAQUE );
 Color g_Transparent (1.0f, 0.0f, 1.0f, fTRANSPARENT );
 
 // Note! If you change these direction vectors around to suit yourself
-// Make sure you change it so it retains a left handed
+// Make sure you change it so it retains a right handed
 // coordinate system 
-Vec3 g_Right(1.0f, 0.0f, 0.0f);
+Vec3 g_Right(-1.0f, 0.0f, 0.0f);
 Vec3 g_Up(0.0f, 1.0f, 0.0f);
 Vec3 g_Forward(0.0f, 0.0f, 1.0f);
 

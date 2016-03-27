@@ -1,5 +1,8 @@
 #pragma once
 
+///////////////////////
+// MY CLASS INCLUDES //
+///////////////////////
 #include "EngineStd.h"
 #include "TransformComponent.h"
 

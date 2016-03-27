@@ -2,8 +2,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Filename: Engine.h
 ////////////////////////////////////////////////////////////////////////////////
-#ifndef _ENGINE_H_
-#define _ENGINE_H_
+
 
 ///////////////////////
 // MY CLASS INCLUDES //
@@ -21,16 +20,21 @@ class EngineApp
       
       void MainLoop( void );
       void AbortGame( void ) { m_bQuitting = true; }
-      bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );
       Uint32  GetWindowState( void );
+      BaseGameLogic* GetGameLogic(void) const { return m_pGame; }
+      
+      bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );
       virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
       HWND EngineApp::GetHwnd( void );
+      BaseGameLogic* VCreateGameAndView();
 
    public:
       struct EngineOptions m_EngineOptions;
       TCHAR m_saveGameDirectory[MAX_PATH];
       BaseGameLogic *m_pGame;
       
+   protected:
+      void FlashWhileMinized( void );
 
    protected:
       bool m_bIsRunning;
@@ -41,8 +45,10 @@ class EngineApp
 
    private:
       void MsgProc( void );
-      void OnUpdateGame( double fTime, float fElapsedTime, void* pUserContext  );
-      void FlashWhileMinized( void );
+      int EventFilter( void* userdata, SDL_Event* event);
+
+      void OnUpdateGame( double fTime, float fElapsedTime );
+      
       void OnClose( void );
       
       /* 
@@ -53,13 +59,11 @@ class EngineApp
       if we are using Unicode
       http://www.codeproject.com/Articles/76252/What-are-TCHAR-WCHAR-LPSTR-LPWSTR-LPCTSTR-etc
       */
-      virtual TCHAR *VGetGameTitle() { return _T("Engine"); };
-      BaseGameLogic *VCreateGameAndView();
-      BaseGameLogic* GetGameLogic(void) const { return m_pGame; }
+      virtual TCHAR* VGetGameTitle() { return _T("Engine"); };
+      
+      
    private:
  
    };
 
 extern EngineApp *g_pApp;
-
-#endif

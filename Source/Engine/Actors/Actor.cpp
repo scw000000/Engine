@@ -19,6 +19,7 @@ Actor::Actor(ActorId id)
 	m_resource = "Unknown";
    }
 
+// The actor should call Destroy() before calling destructor
 Actor::~Actor(void)
    {
    ENG_LOG("Actor", std::string("Destroying Actor ") + ToStr(m_id));
@@ -42,8 +43,10 @@ void Actor::PostInit(void)
       }
    }
 
+// Once these pointers are deleted from map, it will delete itself automatically
 void Actor::Destroy(void)
    {
+   // Call map::clear
    m_components.clear();
    }
 

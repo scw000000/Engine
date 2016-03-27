@@ -132,6 +132,8 @@ class Mat4x4 : public glm::mat4
       inline void BuildRotationX( const float radians ) { *this = glm::rotate( radians , glm::vec3( 1.0f, 0.0f, 0.0f ) ); }
       inline void BuildRotationY( const float radians ) { *this = glm::rotate( radians , glm::vec3( 0.0f, 1.0f, 0.0f ) ); }
       inline void BuildRotationZ( const float radians ) { *this = glm::rotate( radians , glm::vec3( 0.0f, 0.0f, 1.0f ) ); }
+      // Rotate around counterclockwise direction, 
+      // Yaw->Yaxis, Pitch->Xaxis, Roll->Zaxis
       inline void BuildYawPitchRoll( const float yawRadians, const float pitchRadians, const float rollRadians )
          { *this = glm::eulerAngleYXZ( yawRadians, pitchRadians, rollRadians ); }
       // Todo: implement quat class first
@@ -156,19 +158,19 @@ inline Vec3 Mat4x4::GetYawPitchRoll() const
 {
    float yaw, pitch, roll;
 	
-   pitch = asin( -(*this)[2][3] );
+   pitch = asin( -(*this)[2][1] );
 
    double threshold = 0.001; // Hardcoded constant - burn him, he's a witch
    double test = cos(pitch);
 
    if(test > threshold) 
    {
-      roll = atan2( (*this)[2][1] , (*this)[2][2] );
-      yaw = atan2(  (*this)[1][3] , (*this)[3][3] );
+      roll = atan2( (*this)[0][1] , (*this)[1][1] );
+      yaw = atan2(  (*this)[2][0] , (*this)[2][2] );
    }
    else 
    {
-      roll = atan2( -(*this)[1][2] , (*this)[1][1]  );
+      roll = atan2( -(*this)[1][0] , (*this)[0][0]  );
       yaw = 0.0;
    }
 

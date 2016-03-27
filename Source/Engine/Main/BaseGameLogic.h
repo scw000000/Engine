@@ -4,39 +4,36 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-//#include "EngineStd.h"
 #include "..\Main\Interfaces.h"
-//typedef std::map<ActorId, StrongActorPtr> ActorMap;
-
-
+typedef std::map<ActorId, StrongActorPtr> ActorMap;
 
 class BaseGameLogic : public IGameLogic
-{
+   {
 	friend class EngineApp;						// This is only to gain access to the view list
 
-protected:
-	//GCCRandom m_random;								// our RNG
-	//ActorMap m_actors;
-	ActorId m_LastActorId;
-//	BaseGameState m_State;							// game state: loading, running, etc.
-	int m_ExpectedPlayers;							// how many local human players
-	int m_ExpectedRemotePlayers;					// expected remote human players
-	int m_ExpectedAI;								// how many AI players
-	int m_HumanPlayersAttached;
-	int m_AIPlayersAttached;
-	int m_HumanGamesLoaded;
-	GameViewList m_gameViews;						// views that are attached to our game
+   protected:
+	   //GCCRandom m_random;								// our RNG
+	   ActorMap m_actors;
+	   ActorId m_LastActorId;
+   //	BaseGameState m_State;							// game state: loading, running, etc.
+	   int m_ExpectedPlayers;							// how many local human players
+	   int m_ExpectedRemotePlayers;					// expected remote human players
+	   int m_ExpectedAI;								// how many AI players
+	   int m_HumanPlayersAttached;
+	   int m_AIPlayersAttached;
+	   int m_HumanGamesLoaded;
+	   GameViewList m_gameViews;						// views that are attached to our game
       
-public:
+   public:
    
-	BaseGameLogic();
-	virtual ~BaseGameLogic();
-    bool Init(void);
+	   BaseGameLogic();
+	   virtual ~BaseGameLogic();
+      bool Init(void);
 
-	ActorId GetNewActorID( void )
-	{
+	   ActorId GetNewActorID( void )
+	   {
 		return ++m_LastActorId;
-	}
+	   }
 	
 	virtual void VAddView(shared_ptr<IGameView> pView, ActorId actorId=INVALID_ACTOR_ID);
 	//virtual void VRemoveView(shared_ptr<IGameView> pView);
@@ -50,8 +47,8 @@ public:
 	virtual void VMoveActor(const ActorId id, Mat4x4 const &mat) {}
 
    */
-protected:
+   protected:
 
-};
+   };
 
 

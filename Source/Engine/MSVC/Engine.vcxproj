@@ -98,6 +98,9 @@
     <ClCompile Include="..\Debugging\Logger.cpp" />
     <ClCompile Include="..\Graphics\Geometry.cpp" />
     <ClCompile Include="..\MainLoop\Initialization.cpp" />
+    <ClCompile Include="..\MainLoop\Process.cpp" />
+    <ClCompile Include="..\MainLoop\ProcessManager.cpp" />
+    <ClCompile Include="..\MainLoop\Timer.cpp" />
     <ClCompile Include="..\Main\BaseGameLogic.cpp" />
     <ClCompile Include="..\Main\Engine.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EngineStd.h</PrecompiledHeaderFile>
@@ -126,6 +129,9 @@
     <ClInclude Include="..\Debugging\Logger.h" />
     <ClInclude Include="..\Graphics\Geometry.h" />
     <ClInclude Include="..\MainLoop\Initialization.h" />
+    <ClInclude Include="..\MainLoop\Process.h" />
+    <ClInclude Include="..\MainLoop\ProcessManager.h" />
+    <ClInclude Include="..\MainLoop\Timer.h" />
     <ClInclude Include="..\Main\BaseGameLogic.h" />
     <ClInclude Include="..\Main\Engine.h" />
     <ClInclude Include="..\Main\Interfaces.h" />

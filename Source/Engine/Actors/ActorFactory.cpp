@@ -3,13 +3,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-//////////////
-// INCLUDES //
-//////////////
+///////////////////////
+// MY CLASS INCLUDES //  
+///////////////////////
 #include "EngineStd.h"
 #include "ActorFactory.h"
 #include "Actor.h"
 #include "ActorComponent.h"
+
+ActorFactory::ActorFactory( void )
+   {
+   m_lastActorId = INVALID_ACTOR_ID;
+   }
 
 // This version of function is different than the source code
 // Including function arguments
@@ -51,6 +56,29 @@ StrongActorPtr ActorFactory::CreateActor( const char* actorResource )
    pActor->PostInit();
 
    return pActor;
+   }
+
+void ActorFactory::ModifyActor(StrongActorPtr pActor, TiXmlElement* overrides)
+   {
+	// Loop through each child element and load the component
+	for (TiXmlElement* pNode = overrides->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement())
+	   {
+		ComponentId componentId = ActorComponent::GetIdFromName( pNode->Value() );
+		StrongActorComponentPtr pComponent = MakeStrongPtr( pActor->GetComponent<ActorComponent>( componentId ) );
+		if (pComponent)
+		   {
+			pComponent->VInit( pNode );
+		   }
+		else
+		   {
+			pComponent = CreateComponent( pNode );
+			if (pComponent)
+			   {
+				pActor->AddComponent(pComponent);
+				pComponent->SetOwner(pActor);
+			   }
+		   }
+	   }  		
    }
 
 StrongActorComponentPtr ActorFactory::CreateComponent( TiXmlElement* pData )

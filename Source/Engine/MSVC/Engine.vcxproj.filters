@@ -28,6 +28,9 @@
     <Filter Include="Graphics">
       <UniqueIdentifier>{872bd5c0-d545-4723-832a-5b5b18951dae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ResourceCache">
+      <UniqueIdentifier>{824d2cd5-53c1-4719-a4fa-c3d973385592}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
@@ -75,6 +78,9 @@
     </ClCompile>
     <ClCompile Include="..\MainLoop\Timer.cpp">
       <Filter>MainLoop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ResourceCache\ZipFile.cpp">
+      <Filter>ResourceCache</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -136,6 +142,9 @@
     </ClInclude>
     <ClInclude Include="..\MainLoop\Timer.h">
       <Filter>MainLoop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ResourceCache\ZipFile.h">
+      <Filter>ResourceCache</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

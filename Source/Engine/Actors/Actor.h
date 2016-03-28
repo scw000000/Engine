@@ -30,13 +30,16 @@ class Actor
             {
             // Get component ptr as class actor component
             // We need to down cast it to specific actor component class
-            StrongActorPtrComponentPtr pBase( findIt->second );
+            StrongActorComponentPtr pBase( findIt->second );
             shared_ptr<ComponenType> pSub( std::static_pointer_cast<ComponenType>( pBase ) );
             // transfer it to weak ptr
             weak_ptr<ComponenType> pWeakSub( pSub );
             return pWeakSub;
             }
-         
+         else
+            {
+            return weak_ptr<ComponenType>();
+            }
          }
    private:
       void AddComponent( StrongActorComponentPtr pComponent );

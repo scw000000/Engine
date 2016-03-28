@@ -25,7 +25,7 @@ EngineOptions::EngineOptions()
 	m_Renderer = "Direct3D 9";
 	m_runFullSpeed = false;
 	m_ScreenSize = Point(1024,768);
-
+   m_numAIs = 0;
 	m_pDoc = NULL;
    }
 
@@ -79,6 +79,14 @@ void EngineOptions::Init(const char* xmlFileName)
 				attribute = pNode->Attribute("runfullspeed");
 				m_runFullSpeed = (attribute == "yes") ? true : false;
 			   }
+
+		   }
+
+      pNode = pRoot->FirstChildElement("Multiplayer"); 
+		if (pNode)
+		   {
+			m_numAIs = atoi(pNode->Attribute("numAIs"));
+			m_maxAIs = atoi(pNode->Attribute("maxAIs"));
 		   }
 
 	   }

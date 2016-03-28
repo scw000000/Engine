@@ -7,11 +7,13 @@
 typedef unsigned long AcotrId;
 typedef shared_ptr<Actor> StrongActorPtr;
 typedef shared_ptr<ActorComponent> StrongActorComponentPtr;
+
 class ActorFactory
    {
    public:
       ActorFactory( void );
       StrongActorPtr CreateActor( const char *actorResource );
+      void ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides );
 
    protected:
       virtual StrongActorComponentPtr CreateComponent( TiXmlElement* pData );

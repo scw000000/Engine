@@ -9,6 +9,11 @@
 #include "ProcessManager.h"
 
 
+ProcessManager::~ProcessManager(void)
+   {
+   ClearAllProcesses();
+   }
+
 unsigned int ProcessManager::UpdateProcesses( unsigned long deltaMs )
    {
    unsigned short int successCount = 0;
@@ -76,5 +81,10 @@ WeakProcessPtr ProcessManager::AttachProcess( StrongProcessPtr pProcess )
    {
 	m_processList.push_front(pProcess);
    return WeakProcessPtr(pProcess);
+   }
+
+void ProcessManager::ClearAllProcesses( void )
+   {
+   m_processList.clear();
    }
 

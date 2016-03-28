@@ -164,6 +164,13 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    return true;
    }
 
+bool EngineApp::VLoadGame(void)
+   {
+   // Read the game options and see what the current game
+   // needs to be - all of the game graphics are initialized by now, too...
+	return m_pGame->VLoadGame( m_EngineOptions.m_Level.c_str() );
+   }
+
 Uint32 EngineApp::GetWindowState( void )
    {
    return SDL_GetWindowFlags( m_window );
@@ -208,22 +215,14 @@ void EngineApp::MsgProc( void )
       }// If poll event exist
    }// Function MsgProc
 
-int EngineApp::EventFilter( void* userdata, SDL_Event* event)
-   {
-   if( event->type == SDL_QUIT )
-      {
-      return 0;
-      }
-   return 1;
-   }
-
 BaseGameLogic *EngineApp::VCreateGameAndView( void )
    {
    m_pGame = ENG_NEW BaseGameLogic();
    m_pGame->Init();
 
-	shared_ptr<IGameView> menuView(ENG_NEW HumanView());
-	m_pGame->VAddView(menuView);
+   shared_ptr<IGameView> menuView;
+	//shared_ptr<IGameView> menuView( ENG_NEW HumanView() );
+	// m_pGame->VAddView( menuView );
 
 	return m_pGame;
    }
@@ -240,7 +239,9 @@ void EngineApp::MainLoop( void )
       GetGlobalTimer()->GetTimeValues( &fAppTime, &fAbsoluteTime, &fElapasedTime );
 
       OnUpdateGame( fAppTime, fElapasedTime );
-       
+      
+      OnFrameRender( fAppTime, fElapasedTime );
+
       }
 
    OnClose();
@@ -258,8 +259,13 @@ void EngineApp::OnUpdateGame( double fTime, float fElapsedTime )
 	   if (m_pGame)
 	   {
      //   IEventManager::Get()->VUpdate(20); // allow event queue to process for up to 20 ms
-		//g_pApp->m_pGame->VOnUpdate(float(fTime), fElapsedTime);
+		g_pApp->m_pGame->VOnUpdate(float(fTime), fElapsedTime);
 	   }
+   }
+
+void EngineApp::OnFrameRender( double fTime, float fElapsedTime )
+   {
+   
    }
 
 void EngineApp::FlashWhileMinized( void )

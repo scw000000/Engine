@@ -18,6 +18,7 @@ class EngineApp
       EngineApp( void );
       ~EngineApp( void );
       
+      virtual bool VLoadGame( void );
       void MainLoop( void );
       void AbortGame( void ) { m_bQuitting = true; }
       Uint32  GetWindowState( void );
@@ -36,21 +37,10 @@ class EngineApp
    protected:
       void FlashWhileMinized( void );
 
-   protected:
-      bool m_bIsRunning;
-      bool m_bQuitting;
-      bool m_bQuitRequested;
-      Point m_screenSize;					// game screen size
-      SDL_Window *m_window;
-
-   private:
       void MsgProc( void );
-      int EventFilter( void* userdata, SDL_Event* event);
-
       void OnUpdateGame( double fTime, float fElapsedTime );
-      
+      void OnFrameRender( double fTime, float fElapsedTime );
       void OnClose( void );
-      
       /* 
       Why use TCHAR? because we may support multiple languages, some of them 
       will take 2 char instead of one for each character, in this case, we set the char class to ANSI (1) or Unicode (2)
@@ -60,8 +50,14 @@ class EngineApp
       http://www.codeproject.com/Articles/76252/What-are-TCHAR-WCHAR-LPSTR-LPWSTR-LPCTSTR-etc
       */
       virtual TCHAR* VGetGameTitle() { return _T("Engine"); };
-      
-      
+
+   protected:
+      bool m_bIsRunning;
+      bool m_bQuitting;
+      bool m_bQuitRequested;
+      Point m_screenSize;					// game screen size
+      SDL_Window *m_window;
+
    private:
  
    };

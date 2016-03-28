@@ -35,6 +35,8 @@
 	#error Preprocessor defines can't figure out which Bullet library to use.
 #endif
 
+#pragma comment(lib, "zlibstat.lib")
+
 #pragma comment(lib, "tinyxml.lib")
 
 

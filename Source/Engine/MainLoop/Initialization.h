@@ -24,6 +24,9 @@ struct EngineOptions
    EngineOptions();
 	~EngineOptions() { SAFE_DELETE(m_pDoc); }
 
+   // Level option
+	std::string m_Level;
+
    // TiXmlElement - look at this to find other options added by the developer
 	TiXmlDocument *m_pDoc;
 
@@ -32,7 +35,8 @@ struct EngineOptions
 	std::string m_Renderer;
 	bool m_runFullSpeed;
 	Point m_ScreenSize;
-
+   int m_numAIs;
+	int m_maxAIs;
 	
 
    void Init(const char* xmlFileName);

@@ -3,9 +3,6 @@
 // Filename: Interfaces.h
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef _INTERFACES_H_
-#define _INTERFACES_H_
-
 class Actor;
 class ActorComponent;
 
@@ -60,18 +57,57 @@ public:
 typedef std::list<shared_ptr<IGameView> > GameViewList;
 
 class IKeyboardHandler
-{
-public:
-	//virtual bool VOnKeyDown(const BYTE c)=0;
-	//virtual bool VOnKeyUp(const BYTE c)=0;
-};
+   {
+   public:
+	   virtual bool VOnKeyDown(const BYTE c)=0;
+	   virtual bool VOnKeyUp(const BYTE c)=0;
+   };
 
 class IPointerHandler
-{
-public:
-	//virtual bool VOnPointerMove(const Point &pos, const int radius) = 0;
-	//virtual bool VOnPointerButtonDown(const Point &pos, const int radius, const std::string &buttonName) = 0;
-	//virtual bool VOnPointerButtonUp(const Point &pos, const int radius, const std::string &buttonName) = 0;
-};
+   {
+   public:
+	   virtual bool VOnPointerMove(const Point &pos, const int radius) = 0;
+	   virtual bool VOnPointerButtonDown(const Point &pos, const int radius, const std::string &buttonName) = 0;
+	   virtual bool VOnPointerButtonUp(const Point &pos, const int radius, const std::string &buttonName) = 0;
+   };
 
-#endif // !_INTERFACES_H_
+class IJoystickHandler
+   {
+   public:
+	   virtual bool VOnButtonDown(const std::string &buttonName, int const pressure)=0;
+	   virtual bool VOnButtonUp(const std::string &buttonName)=0;
+	   virtual bool VOnJoystick(float const x, float const y)=0;
+   };
+
+class IGamepadHandler
+   {
+   public:
+	   virtual bool VOnTrigger(const std::string &triggerName, float const pressure)=0;
+	   virtual bool VOnButtonDown(const std::string &buttonName, int const pressure)=0;
+	   virtual bool VOnButtonUp(const std::string &buttonName)=0;
+	   virtual bool VOnDirectionalPad(const std::string &direction)=0;
+	   virtual bool VOnThumbstick(const std::string &stickName, float const x, float const y)=0;
+   };
+
+class IResourceLoader
+   {
+   public:
+	   virtual std::string VGetPattern() = 0;
+	   virtual bool VUseRawFile() = 0;
+	   virtual bool VDiscardRawBufferAfterLoad() = 0;
+      virtual bool VAddNullZero() { return false; }
+	   virtual unsigned int VGetLoadedResourceSize(char *rawBuffer, unsigned int rawSize) = 0;
+	   virtual bool VLoadResource(char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle) = 0;
+   };
+
+class IResourceFile
+   {
+   public:
+	   virtual bool VOpen() = 0;
+	   virtual int VGetRawResourceSize(const Resource &r) = 0;
+	   virtual int VGetRawResource(const Resource &r, char *buffer) = 0;
+	   virtual int VGetNumResources() const = 0;
+	   virtual std::string VGetResourceName(int num) const = 0;
+      virtual bool VIsUsingDevelopmentDirectories(void) const = 0;
+	   virtual ~IResourceFile() { }
+   };

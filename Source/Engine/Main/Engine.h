@@ -9,7 +9,7 @@
 ///////////////////////
 #include "../Mainloop/Initialization.h"
 #include "../Main/BaseGameLogic.h"
-
+#include "../ResourceCache/ResourceCache.h"
 
 
 class EngineApp
@@ -33,7 +33,8 @@ class EngineApp
       struct EngineOptions m_EngineOptions;
       TCHAR m_saveGameDirectory[MAX_PATH];
       BaseGameLogic *m_pGame;
-      
+      ResCache *m_ResCache;
+
    protected:
       void FlashWhileMinized( void );
 

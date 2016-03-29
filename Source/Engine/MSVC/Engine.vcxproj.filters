@@ -88,6 +88,9 @@
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp">
       <Filter>ResourceCache</Filter>
     </ClCompile>
+    <ClCompile Include="..\Utilities\Math.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />

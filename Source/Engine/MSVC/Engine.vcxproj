@@ -114,6 +114,7 @@
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp" />
     <ClCompile Include="..\ResourceCache\ZipFile.cpp" />
     <ClCompile Include="..\UserInterface\HumanView.cpp" />
+    <ClCompile Include="..\Utilities\Math.cpp" />
     <ClCompile Include="..\Utilities\Random.cpp" />
     <ClCompile Include="..\Utilities\String.cpp" />
     <ClCompile Include="EngineStd.cpp">

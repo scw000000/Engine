@@ -17,18 +17,41 @@ typedef weak_ptr<Actor> WeakActorPtr;
 typedef shared_ptr<ActorComponent> StrongActorComponentPtr;
 typedef weak_ptr<ActorComponent> WeakActorComponentPtr;
 
+//
+// class IScreenElement							- Chapter 10, page 285
+//
+class IScreenElement
+   {
+   public:
+	   virtual HRESULT VOnRestore() = 0;
+	   virtual HRESULT VOnLostDevice() = 0;
+	   virtual HRESULT VOnRender(double fTime, float fElapsedTime) = 0;
+	   virtual void VOnUpdate(int deltaMilliseconds) = 0;
+
+	   virtual int VGetZOrder() const = 0;
+	   virtual void VSetZOrder(int const zOrder) = 0;
+	   virtual bool VIsVisible() const = 0;
+	   virtual void VSetVisible(bool visible) = 0;
+
+	   virtual int VOnMsgProc( SDL_Event event )=0;
+
+	   virtual ~IScreenElement() { };
+	   virtual bool const operator <(IScreenElement const &other) { return VGetZOrder() < other.VGetZOrder(); }
+   };
+
+
 class IGameLogic
-{
-public:
-	virtual WeakActorPtr VGetActor(const ActorId id)=0;
-   virtual StrongActorPtr VCreateActor(const std::string &actorResource, TiXmlElement *overrides, const Mat4x4 *initialTransform=NULL, const ActorId serversActorId=INVALID_ACTOR_ID)=0;
-   virtual void VDestroyActor(const ActorId actorId)=0;
-	virtual bool VLoadGame(const char* levelResource)=0;
-	//virtual void VSetProxy()=0;				
-	virtual void VOnUpdate(float time, float elapsedTime)=0;
-	virtual void VChangeState(enum BaseGameState newState)=0;
-	virtual void VMoveActor(const ActorId id, Mat4x4 const &mat)=0;
-};
+   {
+   public:
+   	virtual WeakActorPtr VGetActor(const ActorId id)=0;
+      virtual StrongActorPtr VCreateActor(const std::string &actorResource, TiXmlElement *overrides, const Mat4x4 *initialTransform=NULL, const ActorId serversActorId=INVALID_ACTOR_ID)=0;
+      virtual void VDestroyActor(const ActorId actorId)=0;
+	   virtual bool VLoadGame(const char* levelResource)=0;
+	   //virtual void VSetProxy()=0;				
+	   virtual void VOnUpdate(float time, float elapsedTime)=0;
+	   virtual void VChangeState(enum BaseGameState newState)=0;
+	   virtual void VMoveActor(const ActorId id, Mat4x4 const &mat)=0;
+   };
 
 enum GameViewType
 {

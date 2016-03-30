@@ -91,6 +91,9 @@
     <ClCompile Include="..\Utilities\Math.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="..\UserInterface\MessageBox.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -157,6 +160,12 @@
     </ClInclude>
     <ClInclude Include="..\ResourceCache\ResourceCache.h">
       <Filter>ResourceCache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UserInterface\UserInterface.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UserInterface\MessageBox.h">
+      <Filter>UserInterface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

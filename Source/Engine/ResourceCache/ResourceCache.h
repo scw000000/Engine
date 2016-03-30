@@ -27,19 +27,6 @@ class IResourceExtraData
 	   virtual std::string VToString()=0;
    };
 
-// Each resource file may contains many ressources
-class IResourceFile
-   {
-   public:
-      virtual ~IResourceFile() { }
-      
-      virtual bool VOpen() = 0;
-      virtual int VGetRawResourceSize( const Resource &resource ) = 0;
-      virtual int VGetRawResource( const Resource &resource, char *buffer ) = 0;
-      virtual int VGetNumResources() const = 0;
-      virtual std::string VGetResourceName( int num ) const = 0;
-   };
-
 // an expansion class of resrouce
 class ResHandle
    {
@@ -98,7 +85,7 @@ class ResCache
 
    protected:
       shared_ptr< ResHandle > Find( Resource *resource );
-      const void *Update( shared_ptr< ResHandle > handle  );
+      void Update( shared_ptr< ResHandle > handle  );
       shared_ptr< ResHandle > Load( Resource *resource );
       void Free( shared_ptr< ResHandle > gonner );
 

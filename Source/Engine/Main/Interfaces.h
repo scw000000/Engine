@@ -23,10 +23,10 @@ typedef weak_ptr<ActorComponent> WeakActorComponentPtr;
 class IScreenElement
    {
    public:
-	   virtual HRESULT VOnRestore() = 0;
-	   virtual HRESULT VOnLostDevice() = 0;
-	   virtual HRESULT VOnRender(double fTime, float fElapsedTime) = 0;
-	   virtual void VOnUpdate(int deltaMilliseconds) = 0;
+	   virtual int VOnRestore() = 0;
+	   virtual int VOnLostDevice() = 0;
+	   virtual int VOnRender( double fTime, float fElapsedTime ) = 0;
+	   virtual void VOnUpdate( int deltaMilliseconds ) = 0;
 
 	   virtual int VGetZOrder() const = 0;
 	   virtual void VSetZOrder(int const zOrder) = 0;
@@ -68,7 +68,7 @@ extern const GameViewId gc_InvalidGameViewId;
 class IGameView 
 {
 public:
-   virtual long VOnRestore()=0;
+   virtual int VOnRestore()=0;
 	virtual void VOnRender(double fTime, float fElapsedTime)=0;
 	virtual GameViewType VGetType()=0;
 	virtual GameViewId VGetId() const=0;
@@ -112,6 +112,10 @@ class IGamepadHandler
 	   virtual bool VOnThumbstick(const std::string &stickName, float const x, float const y)=0;
    };
 
+class Resource;
+class IResourceFile;
+class ResHandle;
+
 class IResourceLoader
    {
    public:
@@ -123,6 +127,7 @@ class IResourceLoader
 	   virtual bool VLoadResource(char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle) = 0;
    };
 
+// Each resource file may contains many ressources
 class IResourceFile
    {
    public:

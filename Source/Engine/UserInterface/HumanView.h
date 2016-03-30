@@ -4,7 +4,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
-typedef std::list< IScreenElement > ScreenElementList;
+typedef std::list< shared_ptr< IScreenElement > > ScreenElementList;
 
 class HumanView : public IGameView
    {
@@ -22,8 +22,8 @@ class HumanView : public IGameView
    		m_ViewId = vid; 
 	   	m_ActorId = aid;
 	      }
-      virtual long VOnRestore();
-
+      virtual int VOnRestore();
+      virtual int VOnLostDevice();
       virtual int VOnMsgProc( SDL_Event event ); // process the OS event
 	   virtual void VOnUpdate(const int deltaMilliseconds );
    
@@ -31,6 +31,7 @@ class HumanView : public IGameView
 	   virtual void VPushElement(shared_ptr<IScreenElement> pElement);
 	   virtual void VRemoveElement(shared_ptr<IScreenElement> pElement);
 
+      ProcessManager* GetProcessManager() { return m_pProcessManager; }
 	   //void TogglePause(bool active);
 
 	   //HumanView(shared_ptr<IRenderer> renderer);
@@ -44,7 +45,8 @@ class HumanView : public IGameView
       Uint64 m_currTick; 
       Uint64 m_lastDraw; // last time the game rended
       bool m_runFullSpeed; // if the view should ignore max rendering frequency setting
-
+      ProcessManager *m_pProcessManager; // this Processmanager is for things like button animations
+      BaseGameState m_BaseGameState;					// Added post-press - what is the current game state
    private:
 
    };

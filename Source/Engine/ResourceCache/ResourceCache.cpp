@@ -96,7 +96,7 @@ int ResCache::Preload( const std::string pattern, void (*progressCallback)( int,
    for( int i = 0; i < numFiles; ++i )
       {
       Resource resource( m_file->VGetResourceName( i ) );
-      if( WildcardMatch( pattern.c_str, resource.m_name.c_str() ) )
+      if( WildcardMatch( pattern.c_str(), resource.m_name.c_str() ) )
          {
          shared_ptr< ResHandle > handle = g_pApp->m_ResCache->GetHandle( &resource ); // use resource cache to load resource
          ++loaded;
@@ -136,10 +136,11 @@ shared_ptr< ResHandle > ResCache::Find( Resource *resource )
    }
 
 // move the handle to front of list is this resource is accessed by engine
-const void* ResCache::Update( shared_ptr< ResHandle > handle  )
+void ResCache::Update( shared_ptr< ResHandle > handle  )
    {
    m_lruResHandleList.remove(handle);
 	m_lruResHandleList.push_front(handle);
+
    }
 
 shared_ptr< ResHandle > ResCache::Load( Resource *resource )

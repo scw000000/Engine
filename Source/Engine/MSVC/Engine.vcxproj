@@ -114,6 +114,7 @@
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp" />
     <ClCompile Include="..\ResourceCache\ZipFile.cpp" />
     <ClCompile Include="..\UserInterface\HumanView.cpp" />
+    <ClCompile Include="..\UserInterface\MessageBox.cpp" />
     <ClCompile Include="..\Utilities\Math.cpp" />
     <ClCompile Include="..\Utilities\Random.cpp" />
     <ClCompile Include="..\Utilities\String.cpp" />
@@ -143,6 +144,8 @@
     <ClInclude Include="..\ResourceCache\ResourceCache.h" />
     <ClInclude Include="..\ResourceCache\ZipFile.h" />
     <ClInclude Include="..\UserInterface\HumanView.h" />
+    <ClInclude Include="..\UserInterface\MessageBox.h" />
+    <ClInclude Include="..\UserInterface\UserInterface.h" />
     <ClInclude Include="..\Utilities\Math.h" />
     <ClInclude Include="..\Utilities\String.h" />
     <ClInclude Include="..\Utilities\templates.h" />

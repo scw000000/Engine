@@ -81,6 +81,7 @@ class ENG_noncopyable
 #include "..\Main\Interfaces.h"
 #include "..\MainLoop\Timer.h"
 
+
 extern Color g_White;
 extern Color g_Black;
 extern Color g_Cyan;

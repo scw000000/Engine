@@ -27,7 +27,8 @@ class EngineApp
       
       bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );
       virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
-      HWND EngineApp::GetHwnd( void );
+      SDL_Window* GetWindow() { return m_window; }
+      HWND GetHwnd( void );
       BaseGameLogic* VCreateGameAndView();
 
    public:

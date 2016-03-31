@@ -39,7 +39,7 @@ unsigned int ProcessManager::UpdateProcesses( unsigned long deltaMs )
          pCurrProcess->VOnUpdate( deltaMs );
          }
       // This process is SUCCEED or FAILED or ABORTED
-      // After necessary process, remove it from the list
+      // After necessary processing, remove it from the list
       if( pCurrProcess->IsDead() )
          {
          switch ( pCurrProcess->GetState() )

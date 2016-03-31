@@ -7,6 +7,7 @@
 ///////////////////////
 #include "EngineStd.h"
 #include "..\UserInterface\HumanView.h"
+#include "../UserInterface/MessageBox.h"
 
 
 EngineApp *g_pApp = NULL;
@@ -62,7 +63,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       }
    #endif
 
-   SetCursor( NULL );
+   SDL_ShowCursor( SDL_DISABLE );
    
    //--------------------------------- 
    // Check system requirements
@@ -73,13 +74,13 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 		const DWORDLONG physicalRAM = 512 * MEGABYTE;
 		const DWORDLONG virtualRAM = 1024 * MEGABYTE;
 		const DWORDLONG diskSpace = 10 * MEGABYTE;
-		if (!CheckStorage(diskSpace))
+		if ( !CheckStorage(diskSpace) )
          {
 			return false;
          }
 		const DWORD minCpuSpeed = 1300;			// 1.3Ghz
 		DWORD thisCPU = ReadCPUSpeed();
-		if (thisCPU < minCpuSpeed)
+		if ( thisCPU < minCpuSpeed )
 		   {
 			ENG_ERROR("GetCPUSpeed reports CPU is too slow for this game.");
 			return false;
@@ -122,6 +123,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 
 	m_screenSize = Point( screenWidth, screenHeight );
 
+   // setup opengl rendering context
    SDL_GLContext glContext = SDL_GL_CreateContext( m_window );
    if( !glContext )
       {

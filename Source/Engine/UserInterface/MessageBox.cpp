@@ -6,18 +6,19 @@
 #include "MessageBox.h"
 #include "HumanView.h"
 
+/*
 const SDL_MessageBoxColorScheme DEFAULT_COLOR_SCHEME = 
    {
-      { /* .colors (.r, .g, .b) */
-         /* [SDL_MESSAGEBOX_COLOR_BACKGROUND] */
+      { // .colors (.r, .g, .b) 
+         // [SDL_MESSAGEBOX_COLOR_BACKGROUND] 
          { 255,   0,   0 },
-         /* [SDL_MESSAGEBOX_COLOR_TEXT] */
+         // [SDL_MESSAGEBOX_COLOR_TEXT] 
          {   0, 255,   0 },
-         /* [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] */
+         // [SDL_MESSAGEBOX_COLOR_BUTTON_BORDER] 
          { 255, 255,   0 },
-         /* [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] */
+         // [SDL_MESSAGEBOX_COLOR_BUTTON_BACKGROUND] 
          {   0,   0, 255 },
-         /* [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] */
+         // [SDL_MESSAGEBOX_COLOR_BUTTON_SELECTED] 
          { 255,   0, 255 }
       }
    };
@@ -106,3 +107,4 @@ int MessageBox::VOnRender( double fTime, float fElapsedTime )
    {
    
    }
+*/

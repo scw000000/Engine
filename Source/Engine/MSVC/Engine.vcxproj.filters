@@ -94,6 +94,9 @@
     <ClCompile Include="..\UserInterface\MessageBox.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
+    <ClCompile Include="..\UserInterface\GUIManager.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -165,6 +168,9 @@
       <Filter>UserInterface</Filter>
     </ClInclude>
     <ClInclude Include="..\UserInterface\MessageBox.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UserInterface\GUIManager.h">
       <Filter>UserInterface</Filter>
     </ClInclude>
   </ItemGroup>

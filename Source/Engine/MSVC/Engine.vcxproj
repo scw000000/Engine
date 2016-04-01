@@ -43,14 +43,14 @@
     <OutDir>$(ProjectDir)..\..\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\tinyxml;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.5\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)..\..\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.5\cegui\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -113,6 +113,7 @@
     </ClCompile>
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp" />
     <ClCompile Include="..\ResourceCache\ZipFile.cpp" />
+    <ClCompile Include="..\UserInterface\GUIManager.cpp" />
     <ClCompile Include="..\UserInterface\HumanView.cpp" />
     <ClCompile Include="..\UserInterface\MessageBox.cpp" />
     <ClCompile Include="..\Utilities\Math.cpp" />
@@ -143,6 +144,7 @@
     <ClInclude Include="..\Multicore\CriticalSection.h" />
     <ClInclude Include="..\ResourceCache\ResourceCache.h" />
     <ClInclude Include="..\ResourceCache\ZipFile.h" />
+    <ClInclude Include="..\UserInterface\GUIManager.h" />
     <ClInclude Include="..\UserInterface\HumanView.h" />
     <ClInclude Include="..\UserInterface\MessageBox.h" />
     <ClInclude Include="..\UserInterface\UserInterface.h" />

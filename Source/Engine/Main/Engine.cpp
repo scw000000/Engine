@@ -7,7 +7,7 @@
 ///////////////////////
 #include "EngineStd.h"
 #include "..\UserInterface\HumanView.h"
-#include "../UserInterface/MessageBox.h"
+#include "../UserInterface/GUIManager.h"
 
 
 EngineApp *g_pApp = NULL;

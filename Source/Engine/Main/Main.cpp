@@ -22,6 +22,8 @@
 	#if defined(_DEBUG)
       //#pragma comment(lib, "glew32sd.lib")
       #pragma comment(lib, "glew32d.lib")
+      #pragma comment(lib, "CEGUIBase-0_d.lib")
+      #pragma comment(lib, "CEGUIOpenGLRenderer-0_d.lib")
 	#else
 
 	#endif

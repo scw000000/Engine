@@ -5,6 +5,7 @@
 
 #include "UserInterface.h"
 
+/*
 class MessageBox : public BaseUI
    {
    public:
@@ -24,5 +25,5 @@ class MessageBox : public BaseUI
       SDL_MessageBoxData m_UIData;
    };
 
-
+   */
 

@@ -5,7 +5,8 @@
 
 
 #include "..\Main\Interfaces.h"
-
+#include "CEGUI/CEGUI.h"
+#include "CEGUI/RendererModules/OpenGL/GL3Renderer.h"
 
 enum MessageBox_Questions 
    {
@@ -13,20 +14,19 @@ enum MessageBox_Questions
 	QUESTION_QUIT_GAME,
    };
 
-
-class BaseUI : public IScreenElement
+  
+class Dialog
    {
-   public:
-      BaseUI() { m_bIsVisible = true; m_posX = 0; m_posY = 0; width = 100; height = 100; }
-      virtual void VOnUpdate( int ) { }
-      virtual bool VIsVisible() const { return m_bIsVisible; }
-      virtual void VSetVisiable( const bool visible ) { m_bIsVisible = visible; }
+   public:  
+      Dialog( CEGUI::Window* pWindow, const std::wstring& msg, const std::wstring& title, int buttonFlags = MB_OK );
+      ~Dialog();
+      virtual int VOnRestore() { return 0; }
+      virtual int VGetZOrder() const { return 99; }
+      virtual void VSetZorder( const int zOrder ) { }
+      virtual void VSetVisible( const bool isVisible ) { }
+      static void OnGUIEvent( UINT nEvent, int nControlID );
+      static int Ask( MessageBox_Questions question ); // this static function new a MessageBox based on qustion
 
    protected:
-      int m_posX;
-      int m_posY;
-      int width;
-      int height;
-      optional<int> result;
-      bool m_bIsVisible;
+      CEGUI::Window* m_pWindow;
    };

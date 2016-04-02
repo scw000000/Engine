@@ -4,6 +4,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 #include "EngineStd.h"
 #include "HumanView.h"
+#include "GUIManager.h"
 
 const unsigned int SCREEN_MAX_FRAME_RATE = 60;
 const Uint64 SCREEN_MIN_RENDER_INTERVAL = ( SDL_GetPerformanceFrequency() / SCREEN_MAX_FRAME_RATE );
@@ -16,7 +17,9 @@ HumanView::HumanView( )
 	m_ViewId = gc_InvalidGameViewId;
 
 	m_BaseGameState = BGS_Initializing;		// what is the current game state
-   	
+   
+   m_pGUIManager = ENG_NEW GUIManager;
+   m_pGUIManager->Init( "GUI/" );
    }
 
 
@@ -27,8 +30,8 @@ HumanView::~HumanView()
 		m_ScreenElements.pop_front();		
 	   }
 
-	SAFE_DELETE(m_pProcessManager);
-
+	SAFE_DELETE( m_pProcessManager );
+   SAFE_DELETE( m_pGUIManager );
 	}
 
 void HumanView::VOnRender( double fTime, float fElapsedTime )
@@ -56,6 +59,8 @@ void HumanView::VOnRender( double fTime, float fElapsedTime )
          }
       }
 
+   // Render GUI last, becaouse its on top of screen
+   m_pGUIManager->OnRender( fTime, fElapsedTime );
    }
 
 int HumanView::VOnRestore()
@@ -127,7 +132,7 @@ int HumanView::VOnMsgProc( SDL_Event event )
 	return 0;
    }
 
-void HumanView::VOnUpdate( const int deltaMilliseconds )
+void HumanView::VOnUpdate( const unsigned long deltaMilliseconds )
    {
    m_pProcessManager->UpdateProcesses( deltaMilliseconds );
    for(ScreenElementList::iterator i=m_ScreenElements.begin(); i!=m_ScreenElements.end(); ++i)

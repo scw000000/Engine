@@ -97,6 +97,9 @@
     <ClCompile Include="..\UserInterface\GUIManager.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
+    <ClCompile Include="..\UserInterface\UserInterface.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />

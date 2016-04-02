@@ -61,7 +61,7 @@ extern Vec3 g_Forward;
 class Vec4 : public glm::vec4
    {
    public:
-      Vec4() : glm::vec4() { x = 0; y = 0; z = 0; w = 0; }
+      Vec4() : glm::vec4() { x = 0.0f; y = 0.0f; z = 0.0f; w = 0.0f; }
       Vec4( const glm::vec4 &v4 ) : glm::vec4( v4 ) { /*x = v4.x; y = v4.y; z = v4.z; w = v4.w;*/ }
       Vec4( const glm::vec3 &v3 ) { x = v3.x; y = v3.y; z = v3.z; w = 1.0f; }
       Vec4( const float _x, const float _y, const float _z, const float _w ) { x = _x; y = _y; z = _z; w = _w; }

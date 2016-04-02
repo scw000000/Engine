@@ -31,9 +31,9 @@ class IScreenElement
 	   virtual int VGetZOrder() const = 0;
 	   virtual void VSetZOrder(int const zOrder) = 0;
 	   virtual bool VIsVisible() const = 0;
-	   virtual void VSetVisible(bool visible) = 0;
+	   virtual void VSetVisible( const bool visible) = 0;
 
-	   virtual int VOnMsgProc( SDL_Event event )=0;
+	   virtual int VOnMsgProc( const SDL_Event& event ) = 0;
 
 	   virtual ~IScreenElement() { };
 	   virtual bool const operator <(IScreenElement const &other) { return VGetZOrder() < other.VGetZOrder(); }
@@ -68,13 +68,13 @@ extern const GameViewId gc_InvalidGameViewId;
 class IGameView 
 {
 public:
-   virtual int VOnRestore()=0;
-	virtual void VOnRender(double fTime, float fElapsedTime)=0;
-	virtual GameViewType VGetType()=0;
-	virtual GameViewId VGetId() const=0;
-	virtual void VOnUpdate(unsigned long deltaMs)=0;
-   virtual void VOnAttach(GameViewId vid, ActorId aid)=0;
-	virtual ~IGameView() { };
+   virtual int VOnRestore( void ) = 0;
+	virtual void VOnRender( double fTime, float fElapsedTime )=0;
+	virtual GameViewType VGetType( void ) = 0;
+	virtual GameViewId VGetId() const = 0;
+	virtual void VOnUpdate( const unsigned long deltaMs ) = 0;
+   virtual void VOnAttach( GameViewId vid, ActorId aid ) = 0;
+	virtual ~IGameView( void ) { };
 };
 
 typedef std::list<shared_ptr<IGameView> > GameViewList;

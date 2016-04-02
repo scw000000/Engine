@@ -316,6 +316,21 @@ std::wstring s2ws(const std::string &s)
 }
 
 
+std::string ws2UTF8s( const std::wstring& s )
+   {
+      if( s.empty() )
+         {
+         return std::string();
+         }
+   // If parameter size_needed is set to 0, the function returns the required buffer size for lpMultiByteStr and makes no use of the output parameter itself.
+   int size_needed = WideCharToMultiByte(CP_UTF8, 0, &s[0], (int)s.size(), NULL, 0, NULL, NULL);
+   std::string strTo( size_needed, 0 );
+   WideCharToMultiByte                  (CP_UTF8, 0, &s[0], (int)s.size(), &strTo[0], size_needed, NULL, NULL);
+   return strTo;
+   }
+      
+
+
 
 
 

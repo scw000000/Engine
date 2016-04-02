@@ -77,7 +77,7 @@ extern std::string ToStr(const Mat4x4& mat);
 extern std::string ws2s(const std::wstring& s);
 extern std::wstring s2ws(const std::string &s);
 
-
+extern std::string ws2UTF8s( const std::wstring& s );
 
 // Splits a string by the delimeter into a vector of strings.  For example, say you have the following string:
 // std::string test("one,two,three");

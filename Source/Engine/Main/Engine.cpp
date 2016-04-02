@@ -22,7 +22,7 @@ EngineApp::EngineApp( void )
    m_bIsRunning = false;
 
    m_screenSize = Point(0,0);
-   m_window = NULL;
+   m_pWindow = NULL;
    
    }
 
@@ -38,7 +38,7 @@ HWND EngineApp::GetHwnd( void )
    SDL_VERSION( &info.version ); 
 
    // the call returns true on success
-   if( SDL_GetWindowWMInfo( m_window, &info ) ) 
+   if( SDL_GetWindowWMInfo( m_pWindow, &info ) ) 
       { 
       return info.info.win.window;
       }
@@ -93,7 +93,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
 
    //--------------------------------- 
-   // Initiate window & SDL
+   // Initiate window & SDL, glew
    //--------------------------------- 
    if ( SDL_Init(SDL_INIT_EVERYTHING) != 0 )
       {
@@ -108,23 +108,22 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       }
    if( !window )
       {
-      m_window = SDL_CreateWindow( charTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth,screenHeight, SDL_WINDOW_OPENGL );
+      m_pWindow = SDL_CreateWindow( charTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth,screenHeight, SDL_WINDOW_OPENGL );
+      if ( !m_pWindow ) 
+         {
+         ENG_ERROR( SDL_GetError() );
+         return false;
+         }
       }
    else
       {
-      m_window = window;
-      }
-   
-   if ( !m_window ) 
-      {
-      ENG_ERROR( SDL_GetError() );
-      return false;
+      m_pWindow = window;
       }
 
 	m_screenSize = Point( screenWidth, screenHeight );
 
    // setup opengl rendering context
-   SDL_GLContext glContext = SDL_GL_CreateContext( m_window );
+   SDL_GLContext glContext = SDL_GL_CreateContext( m_pWindow );
    if( !glContext )
       {
       ENG_ERROR( SDL_GetError() );
@@ -140,9 +139,10 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       }
    // set two buffer for rendering
    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-
+   // setting clear color
+   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
    //--------------------------------- 
-   // Create window
+   // Initiate window & SDL, glew
    //--------------------------------- 
 
    // Start global timer
@@ -175,7 +175,7 @@ bool EngineApp::VLoadGame(void)
 
 Uint32 EngineApp::GetWindowState( void )
    {
-   return SDL_GetWindowFlags( m_window );
+   return SDL_GetWindowFlags( m_pWindow );
    }
 
 void EngineApp::MsgProc( void )
@@ -222,9 +222,9 @@ BaseGameLogic *EngineApp::VCreateGameAndView( void )
    m_pGame = ENG_NEW BaseGameLogic();
    m_pGame->Init();
 
-   shared_ptr<IGameView> menuView;
-	//shared_ptr<IGameView> menuView( ENG_NEW HumanView() );
-	// m_pGame->VAddView( menuView );
+   // shared_ptr<IGameView> menuView;
+	shared_ptr<IGameView> menuView( ENG_NEW HumanView() );
+	m_pGame->VAddView( menuView );
 
 	return m_pGame;
    }
@@ -267,7 +267,20 @@ void EngineApp::OnUpdateGame( double fTime, float fElapsedTime )
 
 void EngineApp::OnFrameRender( double fTime, float fElapsedTime )
    {
-   
+   // TODO: move these to renderer
+   glClearDepth( 1.0 );
+   // use previously setted clearColr to draw background
+   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+   BaseGameLogic *pGame = g_pApp->m_pGame;
+
+	for(GameViewList::iterator i=pGame->m_gameViews.begin(), end=pGame->m_gameViews.end(); i!=end; ++i)
+	   {
+		(*i)->VOnRender( fTime, fElapsedTime );
+	   }
+
+   SDL_GL_SwapWindow( m_pWindow );
+
    }
 
 void EngineApp::FlashWhileMinized( void )
@@ -334,7 +347,8 @@ void EngineApp::OnClose()
 	// release all the game systems in reverse order from which they were created
    ENG_LOG( "Test", "On close" );
 	SAFE_DELETE( m_pGame );
-   SDL_DestroyWindow( m_window );
+   SDL_DestroyWindow( m_pWindow );
+   SDL_Quit();
    /*
 	VDestroyNetworkEventForwarder();
 

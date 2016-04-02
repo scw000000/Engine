@@ -62,14 +62,14 @@ StrongActorPtr BaseGameLogic::VCreateActor(const std::string &actorResource, TiX
    {
    ENG_ASSERT( m_pActorFactory );
 
-    StrongActorPtr pActor = m_pActorFactory->CreateActor(actorResource.c_str() );
-    if (pActor)
+   StrongActorPtr pActor = m_pActorFactory->CreateActor(actorResource.c_str() );
+   if (pActor)
       {
       // Insert into actor map
       m_actors.insert( std::make_pair(pActor->GetId(), pActor) );
       return pActor;
       }
-    else
+   else
       {
       // FUTURE WORK: Log error: couldn't create actor
       return StrongActorPtr();

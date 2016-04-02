@@ -24,10 +24,11 @@ class EngineApp
       void AbortGame( void ) { m_bQuitting = true; }
       Uint32  GetWindowState( void );
       BaseGameLogic* GetGameLogic(void) const { return m_pGame; }
-      
+      bool IsRunning() { return m_bIsRunning; }
+
       bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );
       virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
-      SDL_Window* GetWindow() { return m_window; }
+      SDL_Window* GetWindow() { return m_pWindow; }
       HWND GetHwnd( void );
       BaseGameLogic* VCreateGameAndView();
 
@@ -59,7 +60,7 @@ class EngineApp
       bool m_bQuitting;
       bool m_bQuitRequested;
       Point m_screenSize;					// game screen size
-      SDL_Window *m_window;
+      SDL_Window *m_pWindow;
 
    private:
  

@@ -70,6 +70,7 @@ class IGameView
 public:
    virtual int VOnRestore( void ) = 0;
 	virtual void VOnRender( double fTime, float fElapsedTime )=0;
+   virtual int VOnMsgProc( SDL_Event event ) = 0;
 	virtual GameViewType VGetType( void ) = 0;
 	virtual GameViewId VGetId() const = 0;
 	virtual void VOnUpdate( const unsigned long deltaMs ) = 0;

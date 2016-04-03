@@ -214,6 +214,15 @@ void EngineApp::MsgProc( void )
          break;
 
          }// Switch
+      // send event to all of game views
+      for( auto i = m_pGame->m_gameViews.rbegin(); i != m_pGame->m_gameViews.rend(); ++i) 
+		   {
+			if ( (*i)->VOnMsgProc( event ) )
+				{
+				//return true;
+				break;				// WARNING! This breaks out of the for loop.
+			   }
+			}
       }// If poll event exist
    }// Function MsgProc
 
@@ -225,7 +234,6 @@ BaseGameLogic *EngineApp::VCreateGameAndView( void )
    // shared_ptr<IGameView> menuView;
 	shared_ptr<IGameView> menuView( ENG_NEW HumanView() );
 	m_pGame->VAddView( menuView );
-
 	return m_pGame;
    }
 

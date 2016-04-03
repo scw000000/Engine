@@ -31,6 +31,7 @@ class EngineApp
       SDL_Window* GetWindow() { return m_pWindow; }
       HWND GetHwnd( void );
       BaseGameLogic* VCreateGameAndView();
+      Point GetScreenSize( void ) const { return m_screenSize; }
 
    public:
       struct EngineOptions m_EngineOptions;

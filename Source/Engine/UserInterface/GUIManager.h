@@ -20,14 +20,15 @@ class GUIManager
       void LoadScheme( const std::string& schemeFile );
       void SetFont( const std::string& fontFile );
 
+      void OnUpdate( const int deltaMs );
       void OnRender( double fTime, float fElapsedTime );
+      int  OnMsgProc( SDL_Event event ); // process the OS event
 
-      static int Ask( MessageBox_Questions question );
+      int Ask( MessageBox_Questions question );
 
    protected:
-      static CEGUI::Window* CreateCEGUIWindow( const std::string &type, const std::string& name, const Vec4& position = Vec4(), const Vec4& size = Vec4() );
-
-     // MessageBox* CreateWidget( const std::string &type, const std::string& name = "" );
+      static CEGUI::Key::Scan SDLKeyToCEGUIKey( SDL_Keycode key );
+      static CEGUI::MouseButton SDLButtonTOCEGUIButton( Uint8 button );
 
    protected:
       static  CEGUI::OpenGL3Renderer* s_pRenderer;

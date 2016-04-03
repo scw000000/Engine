@@ -18,15 +18,16 @@ enum MessageBox_Questions
 class Dialog
    {
    public:  
-      Dialog( CEGUI::Window* pWindow, const std::wstring& msg, const std::wstring& title, int buttonFlags = MB_OK );
-      ~Dialog();
-      virtual int VOnRestore() { return 0; }
-      virtual int VGetZOrder() const { return 99; }
-      virtual void VSetZorder( const int zOrder ) { }
+      Dialog( CEGUI::Window* pRoot, const std::wstring& msg, const std::wstring& title, int buttonFlags = MB_OK);
+      ~Dialog( void );
+      virtual int VOnRestore( void ) { return 0; }
       virtual void VSetVisible( const bool isVisible ) { }
-      static void OnGUIEvent( UINT nEvent, int nControlID );
-      static int Ask( MessageBox_Questions question ); // this static function new a MessageBox based on qustion
+      
 
    protected:
-      CEGUI::Window* m_pWindow;
-   };
+      static CEGUI::Window* CreateCEGUIWindow( const std::string &type, const std::string& name, const Vec4& position = Vec4(), const Vec4& size = Vec4() );
+      bool OnButtonClicked( const CEGUI::EventArgs& arg );
+
+   protected:
+      CEGUI::FrameWindow* m_pWindow;
+       };

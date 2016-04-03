@@ -89,6 +89,7 @@ int HumanView::VOnMsgProc( SDL_Event event )
    // Iterate through the screen layers first
 	// In reverse order since we'll send input messages to the 
 	// screen on top
+   m_pGUIManager->OnMsgProc( event );
 	for( ScreenElementList::reverse_iterator i=m_ScreenElements.rbegin(); i != m_ScreenElements.rend(); ++i )
 	   {
 		if ( (*i)->VIsVisible() )
@@ -132,12 +133,19 @@ int HumanView::VOnMsgProc( SDL_Event event )
 	return 0;
    }
 
-void HumanView::VOnUpdate( const unsigned long deltaMilliseconds )
+void HumanView::VOnUpdate( const unsigned long deltaMs )
    {
-   m_pProcessManager->UpdateProcesses( deltaMilliseconds );
+   static bool test = true;
+   if( test )
+      {
+      test = false;
+     // m_pGUIManager->Ask( QUESTION_QUIT_GAME );
+      }
+   m_pGUIManager->OnUpdate( deltaMs );
+   m_pProcessManager->UpdateProcesses( deltaMs );
    for(ScreenElementList::iterator i=m_ScreenElements.begin(); i!=m_ScreenElements.end(); ++i)
 	   {
-	   ( (*i)->VOnUpdate( deltaMilliseconds ) );
+	   ( (*i)->VOnUpdate( deltaMs ) );
 	   }
    }
 

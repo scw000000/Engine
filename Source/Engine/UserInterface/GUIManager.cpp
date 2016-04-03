@@ -1,4 +1,4 @@
-////////////////////////////////////////////////////////////////////////////////
+﻿////////////////////////////////////////////////////////////////////////////////
 // Filename: GUIManager.cpp
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -49,9 +49,16 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
    m_pRoot->addChild( m_pPromptRoot );
    m_pUIRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "ui_root" );
    m_pRoot->addChild( m_pUIRoot );
-   CEGUI::Window* p_Window = CreateCEGUIWindow( "WindowsLook/FrameWindow", "TestButton", Vec4( 0.5f, 0.0f, 0.5f, 0.0f ), Vec4( 0.3f, 0.0f, 0.3f, 0.f ) );
-   ENG_NEW Dialog( p_Window, std::wstring( _T( "�ھާA�Q���T" ) ), std::wstring( _T( "ĵ�i" ) ), MB_RETRYCANCEL );
-   m_pPromptRoot->addChild( p_Window );
+
+   CEGUI::Window* pWindow =  CEGUI::WindowManager::getSingleton().createWindow(  "WindowsLook/FrameWindow", "Dialog"  );
+   m_pPromptRoot->addChild( pWindow );
+   CEGUI::WindowManager::getSingleton().destroyWindow( pWindow );
+
+ //  m_pPromptRoot->addChild( pWindow );
+//   CEGUI::WindowManager::getSingleton().destroyWindow( pWindow );
+  // ENG_NEW Dialog( m_pPromptRoot, std::wstring( _T( "一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四" ) ), std::wstring( _T( "警告" ) ), MB_ABORTRETRYIGNORE );
+ // Dialog( m_pPromptRoot, std::wstring( _T( "一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四" ) ), std::wstring( _T( "警告" ) ), MB_ABORTRETRYIGNORE );
+	
    }
 
 void GUIManager::Destory( void )
@@ -67,20 +74,62 @@ void GUIManager::LoadScheme( const std::string& schemeFile )
 void GUIManager::SetFont( const std::string& fontFile )
    {
    ENG_ASSERT( m_pContext );
+   // in order to display different language ex: Chinese
    CEGUI::FontManager::getSingleton().createFreeTypeFont( fontFile, 10/*pt*/, true, fontFile );
    m_pContext->setDefaultFont( fontFile );
+   
   // CEGUI::FontManager::getSingleton().createFromFile( fontFile + ".font" );
   // m_pContext->setDefaultFont( fontFile );
    }
 
+void GUIManager::OnUpdate( const int deltaMs )
+   {
+   // This fuction takes seconds as input
+   m_pContext->injectTimePulse( (float)deltaMs / 1000.f );
+   }
+
 void GUIManager::OnRender( double fTime, float fElapsedTime )
    {
+ //  std::cout << m_pPromptRoot->getChildCount() << std::endl;
    s_pRenderer->beginRendering();
    m_pContext->draw();
    s_pRenderer->endRendering();
    }
 
-/*
+int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
+   {
+   switch( event.type )
+      {
+      case SDL_MOUSEBUTTONDOWN:
+      std::cout << "mother fucjker" << std::endl;
+         m_pContext->injectMouseButtonDown( SDLButtonTOCEGUIButton( event.button.button ) );    
+         break;
+      case SDL_MOUSEBUTTONUP:
+         m_pContext->injectMouseButtonUp( SDLButtonTOCEGUIButton( event.button.button ) );
+         break;
+      case SDL_MOUSEMOTION:
+         m_pContext->injectMousePosition( (float)event.motion.x, (float)event.motion.y );
+         break;
+      case SDL_KEYDOWN:
+         m_pContext->injectKeyDown( SDLKeyToCEGUIKey( event.key.keysym.sym ) );
+         break;
+      case SDL_KEYUP:
+         m_pContext->injectKeyUp( SDLKeyToCEGUIKey( event.key.keysym.sym ) );
+         break;
+      case SDL_TEXTINPUT:
+         // TODO: this convertion is wrong, we need to convert event.text.text (UTF8) to codePoint (UTF32)
+         // for m_pContext->injectChar( UTF32DATA );
+         CEGUI::utf32 codePoint = 0;
+         for( int i = 0; event.text.text[i] != '\0'; ++i )
+            {
+            codePoint |= event.text.text[i] << ( i * 8 );
+            }
+         m_pContext->injectChar( codePoint );
+         break;
+      }
+   return 0;
+   }
+
 // TODO: implement xml resourceloader & localized string conversion
 int GUIManager::Ask( MessageBox_Questions question )
    {
@@ -90,48 +139,171 @@ int GUIManager::Ask( MessageBox_Questions question )
 	int defaultAnswer = IDOK;
 
 	switch(question)
-	{
+	   {
 		case QUESTION_WHERES_THE_CD:
-		{
+		   {
 			msg = (_T("IDS_QUESTION_WHERES_THE_CD"));
 			title = (_T("IDS_ALERT"));
-			buttonFlags = MB_RETRYCANCEL | MB_ICONEXCLAMATION;
+			buttonFlags = MB_RETRYCANCEL;
 			defaultAnswer = IDCANCEL;
 			break;
-		}
+		   }
 		case QUESTION_QUIT_GAME:
-		{
+		   {
 			msg = (_T("IDS_QUESTION_QUIT_GAME"));
 			title = (_T("IDS_QUESTION"));
-			buttonFlags = MB_YESNO|MB_ICONQUESTION;
+			buttonFlags = MB_YESNO;
 			defaultAnswer = IDNO;
 			break;
-		}
+		   }
 		default:
 			ENG_ASSERT(0 && _T("Undefined question in GUIManager::Ask"));
 			return IDCANCEL;
-	}
+	   }
 
-	if ( g_pApp && g_pApp->IsRunning() )
-	{
+	if ( true || g_pApp && g_pApp->IsRunning() )
+	   {
+      SDL_ShowCursor( true );
 		ShowCursor(true);
-		shared_ptr<MessageBox> pMessageBox( ENG_NEW MessageBox( msg, title, buttonFlags ) );
-		int result = g_pApp->Modal(pMessageBox, defaultAnswer);
-		ShowCursor(false);
+		shared_ptr<Dialog> pDialog( ENG_NEW Dialog( m_pPromptRoot, msg, title, buttonFlags ) );
+		//int result = g_pApp->Modal(pMessageBox, defaultAnswer);
+      int result = 0;
+		SDL_ShowCursor( false );
 		return result;
-	}
+	   }
 	// If the engine is not exist, still pop a message box
 	return -1;
    //return ::MessageBox(g_pApp ? g_pApp->GetHwnd() : NULL, msg.c_str(), title.c_str(), buttonFlags);
-   }*/
+   }
 
-// CEGUI::UDim( scale, pos ) : scale : relative point on the screen between (0,1)
-//                             pos   : additional absolute shift in pixels
-// UDim( 0.5, 100 ) -> middle point + shift 100
-CEGUI::Window* GUIManager::CreateCEGUIWindow( const std::string &type, const std::string& name, const Vec4& position, const Vec4& size )
+CEGUI::Key::Scan GUIManager::SDLKeyToCEGUIKey( SDL_Keycode key )
    {
-   CEGUI::Window* pWindow =  CEGUI::WindowManager::getSingleton().createWindow( type, name );
-   pWindow->setPosition( CEGUI::UVector2( CEGUI::UDim( position.x, position.y ), CEGUI::UDim( position.z, position.w ) ) );
-   pWindow->setSize( CEGUI::USize( CEGUI::UDim( size.x, size.y ), CEGUI::UDim( size.z, size.w ) ) );
-   return pWindow;
+   using namespace CEGUI;
+   switch (key)
+      {
+      case SDLK_BACKSPACE:    return Key::Backspace;
+      case SDLK_TAB:          return Key::Tab;
+      case SDLK_RETURN:       return Key::Return;
+      case SDLK_PAUSE:        return Key::Pause;
+      case SDLK_ESCAPE:       return Key::Escape;
+      case SDLK_SPACE:        return Key::Space;
+      case SDLK_COMMA:        return Key::Comma;
+      case SDLK_MINUS:        return Key::Minus;
+      case SDLK_PERIOD:       return Key::Period;
+      case SDLK_SLASH:        return Key::Slash;
+      case SDLK_0:            return Key::Zero;
+      case SDLK_1:            return Key::One;
+      case SDLK_2:            return Key::Two;
+      case SDLK_3:            return Key::Three;
+      case SDLK_4:            return Key::Four;
+      case SDLK_5:            return Key::Five;
+      case SDLK_6:            return Key::Six;
+      case SDLK_7:            return Key::Seven;
+      case SDLK_8:            return Key::Eight;
+      case SDLK_9:            return Key::Nine;
+      case SDLK_COLON:        return Key::Colon;
+      case SDLK_SEMICOLON:    return Key::Semicolon;
+      case SDLK_EQUALS:       return Key::Equals;
+      case SDLK_LEFTBRACKET:  return Key::LeftBracket;
+      case SDLK_BACKSLASH:    return Key::Backslash;
+      case SDLK_RIGHTBRACKET: return Key::RightBracket;
+      case SDLK_a:            return Key::A;
+      case SDLK_b:            return Key::B;
+      case SDLK_c:            return Key::C;
+      case SDLK_d:            return Key::D;
+      case SDLK_e:            return Key::E;
+      case SDLK_f:            return Key::F;
+      case SDLK_g:            return Key::G;
+      case SDLK_h:            return Key::H;
+      case SDLK_i:            return Key::I;
+      case SDLK_j:            return Key::J;
+      case SDLK_k:            return Key::K;
+      case SDLK_l:            return Key::L;
+      case SDLK_m:            return Key::M;
+      case SDLK_n:            return Key::N;
+      case SDLK_o:            return Key::O;
+      case SDLK_p:            return Key::P;
+      case SDLK_q:            return Key::Q;
+      case SDLK_r:            return Key::R;
+      case SDLK_s:            return Key::S;
+      case SDLK_t:            return Key::T;
+      case SDLK_u:            return Key::U;
+      case SDLK_v:            return Key::V;
+      case SDLK_w:            return Key::W;
+      case SDLK_x:            return Key::X;
+      case SDLK_y:            return Key::Y;
+      case SDLK_z:            return Key::Z;
+      case SDLK_DELETE:       return Key::Delete;
+      case SDLK_KP_0:          return Key::Numpad0;
+      case SDLK_KP_1:          return Key::Numpad1;
+      case SDLK_KP_2:          return Key::Numpad2;
+      case SDLK_KP_3:          return Key::Numpad3;
+      case SDLK_KP_4:          return Key::Numpad4;
+      case SDLK_KP_5:          return Key::Numpad5;
+      case SDLK_KP_6:          return Key::Numpad6;
+      case SDLK_KP_7:          return Key::Numpad7;
+      case SDLK_KP_8:          return Key::Numpad8;
+      case SDLK_KP_9:          return Key::Numpad9;
+      case SDLK_KP_PERIOD:    return Key::Decimal;
+      case SDLK_KP_DIVIDE:    return Key::Divide;
+      case SDLK_KP_MULTIPLY:  return Key::Multiply;
+      case SDLK_KP_MINUS:     return Key::Subtract;
+      case SDLK_KP_PLUS:      return Key::Add;
+      case SDLK_KP_ENTER:     return Key::NumpadEnter;
+      case SDLK_KP_EQUALS:    return Key::NumpadEquals;
+      case SDLK_UP:           return Key::ArrowUp;
+      case SDLK_DOWN:         return Key::ArrowDown;
+      case SDLK_RIGHT:        return Key::ArrowRight;
+      case SDLK_LEFT:         return Key::ArrowLeft;
+      case SDLK_INSERT:       return Key::Insert;
+      case SDLK_HOME:         return Key::Home;
+      case SDLK_END:          return Key::End;
+      case SDLK_PAGEUP:       return Key::PageUp;
+      case SDLK_PAGEDOWN:     return Key::PageDown;
+      case SDLK_F1:           return Key::F1;
+      case SDLK_F2:           return Key::F2;
+      case SDLK_F3:           return Key::F3;
+      case SDLK_F4:           return Key::F4;
+      case SDLK_F5:           return Key::F5;
+      case SDLK_F6:           return Key::F6;
+      case SDLK_F7:           return Key::F7;
+      case SDLK_F8:           return Key::F8;
+      case SDLK_F9:           return Key::F9;
+      case SDLK_F10:          return Key::F10;
+      case SDLK_F11:          return Key::F11;
+      case SDLK_F12:          return Key::F12;
+      case SDLK_F13:          return Key::F13;
+      case SDLK_F14:          return Key::F14;
+      case SDLK_F15:          return Key::F15;
+   //   case SDLK_NUMLOCKCLEAR: return Key::NumLock; // is it correct?
+      case SDLK_SCROLLLOCK:    return Key::ScrollLock;
+      case SDLK_RSHIFT:       return Key::RightShift;
+      case SDLK_LSHIFT:       return Key::LeftShift;
+      case SDLK_RCTRL:        return Key::RightControl;
+      case SDLK_LCTRL:        return Key::LeftControl;
+      case SDLK_RALT:         return Key::RightAlt;
+      case SDLK_LALT:         return Key::LeftAlt;
+  //    case SDLK_LSUPER:       return Key::LeftWindows;
+   //   case SDLK_RSUPER:       return Key::RightWindows;
+      case SDLK_SYSREQ:       return Key::SysRq;
+      case SDLK_MENU:         return Key::AppMenu;
+      case SDLK_POWER:        return Key::Power;
+      default:                return Key::Unknown;
+      }
+      return Key::Unknown;
+   }
+
+CEGUI::MouseButton GUIManager::SDLButtonTOCEGUIButton( Uint8 button )
+   {
+   using namespace CEGUI;
+   switch( button )
+      {
+      case SDL_BUTTON_LEFT:   return MouseButton::LeftButton;
+      case SDL_BUTTON_MIDDLE: return MouseButton::MiddleButton;
+      case SDL_BUTTON_RIGHT:  return MouseButton::RightButton;
+      case SDL_BUTTON_X1:     return MouseButton::X1Button;
+      case SDL_BUTTON_X2:     return MouseButton::X2Button;
+      default:                return MouseButton::NoButton;
+      }
+   return MouseButton::NoButton;
    }

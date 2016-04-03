@@ -50,14 +50,14 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
    m_pUIRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "ui_root" );
    m_pRoot->addChild( m_pUIRoot );
 
-   CEGUI::Window* pWindow =  CEGUI::WindowManager::getSingleton().createWindow(  "WindowsLook/FrameWindow", "Dialog"  );
-   m_pPromptRoot->addChild( pWindow );
-   CEGUI::WindowManager::getSingleton().destroyWindow( pWindow );
+ //  CEGUI::Window* pWindow =  CEGUI::WindowManager::getSingleton().createWindow(  "WindowsLook/FrameWindow", "Dialog"  );
+  // m_pPromptRoot->addChild( pWindow );
+ //  CEGUI::WindowManager::getSingleton().destroyWindow( pWindow );
 
  //  m_pPromptRoot->addChild( pWindow );
 //   CEGUI::WindowManager::getSingleton().destroyWindow( pWindow );
   // ENG_NEW Dialog( m_pPromptRoot, std::wstring( _T( "一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四" ) ), std::wstring( _T( "警告" ) ), MB_ABORTRETRYIGNORE );
- // Dialog( m_pPromptRoot, std::wstring( _T( "一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四" ) ), std::wstring( _T( "警告" ) ), MB_ABORTRETRYIGNORE );
+  Dialog( m_pPromptRoot, std::wstring( _T( "一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四" ) ), std::wstring( _T( "警告" ) ), MB_ABORTRETRYIGNORE );
 	
    }
 

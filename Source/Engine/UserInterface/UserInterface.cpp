@@ -19,7 +19,7 @@ Dialog::~Dialog( void )
    //   m_pWindow->removeChild( pWindow );
     //  pWindow = NULL;
      //CEGUI::WindowManager::getSingleton().destroyWindow( m_pWindow->getTitlebar() );
-      CEGUI::WindowManager::getSingleton().destroyWindow( m_pWindow );
+   //   CEGUI::WindowManager::getSingleton().destroyWindow( m_pWindow );
       m_pWindow = NULL;
       }
    }

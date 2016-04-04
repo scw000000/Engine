@@ -8,18 +8,11 @@
 
 Dialog::~Dialog( void )
    {
-   std::cout << "delete" << std::endl;
    if( m_pWindow )
       {
-      std::cout << "delete" << std::endl;
-     // CEGUI::Window* pWindow = m_pWindow->getTitlebar();
-      m_pWindow->removeAllEvents();
-      
-      //m_pWindow->getParent()->destroyChild( m_pWindow );
-   //   m_pWindow->removeChild( pWindow );
-    //  pWindow = NULL;
-     //CEGUI::WindowManager::getSingleton().destroyWindow( m_pWindow->getTitlebar() );
-   //   CEGUI::WindowManager::getSingleton().destroyWindow( m_pWindow );
+      std::cout << "out" << std::endl;
+     // m_pWindow->removeAllEvents();
+     // CEGUI::WindowManager::getSingleton().destroyWindow( m_pWindow );
       m_pWindow = NULL;
       }
    }
@@ -71,7 +64,6 @@ Dialog::Dialog( CEGUI::Window* pRoot, const std::wstring& msg, const std::wstrin
       CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_CONTINUE", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
       button0->setText( "CONTINUE" );
       button0->setID( 0 );
-      button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       std::cout << "subscribe" << std::endl;
       m_pWindow->addChild( button0 );
 
@@ -123,6 +115,8 @@ Dialog::Dialog( CEGUI::Window* pRoot, const std::wstring& msg, const std::wstrin
       CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_YES", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
       button0->setText( "YES" );
       button0->setID( 0 );
+      button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
+      button0->setEnabled( true );
       m_pWindow->addChild( button0 );
 
       CEGUI::PushButton* button1 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_NO", Vec4( 0.0f, borderWidth * 2.0f + btnWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
@@ -175,6 +169,10 @@ CEGUI::Window* Dialog::CreateCEGUIWindow( const std::string &type, const std::st
 
 bool Dialog::OnButtonClicked( const CEGUI::EventArgs& arg )
    {
-   std::cout << "fuck" << std::endl;
+   std::cout << "buttonClicked" << std::endl;
+   const CEGUI::MouseEventArgs& mouseArgs = static_cast<const CEGUI::MouseEventArgs&>( arg );
+   int id = mouseArgs.window->getID();
+   std::cout << id << std::endl;
+
    return true;
    }

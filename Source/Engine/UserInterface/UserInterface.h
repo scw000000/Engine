@@ -17,6 +17,7 @@ enum MessageBox_Questions
   
 class Dialog
    {
+   friend class GUIManager;
    public:  
       Dialog( CEGUI::Window* pRoot, const std::wstring& msg, const std::wstring& title, int buttonFlags = MB_OK);
       ~Dialog( void );

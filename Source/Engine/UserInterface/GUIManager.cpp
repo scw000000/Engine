@@ -45,11 +45,20 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
 
    m_pRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "root" );
    m_pContext->setRootWindow( m_pRoot );
-   m_pPromptRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "prompt_root" );
-   m_pRoot->addChild( m_pPromptRoot );
-   m_pUIRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "ui_root" );
-   m_pRoot->addChild( m_pUIRoot );
 
+   m_pPromptRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "prompt_root" );
+   m_pPromptRoot->setMousePassThroughEnabled( true );
+   m_pRoot->addChild( m_pPromptRoot );
+  
+
+   m_pUIRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "ui_root" );
+   m_pUIRoot->setMousePassThroughEnabled( true );
+   m_pRoot->addChild( m_pUIRoot );
+   
+
+   //m_pUIRoot->setSize( CEGUI::USize( CEGUI::UDim( 0.0f, 0.0f ), CEGUI::UDim( 0.0f, 0.0f ) ) );
+   
+   
  //  CEGUI::Window* pWindow =  CEGUI::WindowManager::getSingleton().createWindow(  "WindowsLook/FrameWindow", "Dialog"  );
   // m_pPromptRoot->addChild( pWindow );
  //  CEGUI::WindowManager::getSingleton().destroyWindow( pWindow );
@@ -57,7 +66,7 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
  //  m_pPromptRoot->addChild( pWindow );
 //   CEGUI::WindowManager::getSingleton().destroyWindow( pWindow );
   // ENG_NEW Dialog( m_pPromptRoot, std::wstring( _T( "一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四" ) ), std::wstring( _T( "警告" ) ), MB_ABORTRETRYIGNORE );
-  Dialog( m_pPromptRoot, std::wstring( _T( "一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四" ) ), std::wstring( _T( "警告" ) ), MB_ABORTRETRYIGNORE );
+ // Dialog( m_pPromptRoot, std::wstring( _T( "一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四" ) ), std::wstring( _T( "警告" ) ), MB_ABORTRETRYIGNORE );
 	
    }
 
@@ -163,12 +172,13 @@ int GUIManager::Ask( MessageBox_Questions question )
 
 	if ( true || g_pApp && g_pApp->IsRunning() )
 	   {
-      SDL_ShowCursor( true );
-		ShowCursor(true);
-		shared_ptr<Dialog> pDialog( ENG_NEW Dialog( m_pPromptRoot, msg, title, buttonFlags ) );
-		//int result = g_pApp->Modal(pMessageBox, defaultAnswer);
+      SDL_ShowCursor( SDL_ENABLE );
+	//	shared_ptr<Dialog> pDialog( ENG_NEW Dialog( m_pPromptRoot, msg, title, buttonFlags ) );
+		Dialog *pDialog = ENG_NEW Dialog( m_pPromptRoot, msg, title, buttonFlags );
+      //int result = g_pApp->Modal(pMessageBox, defaultAnswer);
+
       int result = 0;
-		SDL_ShowCursor( false );
+		SDL_ShowCursor( SDL_ENABLE );
 		return result;
 	   }
 	// If the engine is not exist, still pop a message box

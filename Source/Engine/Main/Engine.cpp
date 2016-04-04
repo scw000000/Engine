@@ -63,7 +63,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       }
    #endif
 
-   SDL_ShowCursor( SDL_DISABLE );
+   //SDL_ShowCursor( SDL_DISABLE );
    
    //--------------------------------- 
    // Check system requirements

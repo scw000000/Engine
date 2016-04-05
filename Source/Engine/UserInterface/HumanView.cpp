@@ -159,3 +159,8 @@ void HumanView::VRemoveElement( shared_ptr<IScreenElement> pElement )
    m_ScreenElements.remove(pElement);
    }
 
+int HumanView::Ask( MessageBox_Questions question )
+   {
+   return m_pGUIManager->Ask( question );
+   }
+

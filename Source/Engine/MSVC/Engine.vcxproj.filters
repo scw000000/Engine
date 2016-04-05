@@ -31,9 +31,6 @@
     <Filter Include="ResourceCache">
       <UniqueIdentifier>{824d2cd5-53c1-4719-a4fa-c3d973385592}</UniqueIdentifier>
     </Filter>
-    <Filter Include="NewFilter1">
-      <UniqueIdentifier>{de80eb4f-1885-4e19-80d8-b94a86d960d7}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">

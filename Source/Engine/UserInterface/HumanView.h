@@ -3,6 +3,9 @@
 // Filename: HumanView.h
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "UserInterface.h"
+#include "GUIManager.h"
+
 class GUIManager;
 
 typedef std::list< shared_ptr< IScreenElement > > ScreenElementList;
@@ -32,9 +35,11 @@ class HumanView : public IGameView
 	   virtual void VPushElement(shared_ptr<IScreenElement> pElement);
 	   virtual void VRemoveElement(shared_ptr<IScreenElement> pElement);
 
-      ProcessManager* GetProcessManager() { return m_pProcessManager; }
+      ProcessManager* GetProcessManager( void ) { return m_pProcessManager; }
 	   //void TogglePause(bool active);
-
+      int Ask( MessageBox_Questions question );
+      bool HasModalDialog( void ) { return m_pGUIManager->HasModalDialog() != 0; }
+      Uint32 GetModalEventType( void ) { return m_pGUIManager->GetModalEventType(); }
 	   //HumanView(shared_ptr<IRenderer> renderer);
 
    public:

@@ -14,6 +14,8 @@ GUIManager::GUIManager( void )
    m_pRoot = NULL;
    m_pPromptRoot = NULL;
    m_pUIRoot = NULL;
+   m_ModalEventType = 0;
+   m_HasModalDialog = 0;
    }
 
 void GUIManager::Init(  const std::string& resourceDirectory  )
@@ -45,6 +47,7 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
 
    m_pRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "root" );
    m_pContext->setRootWindow( m_pRoot );
+   m_pRoot->setMousePassThroughEnabled( true );
 
    m_pPromptRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "prompt_root" );
    m_pPromptRoot->setMousePassThroughEnabled( true );
@@ -54,20 +57,9 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
    m_pUIRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "ui_root" );
    m_pUIRoot->setMousePassThroughEnabled( true );
    m_pRoot->addChild( m_pUIRoot );
-   
 
-   //m_pUIRoot->setSize( CEGUI::USize( CEGUI::UDim( 0.0f, 0.0f ), CEGUI::UDim( 0.0f, 0.0f ) ) );
-   
-   
- //  CEGUI::Window* pWindow =  CEGUI::WindowManager::getSingleton().createWindow(  "WindowsLook/FrameWindow", "Dialog"  );
-  // m_pPromptRoot->addChild( pWindow );
- //  CEGUI::WindowManager::getSingleton().destroyWindow( pWindow );
-
- //  m_pPromptRoot->addChild( pWindow );
-//   CEGUI::WindowManager::getSingleton().destroyWindow( pWindow );
-  // ENG_NEW Dialog( m_pPromptRoot, std::wstring( _T( "一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四" ) ), std::wstring( _T( "警告" ) ), MB_ABORTRETRYIGNORE );
- // Dialog( m_pPromptRoot, std::wstring( _T( "一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四一二三四" ) ), std::wstring( _T( "警告" ) ), MB_ABORTRETRYIGNORE );
-	
+   m_ModalEventType = SDL_RegisterEvents( 1 );
+   ENG_ASSERT( m_ModalEventType != ((Uint32)-1) );
    }
 
 void GUIManager::Destory( void )
@@ -99,7 +91,6 @@ void GUIManager::OnUpdate( const int deltaMs )
 
 void GUIManager::OnRender( double fTime, float fElapsedTime )
    {
- //  std::cout << m_pPromptRoot->getChildCount() << std::endl;
    s_pRenderer->beginRendering();
    m_pContext->draw();
    s_pRenderer->endRendering();
@@ -110,20 +101,36 @@ int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
    switch( event.type )
       {
       case SDL_MOUSEBUTTONDOWN:
-      std::cout << "mother fucjker" << std::endl;
-         m_pContext->injectMouseButtonDown( SDLButtonTOCEGUIButton( event.button.button ) );    
+         if( m_pContext->injectMouseButtonDown( SDLButtonTOCEGUIButton( event.button.button ) ) || m_HasModalDialog )
+            {
+            return 1;
+            }
+         
          break;
       case SDL_MOUSEBUTTONUP:
-         m_pContext->injectMouseButtonUp( SDLButtonTOCEGUIButton( event.button.button ) );
+         if( m_pContext->injectMouseButtonUp( SDLButtonTOCEGUIButton( event.button.button ) ) || m_HasModalDialog )
+            {
+            return 1;
+            }
          break;
       case SDL_MOUSEMOTION:
-         m_pContext->injectMousePosition( (float)event.motion.x, (float)event.motion.y );
+         if( m_pContext->injectMousePosition( (float)event.motion.x, (float)event.motion.y ) || m_HasModalDialog )
+            {
+            return 1;
+            }
          break;
       case SDL_KEYDOWN:
-         m_pContext->injectKeyDown( SDLKeyToCEGUIKey( event.key.keysym.sym ) );
+         if( m_pContext->injectKeyDown( SDLKeyToCEGUIKey( event.key.keysym.sym ) ) || m_HasModalDialog )
+            {
+            
+            return 1;
+            }
          break;
       case SDL_KEYUP:
-         m_pContext->injectKeyUp( SDLKeyToCEGUIKey( event.key.keysym.sym ) );
+         if( m_pContext->injectKeyUp( SDLKeyToCEGUIKey( event.key.keysym.sym ) ) || m_HasModalDialog )
+            {
+            return 1;
+            }
          break;
       case SDL_TEXTINPUT:
          // TODO: this convertion is wrong, we need to convert event.text.text (UTF8) to codePoint (UTF32)
@@ -133,9 +140,15 @@ int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
             {
             codePoint |= event.text.text[i] << ( i * 8 );
             }
-         m_pContext->injectChar( codePoint );
+         if( m_pContext->injectChar( codePoint ) || m_HasModalDialog )
+            {
+            return 1;
+            }
          break;
+               
       }
+
+   std::cout << " unprocessed event " << event.type  << std::endl;
    return 0;
    }
 
@@ -170,11 +183,20 @@ int GUIManager::Ask( MessageBox_Questions question )
 			return IDCANCEL;
 	   }
 
-	if ( true || g_pApp && g_pApp->IsRunning() )
+	if ( m_pContext )
 	   {
+      if ( m_HasModalDialog & 0x10000000 )
+	      {
+		   ENG_ASSERT( 0 && "Too Many nested dialogs!" );
+		   return defaultAnswer;
+	      }
+      m_HasModalDialog <<= 1;
+	   m_HasModalDialog |= 1;
+
       SDL_ShowCursor( SDL_ENABLE );
 	//	shared_ptr<Dialog> pDialog( ENG_NEW Dialog( m_pPromptRoot, msg, title, buttonFlags ) );
-		Dialog *pDialog = ENG_NEW Dialog( m_pPromptRoot, msg, title, buttonFlags );
+		Dialog *pDialog = ENG_NEW Dialog( m_pPromptRoot, m_ModalEventType, msg, title, buttonFlags );
+      pDialog->m_pWindow->setModalState( true );
       //int result = g_pApp->Modal(pMessageBox, defaultAnswer);
 
       int result = 0;
@@ -182,7 +204,7 @@ int GUIManager::Ask( MessageBox_Questions question )
 		return result;
 	   }
 	// If the engine is not exist, still pop a message box
-	return -1;
+	return 0;
    //return ::MessageBox(g_pApp ? g_pApp->GetHwnd() : NULL, msg.c_str(), title.c_str(), buttonFlags);
    }
 
@@ -300,6 +322,7 @@ CEGUI::Key::Scan GUIManager::SDLKeyToCEGUIKey( SDL_Keycode key )
       case SDLK_POWER:        return Key::Power;
       default:                return Key::Unknown;
       }
+      std::cout << "unkown key" << std::endl;
       return Key::Unknown;
    }
 

@@ -10,8 +10,9 @@
 #include "../Mainloop/Initialization.h"
 #include "../Main/BaseGameLogic.h"
 #include "../ResourceCache/ResourceCache.h"
-//#include "../UserInterface/UserInterface.h"
+#include "../UserInterface/UserInterface.h"
 
+class HumanView;
 
 class EngineApp
    {
@@ -33,6 +34,10 @@ class EngineApp
       BaseGameLogic* VCreateGameAndView();
       Point GetScreenSize( void ) const { return m_screenSize; }
 
+      int Modal( shared_ptr<Dialog> pModalScreen, int defaultAnswer );
+      HumanView* GetHumanView();
+
+
    public:
       struct EngineOptions m_EngineOptions;
       TCHAR m_saveGameDirectory[MAX_PATH];
@@ -40,7 +45,9 @@ class EngineApp
       ResCache *m_ResCache;
 
    protected:
-      void FlashWhileMinized( void );
+      int PumpUntilMessage( Uint32& eventEnd, Sint32& code );
+      void FlashWhileMinimized( void );
+      int  PushUserEvent( Uint32 eventType, Sint32 code, void* d1 = NULL, void* d2 = NULL );
 
       void MsgProc( void );
       void OnUpdateGame( double fTime, float fElapsedTime );
@@ -62,6 +69,7 @@ class EngineApp
       bool m_bQuitRequested;
       Point m_screenSize;					// game screen size
       SDL_Window *m_pWindow;
+      Uint32 m_ShutDownEventType;
 
    private:
  

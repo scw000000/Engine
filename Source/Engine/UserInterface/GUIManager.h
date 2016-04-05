@@ -9,6 +9,8 @@
 
 typedef shared_ptr<IScreenElement> StrongScreenElementPtr;
 
+
+
 class GUIManager
    {
    friend class Dialog;
@@ -25,6 +27,8 @@ class GUIManager
       int  OnMsgProc( SDL_Event event ); // process the OS event
 
       int Ask( MessageBox_Questions question );
+      bool HasModalDialog( void ){ return m_HasModalDialog != 0; }
+      Uint32 GetModalEventType( void ){ return m_ModalEventType; }
 
    protected:
       static CEGUI::Key::Scan SDLKeyToCEGUIKey( SDL_Keycode key );
@@ -37,4 +41,6 @@ class GUIManager
       CEGUI::Window* m_pRoot;
       CEGUI::Window* m_pPromptRoot;
       CEGUI::Window* m_pUIRoot;
+      Uint32 m_ModalEventType;
+      int m_HasModalDialog;
    };

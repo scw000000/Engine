@@ -23,6 +23,7 @@ EngineApp::EngineApp( void )
 
    m_screenSize = Point(0,0);
    m_pWindow = NULL;
+   m_ShutDownEventType = 0;
    
    }
 
@@ -141,6 +142,9 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
    // setting clear color
    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
+
+   m_ShutDownEventType = SDL_RegisterEvents( 1 );
+   ENG_ASSERT( m_ShutDownEventType != ((Uint32)-1) );
    //--------------------------------- 
    // Initiate window & SDL, glew
    //--------------------------------- 
@@ -189,38 +193,44 @@ void EngineApp::MsgProc( void )
             
          break;
 
-         case SDL_QUIT:
+         case SDL_QUIT: // this case is triggered by hitting 'x' at the window
+            if( m_bQuitRequested )
+               {
+               return;
+               }
 
             m_bQuitRequested = true;
-            m_bQuitting = true;
-			   return;
-            /*
+            
             // remenber to process additional messagebox
-            if ( MessageBox::Ask(QUESTION_QUIT_GAME) == IDNO )
+            if ( GetHumanView()->Ask( QUESTION_QUIT_GAME ) == IDNO )
 				   {
-					   // Bail - quit aborted
-					
-					   // Reset quit requested flag
-					   m_bQuitRequested = false;
-					
-					   return;
-				      }
-			      }*/
-           
-			   
-         break;
+               // We've cleared the dialog, Reset quit requested flag
+					m_bQuitRequested = false;
+					return; 
+			      }
+            m_bQuitting = true;
+            break;
 
          case SDL_KEYDOWN:
-         break;
+            break;
 
          }// Switch
+      if( event.type == m_ShutDownEventType )
+         {
+         if( GetHumanView()->HasModalDialog() )
+            {
+            // force the dialog to exit
+            ENG_ASSERT( PushUserEvent( GetHumanView()->GetModalEventType(), g_QuitNoPrompt ) >= 0 );
+            // force next dialog( if it exists ) to exit
+            ENG_ASSERT( PushUserEvent( m_ShutDownEventType, 0 ) >= 0 );
+            }
+         }
       // send event to all of game views
       for( auto i = m_pGame->m_gameViews.rbegin(); i != m_pGame->m_gameViews.rend(); ++i) 
 		   {
 			if ( (*i)->VOnMsgProc( event ) )
 				{
-				//return true;
-				break;				// WARNING! This breaks out of the for loop.
+				return;
 			   }
 			}
       }// If poll event exist
@@ -236,6 +246,77 @@ BaseGameLogic *EngineApp::VCreateGameAndView( void )
 	m_pGame->VAddView( menuView );
 	return m_pGame;
    }
+
+int EngineApp::Modal( shared_ptr<Dialog> pModalScreen, int defaultAnswer )
+   {
+   ENG_ASSERT( GetWindow() != NULL && _T("Main Window is NULL!") );
+   // if the dialog poped out while the window is minimized, flash it to notify
+	if ( IsIconic(GetHwnd()) )
+	   {
+		FlashWhileMinimized();
+	   }
+  // int result = PumpUntilMessage(g_MsgEndModal, NULL, &lParam);
+
+   }
+
+HumanView* EngineApp::GetHumanView()
+   {
+   for( auto it = m_pGame->m_gameViews.begin(); it != m_pGame->m_gameViews.end(); ++it )
+      {
+      if( (*it)->VGetType() == GameViewType::GameView_Human )
+         {
+         shared_ptr<IGameView> pIGameView( *it );
+			return static_cast<HumanView *>( &*pIGameView );
+         }
+      }
+   }
+
+//
+// class GameCodeApp::PumpUntilMessage			- Chapter 10, page 295
+//
+int EngineApp::PumpUntilMessage( Uint32& eventEnd, Sint32& code )
+{
+   SDL_Event event;
+	int currentTime = timeGetTime();
+	for ( ;; )
+	   {
+		if ( SDL_PeepEvents( &event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) )
+		   {
+         // it should be the event we want
+			if ( event.type == eventEnd )
+			   {
+				SDL_PeepEvents( &event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT );
+            code = event.user.type;
+				break;
+			   }
+			else
+			   {
+            // Default processing
+				MsgProc();
+			   }
+		   }
+		else
+		   {
+			// Update the game views, but nothing else! ( actor & game logic state skipped ) 
+			// Remember this is a modal screen.
+			if ( m_pGame )
+			   {
+				double fAppTime = 0.0;
+            double fAbsoluteTime = 0.0;
+            float  fElapasedTime = 0.0f;
+            GetGlobalTimer()->GetTimeValues( &fAppTime, &fAbsoluteTime, &fElapasedTime );
+				for( auto i = m_pGame->m_gameViews.begin(); i!=m_pGame->m_gameViews.end(); ++i )
+				   {
+					(*i)->VOnUpdate( (int) ( fElapasedTime * 1000.f ) );
+				   }
+				OnFrameRender( fAppTime, fElapasedTime );
+			   }
+		   }
+	}
+	
+
+	return 0;
+}
 
 void EngineApp::MainLoop( void )
    {
@@ -263,7 +344,7 @@ void EngineApp::OnUpdateGame( double fTime, float fElapsedTime )
 	   {
       SDL_Event event;
       event.type = SDL_QUIT;
-      SDL_PushEvent(&event);
+      ENG_ASSERT( SDL_PushEvent( &event ) >= 0 );
 	   }
 
 	   if (m_pGame)
@@ -291,7 +372,7 @@ void EngineApp::OnFrameRender( double fTime, float fElapsedTime )
 
    }
 
-void EngineApp::FlashWhileMinized( void )
+void EngineApp::FlashWhileMinimized( void )
    {
  
    if( !GetHwnd() )
@@ -348,6 +429,17 @@ void EngineApp::FlashWhileMinized( void )
          }
       }
 
+   }
+
+int  EngineApp::PushUserEvent( Uint32 eventType, Sint32 code, void* d1, void* d2 )
+   {
+   SDL_Event event;
+   SDL_zero( event );
+   event.type = eventType;
+   event.user.code = code;
+   event.user.data1 = d1;
+   event.user.data2 = d2;
+   return SDL_PushEvent( &event );
    }
 
 void EngineApp::OnClose()

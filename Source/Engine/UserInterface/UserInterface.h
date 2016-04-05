@@ -8,6 +8,8 @@
 #include "CEGUI/CEGUI.h"
 #include "CEGUI/RendererModules/OpenGL/GL3Renderer.h"
 
+const Uint32 g_QuitNoPrompt = -1;
+
 enum MessageBox_Questions 
    {
 	QUESTION_WHERES_THE_CD,
@@ -19,7 +21,7 @@ class Dialog
    {
    friend class GUIManager;
    public:  
-      Dialog( CEGUI::Window* pRoot, const std::wstring& msg, const std::wstring& title, int buttonFlags = MB_OK);
+      Dialog( CEGUI::Window* pRoot, Uint32 eventType,const std::wstring& msg, const std::wstring& title, int buttonFlags = MB_OK);
       ~Dialog( void );
       virtual int VOnRestore( void ) { return 0; }
       virtual void VSetVisible( const bool isVisible ) { }
@@ -31,4 +33,5 @@ class Dialog
 
    protected:
       CEGUI::FrameWindow* m_pWindow;
-       };
+      Uint32 m_EventType;  
+    };

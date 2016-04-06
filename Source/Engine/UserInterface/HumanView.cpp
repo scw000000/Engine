@@ -139,7 +139,7 @@ void HumanView::VOnUpdate( const unsigned long deltaMs )
    if( test )
       {
       test = false;
-      m_pGUIManager->Ask( QUESTION_QUIT_GAME );
+      m_pGUIManager->Ask( QUESTION_WHERES_THE_CD );
       }
    m_pGUIManager->OnUpdate( deltaMs );
    m_pProcessManager->UpdateProcesses( deltaMs );

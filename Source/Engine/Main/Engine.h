@@ -35,7 +35,7 @@ class EngineApp
       Point GetScreenSize( void ) const { return m_screenSize; }
 
       int Modal( shared_ptr<Dialog> pModalScreen, int defaultAnswer );
-      HumanView* GetHumanView();
+      HumanView* GetHumanView( void );
 
 
    public:

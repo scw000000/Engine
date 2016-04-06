@@ -18,7 +18,8 @@ Dialog::~Dialog( void )
 Dialog::Dialog( CEGUI::Window* pRoot, Uint32 eventType, const std::wstring& msg, const std::wstring& title, int buttonFlags )
    {
    ENG_ASSERT( pRoot );
-   CEGUI::Window* p_Window = CreateCEGUIWindow( "WindowsLook/FrameWindow", "Dialog" );
+   // Be aware! creating CEGUI window must specify unique name, or it will throw exception
+   CEGUI::Window* p_Window = CreateCEGUIWindow( "WindowsLook/FrameWindow", ws2s( msg ) );
    m_pWindow = static_cast<CEGUI::FrameWindow*>( p_Window );
    pRoot->addChild( m_pWindow );
 

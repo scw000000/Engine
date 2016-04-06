@@ -194,13 +194,15 @@ int GUIManager::Ask( MessageBox_Questions question )
 	   m_HasModalDialog |= 1;
 
       SDL_ShowCursor( SDL_ENABLE );
-	//	shared_ptr<Dialog> pDialog( ENG_NEW Dialog( m_pPromptRoot, msg, title, buttonFlags ) );
-		Dialog *pDialog = ENG_NEW Dialog( m_pPromptRoot, m_ModalEventType, msg, title, buttonFlags );
+		shared_ptr<Dialog> pDialog( ENG_NEW Dialog( m_pPromptRoot, m_ModalEventType, msg, title, buttonFlags ) );
       pDialog->m_pWindow->setModalState( true );
-      //int result = g_pApp->Modal(pMessageBox, defaultAnswer);
+      int result = g_pApp->Modal( pDialog, defaultAnswer );
 
-      int result = 0;
-		SDL_ShowCursor( SDL_ENABLE );
+      m_HasModalDialog >>= 1;
+      if( !m_HasModalDialog )
+         {
+         SDL_ShowCursor( SDL_DISABLE );
+         }
 		return result;
 	   }
 	// If the engine is not exist, still pop a message box

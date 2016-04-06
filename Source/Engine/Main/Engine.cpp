@@ -63,8 +63,6 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       return false;
       }
    #endif
-
-   //SDL_ShowCursor( SDL_DISABLE );
    
    //--------------------------------- 
    // Check system requirements
@@ -122,6 +120,8 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       }
 
 	m_screenSize = Point( screenWidth, screenHeight );
+
+   SDL_ShowCursor( SDL_DISABLE );
 
    // setup opengl rendering context
    SDL_GLContext glContext = SDL_GL_CreateContext( m_pWindow );
@@ -184,15 +184,32 @@ Uint32 EngineApp::GetWindowState( void )
 
 void EngineApp::MsgProc( void )
    {
+   ENG_LOG( "Test", "MSG" );
    SDL_Event event;
+   HumanView*  pHumanView;
    if( SDL_PollEvent( &event ) )
       {
+      if( event.type == m_ShutDownEventType )
+         {
+         pHumanView = GetHumanView();
+         if( pHumanView && pHumanView->HasModalDialog() )
+            {
+            // force the dialog to exit
+            ENG_ASSERT( PushUserEvent( pHumanView->GetModalEventType(), g_QuitNoPrompt ) >= 0 );
+            // force next dialog( if it exists ) to exit
+            ENG_ASSERT( PushUserEvent( m_ShutDownEventType, 0 ) >= 0 );
+            }
+         else // this should not happen
+            {
+            m_bQuitting = true;
+            }
+         return;
+         }
       switch( event.type )
          {
          case SDL_WINDOWEVENT:
             
          break;
-
          case SDL_QUIT: // this case is triggered by hitting 'x' at the window
             if( m_bQuitRequested )
                {
@@ -200,9 +217,9 @@ void EngineApp::MsgProc( void )
                }
 
             m_bQuitRequested = true;
-            
+            pHumanView = GetHumanView();
             // remenber to process additional messagebox
-            if ( GetHumanView()->Ask( QUESTION_QUIT_GAME ) == IDNO )
+            if ( pHumanView && pHumanView->Ask( QUESTION_QUIT_GAME ) == IDNO )
 				   {
                // We've cleared the dialog, Reset quit requested flag
 					m_bQuitRequested = false;
@@ -210,29 +227,37 @@ void EngineApp::MsgProc( void )
 			      }
             m_bQuitting = true;
             break;
-
          case SDL_KEYDOWN:
-            break;
-
-         }// Switch
-      if( event.type == m_ShutDownEventType )
-         {
-         if( GetHumanView()->HasModalDialog() )
-            {
-            // force the dialog to exit
-            ENG_ASSERT( PushUserEvent( GetHumanView()->GetModalEventType(), g_QuitNoPrompt ) >= 0 );
-            // force next dialog( if it exists ) to exit
-            ENG_ASSERT( PushUserEvent( m_ShutDownEventType, 0 ) >= 0 );
-            }
-         }
-      // send event to all of game views
-      for( auto i = m_pGame->m_gameViews.rbegin(); i != m_pGame->m_gameViews.rend(); ++i) 
-		   {
-			if ( (*i)->VOnMsgProc( event ) )
-				{
-				return;
+         case SDL_KEYUP:
+         case SDL_TEXTEDITING:
+         case SDL_TEXTINPUT:
+         case SDL_KEYMAPCHANGED:
+         case SDL_MOUSEMOTION:
+         case SDL_MOUSEBUTTONDOWN:
+         case SDL_MOUSEBUTTONUP:
+         case SDL_MOUSEWHEEL:
+         case SDL_JOYAXISMOTION:
+         case SDL_JOYBALLMOTION:
+         case SDL_JOYHATMOTION:
+         case SDL_JOYBUTTONDOWN:
+         case SDL_JOYBUTTONUP:
+         case SDL_JOYDEVICEADDED:
+         case SDL_JOYDEVICEREMOVED:
+         case SDL_CONTROLLERAXISMOTION:
+         case SDL_CONTROLLERBUTTONDOWN:
+         case SDL_CONTROLLERBUTTONUP:
+         case SDL_CONTROLLERDEVICEADDED:
+         case SDL_CONTROLLERDEVICEREMOVED:
+         case SDL_CONTROLLERDEVICEREMAPPED:
+         // send event to all of game views
+         for( auto i = m_pGame->m_gameViews.rbegin(); i != m_pGame->m_gameViews.rend(); ++i) 
+		      {
+			   if ( (*i)->VOnMsgProc( event ) )
+				   {
+				   return;
+			      }
 			   }
-			}
+         }// Switch
       }// If poll event exist
    }// Function MsgProc
 
@@ -255,20 +280,34 @@ int EngineApp::Modal( shared_ptr<Dialog> pModalScreen, int defaultAnswer )
 	   {
 		FlashWhileMinimized();
 	   }
-  // int result = PumpUntilMessage(g_MsgEndModal, NULL, &lParam);
+   HumanView*  pHumanView = GetHumanView();
+   
+   if( pHumanView )
+      {
+      Uint32 eventEndType = pHumanView->GetModalEventType();
+      Sint32 code = 0;
+      int result = PumpUntilMessage( eventEndType, code );
+      if( eventEndType == m_ShutDownEventType )
+         {
+         return defaultAnswer;
+         }
+      return (int) code;
+      }
+
+   return defaultAnswer;
 
    }
 
-HumanView* EngineApp::GetHumanView()
+HumanView* EngineApp::GetHumanView( void )
    {
    for( auto it = m_pGame->m_gameViews.begin(); it != m_pGame->m_gameViews.end(); ++it )
       {
       if( (*it)->VGetType() == GameViewType::GameView_Human )
          {
-         shared_ptr<IGameView> pIGameView( *it );
-			return static_cast<HumanView *>( &*pIGameView );
+         return static_cast<HumanView*>( &**it );
          }
       }
+   return NULL;
    }
 
 //
@@ -280,13 +319,15 @@ int EngineApp::PumpUntilMessage( Uint32& eventEnd, Sint32& code )
 	int currentTime = timeGetTime();
 	for ( ;; )
 	   {
-		if ( SDL_PeepEvents( &event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) )
+      SDL_PumpEvents();
+		if ( SDL_PeepEvents( &event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) > 0 )
 		   {
          // it should be the event we want
 			if ( event.type == eventEnd )
 			   {
 				SDL_PeepEvents( &event, 1, SDL_GETEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT );
-            code = event.user.type;
+            eventEnd = event.user.type;
+            code = event.user.code;
 				break;
 			   }
 			else
@@ -344,8 +385,8 @@ void EngineApp::OnUpdateGame( double fTime, float fElapsedTime )
 	   {
       SDL_Event event;
       event.type = SDL_QUIT;
-      ENG_ASSERT( SDL_PushEvent( &event ) >= 0 );
-	   }
+      ENG_ASSERT( PushUserEvent( m_ShutDownEventType, 0 ) );
+      }
 
 	   if (m_pGame)
 	   {

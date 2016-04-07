@@ -14,7 +14,7 @@ class XmlResourceExtraData : public IResourceExtraData
       TiXmlElement* GetRoot(void) { return m_xmlDocument.RootElement(); }
 
    private:
-      TiXmlDocument m_xmlDocument;
+      TiXmlDocument m_xmlDocument;  
    };
 
 class XmlResourceLoader : public IResourceLoader

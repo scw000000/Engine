@@ -42,11 +42,11 @@ Dialog::Dialog( CEGUI::Window* pRoot, Uint32 eventType, const std::wstring& msg,
    float borderHeight =  ( m_pWindow->getRootContainerSize().d_height * 0.008f);
    m_pWindow->setWidth( CEGUI::UDim( 0.0f, (float)numButtons * ( borderWidth + btnWidth ) + borderWidth ) );
 
-   m_pWindow->setText( (CEGUI::utf8*)( ws2UTF8s( title ).c_str() ) );
+   m_pWindow->setText(  ws2UTF8s( g_pApp->GetString( title ) ) );
    CEGUI::MultiLineEditbox* textBox = static_cast<CEGUI::MultiLineEditbox*> ( CreateCEGUIWindow( "WindowsLook/MultiLineEditbox", "textbox", Vec4( 0.0f, 0.0f, 0.0f, 0.0f ), Vec4( 1.0f, 0.0f, 1.0f, 0.f ) ) );
    // We need to attach it before get corret line number
    m_pWindow->addChild( textBox ); 
-   textBox->setText(  (CEGUI::utf8*)( ws2UTF8s( msg ).c_str() ) );
+   textBox->setText(  ws2UTF8s( g_pApp->GetString( msg ) ) );
    textBox->setReadOnly( true ); 
    float textBoxHeight = textBox->getFont()->getLineSpacing() * static_cast<float> ( textBox->getFormattedLines(  ).size() ) + 10.0f ;
    textBox->setHeight(  CEGUI::UDim( 0.0f, textBoxHeight ) );
@@ -68,19 +68,19 @@ Dialog::Dialog( CEGUI::Window* pRoot, Uint32 eventType, const std::wstring& msg,
       std::string windowName = m_pWindow->getName().c_str();
 
       CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_CONTINUE", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button0->setText( "CONTINUE" );
+      button0->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_CONTINUE" ) ) ) );
       button0->setID( IDCONTINUE );
       button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button0 );
 
       CEGUI::PushButton* button1 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_TRYAGAIN", Vec4( 0.0f, borderWidth * 2.0f + btnWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button1->setText( "TRYAGAIN" );
+      button1->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_TRYAGAIN" ) ) ) );
       button1->setID( IDTRYAGAIN );
       button1->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button1 );
 
       CEGUI::PushButton* button2 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_CANCEL", Vec4( 0.0f, borderWidth * 3.0f + btnWidth * 2.0f, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button2->setText( "CANCEL" );
+      button2->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_CANCEL" ) ) )  );
       button2->setID( IDCANCEL );
       button2->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button2 );
@@ -91,13 +91,13 @@ Dialog::Dialog( CEGUI::Window* pRoot, Uint32 eventType, const std::wstring& msg,
       std::string windowName = m_pWindow->getName().c_str();
 
       CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_OK", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button0->setText( "OK" );
+      button0->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_OK" ) ) ) );
       button0->setID( IDOK );
       button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button0 );
 
       CEGUI::PushButton* button1 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_CANCEL", Vec4( 0.0f, borderWidth * 2.0f + btnWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button1->setText( "CANCEL" );
+      button1->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_CANCEL" ) ) )  );
       button1->setID( IDCANCEL );
       button1->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button1 );
@@ -108,13 +108,13 @@ Dialog::Dialog( CEGUI::Window* pRoot, Uint32 eventType, const std::wstring& msg,
       std::string windowName = m_pWindow->getName().c_str();
 
       CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_RETRY", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button0->setText( "RETRY" );
+      button0->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_RETRY" ) ) )  );
       button0->setID( IDRETRY );
       button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button0 );
 
       CEGUI::PushButton* button1 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_CANCEL", Vec4( 0.0f, borderWidth * 2.0f + btnWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button1->setText( "CANCEL" );
+      button1->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_CANCEL" ) ) )  );
       button1->setID( IDCANCEL );
       button1->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button1 );
@@ -125,13 +125,13 @@ Dialog::Dialog( CEGUI::Window* pRoot, Uint32 eventType, const std::wstring& msg,
       std::string windowName = m_pWindow->getName().c_str();
 
       CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_YES", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button0->setText( "YES" );
+      button0->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_YES" ) ) )  );
       button0->setID( IDYES );
       button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button0 );
 
       CEGUI::PushButton* button1 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_NO", Vec4( 0.0f, borderWidth * 2.0f + btnWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button1->setText( "NO" );
+      button1->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_NO" ) ) )  );
       button1->setID( IDNO );
       button1->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button1 );
@@ -142,19 +142,19 @@ Dialog::Dialog( CEGUI::Window* pRoot, Uint32 eventType, const std::wstring& msg,
       std::string windowName = m_pWindow->getName().c_str();
 
       CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_YES", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button0->setText( "YES" );
+      button0->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_YES" ) ) )  );
       button0->setID( IDYES );
       button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button0 );
 
       CEGUI::PushButton* button1 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_NO", Vec4( 0.0f, borderWidth * 2.0f + btnWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button1->setText( "NO" );
+      button1->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_NO" ) ) )  );
       button1->setID( IDNO );
       button1->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button1 );
 
       CEGUI::PushButton* button2 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_CANCEL", Vec4( 0.0f, borderWidth * 3.0f + btnWidth * 2.0f, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button2->setText( "CANCEL" );
+      button2->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_CANCEL" ) ) )  );
       button2->setID( IDCANCEL );
       button2->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button2 );
@@ -165,7 +165,7 @@ Dialog::Dialog( CEGUI::Window* pRoot, Uint32 eventType, const std::wstring& msg,
 		std::string windowName = m_pWindow->getName().c_str();
 
       CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "WindowsLook/Button", windowName + " IDS_OK", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button0->setText( "OK" );
+      button0->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_OK" ) ) )  );
       button0->setID( IDOK );
       button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
       m_pWindow->addChild( button0 );

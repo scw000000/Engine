@@ -97,6 +97,9 @@
     <ClCompile Include="..\UserInterface\UserInterface.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
+    <ClCompile Include="..\ResourceCache\XmlResource.cpp">
+      <Filter>ResourceCache</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -172,6 +175,9 @@
     </ClInclude>
     <ClInclude Include="..\UserInterface\GUIManager.h">
       <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ResourceCache\XmlResource.h">
+      <Filter>ResourceCache</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

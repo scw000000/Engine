@@ -118,7 +118,7 @@ void Timer::GetTimeValues( double* pfTime, double* pfAbsoluteTime, float* pfElap
    *pfElapsedTime = fElapsedTime;
    }
 
-
+// This function returns how many seconds has elpased
 float Timer::GetElapsedTime()
    {
    Uint64 qwTime = GetAdjustedCurrentTime();

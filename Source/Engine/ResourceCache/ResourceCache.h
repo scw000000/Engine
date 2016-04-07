@@ -13,7 +13,8 @@
 ///////////////////////
 #include "ZipFile.h"			// needed for ZipContentsMap
 
-// Basic definition of a "resource", ex: a textrue, a music file, etc.
+// Basic definition of a single resource description, ex: a textrue, a music file, etc.
+// It only contains a name data for now
 class Resource
    {
    public:
@@ -67,6 +68,7 @@ typedef std::map < std::string, shared_ptr < ResHandle > > ResHandleMap;
 typedef std::list< shared_ptr< IResourceLoader > > ResourceLoaders;
 
 // This class holds all of resource loader and ptr to resource handle
+// Also, this class holds resource file - a zip file with all assets
 class ResCache
    {
    friend class ResHandle;
@@ -98,9 +100,27 @@ class ResCache
       ResHandleList m_lruResHandleList; // least recently used list
       ResHandleMap m_resources;
       ResourceLoaders m_resourceLoaders;
-
+      // this menber stores zip file 
       IResourceFile *m_file;
 
       unsigned int m_cacheSize; // size in bytes
       unsigned int m_allocated;
+   };
+
+class ResourceZipFile : public IResourceFile
+   {
+   public:
+	   ResourceZipFile( const std::wstring resFileName ) { m_pZipFile = NULL; m_resFileName = resFileName; }
+	   virtual ~ResourceZipFile();
+
+	   virtual bool VOpen();
+	   virtual int VGetRawResourceSize( const Resource &r );
+	   virtual int VGetRawResource( const Resource &r, char *buffer );
+	   virtual int VGetNumResources() const;
+	   virtual std::string VGetResourceName( int num ) const;
+      virtual bool VIsUsingDevelopmentDirectories( void ) const { return false; }
+   
+   private:
+      ZipFile *m_pZipFile;
+	   std::wstring m_resFileName;
    };

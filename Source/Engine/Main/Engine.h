@@ -37,6 +37,8 @@ class EngineApp
       int Modal( shared_ptr<Dialog> pModalScreen, int defaultAnswer );
       HumanView* GetHumanView( void );
 
+      bool LoadStrings( std::string language );
+      std::wstring GetString( std::wstring sID );
 
    public:
       struct EngineOptions m_EngineOptions;
@@ -70,6 +72,7 @@ class EngineApp
       Point m_screenSize;					// game screen size
       SDL_Window *m_pWindow;
       Uint32 m_ShutDownEventType;
+      std::map<std::wstring,std::wstring> m_textResource;
 
    private:
  

@@ -133,7 +133,7 @@ int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
             }
          break;
       case SDL_TEXTINPUT:
-         // TODO: this convertion is wrong, we need to convert event.text.text (UTF8) to codePoint (UTF32)
+         // LATER: this convertion is wrong, we need to convert event.text.text (UTF8) to codePoint (UTF32)
          // for m_pContext->injectChar( UTF32DATA );
          CEGUI::utf32 codePoint = 0;
          for( int i = 0; event.text.text[i] != '\0'; ++i )
@@ -152,7 +152,7 @@ int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
    return 0;
    }
 
-// TODO: implement xml resourceloader & localized string conversion
+
 int GUIManager::Ask( MessageBox_Questions question )
    {
    std::wstring msg;

@@ -136,11 +136,7 @@ int HumanView::VOnMsgProc( SDL_Event event )
 void HumanView::VOnUpdate( const unsigned long deltaMs )
    {
    static bool test = true;
-   if( test )
-      {
-      test = false;
-      m_pGUIManager->Ask( QUESTION_WHERES_THE_CD );
-      }
+
    m_pGUIManager->OnUpdate( deltaMs );
    m_pProcessManager->UpdateProcesses( deltaMs );
    for(ScreenElementList::iterator i=m_ScreenElements.begin(); i!=m_ScreenElements.end(); ++i)

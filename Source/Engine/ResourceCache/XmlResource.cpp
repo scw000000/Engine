@@ -30,7 +30,7 @@ shared_ptr<IResourceLoader> CreateXmlResourceLoader()
    return shared_ptr<IResourceLoader>( ENG_NEW XmlResourceLoader() );
    }
 
-// This handle will be pushed into m_lruResHandleList until engine exist or swapped out
+// The resource handle will be pushed into m_lruResHandleList until engine exist or swapped out
 TiXmlElement* XmlResourceLoader::LoadAndReturnRootXmlElement( const char* resourceString )
    {
    Resource resource( resourceString );

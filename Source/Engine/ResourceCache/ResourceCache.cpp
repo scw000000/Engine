@@ -13,7 +13,7 @@
 #include <cctype>			// for std::tolower
 
 
-// before restore the file name, trans from the alphabets to lowercase
+// before restore the file name, trans from the alphabets to lowercase to prevent case-sensitive situation
 Resource::Resource( const std::string &name )
    {
    m_name = name;
@@ -23,9 +23,10 @@ Resource::Resource( const std::string &name )
 
 ResHandle::ResHandle( Resource &resource, char *buffer, unsigned int size, ResCache *pResCache ) : m_resource( resource )
    {
-   const int i = 0;
-   int j = i;
-   j++;
+   m_buffer = buffer;
+	m_size = size;
+	m_extra = NULL;
+	m_pResCache = pResCache;
    }
 
 // The destructor truely free the allocated memory to resource cache
@@ -68,10 +69,11 @@ void ResCache::RegisterLoader( shared_ptr< IResourceLoader > loader )
    m_resourceLoaders.push_front( loader );
    }
 
+// This function is callled by ResCache::preload to 
 shared_ptr< ResHandle > ResCache::GetHandle( Resource *resource )
    {
    shared_ptr< ResHandle > handle( Find( resource ) );
-   // if the handle is not loaded yet ( cannot find the resource handle ), then load it
+   // if the handle is not loaded yet ( cannot find the resource handle map ), then load it
    if( !handle )
       {
       handle = Load( resource );
@@ -93,9 +95,12 @@ int ResCache::Preload( const std::string pattern, void (*progressCallback)( int,
    int numFiles = m_file->VGetNumResources();
    int loaded = 0;
    bool cancel = false;
+   // for all of files in the zip file
    for( int i = 0; i < numFiles; ++i )
       {
+      // try to get every file name in the zip file
       Resource resource( m_file->VGetResourceName( i ) );
+      // load the file if pattern is matched
       if( WildcardMatch( pattern.c_str(), resource.m_name.c_str() ) )
          {
          shared_ptr< ResHandle > handle = g_pApp->m_ResCache->GetHandle( &resource ); // use resource cache to load resource
@@ -122,14 +127,14 @@ void ResCache::Flush( void )
 	   {
 		shared_ptr<ResHandle> handle = *( m_lruResHandleList.begin() );
 		Free( handle );
-		m_lruResHandleList.pop_front(); // should this be called? remove is alreadt been called in Free()
+		// m_lruResHandleList.pop_front(); // should this be called? remove is alreadt been called in Free()
 	   }
    }
 
 shared_ptr< ResHandle > ResCache::Find( Resource *resource )
    {
    ResHandleMap::iterator i = m_resources.find( resource->m_name );
-	if (i == m_resources.end())
+	if ( i == m_resources.end() )
 		return shared_ptr<ResHandle>();
 
 	return i->second;
@@ -163,16 +168,24 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
       ENG_ASSERT( loader && _T( "Default resource loader not found!" ) );
       return handle;
       }
-
-   unsigned int rawSize = m_file->VGetRawResourceSize( *resource );
-   // if the resource do not need additional processing, then just allocate rawSize
-   char *rawBuffer = loader->VUseRawFile()? Allocate( rawSize ): ENG_NEW char[rawSize];
-   // allocate fail because of out of memory
-   if( !rawBuffer )
+   // find correspond file in zip file and return its size
+   int rawSize = m_file->VGetRawResourceSize( *resource );
+	if (rawSize < 0)
+	   { 
+		ENG_ASSERT(rawSize > 0 && "Resource size returned -1 - Resource not found");
+		return shared_ptr<ResHandle>();
+	   }
+   // add addition one byte if needed, lua resource loader will use this feature
+   int allocSize = rawSize + ( (loader->VAddNullZero() ) ? (1) : (0));
+   // if the resource do not need additional processing, then just call Allocate, 
+   // because we dont need additional buffer ( rawBuffer )
+   char *rawBuffer = loader->VUseRawFile()? Allocate( allocSize ): ENG_NEW char[ allocSize ];
+   memset( rawBuffer, 0, allocSize );
+   // allocate rawBuffer fail or cannot load raw file from zip fIle
+   if( !rawBuffer || !m_file->VGetRawResource( *resource, rawBuffer ) )
       {
       return shared_ptr< ResHandle >();
       }
-   m_file->VGetRawResource( *resource, rawBuffer );
    char *buffer = NULL;
    unsigned int size = 0;
 
@@ -189,9 +202,12 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
          {
          return shared_ptr<ResHandle>();
          }
+      // set buffer for handle
       handle = shared_ptr< ResHandle >( ENG_NEW ResHandle( *resource, buffer, size, this ) );
-      bool success = loader->VLoadResource( rawBuffer, rawSize, handle ); // for getting processed resource
-      SAFE_DELETE_ARRAY( rawBuffer ); // after processing resource, delete raw data
+      // loader store processed data into handle from rawBuffer
+      bool success = loader->VLoadResource( rawBuffer, rawSize, handle ); 
+      // after processing resource, delete raw data
+      SAFE_DELETE_ARRAY( rawBuffer ); 
       if( !success ) // process raw file failed 
          {
          return shared_ptr<ResHandle>();
@@ -202,15 +218,15 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
       m_lruResHandleList.push_front( handle ); // this resource is newly loaded, put it in the start of list
       m_resources[ resource->m_name ] = handle; // add resource name & handle mapping
       }
-   //ENG_ASSERT( loader && _T( "Default resource loader not found!" ) );
+   ENG_ASSERT( loader && _T( "Default resource loader not found!" ) );
    return handle;
    }
 
 // remove the resource from list and map
 void ResCache::Free( shared_ptr< ResHandle > gonner )
    {
-   m_lruResHandleList.remove(gonner); // This calls the destructor of shared_ptr
-	m_resources.erase(gonner->m_resource.m_name);
+   m_lruResHandleList.remove( gonner ); // This calls the destructor of shared_ptr
+	m_resources.erase( gonner->m_resource.m_name );
    // Note - the resource might still be in use by something,
 	// so the cache can't actually count the memory freed until the
 	// ResHandle pointing to it is destroyed. ( destructor of ResHandle has been called ) 
@@ -254,8 +270,9 @@ void ResCache::FreeOneResource()
    auto gonner = m_lruResHandleList.end();
    --gonner;
    shared_ptr< ResHandle > handle = *gonner;
-   m_lruResHandleList.pop_back();
-   m_resources.erase( handle->m_resource.m_name );
+   Free( handle );
+   // m_lruResHandleList.pop_back();
+  // m_resources.erase( handle->m_resource.m_name );
    }
 
 // This function is called by destructor of ResHandle
@@ -270,16 +287,16 @@ void ResCache::MemoryHasBeenFreed( unsigned int size )
 //   Searches the resource cache assets for files matching the pattern. Useful for providing a 
 //   a list of levels for a main menu screen, for example.
 //
-std::vector<std::string> ResCache::Match(const std::string pattern)
+std::vector<std::string> ResCache::Match( const std::string pattern )
    {
 	std::vector<std::string> matchingNames;
 	if ( m_file == NULL )
 		return matchingNames;
-
+   // get total number of files in zip file
 	int numFiles = m_file->VGetNumResources();
-	for (int i=0; i<numFiles; ++i)
+	for ( int i = 0; i < numFiles; ++i )
 	   {
-		std::string name = m_file->VGetResourceName(i);
+		std::string name = m_file->VGetResourceName( i );
 		std::transform(name.begin(), name.end(), name.begin(), (int(*)(int)) std::tolower);
 		if ( WildcardMatch( pattern.c_str(), name.c_str() ) )
 		   {
@@ -289,3 +306,59 @@ std::vector<std::string> ResCache::Match(const std::string pattern)
 	return matchingNames;
    }
 
+//========================================================================
+// class ResourceZipFile					- not discussed in the book
+//
+//    This class implements the IResourceFile interface with a ZipFile.
+//
+ResourceZipFile::~ResourceZipFile() 
+   { 
+	SAFE_DELETE( m_pZipFile ); 
+   }
+
+bool ResourceZipFile::VOpen()
+   {
+	m_pZipFile = ENG_NEW ZipFile;
+      if (m_pZipFile)
+      {
+		return m_pZipFile->Init( m_resFileName.c_str() );
+	   }
+	return false;	
+   }
+
+int ResourceZipFile::VGetRawResourceSize(const Resource &r)
+   {
+	int resourceNum = m_pZipFile->Find( r.m_name.c_str() );
+	if (resourceNum == -1)
+		return -1;
+
+	return m_pZipFile->GetFileLen(resourceNum);
+   }
+
+int ResourceZipFile::VGetRawResource( const Resource &r, char *buffer )
+   {
+	int size = 0;
+	optional<int> resourceNum = m_pZipFile->Find( r.m_name.c_str() );
+	if (resourceNum.valid())
+	   {
+		size = m_pZipFile->GetFileLen( *resourceNum );
+		m_pZipFile->ReadFile( *resourceNum, buffer );
+	   }
+	return size;	
+   }
+
+int ResourceZipFile::VGetNumResources() const 
+   { 
+	return ( m_pZipFile == NULL ) ? 0 : m_pZipFile->GetNumFiles(); 
+   }
+
+// return file name based on file index
+std::string ResourceZipFile::VGetResourceName( int num ) const 
+   { 
+	std::string resName = "";
+	if ( m_pZipFile != NULL && num >= 0 && num<m_pZipFile->GetNumFiles() )
+	   {
+		resName = m_pZipFile->GetFileName( num ); 
+	   }
+	return resName;
+   }

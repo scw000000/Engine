@@ -20,7 +20,7 @@ class ZipFile
       bool Init( const std::wstring &resFileName );
       void End();
 
-      int GerNumFiles() const { return m_nEntries; }
+      int GetNumFiles() const { return m_nEntries; }
       std::string GetFileName( int i ) const; // return file name based one the entry
       int GetFileLen( int i ) const;
       bool ReadFile( int i, void *pBuf );

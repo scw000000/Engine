@@ -136,8 +136,7 @@ class Mat4x4 : public glm::mat4
       // Yaw->Yaxis, Pitch->Xaxis, Roll->Zaxis
       inline void BuildYawPitchRoll( const float yawRadians, const float pitchRadians, const float rollRadians )
          { *this = glm::eulerAngleYXZ( yawRadians, pitchRadians, rollRadians ); }
-      // Todo: implement quat class first
-      inline void BuildRotationQuat() { }
+      inline void BuildRotationQuat( const Quaternion &q ) { *this = mat4_cast( q ); }
       
    public: 
       static const Mat4x4 g_Identity;

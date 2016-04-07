@@ -10,6 +10,7 @@
 #include "ActorFactory.h"
 #include "Actor.h"
 #include "ActorComponent.h"
+#include "..\ResourceCache\XmlResource.h"
 
 ActorFactory::ActorFactory( void )
    {
@@ -17,12 +18,10 @@ ActorFactory::ActorFactory( void )
    }
 
 // This version of function is different than the source code
-// Including function arguments
+// Including function arguments LATER: modify it and let it consistant
 StrongActorPtr ActorFactory::CreateActor( const char* actorResource )
    {
-   // Todo: implement XmlResourceLoader 
-   //TiXmlElement *pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( actorResource );
-   TiXmlElement *pRoot = NULL;
+   TiXmlElement *pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( actorResource );
 
    // Resource loading failed, return empty pointer
    if( !pRoot )
@@ -30,8 +29,13 @@ StrongActorPtr ActorFactory::CreateActor( const char* actorResource )
       ENG_ERROR( "Failed to create actor from resource: " + std::string( actorResource ) );
       return StrongActorPtr();
       }
-   
-   StrongActorPtr pActor( ENG_NEW Actor( GetNextActorId() ) );
+   ActorId nextActorId = GetNextActorId();
+   if( nextActorId == INVALID_ACTOR_ID )
+      {
+      ENG_ERROR( "Actor ID generation failed: " + std::string( actorResource ) );
+      }
+
+   StrongActorPtr pActor( ENG_NEW Actor( nextActorId ) );
    if( !pActor->Init( pRoot ) )
       {
       ENG_ERROR( "Failed to initialize actor " + std::string( actorResource ) );
@@ -86,7 +90,7 @@ StrongActorComponentPtr ActorFactory::CreateComponent( TiXmlElement* pData )
    std::string name( pData->Value() );
 
    // Create a component from componentFactory, the Create function take Id as argument
-   // Which means it will search its creation function based on id -> id is mapping to creation function
+   // Which means it will search its creation function based on id --> id is mapping to creation function
    // typedef BaseClass* (*ObjectCreationFunction)(void); -> called creation function    
    // std::map<IdType, ObjectCreationFunction> m_creationFunctions -> the table of creation functions 
    // ( of course these functions should be registered first )

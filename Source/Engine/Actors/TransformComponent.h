@@ -8,8 +8,6 @@
 // the transform and doesn't register with the physics system at all.
 //---------------------------------------------------------------------------------------------------------------------
 
-// Todo: implement basic math structure matrix and vector
-
 class TransformComponent : public ActorComponent
    {
    

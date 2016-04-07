@@ -7,7 +7,8 @@
 ///////////////////////
 #include "EngineStd.h"
 #include "..\UserInterface\HumanView.h"
-#include "../UserInterface/GUIManager.h"
+#include "..\UserInterface/GUIManager.h"
+#include "..\ResourceCache\XmlResource.h"
 
 
 EngineApp *g_pApp = NULL;
@@ -45,6 +46,7 @@ HWND EngineApp::GetHwnd( void )
       }
    else
       {
+      ENG_ERROR( "Error: Target Platform is not Windows" );
       return NULL;
       }
    }
@@ -89,6 +91,41 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 	   }
    //--------------------------------- 
    // Check system requirements
+   //--------------------------------- 
+
+	//--------------------------------- 
+   //  Initialize the ResCache, all asseets are within a zip file
+   //--------------------------------- 
+	IResourceFile *zipFile = ENG_NEW ResourceZipFile( L"Assets.zip" );
+
+	m_ResCache = ENG_NEW ResCache( 50, zipFile );
+
+	if ( !m_ResCache->Init() )
+	   {
+      ENG_ERROR("Failed to initialize resource cache!  Are your paths set up correctly?");
+		return false;
+	   }
+
+ //  extern shared_ptr<IResourceLoader> CreateWAVResourceLoader();
+//	extern shared_ptr<IResourceLoader> CreateOGGResourceLoader();
+	//extern shared_ptr<IResourceLoader> CreateDDSResourceLoader();
+	//extern shared_ptr<IResourceLoader> CreateJPGResourceLoader();
+   extern shared_ptr<IResourceLoader> CreateXmlResourceLoader();
+   //extern shared_ptr<IResourceLoader> CreateSdkMeshResourceLoader();
+   //extern shared_ptr<IResourceLoader> CreateScriptResourceLoader();
+
+	// Note - register these in order from least specific to most specific! They get pushed onto a list.
+	// RegisterLoader is discussed in Chapter 5, page 142
+
+   m_ResCache->RegisterLoader(CreateXmlResourceLoader());
+
+   if( !LoadStrings("English") )
+	   {
+      ENG_ERROR("Failed to load strings");
+		return false;
+	   }
+   //--------------------------------- 
+   //  Initialize the ResCache
    //--------------------------------- 
 
    //--------------------------------- 
@@ -184,7 +221,7 @@ Uint32 EngineApp::GetWindowState( void )
 
 void EngineApp::MsgProc( void )
    {
-   ENG_LOG( "Test", "MSG" );
+
    SDL_Event event;
    HumanView*  pHumanView;
    if( SDL_PollEvent( &event ) )
@@ -199,9 +236,9 @@ void EngineApp::MsgProc( void )
             // force next dialog( if it exists ) to exit
             ENG_ASSERT( PushUserEvent( m_ShutDownEventType, 0 ) >= 0 );
             }
-         else // this should not happen
+         else // this is triggered by last dialog event
             {
-            m_bQuitting = true;
+            OnClose();
             }
          return;
          }
@@ -219,11 +256,18 @@ void EngineApp::MsgProc( void )
             m_bQuitRequested = true;
             pHumanView = GetHumanView();
             // remenber to process additional messagebox
-            if ( pHumanView && pHumanView->Ask( QUESTION_QUIT_GAME ) == IDNO )
+            if ( pHumanView )
 				   {
-               // We've cleared the dialog, Reset quit requested flag
-					m_bQuitRequested = false;
-					return; 
+               if( pHumanView->Ask( QUESTION_QUIT_GAME ) == IDNO )
+                  {
+                  // We've cleared the dialog, Reset quit requested flag
+					   m_bQuitRequested = false;
+					   return; 
+                  }
+               else
+                  {
+                  PushUserEvent( m_ShutDownEventType, 0 );
+                  }
 			      }
             m_bQuitting = true;
             break;
@@ -287,7 +331,7 @@ int EngineApp::Modal( shared_ptr<Dialog> pModalScreen, int defaultAnswer )
       Uint32 eventEndType = pHumanView->GetModalEventType();
       Sint32 code = 0;
       int result = PumpUntilMessage( eventEndType, code );
-      if( eventEndType == m_ShutDownEventType )
+      if( code == g_QuitNoPrompt )
          {
          return defaultAnswer;
          }
@@ -309,6 +353,48 @@ HumanView* EngineApp::GetHumanView( void )
       }
    return NULL;
    }
+
+bool EngineApp::LoadStrings( std::string language )
+   {
+	std::string languageFile = "Strings\\";
+	languageFile += language;
+	languageFile += ".xml";
+
+	TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( languageFile.c_str() );
+	// load failed
+   if ( !pRoot )
+	   {
+		ENG_ERROR("Strings are missing.");
+		return false;
+	   }
+
+    // Loop through each child element and load the component
+    for ( TiXmlElement* pElem = pRoot->FirstChildElement(); pElem; pElem = pElem->NextSiblingElement() )
+      {
+		const char *pKey = pElem->Attribute( "id" );
+		const char *pText = pElem->Attribute( "value" );
+		if( pKey && pText ) 
+		   {
+			wchar_t wideKey[64];
+			wchar_t wideText[1024];
+			AnsiToWideCch(wideKey, pKey, 64);
+			AnsiToWideCch(wideText, pText, 1024);
+			m_textResource[ std::wstring(wideKey) ] = std::wstring(wideText);
+		   }
+	   }
+	return true;
+   }
+
+std::wstring EngineApp::GetString( std::wstring sID )
+   {
+	auto localizedString = m_textResource.find( sID );
+	if(localizedString == m_textResource.end() )
+	   {
+		ENG_ASSERT(0 && "String not found!");
+		return L"";
+	   }
+	return localizedString->second;
+   }  
 
 //
 // class GameCodeApp::PumpUntilMessage			- Chapter 10, page 295
@@ -364,10 +450,13 @@ void EngineApp::MainLoop( void )
    double fAppTime = 0.0;
    double fAbsoluteTime = 0.0;
    float  fElapasedTime = 0.0f;
-   while( !m_bQuitting  )
+   while( true  )
       {
       MsgProc();
-      
+      if( !m_bIsRunning )
+         {
+         break;
+         }
       GetGlobalTimer()->GetTimeValues( &fAppTime, &fAbsoluteTime, &fElapasedTime );
 
       OnUpdateGame( fAppTime, fElapasedTime );
@@ -383,8 +472,6 @@ void EngineApp::OnUpdateGame( double fTime, float fElapsedTime )
    {
 	if ( m_bQuitting )
 	   {
-      SDL_Event event;
-      event.type = SDL_QUIT;
       ENG_ASSERT( PushUserEvent( m_ShutDownEventType, 0 ) );
       }
 
@@ -397,7 +484,7 @@ void EngineApp::OnUpdateGame( double fTime, float fElapsedTime )
 
 void EngineApp::OnFrameRender( double fTime, float fElapsedTime )
    {
-   // TODO: move these to renderer
+   // LATER: move these to renderer
    glClearDepth( 1.0 );
    // use previously setted clearColr to draw background
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -413,57 +500,52 @@ void EngineApp::OnFrameRender( double fTime, float fElapsedTime )
 
    }
 
+// This is a WINDOWS dedicated function
+// LATER: This function doesn't work as expected, it won't "blink" on and off, and I cann't find a solution yet
 void EngineApp::FlashWhileMinimized( void )
    {
- 
-   if( !GetHwnd() )
+#ifndef _WINDOWS
+   return;
+#endif
+
+   if( !m_pWindow )
       {
       return;
       }
+   HWND hwnd = GetHwnd();
+   ENG_ASSERT( hwnd );
    // If the window is minized
    if( GetWindowState() & SDL_WINDOW_MINIMIZED )
       {
-      DWORD now = timeGetTime();
-      DWORD then = now;
-      MSG msg;
-      FlashWindow( GetHwnd(), true );
+      GetGlobalTimer()->GetElapsedTime();
+      float totalTime = 0.f;
+      SDL_Event event;
+      FlashWindow( hwnd, true );
 
       while( true )
          {
-         // PeekMessage, 0, 0 means read all of the messages
-         // PeekMessage() gets a message from your application's message queue.   returned to you for processing. If there is no message, 
-         // Any time the user moves the mouse, types on the keyboard, clicks on your window's menu, or does any number
-         // of other things, messages are generated by the system and entered into your program's message queue.
-         if( PeekMessage( &msg, NULL, 0, 0, PM_REMOVE ) )
+         SDL_PumpEvents();
+         if( SDL_PeepEvents( &event, 1, SDL_PEEKEVENT, SDL_FIRSTEVENT, SDL_LASTEVENT ) > 0 )
             {
-            // To filter out WM_SYSCOMMAND or multiple alt + f4 
-            if( msg.message != WM_SYSCOMMAND || msg.wParam != SC_CLOSE )
+            // wait for processing if close or other window event is called
+            if( event.type != SDL_WINDOWEVENT ||  event.type != SDL_QUIT )
                {
-               // Translates virtual-key messages into character messages. 
-               // The character messages are posted to the calling thread's message queue,
-               // to be read the next time the thread calls the GetMessage or PeekMessage function.
-               TranslateMessage( &msg );
-               // Dispatches a message to a window procedure. It is typically used to dispatch a message retrieved by the GetMessage function.
-               // DispatchMessage() sends the message out to the window that the message was sent to.
-               // This could be our main window or it could be another one, or a control,
-               // and in some cases a window that was created behind the scenes by the sytem or another program.
-               DispatchMessage( &msg );
+               MsgProc();
                }
             // Not minimized anymore, flash for once and break
             if( !( GetWindowState() & SDL_WINDOW_MINIMIZED ) )
                {
-               FlashWindow( GetHwnd(), true );
+               FlashWindow( GetHwnd(), false );
                break;
                }
-            
             }
          else // The window has no upcoming message, keep flashing 
             {
-            now = timeGetTime();
-            DWORD timeElapsed = now > then ? ( now - then ) : ( then - now );
-            if( timeElapsed > 1000 )
+            totalTime += GetGlobalTimer()->GetElapsedTime();
+            
+            if( totalTime > 1.0f )
                {
-               then = now;
+               totalTime -= 1.0f;
                FlashWindow( GetHwnd(), true );
                }
             }
@@ -485,11 +567,13 @@ int  EngineApp::PushUserEvent( Uint32 eventType, Sint32 code, void* d1, void* d2
 
 void EngineApp::OnClose()
 {
+   m_bIsRunning = false;
 	// release all the game systems in reverse order from which they were created
    ENG_LOG( "Test", "On close" );
 	SAFE_DELETE( m_pGame );
    SDL_DestroyWindow( m_pWindow );
    SDL_Quit();
+   
    /*
 	VDestroyNetworkEventForwarder();
 

@@ -112,6 +112,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp" />
+    <ClCompile Include="..\ResourceCache\XmlResource.cpp" />
     <ClCompile Include="..\ResourceCache\ZipFile.cpp" />
     <ClCompile Include="..\UserInterface\GUIManager.cpp" />
     <ClCompile Include="..\UserInterface\HumanView.cpp" />
@@ -144,6 +145,7 @@
     <ClInclude Include="..\Memory\MemoryPool.h" />
     <ClInclude Include="..\Multicore\CriticalSection.h" />
     <ClInclude Include="..\ResourceCache\ResourceCache.h" />
+    <ClInclude Include="..\ResourceCache\XmlResource.h" />
     <ClInclude Include="..\ResourceCache\ZipFile.h" />
     <ClInclude Include="..\UserInterface\GUIManager.h" />
     <ClInclude Include="..\UserInterface\HumanView.h" />

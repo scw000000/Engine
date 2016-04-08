@@ -140,3 +140,29 @@ class IResourceFile
       virtual bool VIsUsingDevelopmentDirectories(void) const = 0;
 	   virtual ~IResourceFile() { }
    };
+
+class Scene;
+
+class ISceneNode
+   {
+   public:
+	   virtual ~ISceneNode() { };
+      
+      virtual const SceneNodeProperties * const VGet() const=0;
+
+	   virtual void VSetTransform( const Mat4x4 *toWorld, const Mat4x4 *fromWorld = NULL )=0;
+
+	   virtual HRESULT VOnUpdate( Scene *pScene, DWORD const elapsedMs ) = 0;
+	   virtual HRESULT VOnRestore( Scene *pScene ) = 0;
+
+	   virtual HRESULT VPreRender( Scene *pScene ) = 0;
+	   virtual bool VIsVisible( Scene *pScene ) const = 0;
+	   virtual HRESULT VRender( Scene *pScene ) = 0;
+	   virtual HRESULT VRenderChildren( Scene *pScene )=0;
+	   virtual HRESULT VPostRender( Scene *pScene ) = 0;
+
+	   virtual bool VAddChild( shared_ptr<ISceneNode> kid )=0;
+	   virtual bool VRemoveChild( ActorId id ) = 0;
+	   virtual HRESULT VOnLostDevice( Scene *pScene ) = 0;
+//	   virtual HRESULT VPick( Scene *pScene, RayCast *pRayCast ) = 0;
+   };

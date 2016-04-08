@@ -95,8 +95,10 @@
     <ClCompile Include="..\Actors\Actor.cpp" />
     <ClCompile Include="..\Actors\ActorFactory.cpp" />
     <ClCompile Include="..\Actors\TransformComponent.cpp" />
+    <ClCompile Include="..\Controller\Controller.cpp" />
     <ClCompile Include="..\Debugging\Logger.cpp" />
     <ClCompile Include="..\Graphics\Geometry.cpp" />
+    <ClCompile Include="..\Graphics\SceneNodes.cpp" />
     <ClCompile Include="..\MainLoop\Initialization.cpp" />
     <ClCompile Include="..\MainLoop\Process.cpp" />
     <ClCompile Include="..\MainLoop\ProcessManager.cpp" />
@@ -133,8 +135,10 @@
     <ClInclude Include="..\Actors\ActorComponent.h" />
     <ClInclude Include="..\Actors\ActorFactory.h" />
     <ClInclude Include="..\Actors\TransformComponent.h" />
+    <ClInclude Include="..\Controller\Controller.h" />
     <ClInclude Include="..\Debugging\Logger.h" />
     <ClInclude Include="..\Graphics\Geometry.h" />
+    <ClInclude Include="..\Graphics\SceneNodes.h" />
     <ClInclude Include="..\MainLoop\Initialization.h" />
     <ClInclude Include="..\MainLoop\Process.h" />
     <ClInclude Include="..\MainLoop\ProcessManager.h" />

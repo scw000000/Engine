@@ -31,6 +31,9 @@
     <Filter Include="ResourceCache">
       <UniqueIdentifier>{824d2cd5-53c1-4719-a4fa-c3d973385592}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Controller">
+      <UniqueIdentifier>{f0f99d63-2930-4a8b-af15-acbd86c23c17}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
@@ -99,6 +102,12 @@
     </ClCompile>
     <ClCompile Include="..\ResourceCache\XmlResource.cpp">
       <Filter>ResourceCache</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Controller\Controller.cpp">
+      <Filter>Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNodes.cpp">
+      <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +187,12 @@
     </ClInclude>
     <ClInclude Include="..\ResourceCache\XmlResource.h">
       <Filter>ResourceCache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Controller\Controller.h">
+      <Filter>Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNodes.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

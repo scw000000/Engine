@@ -1,0 +1,15 @@
+#pragma once
+////////////////////////////////////////////////////////////////////////////////
+// Filename: Scene.h
+////////////////////////////////////////////////////////////////////////////////
+#include "SceneNodes.h"
+
+class Scene
+   {
+   public:
+
+   protected:
+      shared_ptr<SceneNode> m_Root;
+     // shared_ptr<CameraNode> m_Camera;
+      //shared_ptr<IRenderer> m_Renderer;
+   };

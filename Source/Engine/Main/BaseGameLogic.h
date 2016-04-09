@@ -44,7 +44,7 @@ class BaseGameLogic : public IGameLogic
 	   virtual void VModifyActor(const ActorId actorId, TiXmlElement *overrides);
 	   virtual void VMoveActor(const ActorId id, Mat4x4 const &mat) {}
 
-      virtual void VOnUpdate(float time, float elapsedTime);
+      virtual void VOnUpdate( float time, float elapsedTime );
 
       virtual void VChangeState(BaseGameState newState);
 	   const BaseGameState GetState() const { return m_State; }

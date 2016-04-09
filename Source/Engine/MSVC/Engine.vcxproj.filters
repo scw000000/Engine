@@ -109,6 +109,9 @@
     <ClCompile Include="..\Graphics\SceneNodes.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Graphics\Scene.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -192,6 +195,9 @@
       <Filter>Controller</Filter>
     </ClInclude>
     <ClInclude Include="..\Graphics\SceneNodes.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Scene.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>

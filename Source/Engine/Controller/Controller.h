@@ -3,7 +3,7 @@
 // Filename: Controller.h
 ////////////////////////////////////////////////////////////////////////////////
 
-
+#include "..\Graphics\SceneNodes.h"
 
 class MovementController : public IPointerHandler, public IKeyboardHandler
    {
@@ -35,7 +35,7 @@ class MovementController : public IPointerHandler, public IKeyboardHandler
 	   MovementController(shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown);
 	   void SetObject(shared_ptr<SceneNode> newObject);
 
-	   void OnUpdate(DWORD const elapsedMs);
+	   void OnUpdate( const unsigned long elapsedMs);
 
 public:
 	bool VOnPointerMove(const Point &mousePos, const int radius);

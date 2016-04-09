@@ -112,9 +112,9 @@ void BaseGameLogic::VModifyActor( const ActorId actorId, TiXmlElement *overrides
       }
    }
 
-void BaseGameLogic::VOnUpdate(float time, float elapsedTime)
+void BaseGameLogic::VOnUpdate( float time, float elapsedTime )
    {
-   int deltaMilliseconds = int( elapsedTime * 1000.0f );
+   unsigned long deltaMilliseconds = unsigned long( elapsedTime * 1000.0f );
 	m_Lifetime += elapsedTime;
 
 	switch(m_State)

@@ -434,7 +434,7 @@ int EngineApp::PumpUntilMessage( Uint32& eventEnd, Sint32& code )
             GetGlobalTimer()->GetTimeValues( &fAppTime, &fAbsoluteTime, &fElapasedTime );
 				for( auto i = m_pGame->m_gameViews.begin(); i!=m_pGame->m_gameViews.end(); ++i )
 				   {
-					(*i)->VOnUpdate( (int) ( fElapasedTime * 1000.f ) );
+					(*i)->VOnUpdate( ( unsigned long ) ( fElapasedTime * 1000.f ) );
 				   }
 				OnFrameRender( fAppTime, fElapasedTime );
 			   }
@@ -478,7 +478,7 @@ void EngineApp::OnUpdateGame( double fTime, float fElapsedTime )
 	   if (m_pGame)
 	   {
      //   IEventManager::Get()->VUpdate(20); // allow event queue to process for up to 20 ms
-		g_pApp->m_pGame->VOnUpdate(float(fTime), fElapsedTime);
+		g_pApp->m_pGame->VOnUpdate( ( float ) fTime, fElapsedTime );
 	   }
    }
 

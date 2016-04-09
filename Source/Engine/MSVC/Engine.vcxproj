@@ -98,6 +98,7 @@
     <ClCompile Include="..\Controller\Controller.cpp" />
     <ClCompile Include="..\Debugging\Logger.cpp" />
     <ClCompile Include="..\Graphics\Geometry.cpp" />
+    <ClCompile Include="..\Graphics\Scene.cpp" />
     <ClCompile Include="..\Graphics\SceneNodes.cpp" />
     <ClCompile Include="..\MainLoop\Initialization.cpp" />
     <ClCompile Include="..\MainLoop\Process.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="..\Controller\Controller.h" />
     <ClInclude Include="..\Debugging\Logger.h" />
     <ClInclude Include="..\Graphics\Geometry.h" />
+    <ClInclude Include="..\Graphics\Scene.h" />
     <ClInclude Include="..\Graphics\SceneNodes.h" />
     <ClInclude Include="..\MainLoop\Initialization.h" />
     <ClInclude Include="..\MainLoop\Process.h" />

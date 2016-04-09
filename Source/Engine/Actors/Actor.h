@@ -20,7 +20,7 @@ class Actor
       void PostInit( void );
       // To break out the circular reference strongPtr chain of Actor & actorComponent
       void Destroy( void );
-      void Update( int deltaMs );
+      void Update( const unsigned long deltaMs );
 
       ActorId GetId( void ) const { return m_id; }
       template<class ComponenType> weak_ptr<ComponenType> GetComponent( ComponentId id )

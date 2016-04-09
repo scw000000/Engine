@@ -83,7 +83,7 @@ void GUIManager::SetFont( const std::string& fontFile )
   // m_pContext->setDefaultFont( fontFile );
    }
 
-void GUIManager::OnUpdate( const int deltaMs )
+void GUIManager::OnUpdate( const unsigned long deltaMs )
    {
    // This fuction takes seconds as input
    m_pContext->injectTimePulse( (float)deltaMs / 1000.f );

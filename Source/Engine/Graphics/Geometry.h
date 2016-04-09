@@ -234,9 +234,9 @@ class Plane
       Plane( const float a, const float b, const float c, const float w ) : n( a, b, c ), d( w )  { }
       void Normalize() { float lengthInv = 1.0f / n.Length(); n *= lengthInv; d *= lengthInv; }
       // Inside is defined as same side of normal
-      bool Inside( Vec3 p );
+      bool Inside( Vec3 p ) const ;
       // Inside is defined as same side of normal, radius means it is a sphere
-      bool Inside( Vec3 p, const float radius );
+      bool Inside( Vec3 p, const float radius ) const ;
 
    public:
       // normatl vector
@@ -250,9 +250,10 @@ class Frustum
    public:
       Frustum( void );
       void Init( const float fov, const float aspect, const float nearClipDis, const float farClipDis );
-      bool Inside( const Vec3 &point );
-      // return if a shpere is inside the frustum
-      bool Inside( const Vec3 &point, float radius );
+      // return if a single point is inside the frustum, point should be in Frustum's local space
+      bool Inside( const Vec3 &point ) const ;
+      // return if a shpere is inside the frustum, point should be in Frustum's local space
+      bool Inside( const Vec3 &point, float radius ) const ;
       
       void SetFOV(float fov) { m_Fov=fov; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
 	   void SetAspect(float aspect) { m_Aspect=aspect; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }

@@ -18,7 +18,7 @@ class ActorComponent
       virtual ~ActorComponent( void ){}
       virtual bool VInit( TiXmlElement* pData ) = 0;
       virtual void VPostInit( void ){}
-      virtual void VUpdate( int deltaMs ){}
+      virtual void VUpdate( const unsigned long deltaMs ){}
 
       virtual ComponentId VGetId( void ) const { return GetIdFromName( VGetName() ); }
       virtual const char *VGetName() const = 0;

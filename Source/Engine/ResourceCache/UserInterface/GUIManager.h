@@ -22,7 +22,7 @@ class GUIManager
       void LoadScheme( const std::string& schemeFile );
       void SetFont( const std::string& fontFile );
 
-      void OnUpdate( const int deltaMs );
+      void OnUpdate( const unsigned long deltaMs );
       void OnRender( double fTime, float fElapsedTime );
       int  OnMsgProc( SDL_Event event ); // process the OS event
 

@@ -50,7 +50,7 @@ void Actor::Destroy(void)
    m_components.clear();
    }
 
-void Actor::Update(int deltaMs)
+void Actor::Update( const unsigned long deltaMs)
    {
    for (ActorComponents::iterator it = m_components.begin(); it != m_components.end(); ++it)
       {

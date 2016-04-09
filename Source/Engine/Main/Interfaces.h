@@ -26,7 +26,7 @@ class IScreenElement
 	   virtual int VOnRestore() = 0;
 	   virtual int VOnLostDevice() = 0;
 	   virtual int VOnRender( double fTime, float fElapsedTime ) = 0;
-	   virtual void VOnUpdate( int deltaMilliseconds ) = 0;
+	   virtual void VOnUpdate( const unsigned long deltaMs ) = 0;
 
 	   virtual int VGetZOrder() const = 0;
 	   virtual void VSetZOrder(int const zOrder) = 0;
@@ -48,7 +48,7 @@ class IGameLogic
       virtual void VDestroyActor(const ActorId actorId)=0;
 	   virtual bool VLoadGame(const char* levelResource)=0;
 	   //virtual void VSetProxy()=0;				
-	   virtual void VOnUpdate(float time, float elapsedTime)=0;
+	   virtual void VOnUpdate( float time, float elapsedTime )=0;
 	   virtual void VChangeState(enum BaseGameState newState)=0;
 	   virtual void VMoveActor(const ActorId id, Mat4x4 const &mat)=0;
    };
@@ -141,6 +141,18 @@ class IResourceFile
 	   virtual ~IResourceFile() { }
    };
 
+
+
+enum RenderPass
+   {
+	RenderPass_0,
+	RenderPass_Static = RenderPass_0,
+	RenderPass_Actor,
+	RenderPass_Sky,
+	RenderPass_NotRendered,
+	RenderPass_Last
+   };
+
 class Scene;
 
 class ISceneNode
@@ -148,21 +160,24 @@ class ISceneNode
    public:
 	   virtual ~ISceneNode() { };
       
-      virtual const SceneNodeProperties * const VGet() const=0;
+      virtual const SceneNodeProperties * const VGetProperties() const = 0;
 
-	   virtual void VSetTransform( const Mat4x4 *toWorld, const Mat4x4 *fromWorld = NULL )=0;
+	   virtual void VSetRelTransform( const Mat4x4 *toRelative, const Mat4x4 *fromRelative = NULL ) = 0;
 
-	   virtual HRESULT VOnUpdate( Scene *pScene, DWORD const elapsedMs ) = 0;
-	   virtual HRESULT VOnRestore( Scene *pScene ) = 0;
+	   virtual int VOnUpdate( Scene *pScene, const unsigned long deltaMs ) = 0;
+	   virtual int VOnRestore( Scene *pScene ) = 0;
 
-	   virtual HRESULT VPreRender( Scene *pScene ) = 0;
+	   virtual int VPreRender( Scene *pScene ) = 0;
 	   virtual bool VIsVisible( Scene *pScene ) const = 0;
-	   virtual HRESULT VRender( Scene *pScene ) = 0;
-	   virtual HRESULT VRenderChildren( Scene *pScene )=0;
-	   virtual HRESULT VPostRender( Scene *pScene ) = 0;
+	   virtual int VRender( Scene *pScene ) = 0;
+	   virtual int VRenderChildren( Scene *pScene )=0;
+	   virtual int VPostRender( Scene *pScene ) = 0;
+
+      virtual Vec3 GetRelPosition( void ) const = 0;
+      virtual void SetRelPosition( const Vec3& pos ) = 0;
 
 	   virtual bool VAddChild( shared_ptr<ISceneNode> kid )=0;
 	   virtual bool VRemoveChild( ActorId id ) = 0;
-	   virtual HRESULT VOnLostDevice( Scene *pScene ) = 0;
-//	   virtual HRESULT VPick( Scene *pScene, RayCast *pRayCast ) = 0;
+	   virtual int VOnLostDevice( Scene *pScene ) = 0;
+//	   virtual int VPick( Scene *pScene, RayCast *pRayCast ) = 0;
    };

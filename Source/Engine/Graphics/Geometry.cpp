@@ -8,12 +8,12 @@
 const Mat4x4 Mat4x4::g_Identity( glm::mat4( 1.0f ) );
 const Quaternion Quaternion::g_Identity( glm::fquat( 0, 0, 0, 1 ) );
 
-bool Plane::Inside( Vec3 p )
+bool Plane::Inside( Vec3 p ) const
    {
    return ( p.Dot( n ) + d >= 0.0f );
    }
 
-bool Plane::Inside( Vec3 p, const float radius )
+bool Plane::Inside( Vec3 p, const float radius ) const 
    {
    float distance = p.Dot( n ) + d;
    // we need to consider if the point is outside the plane, but its radius may compensate for it
@@ -148,7 +148,7 @@ Frustum::Frustum( void )
    m_FarDis = 1000.0f;
    }
 
-bool Frustum::Inside( const Vec3 &point )
+bool Frustum::Inside( const Vec3 &point ) const
    {
    for( int i = 0; i < NumPlanes; ++i )
       {
@@ -160,7 +160,7 @@ bool Frustum::Inside( const Vec3 &point )
    return true;
    }
 
-bool Frustum::Inside( const Vec3 &point, float radius )
+bool Frustum::Inside( const Vec3 &point, float radius ) const
    {
    for( int i = 0; i < NumPlanes; ++i )
       {

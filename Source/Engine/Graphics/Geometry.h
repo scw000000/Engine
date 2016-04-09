@@ -33,6 +33,17 @@ class Vec3 : public glm::vec3
       Vec3( const double _x, const double _y, const double _z ) { x = (float)_x; y = (float)_y; z = (float)_z; }
      // Vec3( const Vec4 &v4 ) { x = v4.x; y = v4.y; z = v4.z; }
 
+      Vec3 operator-( void ){ return Vec3( -( this->x ), -( this->y ), -( this->z ) ); }
+      Vec3 operator+( const Vec3& other ) const { return Vec3( this->x + other.x, this->y + other.y, this->z + other.z ); }
+      Vec3 operator-( const Vec3& other ) const { return Vec3( this->x - other.x, this->y - other.y, this->z - other.z ); }
+      Vec3& operator+=( const Vec3& other ) { return ( *this = *this + other ); }
+      Vec3& operator-=( const Vec3& other ) { return *this += (-other); }
+
+      Vec3 operator*( const float& other ) const { return Vec3( this->x * other, this->y * other, this->z * other ); }
+      Vec3 operator/( const float& other ) const { return Vec3( this->x / other, this->y / other, this->z / other ); }
+      Vec3& operator*=( const float& other ) { return ( *this = *this * other ); }
+      Vec3& operator/=( const float& other ) { return ( *this = *this / other ); }
+
       inline float Length(){ return glm::length<float, glm::highp, glm::tvec3>( (*this) ); }
 	   inline Vec3(const class Vec4 &v4);
 

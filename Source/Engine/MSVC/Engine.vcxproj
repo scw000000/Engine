@@ -98,6 +98,7 @@
     <ClCompile Include="..\Controller\Controller.cpp" />
     <ClCompile Include="..\Debugging\Logger.cpp" />
     <ClCompile Include="..\Graphics\Geometry.cpp" />
+    <ClCompile Include="..\Graphics\MatrixStack.cpp" />
     <ClCompile Include="..\Graphics\Scene.cpp" />
     <ClCompile Include="..\Graphics\SceneNodes.cpp" />
     <ClCompile Include="..\MainLoop\Initialization.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="..\Controller\Controller.h" />
     <ClInclude Include="..\Debugging\Logger.h" />
     <ClInclude Include="..\Graphics\Geometry.h" />
+    <ClInclude Include="..\Graphics\MatrixStack.h" />
     <ClInclude Include="..\Graphics\Scene.h" />
     <ClInclude Include="..\Graphics\SceneNodes.h" />
     <ClInclude Include="..\MainLoop\Initialization.h" />

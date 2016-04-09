@@ -88,7 +88,7 @@ class SceneNode : public ISceneNode
       // return position in actor space
 	   virtual Vec3 GetRelPosition( void ) const { return m_Props.m_ToRelSpace.GetPosition(); }
 	   // set position in actor space
-      virtual void SeRelPosition( const Vec3 &pos ) { m_Props.m_ToRelSpace.SetPosition( pos ); }
+      virtual void SetRelPosition( const Vec3 &pos ) { m_Props.m_ToRelSpace.SetPosition( pos ); }
 
 	   Vec3 GetWorldPosition( void ) const;
 
@@ -114,10 +114,12 @@ struct AlphaSceneNode
 	bool const operator <(AlphaSceneNode const &other) { return m_ScreenZ < other.m_ScreenZ; }
    };
 
+typedef std::list<AlphaSceneNode *> AlphaSceneNodes;
+
 class RootNode : public SceneNode
    {
    public:
-	   RootNode();
+	 //  RootNode(); 
 	   virtual bool VAddChild( shared_ptr<ISceneNode> child );
 	   virtual int VRenderChildren( Scene *pScene );
 	   virtual bool VRemoveChild( ActorId id );

@@ -4,6 +4,7 @@
 
 #include "EngineStd.h"
 #include "SceneNodes.h"
+#include "Scene.h"
 #include "../Actors/ActorComponent.h"
 #include "../Actors/TransformComponent.h"
 
@@ -76,7 +77,8 @@ bool SceneNode::VIsVisible( Scene *pScene ) const
    Vec3 pos = GetWorldPosition();
    // transform to camera's local space
    pos = fromWorld.Xform( pos );
-   const Frustum &frustum = pScene->GetCamera()->GetFrustum();
+ //  const Frustum &frustum = pScene->GetCamera()->GetFrustum();
+   const Frustum frustum;
    return frustum.Inside( pos, VGetProperties()->GetRadius() );
    }
 
@@ -95,6 +97,7 @@ int SceneNode::VRenderChildren( Scene *pScene )
          }
       it->VPostRender( pScene );
       }
+   return S_OK;
    }
 
 int SceneNode::VPostRender( Scene *pScene )
@@ -110,6 +113,7 @@ bool SceneNode::VAddChild( shared_ptr<ISceneNode> child )
    Vec3 childPos = child->GetRelPosition();
    float newRadius = childPos.Length() + child->VGetProperties()->GetRadius();
    m_Props.m_Radius = std::max( m_Props.m_Radius, newRadius );
+   return true; 
    }
 
 bool SceneNode::VRemoveChild( ActorId id )

@@ -154,13 +154,14 @@ enum RenderPass
    };
 
 class Scene;
+class SceneNodeProperties;
 
 class ISceneNode
    {
    public:
 	   virtual ~ISceneNode() { };
       
-      virtual const SceneNodeProperties * const VGetProperties() const = 0;
+      virtual const SceneNodeProperties *const VGetProperties( void ) const = 0;
 
 	   virtual void VSetRelTransform( const Mat4x4 *toRelative, const Mat4x4 *fromRelative = NULL ) = 0;
 

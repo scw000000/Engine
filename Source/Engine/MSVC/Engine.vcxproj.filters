@@ -112,6 +112,9 @@
     <ClCompile Include="..\Graphics\Scene.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Graphics\MatrixStack.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -198,6 +201,9 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\Graphics\Scene.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\MatrixStack.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>

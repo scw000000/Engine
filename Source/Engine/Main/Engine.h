@@ -12,6 +12,7 @@
 #include "../ResourceCache/ResourceCache.h"
 #include "../UserInterface/UserInterface.h"
 
+class EventManager;
 class HumanView;
 
 class EngineApp
@@ -44,7 +45,8 @@ class EngineApp
       struct EngineOptions m_EngineOptions;
       TCHAR m_saveGameDirectory[MAX_PATH];
       BaseGameLogic *m_pGame;
-      ResCache *m_ResCache;
+      ResCache *m_pResCache;
+      EventManager *m_pEventManager;
 
    protected:
       int PumpUntilMessage( Uint32& eventEnd, Sint32& code );

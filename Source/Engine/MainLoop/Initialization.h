@@ -20,26 +20,26 @@ extern const TCHAR *GetSaveGameDirectory(HWND hWnd, const TCHAR *gameAppDirector
 extern bool CheckForJoystick(std::string hWnd);
 
 struct EngineOptions
-{
-   EngineOptions();
-	~EngineOptions() { SAFE_DELETE(m_pDoc); }
+   {
+   public:
+      EngineOptions();
+	   ~EngineOptions() { SAFE_DELETE(m_pDoc); }
 
-   // Level option
-	std::string m_Level;
+      // Level option
+	   std::string m_Level;
 
-   // TiXmlElement - look at this to find other options added by the developer
-	TiXmlDocument *m_pDoc;
+      // TiXmlElement - look at this to find other options added by the developer
+	   TiXmlDocument *m_pDoc;
 
 
-	// Rendering options
-	std::string m_Renderer;
-	bool m_runFullSpeed;
-	Point m_ScreenSize;
-   int m_numAIs;
-	int m_maxAIs;
+	   // Rendering options
+	   std::string m_Renderer;
+	   bool m_runFullSpeed;
+	   Point m_ScreenSize;
+      int m_numAIs;
+	   int m_maxAIs;
 	
-
-   void Init(const char* xmlFileName);
-};
+      void Init(const char* xmlFileName);
+   };
 
 

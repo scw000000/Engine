@@ -43,7 +43,7 @@
     <OutDir>$(ProjectDir)..\..\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.5\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.5\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -97,6 +97,8 @@
     <ClCompile Include="..\Actors\TransformComponent.cpp" />
     <ClCompile Include="..\Controller\Controller.cpp" />
     <ClCompile Include="..\Debugging\Logger.cpp" />
+    <ClCompile Include="..\Event\EventManager.cpp" />
+    <ClCompile Include="..\Event\Events.cpp" />
     <ClCompile Include="..\Graphics\Geometry.cpp" />
     <ClCompile Include="..\Graphics\MatrixStack.cpp" />
     <ClCompile Include="..\Graphics\Scene.cpp" />
@@ -139,6 +141,8 @@
     <ClInclude Include="..\Actors\TransformComponent.h" />
     <ClInclude Include="..\Controller\Controller.h" />
     <ClInclude Include="..\Debugging\Logger.h" />
+    <ClInclude Include="..\Event\EventManager.h" />
+    <ClInclude Include="..\Event\Events.h" />
     <ClInclude Include="..\Graphics\Geometry.h" />
     <ClInclude Include="..\Graphics\MatrixStack.h" />
     <ClInclude Include="..\Graphics\Scene.h" />

@@ -103,7 +103,7 @@ int ResCache::Preload( const std::string pattern, void (*progressCallback)( int,
       // load the file if pattern is matched
       if( WildcardMatch( pattern.c_str(), resource.m_name.c_str() ) )
          {
-         shared_ptr< ResHandle > handle = g_pApp->m_ResCache->GetHandle( &resource ); // use resource cache to load resource
+         shared_ptr< ResHandle > handle = g_pApp->m_pResCache->GetHandle( &resource ); // use resource cache to load resource
          ++loaded;
          }
       if( progressCallback )

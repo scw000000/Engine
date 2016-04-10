@@ -34,7 +34,7 @@ shared_ptr<IResourceLoader> CreateXmlResourceLoader()
 TiXmlElement* XmlResourceLoader::LoadAndReturnRootXmlElement( const char* resourceString )
    {
    Resource resource( resourceString );
-   shared_ptr<ResHandle> pResourceHandle = g_pApp->m_ResCache->GetHandle( &resource );  // this actually loads the XML file from the zip file
+   shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( &resource );  // this actually loads the XML file from the zip file
    shared_ptr<XmlResourceExtraData> pExtraData = static_pointer_cast< XmlResourceExtraData >( pResourceHandle->GetExtraData() );
    return pExtraData->GetRoot();
    }

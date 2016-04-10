@@ -9,6 +9,7 @@
 #include "..\UserInterface\HumanView.h"
 #include "..\UserInterface/GUIManager.h"
 #include "..\ResourceCache\XmlResource.h"
+#include "..\Event\EventManager.h"
 
 
 EngineApp *g_pApp = NULL;
@@ -25,6 +26,7 @@ EngineApp::EngineApp( void )
    m_screenSize = Point(0,0);
    m_pWindow = NULL;
    m_ShutDownEventType = 0;
+   m_pEventManager = NULL;
    
    }
 
@@ -94,13 +96,13 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
 
 	//--------------------------------- 
-   //  Initialize the ResCache, all asseets are within a zip file
+   //  Initialize ResCache, all asseets are within a zip file
    //--------------------------------- 
 	IResourceFile *zipFile = ENG_NEW ResourceZipFile( L"Assets.zip" );
 
-	m_ResCache = ENG_NEW ResCache( 50, zipFile );
+	m_pResCache = ENG_NEW ResCache( 50, zipFile );
 
-	if ( !m_ResCache->Init() )
+	if ( !m_pResCache->Init() )
 	   {
       ENG_ERROR("Failed to initialize resource cache!  Are your paths set up correctly?");
 		return false;
@@ -117,7 +119,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 	// Note - register these in order from least specific to most specific! They get pushed onto a list.
 	// RegisterLoader is discussed in Chapter 5, page 142
 
-   m_ResCache->RegisterLoader(CreateXmlResourceLoader());
+   m_pResCache->RegisterLoader(CreateXmlResourceLoader());
 
    if( !LoadStrings("English") )
 	   {
@@ -125,8 +127,24 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 		return false;
 	   }
    //--------------------------------- 
-   //  Initialize the ResCache
+   //  Initialize ResCache
    //--------------------------------- 
+
+   //--------------------------------- 
+   //  Initialize EventManager
+   //--------------------------------- 
+
+   // Set as global EventManager
+   m_pEventManager = ENG_NEW EventManager( "Engine Event Manager", true );
+	if ( !m_pEventManager )
+	   {
+		ENG_ERROR( "Failed to create EventManager." );
+		return false;
+	   }
+   //--------------------------------- 
+   //  Initialize EventManager
+   //--------------------------------- 
+
 
    //--------------------------------- 
    // Initiate window & SDL, glew
@@ -573,7 +591,8 @@ void EngineApp::OnClose()
 	SAFE_DELETE( m_pGame );
    SDL_DestroyWindow( m_pWindow );
    SDL_Quit();
-   
+   SAFE_DELETE( m_pEventManager );
+   SAFE_DELETE( m_pResCache );
    /*
 	VDestroyNetworkEventForwarder();
 

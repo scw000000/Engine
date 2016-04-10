@@ -27,10 +27,10 @@ const float  ENG_RADIANS_OVER_DEGREES = ENG_PI / 180.0f;
 class Vec3 : public glm::vec3
    {
    public:
-      Vec3() : glm::vec3() { x = 0; y = 0; z = 0; }
+      Vec3() : glm::vec3() { }
       Vec3( const glm::vec3 &v3 ) : glm::vec3( v3 ) { /*x = v3.x; y = v3.y; z = v3.z;*/ }
-	   Vec3( const float _x, const float _y, const float _z ) { x=_x; y=_y; z=_z; }
-      Vec3( const double _x, const double _y, const double _z ) { x = (float)_x; y = (float)_y; z = (float)_z; }
+	   Vec3( const float _x, const float _y, const float _z ) : glm::vec3( _x, _y, _z ) { }
+      Vec3( const double _x, const double _y, const double _z ) : glm::vec3( _x, _y, _z ) { }
      // Vec3( const Vec4 &v4 ) { x = v4.x; y = v4.y; z = v4.z; }
 
       Vec3 operator-( void ){ return Vec3( -( this->x ), -( this->y ), -( this->z ) ); }

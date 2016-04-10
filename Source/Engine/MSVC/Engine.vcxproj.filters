@@ -34,6 +34,9 @@
     <Filter Include="Controller">
       <UniqueIdentifier>{f0f99d63-2930-4a8b-af15-acbd86c23c17}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Event">
+      <UniqueIdentifier>{0992b2a5-f8ff-4c81-85b0-313847f8ecb2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
@@ -114,6 +117,12 @@
     </ClCompile>
     <ClCompile Include="..\Graphics\MatrixStack.cpp">
       <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Event\Events.cpp">
+      <Filter>Event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Event\EventManager.cpp">
+      <Filter>Event</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +214,12 @@
     </ClInclude>
     <ClInclude Include="..\Graphics\MatrixStack.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Event\Events.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Event\EventManager.h">
+      <Filter>Event</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

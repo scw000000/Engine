@@ -147,8 +147,6 @@ int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
          break;
                
       }
-
-   std::cout << " unprocessed event " << event.type  << std::endl;
    return 0;
    }
 

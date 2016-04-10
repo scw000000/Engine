@@ -89,7 +89,10 @@ int HumanView::VOnMsgProc( SDL_Event event )
    // Iterate through the screen layers first
 	// In reverse order since we'll send input messages to the 
 	// screen on top
-   m_pGUIManager->OnMsgProc( event );
+   if( m_pGUIManager->OnMsgProc( event ) )
+      {
+      return 1;
+      }
 	for( ScreenElementList::reverse_iterator i=m_ScreenElements.rbegin(); i != m_ScreenElements.rend(); ++i )
 	   {
 		if ( (*i)->VIsVisible() )
@@ -101,8 +104,8 @@ int HumanView::VOnMsgProc( SDL_Event event )
 		   }
 	   }
 
-	int result = 0;
-	switch ( event.type ) 
+	// Inject userInput into controller here
+   switch ( event.type ) 
 	   {
       case WM_KEYDOWN:
 			break;

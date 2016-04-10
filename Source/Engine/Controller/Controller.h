@@ -7,7 +7,23 @@
 
 class MovementController : public IPointerHandler, public IKeyboardHandler
    {
-   protected:
+   public:
+	   bool VOnPointerMove(const Point &mousePos, const int radius);
+	   bool VOnPointerButtonDown(const Point &mousePos, const int radius, const std::string &buttonName);
+	   bool VOnPointerButtonUp(const Point &mousePos, const int radius, const std::string &buttonName);
+
+	   bool VOnKeyDown(const BYTE c) { m_bKey[c] = true; return true; }
+	   bool VOnKeyUp(const BYTE c) { m_bKey[c] = false; return true; }
+
+	   const Mat4x4 *GetToWorld() { return &m_matToWorld; }
+	   const Mat4x4 *GetFromWorld() { return &m_matFromWorld; }	
+      public:
+	   MovementController(shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown);
+	   void SetObject(shared_ptr<SceneNode> newObject);
+
+	   void OnUpdate( const unsigned long elapsedMs);
+
+    protected:
 	   Mat4x4  m_matFromWorld;
 	   Mat4x4	m_matToWorld;
       Mat4x4  m_matPosition;
@@ -27,24 +43,7 @@ class MovementController : public IPointerHandler, public IKeyboardHandler
 
 	   // Added for Ch19/20 refactor
 	   bool		m_mouseLButtonDown;
-   	bool		m_bRotateWhenLButtonDown;
+      bool		m_bRotateWhenLButtonDown;
 
 	   shared_ptr<SceneNode> m_object;
-
-   public:
-	   MovementController(shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown);
-	   void SetObject(shared_ptr<SceneNode> newObject);
-
-	   void OnUpdate( const unsigned long elapsedMs);
-
-public:
-	bool VOnPointerMove(const Point &mousePos, const int radius);
-	bool VOnPointerButtonDown(const Point &mousePos, const int radius, const std::string &buttonName);
-	bool VOnPointerButtonUp(const Point &mousePos, const int radius, const std::string &buttonName);
-
-	bool VOnKeyDown(const BYTE c) { m_bKey[c] = true; return true; }
-	bool VOnKeyUp(const BYTE c) { m_bKey[c] = false; return true; }
-
-	const Mat4x4 *GetToWorld() { return &m_matToWorld; }
-	const Mat4x4 *GetFromWorld() { return &m_matFromWorld; }	
-};
+   };

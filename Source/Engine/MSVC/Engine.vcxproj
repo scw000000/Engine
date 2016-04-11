@@ -43,7 +43,7 @@
     <OutDir>$(ProjectDir)..\..\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.5\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.5\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus\src;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -103,6 +103,7 @@
     <ClCompile Include="..\Graphics\MatrixStack.cpp" />
     <ClCompile Include="..\Graphics\Scene.cpp" />
     <ClCompile Include="..\Graphics\SceneNodes.cpp" />
+    <ClCompile Include="..\LuaScripting\LuaStateManager.cpp" />
     <ClCompile Include="..\MainLoop\Initialization.cpp" />
     <ClCompile Include="..\MainLoop\Process.cpp" />
     <ClCompile Include="..\MainLoop\ProcessManager.cpp" />
@@ -147,6 +148,7 @@
     <ClInclude Include="..\Graphics\MatrixStack.h" />
     <ClInclude Include="..\Graphics\Scene.h" />
     <ClInclude Include="..\Graphics\SceneNodes.h" />
+    <ClInclude Include="..\LuaScripting\LuaStateManager.h" />
     <ClInclude Include="..\MainLoop\Initialization.h" />
     <ClInclude Include="..\MainLoop\Process.h" />
     <ClInclude Include="..\MainLoop\ProcessManager.h" />

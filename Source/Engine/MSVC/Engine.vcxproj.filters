@@ -37,6 +37,9 @@
     <Filter Include="Event">
       <UniqueIdentifier>{0992b2a5-f8ff-4c81-85b0-313847f8ecb2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="LuaScripting">
+      <UniqueIdentifier>{638e9750-26f8-4e30-b58f-8e5ccd63c7f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
@@ -123,6 +126,9 @@
     </ClCompile>
     <ClCompile Include="..\Event\EventManager.cpp">
       <Filter>Event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LuaScripting\LuaStateManager.cpp">
+      <Filter>LuaScripting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -220,6 +226,9 @@
     </ClInclude>
     <ClInclude Include="..\Event\EventManager.h">
       <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LuaScripting\LuaStateManager.h">
+      <Filter>LuaScripting</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

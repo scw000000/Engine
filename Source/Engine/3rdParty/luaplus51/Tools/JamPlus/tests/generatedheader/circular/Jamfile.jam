@@ -1,0 +1,21 @@
+if $(JAM_USE_CHECKSUMS) = 1 {
+	DEPCACHE.standard = .jamcache ;
+	DEPCACHE = standard ;
+	Clean clean : $(DEPCACHE.standard) ;
+}
+
+rule SleepThenTouch
+{
+    Clean clean : $(<) ;
+}
+
+actions lua SleepThenTouch
+{
+    require 'osprocess'.sleep(5)
+	jam_print([[Writing $(<)]])
+    local file = io.open([[$(<)]], 'wb')
+	file:close()
+}
+
+SleepThenTouch [ C.GristFiles foo : generated.h ] ;
+C.Library foo : sourceA.c sourceB.c ;

@@ -36,6 +36,7 @@ class EventManager : public IEventManager
       virtual bool VTriggerEvent( const IEventDataPtr& pEvent ) const;
       virtual bool VQueueEvent( const IEventDataPtr& pEvent );
       virtual bool VAbortEvent( const EventType&type, bool allOfType = false );
+      // This function is called in EngineApp::OnUpdateGame
       virtual bool VUpdate( unsigned long maxMs = kINFINITE );
 
    public:

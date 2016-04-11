@@ -18,6 +18,10 @@
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
 
+#pragma comment(lib, "zlibstat.lib")
+#pragma comment(lib, "tinyxml.lib")
+#pragma comment(lib, "lua5.1.lib")
+
 #if defined(_M_IX86)
 	#if defined(_DEBUG)
       //#pragma comment(lib, "glew32sd.lib")
@@ -36,11 +40,7 @@
 #else
 	#error Preprocessor defines can't figure out which Bullet library to use.
 #endif
-
-#pragma comment(lib, "zlibstat.lib")
-
-#pragma comment(lib, "tinyxml.lib")
-
+  
 
 EngineApp engineApp;
 
@@ -65,11 +65,11 @@ int main( int argc, char *argv[] )
    */
 	tmpDbgFlag |= _CRTDBG_LEAK_CHECK_DF;	
 
-   _CrtSetDbgFlag(tmpDbgFlag);
+   _CrtSetDbgFlag( tmpDbgFlag );
 
-   Logger::Init("logging.xml");
+   Logger::Init( "logging.xml" );
 
-   g_pApp->m_EngineOptions.Init("PlayerOptions.xml");
+   g_pApp->m_EngineOptions.Init( "PlayerOptions.xml" );
 
    g_pApp->InitInstance( 0, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
    Vec3 v1( 1.0f, 0.0f, 0.0f );

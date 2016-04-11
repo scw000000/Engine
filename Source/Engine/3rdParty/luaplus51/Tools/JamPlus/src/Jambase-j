@@ -1,0 +1,29 @@
+if $(UNIX) {
+	DOT		default	= . ;
+	DOTDOT		default	= .. ;
+	SLASH		default = / ;
+} else if $(NT) || $(OS2) {
+	DOT		default	= . ;
+	DOTDOT		default	= .. ;
+    	SLASH		default = \\ ;
+} else if $(VMS) {
+	DOT		default	= [] ;
+	DOTDOT		default	= [-] ;
+	SLASH		default = . ;
+} else if $(MAC) {
+	DOT		default = ":" ;
+	DOTDOT		default = "::" ;
+	SLASH		default = ":" ;
+}
+
+ROOT_JAMBASE = $(JAM_PROCESS_PATH)$(SLASH)$(DOTDOT)$(SLASH)Jambase.jam ;
+
+# Search in current dir, the executable path, and one directory higher than the executable path.
+JAMBASE ?= Jambase.jam ;
+SEARCH on $(JAMBASE) =
+    $(DOT)
+    $(JAM_PROCESS_PATH)
+    $(JAM_PROCESS_PATH)$(SLASH)$(DOTDOT)
+;
+
+include $(JAMBASE) ;

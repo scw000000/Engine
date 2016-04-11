@@ -495,7 +495,7 @@ void EngineApp::OnUpdateGame( double fTime, float fElapsedTime )
 
 	   if (m_pGame)
 	   {
-     //   IEventManager::Get()->VUpdate(20); // allow event queue to process for up to 20 ms
+      IEventManager::GetSingleton()->VUpdate(20); // allow event queue to process for up to 20 ms
 		g_pApp->m_pGame->VOnUpdate( ( float ) fTime, fElapsedTime );
 	   }
    }

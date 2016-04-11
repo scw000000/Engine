@@ -182,3 +182,12 @@ class ISceneNode
 	   virtual int VOnLostDevice( Scene *pScene ) = 0;
 //	   virtual int VPick( Scene *pScene, RayCast *pRayCast ) = 0;
    };
+
+class IScriptManager
+   {
+   public:
+      virtual ~IScriptManager( void ) {}
+      virtual bool VInit( void ) = 0;
+      virtual void VExecuteFile( const char* resource ) = 0;
+      virtual void VExecuteString( const char* str ) = 0;
+   };

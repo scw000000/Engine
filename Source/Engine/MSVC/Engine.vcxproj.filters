@@ -130,6 +130,15 @@
     <ClCompile Include="..\LuaScripting\LuaStateManager.cpp">
       <Filter>LuaScripting</Filter>
     </ClCompile>
+    <ClCompile Include="..\LuaScripting\ScriptExports.cpp">
+      <Filter>LuaScripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LuaScripting\ScriptProcess.cpp">
+      <Filter>LuaScripting</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LuaScripting\ScriptEvent.cpp">
+      <Filter>LuaScripting</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -228,6 +237,15 @@
       <Filter>Event</Filter>
     </ClInclude>
     <ClInclude Include="..\LuaScripting\LuaStateManager.h">
+      <Filter>LuaScripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LuaScripting\ScriptExports.h">
+      <Filter>LuaScripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LuaScripting\ScriptProcess.h">
+      <Filter>LuaScripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LuaScripting\ScriptEvent.h">
       <Filter>LuaScripting</Filter>
     </ClInclude>
   </ItemGroup>

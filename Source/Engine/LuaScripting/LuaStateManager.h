@@ -14,14 +14,18 @@ class LuaStateManager : public IScriptManager
       static LuaStateManager* GetSingleton( void ){ return s_pLuaStateMgr; }
 
       virtual bool VInit( void ) override;
+      // demand lua to execute a lua file
       virtual void VExecuteFile( const char* resource ) override;
+      // demand lua to execute a sting
       virtual void VExecuteString( const char*str ) override;
 
       LuaPlus::LuaObject GetGlobalVars( void );
       LuaPlus::LuaState* GetLuaState( void ) const;
-
+      // Build a series of connected tables from global variables based on pathStr
+      // EX: this.is.a.path -> global->this->is->a->path
       LuaPlus::LuaObject CreatePath( const char *pathStr, bool toIgnoreLastElement = false );
-      void ConvertVec3ToTable( const Vec3& vec, LuaPlus::LuaObject& luaTable, Vec3& outVec3 ) const;
+      // Create a table from m_pLuaState and restore x y z value in vec into this table
+      void ConvertVec3ToTable( const Vec3& vec, LuaPlus::LuaObject& outLuaTable ) const;
 
    private:
       void SetError( int errorNum );

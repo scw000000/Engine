@@ -43,7 +43,7 @@
     <OutDir>$(ProjectDir)..\..\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.5\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus;D:\Workspace\luaplus51-all\Src\LuaPlus\lua51\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.5\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus\lua51\src;$(SolutionDir)..\3rdParty\SDL2_image-2.0.1;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

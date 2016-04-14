@@ -4,6 +4,7 @@
 
 #include "EngineStd.h"
 #include "TextureResource.h"
+#include "SDL_image.h"
 
 
 //
@@ -51,11 +52,17 @@ unsigned int TextureResourceLoader::VGetLoadedResourceSize(char *rawBuffer, unsi
 //
 bool TextureResourceLoader::VLoadResource(char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle)
    {
+   SDL_Surface *image;
+image=IMG_Load_RW(SDL_RWFromFile("sample.png", "rb"), 1);
+if(!image) {
+    printf("IMG_Load_RW: %s\n", IMG_GetError());
+    // handle error
+}
 	Renderer renderer = EngineApp::GetRendererImpl();
 	if ( renderer == Renderer::Renderer_OpenGL )
 	   {
 		shared_ptr<GLTextureResourceExtraData> extra = shared_ptr<GLTextureResourceExtraData>( ENG_NEW GLTextureResourceExtraData() );
-
+      /*
 		if ( FAILED ( D3DXCreateTextureFromFileInMemory( DXUTGetD3D9Device(), rawBuffer, rawSize, &extra->m_pTexture ) ) )
          {
 			return false;
@@ -64,7 +71,7 @@ bool TextureResourceLoader::VLoadResource(char *rawBuffer, unsigned int rawSize,
 		   {
 			handle->SetExtra( shared_ptr<GLTextureResourceExtraData>( extra ) );
 			return true;
-		   }
+		   }*/
 	   }
 
 

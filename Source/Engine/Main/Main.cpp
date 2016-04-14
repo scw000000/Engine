@@ -15,12 +15,15 @@
 
 #pragma comment(lib, "SDL2.lib")
 #pragma comment(lib, "SDL2main.lib")
+#pragma comment(lib, "SDL2_image.lib")
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
 
 #pragma comment(lib, "zlibstat.lib")
 #pragma comment(lib, "tinyxml.lib")
-#pragma comment(lib, "lua5.1.lib")
+#pragma comment(lib, "lua51_debug.lib")
+
+
 
 #if defined(_M_IX86)
 	#if defined(_DEBUG)

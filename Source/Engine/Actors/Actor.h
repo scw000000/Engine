@@ -22,11 +22,11 @@ class Actor
       void Destroy( void );
       void Update( const unsigned long deltaMs );
 
-      ActorId GetId( void ) const { return m_id; }
+      ActorId GetId( void ) const { return m_Id; }
       template<class ComponenType> weak_ptr<ComponenType> GetComponent( ComponentId id )
          {
-         ActorComponents::iterator findIt = m_components.find( id );
-         if( findIt != m_components.end() )
+         ActorComponents::iterator findIt = m_Components.find( id );
+         if( findIt != m_Components.end() )
             {
             // Get component ptr as class actor component
             // We need to down cast it to specific actor component class
@@ -45,8 +45,8 @@ class Actor
       void AddComponent( StrongActorComponentPtr pComponent );
 
    private:
-      ActorId m_id;
-      ActorType m_type;
-      ActorComponents m_components;
-      std::string m_resource;
+      ActorId m_Id;
+      ActorType m_Type;
+      ActorComponents m_Components;
+      std::string m_Resource; // actor XML file name
    };

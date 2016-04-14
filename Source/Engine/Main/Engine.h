@@ -21,25 +21,34 @@ class EngineApp
       EngineApp( void );
       ~EngineApp( void );
       
+      static Renderer GetRendererImpl();
+
       virtual bool VLoadGame( void );
+      virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
+
       void MainLoop( void );
       void AbortGame( void ) { m_bQuitting = true; }
-      Uint32  GetWindowState( void );
-      BaseGameLogic* GetGameLogic(void) const { return m_pGame; }
-      bool IsRunning() { return m_bIsRunning; }
 
+      bool IsRunning() { return m_bIsRunning; }
       bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );
-      virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
-      SDL_Window* GetWindow() { return m_pWindow; }
-      HWND GetHwnd( void );
-      BaseGameLogic* VCreateGameAndView();
-      Point GetScreenSize( void ) const { return m_screenSize; }
+      bool LoadStrings( std::string language );
 
       int Modal( shared_ptr<Dialog> pModalScreen, int defaultAnswer );
-      HumanView* GetHumanView( void );
 
-      bool LoadStrings( std::string language );
+      Uint32  GetWindowState( void );
+
       std::wstring GetString( std::wstring sID );
+
+      SDL_Window* GetWindow() { return m_pWindow; }
+
+      Point GetScreenSize( void ) const { return m_screenSize; }
+
+      BaseGameLogic* GetGameLogic(void) const { return m_pGame; }
+      BaseGameLogic* VCreateGameAndView();
+      
+      HWND GetHwnd( void );      
+
+      HumanView* GetHumanView( void );
 
    public:
       struct EngineOptions m_EngineOptions;
@@ -74,7 +83,7 @@ class EngineApp
       Point m_screenSize;					// game screen size
       SDL_Window *m_pWindow;
       Uint32 m_ShutDownEventType;
-      std::map<std::wstring,std::wstring> m_textResource;
+      std::map< std::wstring, std::wstring > m_textResource;
 
    private:
  

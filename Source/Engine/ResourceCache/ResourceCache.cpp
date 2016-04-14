@@ -21,19 +21,19 @@ Resource::Resource( const std::string &name )
    }
 
 
-ResHandle::ResHandle( Resource &resource, char *buffer, unsigned int size, ResCache *pResCache ) : m_resource( resource )
+ResHandle::ResHandle( Resource &resource, char *buffer, unsigned int size, ResCache *pResCache ) : m_Resource( resource )
    {
-   m_buffer = buffer;
-	m_size = size;
-	m_extra = NULL;
+   m_pBuffer = buffer;
+	m_Size = size;
+	m_Extra = NULL;
 	m_pResCache = pResCache;
    }
 
 // The destructor truely free the allocated memory to resource cache
 ResHandle::~ResHandle()
    {
-   SAFE_DELETE_ARRAY( m_buffer );
-   m_pResCache->MemoryHasBeenFreed( m_size );
+   SAFE_DELETE_ARRAY( m_pBuffer );
+   m_pResCache->MemoryHasBeenFreed( m_Size );
    }
 
 ResCache::ResCache( const unsigned int sizeInMb, IResourceFile *resFile )
@@ -66,7 +66,7 @@ bool ResCache::Init()
 
 void ResCache::RegisterLoader( shared_ptr< IResourceLoader > loader )
    {
-   m_resourceLoaders.push_front( loader );
+   m_ResourceLoaders.push_front( loader );
    }
 
 // This function is callled by ResCache::preload to 
@@ -133,8 +133,8 @@ void ResCache::Flush( void )
 
 shared_ptr< ResHandle > ResCache::Find( Resource *resource )
    {
-   ResHandleMap::iterator i = m_resources.find( resource->m_name );
-	if ( i == m_resources.end() )
+   ResHandleMap::iterator i = m_Resources.find( resource->m_name );
+	if ( i == m_Resources.end() )
 		return shared_ptr<ResHandle>();
 
 	return i->second;
@@ -153,7 +153,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
    shared_ptr< IResourceLoader > loader;
    shared_ptr< ResHandle > handle;
 
-   for( auto it = m_resourceLoaders.begin(); it != m_resourceLoaders.end(); ++it )
+   for( auto it = m_ResourceLoaders.begin(); it != m_ResourceLoaders.end(); ++it )
       {
       // find correspond matching loader based on resource name
       if( WildcardMatch( (*it)->VGetPattern().c_str(), resource->m_name.c_str() ) )
@@ -216,7 +216,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
    if( handle )
       {
       m_lruResHandleList.push_front( handle ); // this resource is newly loaded, put it in the start of list
-      m_resources[ resource->m_name ] = handle; // add resource name & handle mapping
+      m_Resources[ resource->m_name ] = handle; // add resource name & handle mapping
       }
    ENG_ASSERT( loader && _T( "Default resource loader not found!" ) );
    return handle;
@@ -226,7 +226,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
 void ResCache::Free( shared_ptr< ResHandle > gonner )
    {
    m_lruResHandleList.remove( gonner ); // This calls the destructor of shared_ptr
-	m_resources.erase( gonner->m_resource.m_name );
+	m_Resources.erase( gonner->m_Resource.m_name );
    // Note - the resource might still be in use by something,
 	// so the cache can't actually count the memory freed until the
 	// ResHandle pointing to it is destroyed. ( destructor of ResHandle has been called ) 
@@ -272,7 +272,7 @@ void ResCache::FreeOneResource()
    shared_ptr< ResHandle > handle = *gonner;
    Free( handle );
    // m_lruResHandleList.pop_back();
-  // m_resources.erase( handle->m_resource.m_name );
+  // m_Resources.erase( handle->m_Resource.m_name );
    }
 
 // This function is called by destructor of ResHandle

@@ -23,64 +23,83 @@ bool Plane::Inside( Vec3 p, const float radius ) const
 
 Color::Color() 
    {
-   r = 0.f;
-   g = 0.f;
-   b = 0.f;
-   a = 0.f;
+   memset( m_Color, 0, sizeof( Color ) );
+   //r = 0.f;
+   //g = 0.f;
+   //b = 0.f;
+   //a = 0.f;
    }
 
 
 Color::Color( const Color& color )
    {
-   r = color.r;
-   g = color.g;
-   b = color.b;
-   a = color.a;
+   memcpy( this, &color, sizeof( Color ) );
+//   r = color.r;
+//   g = color.g;
+//   b = color.b;
+//   a = color.a;
    Satuate();
    }
     
-Color::Color( GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha ) : r( red ), g( green ), b( blue ), a( alpha )
+Color::Color( GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha ) // : r( red ), g( green ), b( blue ), a( alpha )
    {
+   m_Color[0] = red;
+   m_Color[1] = green;
+   m_Color[2] = blue;
+   m_Color[3] = alpha;
    Satuate();
    }
 
 // assignment operators
 Color& Color::operator += ( const Color& color )
    {
-   r += color.r;
-   g += color.g;
-   b += color.b;
-   a += color.a;
+
+   m_Color[0] += color.m_Color[0];
+   m_Color[1] += color.m_Color[1];
+   m_Color[2] += color.m_Color[2];
+   m_Color[3] += color.m_Color[3];
    Satuate();
    return *this;
    }
 
 Color& Color::operator -= ( const Color& color )
    {
-   r -= color.r;
-   g -= color.g;
-   b -= color.b;
-   a -= color.a;
+   m_Color[0] -= color.m_Color[0];
+   m_Color[1] -= color.m_Color[1];
+   m_Color[2] -= color.m_Color[2];
+   m_Color[3] -= color.m_Color[3];
+  // r -= color.r;
+   //g -= color.g;
+   //b -= color.b;
+   //a -= color.a;
    Satuate();
    return *this;
    }
 
 Color& Color::operator *= ( float scale )
    {
-   r *= scale;
-   g *= scale;
-   b *= scale;
-   a *= scale;
+   m_Color[0] *= scale;
+   m_Color[1] *= scale;
+   m_Color[2] *= scale;
+   m_Color[3] *= scale;
+   //r *= scale;
+   //g *= scale;
+   //b *= scale;
+   //a *= scale;
    Satuate();
    return *this;
    }
 
 Color& Color::operator /= ( float scale )
    {
-   r /= scale;
-   g /= scale;
-   b /= scale;
-   a /= scale;
+   m_Color[0] /= scale;
+   m_Color[1] /= scale;
+   m_Color[2] /= scale;
+   m_Color[3] /= scale;
+   //r /= scale;
+   //g /= scale;
+   //b /= scale;
+   //a /= scale;
    Satuate();
    return *this;
    }
@@ -93,7 +112,7 @@ Color Color::operator + () const
 
 Color Color::operator - () const
    {
-   return Color( -r, -g, -b, -a );
+   return Color( -m_Color[0], -m_Color[1], -m_Color[2], -m_Color[3] );
    }
 
 // binary operators
@@ -123,7 +142,8 @@ Color Color::operator / ( float scale ) const
 
 bool Color::operator == ( const Color& color ) const
    {
-   return ( r == color.r && g == color.g && b ==  color.b && a == color.a );
+   return memcmp ( m_Color, color.m_Color, sizeof( GLfloat ) * 4 ) == 0;
+  // return ( r == color.r && g == color.g && b ==  color.b && a == color.a );
    }
 
 bool Color::operator != ( const Color& color ) const
@@ -133,10 +153,14 @@ bool Color::operator != ( const Color& color ) const
 
  void Color::Satuate()
     {
-    r = glm::min( r, 1.0f );
-    g = glm::min( g, 1.0f );
-    b = glm::min( b, 1.0f );
-    a = glm::min( a, 1.0f );
+    m_Color[0] = std::min( m_Color[0], 1.0f );
+    m_Color[1] = std::min( m_Color[1], 1.0f );
+    m_Color[2] = std::min( m_Color[2], 1.0f );
+    m_Color[3] = std::min( m_Color[3], 1.0f );
+   // r = min( r, 1.0f );
+//    g = glm::min( g, 1.0f );
+  //  b = glm::min( b, 1.0f );
+    //a = glm::min( a, 1.0f );
 
     }
 

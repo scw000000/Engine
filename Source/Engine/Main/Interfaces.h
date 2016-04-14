@@ -3,6 +3,14 @@
 // Filename: Interfaces.h
 ////////////////////////////////////////////////////////////////////////////////
 
+enum Renderer
+	{
+   Renderer_Unknown,
+   Renderer_OpenGL,
+	Renderer_D3D9,
+	Renderer_D3D11
+	};
+
 class Actor;
 class ActorComponent;
 
@@ -54,13 +62,13 @@ class IGameLogic
    };
 
 enum GameViewType
-{
+   {
 	GameView_Human,
 	GameView_Remote,
 	GameView_AI,
 	GameView_Recorder,
 	GameView_Other
-};
+   };
 
 typedef unsigned int GameViewId;
 extern const GameViewId gc_InvalidGameViewId;

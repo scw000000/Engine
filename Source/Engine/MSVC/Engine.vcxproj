@@ -100,6 +100,7 @@
     <ClCompile Include="..\Event\EventManager.cpp" />
     <ClCompile Include="..\Event\Events.cpp" />
     <ClCompile Include="..\Graphics\Geometry.cpp" />
+    <ClCompile Include="..\Graphics\Material.cpp" />
     <ClCompile Include="..\Graphics\MatrixStack.cpp" />
     <ClCompile Include="..\Graphics\Scene.cpp" />
     <ClCompile Include="..\Graphics\SceneNodes.cpp" />
@@ -122,6 +123,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp" />
+    <ClCompile Include="..\ResourceCache\TextureResource.cpp" />
     <ClCompile Include="..\ResourceCache\XmlResource.cpp" />
     <ClCompile Include="..\ResourceCache\ZipFile.cpp" />
     <ClCompile Include="..\UserInterface\GUIManager.cpp" />
@@ -148,6 +150,7 @@
     <ClInclude Include="..\Event\EventManager.h" />
     <ClInclude Include="..\Event\Events.h" />
     <ClInclude Include="..\Graphics\Geometry.h" />
+    <ClInclude Include="..\Graphics\Material.h" />
     <ClInclude Include="..\Graphics\MatrixStack.h" />
     <ClInclude Include="..\Graphics\Scene.h" />
     <ClInclude Include="..\Graphics\SceneNodes.h" />
@@ -165,6 +168,7 @@
     <ClInclude Include="..\Memory\MemoryPool.h" />
     <ClInclude Include="..\Multicore\CriticalSection.h" />
     <ClInclude Include="..\ResourceCache\ResourceCache.h" />
+    <ClInclude Include="..\ResourceCache\TextureResource.h" />
     <ClInclude Include="..\ResourceCache\XmlResource.h" />
     <ClInclude Include="..\ResourceCache\ZipFile.h" />
     <ClInclude Include="..\UserInterface\GUIManager.h" />

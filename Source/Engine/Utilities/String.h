@@ -101,20 +101,20 @@ class HashedString
 {
 public:
 	explicit HashedString( char const * const pIdentString )
-		: m_ident( hash_name( pIdentString ) )
-	, m_identStr( pIdentString )
+		: m_pIdent( hash_name( pIdentString ) )
+	, m_IdentStr( pIdentString )
 	{
 	}
 
 	unsigned long getHashValue( void ) const
 	{
 
-		return reinterpret_cast<unsigned long>( m_ident );
+		return reinterpret_cast<unsigned long>( m_pIdent );
 	}
 
 	const std::string & getStr() const
 	{
-		return m_identStr;
+		return m_IdentStr;
 	}
 
 	static
@@ -134,14 +134,14 @@ public:
 
 private:
 
-	// note: m_ident is stored as a void* not an int, so that in
+	// note: m_pIdent is stored as a void* not an int, so that in
 	// the debugger it will show up as hex-values instead of
 	// integer values. This is a bit more representative of what
 	// we're doing here and makes it easy to allow external code
 	// to assign event types as desired.
 
-	void *             m_ident;
-	std::string		   m_identStr;
+	void *             m_pIdent;
+	std::string		   m_IdentStr;
 };
 //Remove the warning for warning #4311...
 #pragma warning(pop)

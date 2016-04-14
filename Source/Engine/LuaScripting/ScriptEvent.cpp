@@ -8,11 +8,11 @@
 
 ScriptEvent::CreationFunctions ScriptEvent::s_CreationFunctions;
 
-LuaPlus::LuaObject ScriptEvent::GetEventData( void )
+LuaPlus::LuaObject ScriptEvent::GetLuaEventData( void )
    {
    if ( !m_IsEventDataValid )
 	   {
-		VBuildEventData();
+		VBuildLuaEventData();
 		m_IsEventDataValid = true;
 	   }
 	
@@ -65,9 +65,10 @@ ScriptEvent* ScriptEvent::CreateEventFromScript( EventType type )
    }
 
 //---------------------------------------------------------------------------------------------------------------------
-// Default implementation for VBuildEventData() sets the event data to nil.
+// Default implementation for VBuildLuaEventData() sets the event data to nil.
 //---------------------------------------------------------------------------------------------------------------------
-bool ScriptEvent::VBuildEventData( void )
+bool ScriptEvent::VBuildLuaEventData( void )
    {
    m_LuaEventData.AssignNil( LuaStateManager::GetSingleton()->GetLuaState() );
+   return true;
    }

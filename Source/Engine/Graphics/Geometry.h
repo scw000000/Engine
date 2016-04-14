@@ -195,7 +195,8 @@ typedef struct Color
     Color( const float * );
     Color( float red, float green, float blue, float alpha );
 
-    
+    GLfloat GetAlpha( void ) const { return m_Color[3]; }
+    void SetAlpha( GLfloat alpha ) { m_Color[3] = alpha; }
     // casting
     operator DWORD () const;
 
@@ -220,11 +221,13 @@ typedef struct Color
     bool operator == ( const Color& ) const;
     bool operator != ( const Color& ) const;
 
+    operator const GLfloat*( void ){ return m_Color; }
    public:
-      float r;
-      float g;
-      float b;
-      float a;
+      float m_Color[4];
+    //  float r;
+    //  float g;
+    //  float b;
+    //  float a;
    
    private:
       void Satuate();

@@ -37,17 +37,17 @@ class ResHandle
       ResHandle( Resource &resource, char *buffer, unsigned int size, ResCache *pResCache );
       virtual ~ResHandle();
 
-      unsigned int Size() const { return m_size; }
-      char *GetBuffer() const { return m_buffer; }
-     // char *WritableBuffer() { return m_buffer; }
-      shared_ptr<IResourceExtraData> GetExtraData() const { return m_extra; }
-      void SetExtra( shared_ptr<IResourceExtraData> extra ) { m_extra = extra; }
+      unsigned int Size() const { return m_Size; }
+      char *GetBuffer() const { return m_pBuffer; }
+     // char *WritableBuffer() { return m_pBuffer; }
+      shared_ptr<IResourceExtraData> GetExtraData() const { return m_Extra; }
+      void SetExtra( shared_ptr<IResourceExtraData> extra ) { m_Extra = extra; }
 
    protected:
-      Resource m_resource;
-      char *m_buffer;
-      unsigned int m_size;
-      shared_ptr<IResourceExtraData> m_extra;
+      Resource m_Resource;
+      char *m_pBuffer;
+      unsigned int m_Size;
+      shared_ptr<IResourceExtraData> m_Extra;
       ResCache *m_pResCache;
    };
 
@@ -98,8 +98,8 @@ class ResCache
 
    protected:
       ResHandleList m_lruResHandleList; // least recently used list
-      ResHandleMap m_resources;
-      ResourceLoaders m_resourceLoaders;
+      ResHandleMap m_Resources;
+      ResourceLoaders m_ResourceLoaders;
       // this menber stores zip file 
       IResourceFile *m_file;
 

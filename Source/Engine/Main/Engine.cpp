@@ -35,6 +35,15 @@ EngineApp::~EngineApp( void )
 
    }
 
+Renderer EngineApp::GetRendererImpl( void )
+   {
+   GLint majVer;
+   GLint minVer;
+   glGetIntegerv( GL_MINOR_VERSION, &majVer );
+   glGetIntegerv( GL_MAJOR_VERSION, &minVer );
+   return Renderer_OpenGL;
+   }
+
 HWND EngineApp::GetHwnd( void )
    { 
    SDL_SysWMinfo info;

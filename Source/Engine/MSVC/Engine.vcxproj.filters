@@ -139,6 +139,12 @@
     <ClCompile Include="..\LuaScripting\ScriptEvent.cpp">
       <Filter>LuaScripting</Filter>
     </ClCompile>
+    <ClCompile Include="..\Graphics\Material.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ResourceCache\TextureResource.cpp">
+      <Filter>ResourceCache</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -247,6 +253,12 @@
     </ClInclude>
     <ClInclude Include="..\LuaScripting\ScriptEvent.h">
       <Filter>LuaScripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Material.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ResourceCache\TextureResource.h">
+      <Filter>ResourceCache</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

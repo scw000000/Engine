@@ -164,6 +164,23 @@ enum RenderPass
 class Scene;
 class SceneNodeProperties;
 
+class IRenderer
+{
+   public:
+	   virtual void VSetBackgroundColor( Color color ) = 0; 
+	   virtual GLuint VOnRestore( void ) = 0;
+	   virtual void VShutdown( void ) = 0;
+	   virtual bool VPreRender( void ) = 0;
+	   virtual bool VPostRender( void ) = 0;
+	   //virtual void VCalcLighting( Lights *lights, int maximumLights ) = 0;
+	   virtual void VSetWorldTransform( const Mat4x4 *m )=0;
+	   virtual void VSetViewTransform( const Mat4x4 *m )=0;
+	   virtual void VSetProjectionTransform( const Mat4x4 *m )=0;
+	   //virtual shared_ptr<IRenderState> VPrepareAlphaPass( void )=0;
+	   //virtual shared_ptr<IRenderState> VPrepareSkyBoxPass( void )=0;
+	   //virtual void VDrawLine( const Vec3& from,const Vec3& to,const Color& color )=0;
+   };
+
 class ISceneNode
    {
    public:

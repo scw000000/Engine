@@ -157,7 +157,10 @@ bool EventManager::VUpdate( unsigned long maxMs )
 	m_ActiveQueue = (m_ActiveQueue + 1) % EVENTMANAGER_NUM_QUEUES;
 	m_EventQueues[m_ActiveQueue].clear();
 
-   ENG_LOG("EventLoop", "Processing Event Queue " + ToStr(queueToProcess) + "; " + ToStr((unsigned long)m_EventQueues[queueToProcess].size()) + " events to process");
+   ENG_LOG("EventLoop", "Processing Event Queue " + 
+            ToStr(queueToProcess) + "; " + 
+            ToStr((unsigned long)m_EventQueues[queueToProcess].size()) 
+            + " events to process");
 
 	// Process the queue
 	while ( !m_EventQueues[queueToProcess].empty() )

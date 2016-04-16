@@ -102,8 +102,10 @@
     <ClCompile Include="..\Graphics\Geometry.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
     <ClCompile Include="..\Graphics\MatrixStack.cpp" />
+    <ClCompile Include="..\Graphics\OpenGLRenderer.cpp" />
     <ClCompile Include="..\Graphics\Scene.cpp" />
     <ClCompile Include="..\Graphics\SceneNodes.cpp" />
+    <ClCompile Include="..\Graphics\Shaders.cpp" />
     <ClCompile Include="..\LuaScripting\LuaStateManager.cpp" />
     <ClCompile Include="..\LuaScripting\ScriptEvent.cpp" />
     <ClCompile Include="..\LuaScripting\ScriptExports.cpp" />
@@ -152,8 +154,10 @@
     <ClInclude Include="..\Graphics\Geometry.h" />
     <ClInclude Include="..\Graphics\Material.h" />
     <ClInclude Include="..\Graphics\MatrixStack.h" />
+    <ClInclude Include="..\Graphics\OpenGLRenderer.h" />
     <ClInclude Include="..\Graphics\Scene.h" />
     <ClInclude Include="..\Graphics\SceneNodes.h" />
+    <ClInclude Include="..\Graphics\Shaders.h" />
     <ClInclude Include="..\LuaScripting\LuaStateManager.h" />
     <ClInclude Include="..\LuaScripting\ScriptEvent.h" />
     <ClInclude Include="..\LuaScripting\ScriptExports.h" />

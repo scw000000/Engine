@@ -35,43 +35,46 @@ shared_ptr<IResourceLoader> CreateJPGResourceLoader()
 	return shared_ptr<IResourceLoader>( ENG_NEW JpgResourceLoader() );
    }
 
-GLTextureResourceExtraData::GLTextureResourceExtraData()
-//: m_pTexture(NULL) 
+GLTextureResourceExtraData::GLTextureResourceExtraData() : m_pSurface(NULL) 
    {	
+
    }
 
 
-unsigned int TextureResourceLoader::VGetLoadedResourceSize(char *rawBuffer, unsigned int rawSize)
+unsigned int TextureResourceLoader::VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize )
    {
-	// This will keep the resource cache from allocating memory for the texture, so DirectX can manage it on it's own.
+	// This will keep the resource cache from allocating memory for the texture, so SDL_IMAGE can manage it on it's own.
 	return 0;
    }
 
 //
 // TextureResourceLoader::VLoadResource				- Chapter 14, page 492
 //
-bool TextureResourceLoader::VLoadResource(char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle)
+bool TextureResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle )
    {
-   SDL_Surface *image;
-image=IMG_Load_RW(SDL_RWFromFile("sample.png", "rb"), 1);
-if(!image) {
-    printf("IMG_Load_RW: %s\n", IMG_GetError());
-    // handle error
-}
-	Renderer renderer = EngineApp::GetRendererImpl();
+ 	Renderer renderer = EngineApp::GetRendererImpl();
 	if ( renderer == Renderer::Renderer_OpenGL )
 	   {
-		shared_ptr<GLTextureResourceExtraData> extra = shared_ptr<GLTextureResourceExtraData>( ENG_NEW GLTextureResourceExtraData() );
-      /*
-		if ( FAILED ( D3DXCreateTextureFromFileInMemory( DXUTGetD3D9Device(), rawBuffer, rawSize, &extra->m_pTexture ) ) )
+		
+      SDL_RWops* p_RWops = SDL_RWFromMem( rawBuffer, rawSize );
+      if( !p_RWops )
          {
-			return false;
+         ENG_ERROR( SDL_GetError() );
+         return false;
          }
-		else 
-		   {
-			handle->SetExtra( shared_ptr<GLTextureResourceExtraData>( extra ) );
-			return true;
-		   }*/
+      SDL_Surface* p_Surface = IMG_Load_RW( p_RWops, 0 );
+      if( SDL_RWclose( p_RWops ) )
+         {
+         ENG_WARNING( SDL_GetError() );
+         }
+      if( !p_Surface )
+         {
+         ENG_ERROR( SDL_GetError() );
+         return false;
+         }
+      shared_ptr<GLTextureResourceExtraData> extra = shared_ptr<GLTextureResourceExtraData>( ENG_NEW GLTextureResourceExtraData() );
+      extra->m_pSurface = p_Surface;
+      handle->SetExtra( extra );
 	   }
 
 

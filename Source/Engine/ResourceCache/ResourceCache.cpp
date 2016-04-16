@@ -196,9 +196,9 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
       }
    else // allocate another buffer for processing
       {
-      size = loader->VGetLoadedResourceSize( rawBuffer, rawSize );
-      buffer = Allocate( size );
-      if( !rawBuffer || !buffer ) // allocation failed, return null pointer directly
+      size = loader->VGetLoadedResourceSize( rawBuffer, rawSize ); // chances are that loader will not use this buffer, so it may return size 0
+      buffer = ( size > 0 )? Allocate( size ): NULL;
+      if( !rawBuffer || ( ( !buffer && size ) ) ) // allocation failed, return null pointer directly
          {
          return shared_ptr<ResHandle>();
          }
@@ -206,8 +206,13 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
       handle = shared_ptr< ResHandle >( ENG_NEW ResHandle( *resource, buffer, size, this ) );
       // loader store processed data into handle from rawBuffer
       bool success = loader->VLoadResource( rawBuffer, rawSize, handle ); 
-      // after processing resource, delete raw data
-      SAFE_DELETE_ARRAY( rawBuffer ); 
+
+      if( loader->VDiscardRawBufferAfterLoad() )
+         {
+         // after processing resource, delete raw data
+          SAFE_DELETE_ARRAY( rawBuffer ); 
+         }
+      
       if( !success ) // process raw file failed 
          {
          return shared_ptr<ResHandle>();

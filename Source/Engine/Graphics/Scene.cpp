@@ -5,10 +5,10 @@
 #include "EngineStd.h"
 #include "Scene.h"
 
-Scene::Scene()
+Scene::Scene( shared_ptr<IRenderer> renderer )
    {
    m_Root = shared_ptr< SceneNode > ( ENG_NEW RootNode() );
-	//m_Renderer = renderer;
+	m_pRenderer = renderer;
 	//m_LightManager = GCC_NEW LightManager;
    
    }

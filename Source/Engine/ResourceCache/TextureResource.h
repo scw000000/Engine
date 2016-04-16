@@ -7,22 +7,19 @@
 
 // 
 //  class GLTextureResourceExtraData				- not described in the book, see D3DTextureResourceExtraData11
-//
+// TODO: check if openGL need to resotre smaple state
 class GLTextureResourceExtraData : public IResourceExtraData
    {
 	friend class TextureResourceLoader;
 
    public:
 	   GLTextureResourceExtraData();
-	   virtual ~GLTextureResourceExtraData() {  //SAFE_RELEASE(m_pTexture); 
-         }
-	   virtual std::string VToString() { return "GLTextureResourceExtraData"; }
-
-	  // LPDIRECT3DTEXTURE9 const GetTexture() { return m_pTexture; }
+	   virtual ~GLTextureResourceExtraData( void ) { SDL_FreeSurface( m_pSurface ); }
+	   virtual std::string VToString() override { return "GLTextureResourceExtraData";  }
+      void* GetTexture( void ) { return m_pSurface->pixels; };
 
    protected:
-	//   LPDIRECT3DTEXTURE9		m_pTexture;			
-      GLuint m_TextureId;
+      SDL_Surface* m_pSurface;
    };
 
 

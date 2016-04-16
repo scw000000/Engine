@@ -92,6 +92,7 @@ int SceneNode::VRenderChildren( Scene *pScene )
          {
          if( it->VIsVisible( pScene ) )
             {
+            it->VRender( pScene );
             }
          it->VRenderChildren( pScene );
          }
@@ -196,6 +197,8 @@ bool RootNode::VAddChild( shared_ptr<ISceneNode> child )
 // TODO: finish implement
 int RootNode::VRenderChildren( Scene *pScene )
    {
+   // the child node of Root nodes are empty node, so there's no need calling VRender for them
+   // only their children should be rendered
    for (int pass = RenderPass_0; pass < RenderPass_Last; ++pass)
 	   {
 		switch(pass)

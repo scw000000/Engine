@@ -153,6 +153,8 @@ class Mat4x4 : public glm::mat4
       static const Mat4x4 g_Identity;
    };
 
+
+
 inline Vec3 Mat4x4::GetDirection() const
    {
    // Note - the following code can be used to double check the vector construction above.
@@ -187,6 +189,14 @@ inline Vec3 Mat4x4::GetYawPitchRoll() const
 	return ( Vec3(yaw, pitch, roll) );
 }
 
+typedef struct ColorComponents
+   {
+   float r;
+   float g;
+   float b;
+   float a;
+   }ColorComponents;
+
 typedef struct Color
    {
    public:
@@ -195,8 +205,55 @@ typedef struct Color
     Color( const float * );
     Color( float red, float green, float blue, float alpha );
 
-    GLfloat GetAlpha( void ) const { return m_Color[3]; }
-    void SetAlpha( GLfloat alpha ) { m_Color[3] = alpha; }
+    float GetAlpha( void ) const { return m_Component.a; }
+    void SetAlpha( float alpha ) { m_Component.a = alpha; }
+    // casting
+    operator DWORD () const;
+
+    // assignment operators
+    Color& operator += ( const Color& );
+    Color& operator -= ( const Color& );
+    Color& operator *= ( float );
+    Color& operator /= ( float );
+
+    // unary operators
+    Color operator + () const;
+    Color operator - () const;
+
+    // binary operators
+    Color operator + ( const Color& ) const;
+    Color operator - ( const Color& ) const;
+    Color operator * ( float ) const;
+    Color operator / ( float ) const;
+
+    friend Color operator * ( float, const Color& );
+
+    bool operator == ( const Color& ) const;
+    bool operator != ( const Color& ) const;
+
+    operator const GLfloat*( void ){ return &m_Array[0]; }
+
+   public:
+      union
+         {
+         float m_Array[4];
+         ColorComponents m_Component;
+         };   
+   private:
+      void Satuate();
+   }Color;
+
+/*
+typedef struct Color
+   {
+   public:
+    Color();
+    Color( const Color& color );
+    Color( const float * );
+    Color( float red, float green, float blue, float alpha );
+
+    float GetAlpha( void ) const { return m_Color[3]; }
+    void SetAlpha( float alpha ) { m_Color[3] = alpha; }
     // casting
     operator DWORD () const;
 
@@ -232,6 +289,7 @@ typedef struct Color
    private:
       void Satuate();
    }Color;
+*/
 
 class Plane
    {

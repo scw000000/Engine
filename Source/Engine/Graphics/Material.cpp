@@ -14,23 +14,23 @@ Material::Material( void )
    m_Shininess = 0.f;          
    }
 
-void Material::SetAmbient(const Color &color)
+void Material::SetAmbient( const Color &color )
    {
 	m_Ambient = color;
    }
 
-void Material::SetDiffuse(const Color &color)
+void Material::SetDiffuse( const Color &color )
    {
 	m_Diffuse = color;
    }  
 
-void Material::SetSpecular(const Color &color, const float power)
+void Material::SetSpecular( const Color &color, const float shininess )
    {
 	m_Specular = color;
-	m_Shininess = power;
+	m_Shininess = shininess;
    }
 
-void Material::SetEmissive(const Color &color)
+void Material::SetEmissive( const Color &color )
    {
 	m_Emissive = color;
    }

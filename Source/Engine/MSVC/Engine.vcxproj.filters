@@ -145,6 +145,12 @@
     <ClCompile Include="..\ResourceCache\TextureResource.cpp">
       <Filter>ResourceCache</Filter>
     </ClCompile>
+    <ClCompile Include="..\Graphics\Shaders.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\OpenGLRenderer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -259,6 +265,12 @@
     </ClInclude>
     <ClInclude Include="..\ResourceCache\TextureResource.h">
       <Filter>ResourceCache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Shaders.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\OpenGLRenderer.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

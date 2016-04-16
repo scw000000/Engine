@@ -10,6 +10,7 @@
 #include "..\UserInterface/GUIManager.h"
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Event\EventManager.h"
+#include "..\Graphics\OpenGLRenderer.h"
 
 
 EngineApp *g_pApp = NULL;
@@ -204,14 +205,30 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       }
    // set two buffer for rendering
    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-   // setting clear color
-   glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
 
    m_ShutDownEventType = SDL_RegisterEvents( 1 );
    ENG_ASSERT( m_ShutDownEventType != ((Uint32)-1) );
    //--------------------------------- 
    // Initiate window & SDL, glew
    //--------------------------------- 
+
+   //--------------------------------- 
+   // Set Renderer
+   //--------------------------------- 
+    if( GetRendererImpl() == Renderer_OpenGL )
+      {
+      m_pRenderer = shared_ptr<IRenderer>( ENG_NEW OpenGLRenderer() );
+      }
+   else
+      {
+      ENG_ERROR( "Not supported renderer type" );
+      }
+   m_pRenderer->VSetBackgroundColor( g_Black );
+   m_pRenderer->VOnRestore();
+   //--------------------------------- 
+   // Set Renderer
+   //--------------------------------- 
+
 
    // Start global timer
    GetGlobalTimer()->Reset();

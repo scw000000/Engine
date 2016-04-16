@@ -12,7 +12,7 @@ typedef std::map< ActorId, shared_ptr< ISceneNode > > ActorSceneMap;
 class Scene
    {
    public:
-      Scene( void );
+      Scene( shared_ptr<IRenderer> renderer );
       virtual ~Scene( void );
       int OnRender( void );
       int OnRestore( void );
@@ -37,6 +37,7 @@ class Scene
 	      }
 
 	   void AddAlphaSceneNode( AlphaSceneNode *asn ) { m_AlphaSceneNodes.push_back( asn ); }
+      shared_ptr<IRenderer> GetRenderer( void ) { return m_pRenderer; }
 
    protected:
       void RenderAlphaPass();
@@ -44,7 +45,7 @@ class Scene
    protected:
       shared_ptr<SceneNode>         m_Root;
      // shared_ptr<CameraNode>      m_Camera;
-      //shared_ptr<IRenderer> m_Renderer;
+      shared_ptr<IRenderer>         m_pRenderer;
       MatrixStack                   m_MatrixStack;
       AlphaSceneNodes               m_AlphaSceneNodes;
       ActorSceneMap                 m_ActorMap;

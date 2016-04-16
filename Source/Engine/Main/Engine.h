@@ -55,6 +55,7 @@ class EngineApp
       TCHAR m_saveGameDirectory[MAX_PATH];
       BaseGameLogic *m_pGame;
       ResCache *m_pResCache;
+      shared_ptr<IRenderer> m_pRenderer;
       EventManager *m_pEventManager;
 
    protected:

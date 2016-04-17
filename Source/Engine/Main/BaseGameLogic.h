@@ -49,7 +49,7 @@ class BaseGameLogic : public IGameLogic
       virtual void VChangeState(BaseGameState newState);
 	   const BaseGameState GetState() const { return m_State; }
 
-      virtual bool VLoadGame(const char* levelResource) override;  // [rez] Subclasses shouldn't override this function; use VLoadGameDelegate() instead
+      virtual bool VLoadGame( const char* levelResource ) override;  
 
       void AttachProcess(StrongProcessPtr pProcess) { if (m_pProcessManager) {m_pProcessManager->AttachProcess(pProcess);} }
 

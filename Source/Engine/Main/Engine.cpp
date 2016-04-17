@@ -429,6 +429,12 @@ bool EngineApp::LoadStrings( std::string language )
 	return true;
    }
 
+// THis function is called by  BaseGameLogic::VChangeState
+bool EngineApp::LoadGame( void )
+   {
+   return m_pGame->VLoadGame( m_EngineOptions.m_Level.c_str() );
+   }
+
 std::wstring EngineApp::GetString( std::wstring sID )
    {
 	auto localizedString = m_textResource.find( sID );

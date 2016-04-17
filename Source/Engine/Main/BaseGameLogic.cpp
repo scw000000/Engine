@@ -7,11 +7,13 @@
 ///////////////////////
 #include "EngineStd.h"
 #include "BaseGameLogic.h"
-#include "../Mainloop/Initialization.h"			// only for GameOptions
-#include "../MainLoop/Process.h"
-#include "../Actors/Actor.h"
-#include "../Actors/ActorFactory.h"
-#include "../Utilities/String.h"
+#include "..\Mainloop\Initialization.h"			// only for GameOptions
+#include "..\MainLoop\Process.h"
+#include "..\Actors\Actor.h"
+#include "..\Actors\ActorFactory.h"
+#include "..\Utilities\String.h"
+#include "..\UserInterface\HumanView.h"
+#include "..\ResourceCache\XmlResource.h"
 
 BaseGameLogic::BaseGameLogic()
    {
@@ -223,94 +225,79 @@ void BaseGameLogic::VChangeState( BaseGameState newState )
    }
 
 // this function is called by EngineApp::VLoadGame
+// LATER: finish implementation
 bool BaseGameLogic::VLoadGame( const char* levelResource )
-{
-   /*
+   {
+   
     // Grab the root XML node
-    TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement(levelResource);
-    if (!pRoot)
-    {
-        GCC_ERROR("Failed to find level resource file: " + std::string(levelResource));
-        return false;
-    }
+   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( levelResource );
+   if (!pRoot)
+      { 
+      ENG_ERROR( "Failed to find level resource file: " + std::string( levelResource ) );
+      return false;
+      }
 
     // pre and post load scripts
-    const char* preLoadScript = NULL;
-    const char* postLoadScript = NULL;
+   const char* preLoadScript = NULL;
+   const char* postLoadScript = NULL;
 
     // parse the pre & post script attributes
-    TiXmlElement* pScriptElement = pRoot->FirstChildElement("Script");
-    if (pScriptElement)
-    {
-        preLoadScript = pScriptElement->Attribute("preLoad");
-        postLoadScript = pScriptElement->Attribute("postLoad");
-    }
+   TiXmlElement* pScriptElement = pRoot->FirstChildElement("Script");
+   if (pScriptElement)
+      {
+      preLoadScript = pScriptElement->Attribute("preLoad");
+      postLoadScript = pScriptElement->Attribute("postLoad");
+      }
 
     // load the pre-load script if there is one
-    if (preLoadScript)
-    {
-        Resource resource(preLoadScript);
-        shared_ptr<ResHandle> pResourceHandle = g_pApp->m_ResCache->GetHandle(&resource);  // this actually loads the XML file from the zip file
-    }
+   if (preLoadScript)
+      {
+      Resource resource( preLoadScript );
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( &resource );  // this actually loads the XML file from the zip file
+      }
 
     // load all initial actors
     TiXmlElement* pActorsNode = pRoot->FirstChildElement("StaticActors");
-    if (pActorsNode)
-    {
-        for (TiXmlElement* pNode = pActorsNode->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement())
-        {
-            const char* actorResource = pNode->Attribute("resource");
+   if ( pActorsNode )
+      {
+      for (TiXmlElement* pNode = pActorsNode->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement())
+         {
+         const char* actorResource = pNode->Attribute("resource");
 
 			StrongActorPtr pActor = VCreateActor(actorResource, pNode);
-			if (pActor)
-			{
+			if ( pActor )
+			   {
 				// fire an event letting everyone else know that we created a new actor
-				shared_ptr<EvtData_New_Actor> pNewActorEvent(GCC_NEW EvtData_New_Actor(pActor->GetId()));
-				IEventManager::Get()->VQueueEvent(pNewActorEvent);
-			}
-        }
-    }
+			//	shared_ptr<EvtData_New_Actor> pNewActorEvent( ENG_NEW EvtData_New_Actor(pActor->GetId()));
+			//	IEventManager::Get()->VQueueEvent(pNewActorEvent);
+			   }
+         }
+      }
 
     // initialize all human views
-    for (auto it = m_gameViews.begin(); it != m_gameViews.end(); ++it)
-    {
-        shared_ptr<IGameView> pView = *it;
-        if (pView->VGetType() == GameView_Human)
-        {
-            shared_ptr<HumanView> pHumanView = static_pointer_cast<HumanView, IGameView>(pView);
-            pHumanView->LoadGame(pRoot);
-        }
-    }
+   for ( auto it = m_gameViews.begin(); it != m_gameViews.end(); ++it )
+      {
+      shared_ptr<IGameView> pView = *it;
+      if ( pView->VGetType() == GameView_Human )
+         {
+         shared_ptr<HumanView> pHumanView = static_pointer_cast<HumanView, IGameView>(pView);
+         pHumanView->LoadGame( pRoot );
+         }
+      }
 
     // register script events from the engine
 	//   [mrmike] this was moved to the constructor post-press, since this function can be called when new levels are loaded by the game or editor
     // RegisterEngineScriptEvents();
 
-    // call the delegate load function
-    if (!VLoadGameDelegate(pRoot))
-        return false;  // no error message here because it's assumed VLoadGameDelegate() kicked out the error
-
     // load the post-load script if there is one
-    if (postLoadScript)
-    {
-        Resource resource(postLoadScript);
-        shared_ptr<ResHandle> pResourceHandle = g_pApp->m_ResCache->GetHandle(&resource);  // this actually loads the XML file from the zip file
-    }
-
-	// trigger the Environment Loaded Game event - only then can player actors and AI be spawned!
-	if (m_bProxy)
-	{
-		shared_ptr<EvtData_Remote_Environment_Loaded> pNewGameEvent(GCC_NEW EvtData_Remote_Environment_Loaded);
-		IEventManager::Get()->VTriggerEvent(pNewGameEvent);
-	}
-	else
-	{
-		shared_ptr<EvtData_Environment_Loaded> pNewGameEvent(GCC_NEW EvtData_Environment_Loaded);
-		IEventManager::Get()->VTriggerEvent(pNewGameEvent);
-	}
-   */
-    return true;
-}
+   if ( postLoadScript )
+      {
+      Resource resource( postLoadScript );
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( &resource );  // this actually loads the XML file from the zip file
+      }
+   
+   return true;
+   }
 
 
 ActorFactory* BaseGameLogic::VCreateActorFactory( void )

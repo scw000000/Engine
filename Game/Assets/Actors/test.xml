@@ -1,0 +1,12 @@
+<Actor type="Sphere" resource="actors\sphere.xml">
+
+	<TransformComponent>
+		<Position x="0" y="0" z="10"/>
+	</TransformComponent>
+
+    <CubeRenderComponent>
+        <Color r="0" g="1.0" b="1.0" a="1.0"/>
+        <Cube side="15.0"/>
+	</CubeRenderComponent>
+
+</Actor>

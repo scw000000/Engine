@@ -1,0 +1,10 @@
+<World>
+  
+    <!-- A list of static actors to load.  Static actors have no game view attached.  This is for stuff like 
+    level geometry.-->
+
+    <StaticActors>
+
+    </StaticActors>
+
+</World>

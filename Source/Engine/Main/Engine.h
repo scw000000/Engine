@@ -32,6 +32,7 @@ class EngineApp
       bool IsRunning() { return m_bIsRunning; }
       bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );
       bool LoadStrings( std::string language );
+      bool LoadGame( void );
 
       int Modal( shared_ptr<Dialog> pModalScreen, int defaultAnswer );
 

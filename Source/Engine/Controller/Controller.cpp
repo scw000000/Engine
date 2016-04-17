@@ -5,9 +5,9 @@
 #include "EngineStd.h"
 #include "Controller.h"
 
-MovementController::MovementController(shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown) : m_object(object)
+MovementController::MovementController( shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown ) : m_object( object )
    {
-	m_object->VGetProperties()->Transform(&m_matToWorld, &m_matFromWorld);
+	m_object->VGetProperties()->GetRelTransform( &m_matToWorld, &m_matFromWorld );
 
 	m_fTargetYaw = m_fYaw = RADIANS_TO_DEGREES(-initialYaw);
 	m_fTargetPitch = m_fPitch = RADIANS_TO_DEGREES(initialPitch);

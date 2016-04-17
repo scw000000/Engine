@@ -355,7 +355,7 @@ BaseGameLogic *EngineApp::VCreateGameAndView( void )
    m_pGame->Init();
 
    // shared_ptr<IGameView> menuView;
-	shared_ptr<IGameView> menuView( ENG_NEW HumanView() );
+	shared_ptr<IGameView> menuView( ENG_NEW HumanView( g_pApp->m_pRenderer ) );
 	m_pGame->VAddView( menuView );
 	return m_pGame;
    }

@@ -7,6 +7,7 @@
 #include "..\Main\Interfaces.h"
 #include "CEGUI/CEGUI.h"
 #include "CEGUI/RendererModules/OpenGL/GL3Renderer.h"
+#include "..\Graphics\Scene.h"
 
 const Uint32 g_QuitNoPrompt = -1;
 
@@ -35,3 +36,28 @@ class Dialog
       CEGUI::FrameWindow* m_pWindow;
       Uint32 m_EventType;  
     };
+
+// This calss is made for letting Human view treating it like one of screen element in sceen element list 
+class ScreenElementScene : public IScreenElement, public Scene
+   {
+   public:
+	   ScreenElementScene(shared_ptr<IRenderer> renderer) : Scene( renderer ) { }
+      virtual ~ScreenElementScene(void) { ENG_WARNING("~ScreenElementScene()");  }
+
+	   // IScreenElement Implementation
+	   virtual void VOnUpdate( const unsigned long deltaMs ) override { OnUpdate( deltaMs ); };
+	   virtual int VOnRestore() override { OnRestore(); return S_OK; }
+	   virtual int VOnRender( double fTime, float fElapsedTime ) override { OnRender(); return S_OK; }
+	   virtual int VOnLostDevice() override { OnLostDevice(); return S_OK; } 
+	   virtual int VGetZOrder() const override { return 0; }
+	   virtual void VSetZOrder(int const zOrder) override { }
+
+	   // Don't handle any messages
+	   virtual int VOnMsgProc( const SDL_Event& event ) override { return 0; }
+
+	   virtual bool VIsVisible() const override { return true; }
+	   virtual void VSetVisible( const bool visible) override { }
+
+      // expanded function for adding actor to scene
+	   virtual bool VAddChild( ActorId id, shared_ptr<ISceneNode> kid ) { return Scene::AddChild(id, kid); }
+   };

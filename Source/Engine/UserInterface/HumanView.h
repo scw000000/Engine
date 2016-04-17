@@ -15,7 +15,7 @@ class HumanView : public IGameView
 	friend class EngineApp;
 
    public:
-      HumanView( void );
+      HumanView( shared_ptr<IRenderer> p_renderer );
       virtual ~HumanView( void );
       virtual void VOnRender( double fTime, float fElapsedTime );
 	   virtual GameViewType VGetType() { return GameView_Human; }
@@ -32,13 +32,15 @@ class HumanView : public IGameView
 	   virtual void VOnUpdate( const unsigned long deltaMs );
    
 	   // Virtual methods to control the layering of interface elements
-	   virtual void VPushElement(shared_ptr<IScreenElement> pElement);
-	   virtual void VRemoveElement(shared_ptr<IScreenElement> pElement);
+	   virtual void VPushElement( shared_ptr<IScreenElement> pElement );
+	   virtual void VRemoveElement( shared_ptr<IScreenElement> pElement );
 
       ProcessManager* GetProcessManager( void ) { return m_pProcessManager; }
 	   //void TogglePause(bool active);
       int Ask( MessageBox_Questions question );
+      bool LoadGame( TiXmlElement* pLevelData );
       bool HasModalDialog( void ) { return m_pGUIManager->HasModalDialog() != 0; }
+
       Uint32 GetModalEventType( void ) { return m_pGUIManager->GetModalEventType(); }
 	   //HumanView(shared_ptr<IRenderer> renderer);
 
@@ -54,6 +56,8 @@ class HumanView : public IGameView
       ProcessManager *m_pProcessManager; // this Processmanager is for things like button animations
       BaseGameState m_BaseGameState;					// Added post-press - what is the current game state
       GUIManager* m_pGUIManager;
+      shared_ptr<ScreenElementScene> m_pScene; // this scene will be pushed into screen element list by LoadGame( xml level)
+
    private:
 
    };

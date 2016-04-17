@@ -16,7 +16,7 @@ SceneNodeProperties::SceneNodeProperties( void )
    //m_AlphaType = AlphaOpaque;
    }
 
-void SceneNodeProperties::Transform( Mat4x4* const toRelative, Mat4x4* const fromRelative ) const
+void SceneNodeProperties::GetRelTransform( Mat4x4* const toRelative, Mat4x4* const fromRelative ) const
    {
    if( toRelative )
       {
@@ -155,7 +155,7 @@ void SceneNode::SetAlpha( float alpha )
 Vec3 SceneNode::GetWorldPosition( void ) const
    {
    Vec3 pos = GetRelPosition();
-	if (m_pParent)
+	if ( m_pParent )
 	   {
 		pos += m_pParent->GetWorldPosition();
 	   }
@@ -167,19 +167,19 @@ RootNode::RootNode(): SceneNode( INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(),
    {
 	m_Children.reserve(RenderPass_Last);
 
-	shared_ptr<SceneNode> staticGroup(GCC_NEW SceneNode(INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Static, &Mat4x4::g_Identity));
+	shared_ptr<SceneNode> staticGroup(ENG_NEW SceneNode(INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Static, &Mat4x4::g_Identity));
 	m_Children.push_back(staticGroup);	// RenderPass_Static = 0
 
-	shared_ptr<SceneNode> actorGroup(GCC_NEW SceneNode(INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Actor, &Mat4x4::g_Identity));
+	shared_ptr<SceneNode> actorGroup( ENG_NEW SceneNode(INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Actor, &Mat4x4::g_Identity));
 	m_Children.push_back(actorGroup);	// RenderPass_Actor = 1
 
-	shared_ptr<SceneNode> skyGroup(GCC_NEW SceneNode(INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Sky, &Mat4x4::g_Identity));
+	shared_ptr<SceneNode> skyGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Sky, &Mat4x4::g_Identity));
 	m_Children.push_back(skyGroup);	// RenderPass_Sky = 2
 
-	shared_ptr<SceneNode> invisibleGroup(GCC_NEW SceneNode(INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_NotRendered, &Mat4x4::g_Identity));
+	shared_ptr<SceneNode> invisibleGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_NotRendered, &Mat4x4::g_Identity));
 	m_Children.push_back(invisibleGroup);	// RenderPass_NotRendered = 3
    }
-*/
+   */
 
 // add child into corresponded renderpass node
 bool RootNode::VAddChild( shared_ptr<ISceneNode> child )
@@ -232,6 +232,57 @@ bool RootNode::VRemoveChild( ActorId id )
 		   }
 	   }
 	return anythingRemoved;
+   }
+
+//TODO: implement m_Frustum render
+int CameraNode::VRender( Scene *pScene )
+   {
+   if ( m_IsDebugCamera )
+	   {
+	//	pScene->PopMatrix();
+      // render four plans of m_Frustum
+	//	m_Frustum.Render();	
+
+	//	pScene->PushAndSetMatrix( m_Props.GetToRelSpace() );
+	   }
+
+	return S_OK;
+   }
+
+int CameraNode::VOnRestore( Scene *pScene )
+   {
+   m_Frustum.SetAspect(  (float) g_pApp->GetScreenSize().GetX() / (float) g_pApp->GetScreenSize().GetY() );
+   m_Projection.BuildProjection( m_Frustum.m_Fov, m_Frustum.m_Aspect, m_Frustum.m_NearDis, m_Frustum.m_FarDis );
+	return S_OK;
+   }
+
+Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene ) const
+   {
+   Mat4x4 world = pScene->GetTopMatrix();
+	Mat4x4 view = VGetProperties()->GetFromRelSpace();
+	//Mat4x4 worldView = world * view;
+	return m_Projection * view * world;
+   }
+
+// TODO: check if it's correct
+int CameraNode::SetViewTransform(  Scene *pScene )
+   {
+   // this code simulates camera pole effect, camera is sticked to target's position +  m_CamOffsetVector
+	if( m_pTarget )
+	   {
+      // Get target's local transform
+		Mat4x4 targetToRelSpace = m_pTarget->VGetProperties()->GetToRelSpace();
+		Vec4 at = m_CamOffsetVector;
+		Vec4 atWorld = targetToRelSpace.Xform( at );
+      // 
+		Vec3 pos = m_pTarget->GetRelPosition() + at;
+		targetToRelSpace.SetPosition(pos);
+		VSetRelTransform( &targetToRelSpace );
+	   }
+
+	m_View = VGetProperties()->GetFromRelSpace();
+
+	return S_OK;
    }
 
 

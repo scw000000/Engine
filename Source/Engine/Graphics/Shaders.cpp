@@ -7,60 +7,46 @@
 #include "OpenGLRenderer.h"
 #include "Scene.h"
 
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\GameCode4_VS.hlsl";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\GameCode4_VS.hlsl";
+
 VertexShader::VertexShader( void )
    {
-   m_VetrexShader = 0;
+   m_VertexShader = 0;
    }
 
 VertexShader::~VertexShader( void )
    {
-   if( m_VetrexShader )
+   if( m_VertexShader )
       {
-      glDeleteShader( m_VetrexShader );
+      glDeleteShader( m_VertexShader );
       }
    }
 
 GLint VertexShader::OnRestore( Scene* pScene )
    {
-   GLuint ProgramID = glCreateProgram();
-
    shared_ptr<OpenGLRenderer> p_OpenGLRenderer = static_pointer_cast<OpenGLRenderer>( pScene->GetRenderer() );
 
-   if( m_VetrexShader && p_OpenGLRenderer->GetProgramID() )
+   if( m_VertexShader && p_OpenGLRenderer->GetProgramID() )
       {
-      glDetachShader( p_OpenGLRenderer->GetProgramID(), m_VetrexShader );
-      if( m_VetrexShader )
-         {
-         glDeleteShader( m_VetrexShader );
-         }
+      glDetachShader( p_OpenGLRenderer->GetProgramID(), m_VertexShader );
+      }
+
+   if( m_VertexShader )
+      {
+      glDeleteShader( m_VertexShader );
       }
 	
    // Create the shaders
-	m_VetrexShader = glCreateShader( GL_VERTEX_SHADER );
+	m_VertexShader = glCreateShader( GL_VERTEX_SHADER );
 
-   std::string vertexShaderFileName = "Effects\\GameCode4_VS.hlsl";
-	Resource resource( vertexShaderFileName.c_str() );
+	Resource resource( VERTEX_SHADER_FILE_NAME );
    shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( &resource );  // this actually loads the shader file from the zip file
-
-	GLint result = GL_FALSE;
-	int InfoLogLength;
-
 	// Compile Vertex Shader
    ENG_LOG( "Renderer", "Compiling vertex shader: " + resource.m_name );
-   GLchar* p_VSSourcePointer = ( GLchar* )pResourceHandle->GetBuffer();
-	glShaderSource( m_VetrexShader, 1, &p_VSSourcePointer, NULL);
-	glCompileShader( m_VetrexShader );
 
-	// Check Vertex Shader compliing
-	glGetShaderiv( m_VetrexShader, GL_COMPILE_STATUS, &result );
-	glGetShaderiv( m_VetrexShader, GL_INFO_LOG_LENGTH, &InfoLogLength );
-	if ( InfoLogLength > 0 )
-      {
-      GLchar* p_ErrMsg = new GLchar[ InfoLogLength + 1];
-		glGetShaderInfoLog( m_VetrexShader, InfoLogLength, NULL, p_ErrMsg );
-		ENG_ERROR( p_ErrMsg );
-      SAFE_DELETE_ARRAY( p_ErrMsg );
-	   }
+   GLchar* p_VSSourcePointer = ( GLchar* )pResourceHandle->GetBuffer();
+   GLint result = p_OpenGLRenderer->CompileShader( &p_VSSourcePointer, m_VertexShader );
 
    return result;
    }
@@ -73,11 +59,93 @@ GLint VertexShader::SetupRender( Scene *pScene, SceneNode *pNode )
       ENG_ERROR( "shader pointer cast failed" );
       return 0;
       }
+   GLuint programID = p_OpenGLRenderer->GetProgramID();
    GLint Result = GL_FALSE;
+   int infoLogLength;
+
    // Set the vertex shader
-   glAttachShader(  p_OpenGLRenderer->GetProgramID(), m_VetrexShader );
+   glAttachShader( programID, m_VertexShader );
    // Check the program
-	glGetProgramiv( p_OpenGLRenderer->GetProgramID(), GL_LINK_STATUS, &Result );
+	glGetProgramiv( programID, GL_LINK_STATUS, &Result );
+   glGetProgramiv( programID, GL_INFO_LOG_LENGTH, &infoLogLength);
+	if ( infoLogLength > 0 )
+      {
+      GLchar* p_ErrMsg = new GLchar[ infoLogLength + 1];
+		glGetProgramInfoLog( programID, infoLogLength, NULL, p_ErrMsg );
+		ENG_ERROR( p_ErrMsg );
+      SAFE_DELETE_ARRAY( p_ErrMsg );
+      return Result;
+      }
+
+	return Result;
+   }
+
+FragmentShader::FragmentShader( void )
+   {
+   m_FragmentShader = 0;
+   }
+
+FragmentShader::~FragmentShader( void )
+   {
+   if( m_FragmentShader )
+      {
+      glDeleteShader( m_FragmentShader );
+      }
+   }
+
+GLint FragmentShader::OnRestore( Scene *pScene )
+   {
+   shared_ptr<OpenGLRenderer> p_OpenGLRenderer = static_pointer_cast<OpenGLRenderer>( pScene->GetRenderer() );
+
+   if( m_FragmentShader && p_OpenGLRenderer->GetProgramID() )
+      {
+      glDetachShader( p_OpenGLRenderer->GetProgramID(), m_FragmentShader );
+      }
+
+   if( m_FragmentShader )
+      {
+      glDeleteShader( m_FragmentShader );
+      }
+	
+   // Create the shaders
+	m_FragmentShader = glCreateShader( GL_FRAGMENT_SHADER );
+   // load resource
+	Resource resource( FRAGMENT_SHADER_FILE_NAME );
+   shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( &resource );  // this actually loads the shader file from the zip file
+
+	// Compile Vertex Shader
+   ENG_LOG( "Renderer", "Compiling vertex shader: " + resource.m_name );
+
+   GLchar* p_VSSourcePointer = ( GLchar* )pResourceHandle->GetBuffer();
+   GLint result = p_OpenGLRenderer->CompileShader( &p_VSSourcePointer, m_FragmentShader );
+
+   return result;
+   }
+
+GLint FragmentShader::SetupRender( Scene *pScene, SceneNode *pNode )
+   {
+   shared_ptr<OpenGLRenderer> p_OpenGLRenderer = static_pointer_cast<OpenGLRenderer>( pScene->GetRenderer() );
+   if( !p_OpenGLRenderer )
+      {
+      ENG_ERROR( "shader pointer cast failed" );
+      return 0;
+      }
+   GLuint programID = p_OpenGLRenderer->GetProgramID();
+   GLint Result = GL_FALSE;
+   int infoLogLength;
+
+   // Set the vertex shader
+   glAttachShader( programID, m_FragmentShader );
+   // Check the program
+	glGetProgramiv( programID, GL_LINK_STATUS, &Result );
+   glGetProgramiv( programID, GL_INFO_LOG_LENGTH, &infoLogLength);
+	if ( infoLogLength > 0 )
+      {
+      GLchar* p_ErrMsg = new GLchar[ infoLogLength + 1];
+		glGetProgramInfoLog( programID, infoLogLength, NULL, p_ErrMsg );
+		ENG_ERROR( p_ErrMsg );
+      SAFE_DELETE_ARRAY( p_ErrMsg );
+	   }
 
 	return Result;
    }

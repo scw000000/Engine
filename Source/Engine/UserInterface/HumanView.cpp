@@ -10,7 +10,7 @@ const unsigned int SCREEN_MAX_FRAME_RATE = 60;
 const Uint64 SCREEN_MIN_RENDER_INTERVAL = ( SDL_GetPerformanceFrequency() / SCREEN_MAX_FRAME_RATE );
 const GameViewId gc_InvalidGameViewId = 0xffffffff;
 
-HumanView::HumanView( )
+HumanView::HumanView( shared_ptr<IRenderer> p_renderer )
    {
 	m_pProcessManager = ENG_NEW ProcessManager;
 
@@ -18,6 +18,21 @@ HumanView::HumanView( )
 
 	m_BaseGameState = BGS_Initializing;		// what is the current game state
    
+   // TODO: finish camera part
+   if ( p_renderer )
+	   {
+		// Moved to the HumanView class post press
+		m_pScene.reset( ENG_NEW ScreenElementScene( p_renderer ) );
+
+		//Frustum frustum;
+		//frustum.Init(GCC_PI/4.0f, 1.0f, 1.0f, 100.0f);
+		//m_pCamera.reset(GCC_NEW CameraNode(&Mat4x4::g_Identity, frustum));
+		//ENG_ASSERT(m_pScene && m_pCamera && _T("Out of memory"));
+
+		//m_pScene->VAddChild( INVALID_ACTOR_ID, m_pCamera );
+		//m_pScene->SetCamera(m_pCamera);
+	   }
+
    m_pGUIManager = ENG_NEW GUIManager;
    m_pGUIManager->Init( "GUI/" );
    }
@@ -161,5 +176,12 @@ void HumanView::VRemoveElement( shared_ptr<IScreenElement> pElement )
 int HumanView::Ask( MessageBox_Questions question )
    {
    return m_pGUIManager->Ask( question );
+   }
+
+// TODO: refactor this method ( unnecessary param )
+bool HumanView::LoadGame( TiXmlElement* pLevelData )
+   {
+   VPushElement( m_pScene );  
+   return true;
    }
 

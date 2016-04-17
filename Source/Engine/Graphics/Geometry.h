@@ -148,12 +148,10 @@ class Mat4x4 : public glm::mat4
       inline void BuildYawPitchRoll( const float yawRadians, const float pitchRadians, const float rollRadians )
          { *this = glm::eulerAngleYXZ( yawRadians, pitchRadians, rollRadians ); }
       inline void BuildRotationQuat( const Quaternion &q ) { *this = mat4_cast( q ); }
-      
+      inline void BuildProjection( float fovy, float aspect, float zNear, float zFar );
    public: 
       static const Mat4x4 g_Identity;
    };
-
-
 
 inline Vec3 Mat4x4::GetDirection() const
    {
@@ -188,6 +186,11 @@ inline Vec3 Mat4x4::GetYawPitchRoll() const
 
 	return ( Vec3(yaw, pitch, roll) );
 }
+
+inline void Mat4x4::BuildProjection( float fovy, float aspect, float zNear, float zFar )
+   {
+   *this = glm::perspective( fovy, aspect, zNear, zFar);
+   }
 
 typedef struct ColorComponents
    {
@@ -332,7 +335,7 @@ class Frustum
 	   void SetNear(float nearClip) { m_NearDis=nearClip; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
 	   void SetFar(float farClip) { m_FarDis=farClip; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
 
-   private:
+   public:
       enum Side { Near, Far, Top, Right, Bottom, Left, NumPlanes };
 
       Plane m_Planes[ NumPlanes ];

@@ -210,7 +210,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
       if( loader->VDiscardRawBufferAfterLoad() )
          {
          // after processing resource, delete raw data
-          SAFE_DELETE_ARRAY( rawBuffer ); 
+         SAFE_DELETE_ARRAY( rawBuffer ); 
          }
       
       if( !success ) // process raw file failed 

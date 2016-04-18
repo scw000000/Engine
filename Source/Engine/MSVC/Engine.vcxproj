@@ -94,6 +94,7 @@
   <ItemGroup>
     <ClCompile Include="..\Actors\Actor.cpp" />
     <ClCompile Include="..\Actors\ActorFactory.cpp" />
+    <ClCompile Include="..\Actors\RenderComponent.cpp" />
     <ClCompile Include="..\Actors\TransformComponent.cpp" />
     <ClCompile Include="..\Controller\Controller.cpp" />
     <ClCompile Include="..\Debugging\Logger.cpp" />
@@ -102,6 +103,7 @@
     <ClCompile Include="..\Graphics\Geometry.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
     <ClCompile Include="..\Graphics\MatrixStack.cpp" />
+    <ClCompile Include="..\Graphics\Mesh.cpp" />
     <ClCompile Include="..\Graphics\OpenGLRenderer.cpp" />
     <ClCompile Include="..\Graphics\Scene.cpp" />
     <ClCompile Include="..\Graphics\SceneNodes.cpp" />
@@ -124,6 +126,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\ResourceCache\MeshResource.cpp" />
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp" />
     <ClCompile Include="..\ResourceCache\TextureResource.cpp" />
     <ClCompile Include="..\ResourceCache\XmlResource.cpp" />
@@ -146,6 +149,7 @@
     <ClInclude Include="..\Actors\Actor.h" />
     <ClInclude Include="..\Actors\ActorComponent.h" />
     <ClInclude Include="..\Actors\ActorFactory.h" />
+    <ClInclude Include="..\Actors\RenderComponent.h" />
     <ClInclude Include="..\Actors\TransformComponent.h" />
     <ClInclude Include="..\Controller\Controller.h" />
     <ClInclude Include="..\Debugging\Logger.h" />
@@ -154,6 +158,7 @@
     <ClInclude Include="..\Graphics\Geometry.h" />
     <ClInclude Include="..\Graphics\Material.h" />
     <ClInclude Include="..\Graphics\MatrixStack.h" />
+    <ClInclude Include="..\Graphics\Mesh.h" />
     <ClInclude Include="..\Graphics\OpenGLRenderer.h" />
     <ClInclude Include="..\Graphics\Scene.h" />
     <ClInclude Include="..\Graphics\SceneNodes.h" />
@@ -171,6 +176,7 @@
     <ClInclude Include="..\Main\Interfaces.h" />
     <ClInclude Include="..\Memory\MemoryPool.h" />
     <ClInclude Include="..\Multicore\CriticalSection.h" />
+    <ClInclude Include="..\ResourceCache\MeshResource.h" />
     <ClInclude Include="..\ResourceCache\ResourceCache.h" />
     <ClInclude Include="..\ResourceCache\TextureResource.h" />
     <ClInclude Include="..\ResourceCache\XmlResource.h" />

@@ -5,8 +5,9 @@
 #include "EngineStd.h"
 #include "SceneNodes.h"
 #include "Scene.h"
-#include "../Actors/ActorComponent.h"
-#include "../Actors/TransformComponent.h"
+#include "..\Actors\ActorComponent.h"
+#include "..\Actors\TransformComponent.h"
+#include "..\Actors\RenderComponent.h"
 
 SceneNodeProperties::SceneNodeProperties( void )
    {
@@ -26,6 +27,18 @@ void SceneNodeProperties::GetRelTransform( Mat4x4* const toRelative, Mat4x4* con
       {
       *fromRelative = m_FromRelSpace;
       }
+   }
+
+SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, const Mat4x4 *to, const Mat4x4 *from )
+   {
+   m_pParent= NULL;
+	m_Props.m_ActorId = actorId;
+	m_Props.m_Name = ( renderComponent ) ? renderComponent->VGetName(): "SceneNode";
+	m_Props.m_RenderPass = renderPass;
+	//m_Props.m_AlphaType = AlphaOpaque;
+	m_RenderComponent = renderComponent;
+	VSetRelTransform(to, from); 
+	SetRadius(0);
    }
 
 SceneNode::~SceneNode()

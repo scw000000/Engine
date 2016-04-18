@@ -37,7 +37,8 @@ class ResHandle
       ResHandle( Resource &resource, char *buffer, unsigned int size, ResCache *pResCache );
       virtual ~ResHandle();
 
-      unsigned int Size() const { return m_Size; }
+      unsigned int GetSize( void ) const { return m_Size; }
+      void SetSize( unsigned size ){ m_Size = size; }
       char *GetBuffer() const { return m_pBuffer; }
      // char *WritableBuffer() { return m_pBuffer; }
       shared_ptr<IResourceExtraData> GetExtraData() const { return m_Extra; }

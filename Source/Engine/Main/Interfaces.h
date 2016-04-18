@@ -125,6 +125,8 @@ class Resource;
 class IResourceFile;
 class ResHandle;
 
+// The resource loader is responsible for manipulate handle and setting its extra data
+// when calling VLoadResource
 class IResourceLoader
    {
    public:

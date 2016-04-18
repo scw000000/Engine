@@ -151,6 +151,15 @@
     <ClCompile Include="..\Graphics\OpenGLRenderer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Actors\RenderComponent.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Mesh.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ResourceCache\MeshResource.cpp">
+      <Filter>ResourceCache</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -271,6 +280,15 @@
     </ClInclude>
     <ClInclude Include="..\Graphics\OpenGLRenderer.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Actors\RenderComponent.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Mesh.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ResourceCache\MeshResource.h">
+      <Filter>ResourceCache</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

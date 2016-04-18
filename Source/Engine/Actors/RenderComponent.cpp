@@ -60,11 +60,11 @@ TiXmlElement* BaseRenderComponent::VGenerateXml(void)
 
 shared_ptr<SceneNode> BaseRenderComponent::VGetSceneNode( void )
    {
-   if( !m_pSceneNode )
+   if( !m_pRootSceneNode )
       {
-      m_pSceneNode = VCreateSceneNode();
+      m_pRootSceneNode = VCreateSceneNode();
       }
-   return m_pSceneNode;
+   return m_pRootSceneNode;
    }
 
 Color BaseRenderComponent::LoadColor( TiXmlElement* pData )
@@ -95,25 +95,20 @@ Color BaseRenderComponent::LoadColor( TiXmlElement* pData )
 //---------------------------------------------------------------------------------------------------------------------
 bool MeshRenderComponent::VInit( TiXmlElement* pData )
    {
-    // color
-    TiXmlElement* pColorNode = pData->FirstChildElement( "Color" );
-    if( pColorNode )
-       {
-       m_color = LoadColor( pColorNode );
-       }
-    TiXmlElement* pMeshFileNode = pData->FirstChildElement( "MeshFile" );
-    if( pMeshFileNode )
+   TiXmlElement* pMeshFileNode = pData->FirstChildElement( "MeshFile" );
+   if( pMeshFileNode )
        {
        m_MeshResource = Resource( pMeshFileNode->GetText() );
-      
-      // m_pMeshResource = g_pApp->m_pResCache->GetHandle( &Resource( "fucjk" ) );
+
        }
 
-    return VDelegateInit(pData);
+    return VDelegateInit( pData );
    }
 
+// This function is called by PostInit->VGetSceneNode->VCreateSceneNode
 shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
    {
+
    return shared_ptr<SceneNode>();
    }
 

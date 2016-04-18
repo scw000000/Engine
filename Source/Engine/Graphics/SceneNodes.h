@@ -5,7 +5,10 @@
 
 #include "Material.h"
 
-//typedef unsigned int ActorId;
+
+class BaseRenderComponent;
+
+typedef BaseRenderComponent* WeakBaseRenderComponentPtr;
 
 //   This enum defines the different types of alpha blending
 //   types that can be set on a scene node.
@@ -63,7 +66,7 @@ class SceneNode : public ISceneNode
 
    public:
       // TODO: finish constructor
-	   //SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, const Mat4x4 *to, const Mat4x4 *from = NULL );
+	   SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, const Mat4x4 *to, const Mat4x4 *from = NULL );
 
 	   virtual ~SceneNode();
 
@@ -104,8 +107,10 @@ class SceneNode : public ISceneNode
 	   SceneNodeList			m_Children;
 	   SceneNode				*m_pParent;
 	   SceneNodeProperties		m_Props;
-   //	WeakBaseRenderComponentPtr	m_RenderComponent;
+   	WeakBaseRenderComponentPtr	m_RenderComponent;
    };
+
+
 
 struct AlphaSceneNode
    {
@@ -171,3 +176,7 @@ class CameraNode : public SceneNode
 	   Vec4			m_CamOffsetVector;	//Direction of camera relative to target.
    };
    
+class MeshSceneNode : public SceneNode
+   {
+   
+   };

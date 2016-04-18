@@ -7,18 +7,15 @@
 #include "SDL_image.h"
 
 
-//
-// class DdsResourceLoader					- creates an interface with the Resource cache to load DDS files
-//
-class DdsResourceLoader : public TextureResourceLoader
-{
-public:
-	virtual std::string VGetPattern() { return "*.dds"; }
-};
-
-shared_ptr<IResourceLoader> CreateDDSResourceLoader()
+class BmpResourceLoader : public TextureResourceLoader
    {
-	return shared_ptr<IResourceLoader>( ENG_NEW DdsResourceLoader() );
+   public:
+	   virtual std::string VGetPattern() { return "*.bmp"; }
+   };
+
+shared_ptr<IResourceLoader> CreateBmpResourceLoader()
+   {
+	return shared_ptr<IResourceLoader>( ENG_NEW BmpResourceLoader() );
    }
 
 //
@@ -44,6 +41,7 @@ GLTextureResourceExtraData::GLTextureResourceExtraData() : m_pSurface(NULL)
 unsigned int TextureResourceLoader::VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize )
    {
 	// This will keep the resource cache from allocating memory for the texture, so SDL_IMAGE can manage it on it's own.
+   // This value should be reset in VLoadResource by calling SetSize
 	return 0;
    }
 
@@ -75,9 +73,8 @@ bool TextureResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize
       shared_ptr<GLTextureResourceExtraData> extra = shared_ptr<GLTextureResourceExtraData>( ENG_NEW GLTextureResourceExtraData() );
       extra->m_pSurface = p_Surface;
       handle->SetExtra( extra );
+      handle->SetSize( extra->m_pSurface->w * extra->m_pSurface->h * extra->m_pSurface->format->BytesPerPixel );
 	   }
 
-
-	ENG_ASSERT( 0 && "Unsupported Renderer in TextureResourceLoader::VLoadResource");
 	return false;
    }

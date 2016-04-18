@@ -14,7 +14,6 @@ class BaseRenderComponent : public ActorComponent
       virtual void VPostInit( void ) override;
 	   //virtual void VOnChanged( void ) override;
       //virtual TiXmlElement* VGenerateXml(void) override;
-	   const Color GetColor() const { return m_color; }
 
    protected:
       // loads the SceneNode specific data (represented in the <SceneNode> tag)
@@ -23,8 +22,7 @@ class BaseRenderComponent : public ActorComponent
       Color LoadColor( TiXmlElement* pData );
 
    protected:
-      Color m_color;
-      shared_ptr<SceneNode> m_pSceneNode;
+      shared_ptr<SceneNode> m_pRootSceneNode;
 
    private:
       virtual shared_ptr<SceneNode> VGetSceneNode(void);

@@ -11,6 +11,7 @@
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Event\EventManager.h"
 #include "..\Graphics\OpenGLRenderer.h"
+#include "SDL_image.h"
 
 
 EngineApp *g_pApp = NULL;
@@ -210,6 +211,20 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    ENG_ASSERT( m_ShutDownEventType != ((Uint32)-1) );
    //--------------------------------- 
    // Initiate window & SDL, glew
+   //--------------------------------- 
+
+   //--------------------------------- 
+   // SDL_Image
+   //--------------------------------- 
+   int initFlags= IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF;
+   int initted = IMG_Init( initFlags );
+
+   if( ( initted & flags ) != flags) 
+      {
+      ENG_ERROR( IMG_GetError() );
+      }
+   //--------------------------------- 
+   // SDL_Image
    //--------------------------------- 
 
    //--------------------------------- 
@@ -615,12 +630,14 @@ int  EngineApp::PushUserEvent( Uint32 eventType, Sint32 code, void* d1, void* d2
    return SDL_PushEvent( &event );
    }
 
+// TODO: recheck close order
 void EngineApp::OnClose()
 {
    m_bIsRunning = false;
 	// release all the game systems in reverse order from which they were created
    ENG_LOG( "Test", "On close" );
 	SAFE_DELETE( m_pGame );
+   IMG_Quit();
    SDL_DestroyWindow( m_pWindow );
    SDL_Quit();
    SAFE_DELETE( m_pEventManager );

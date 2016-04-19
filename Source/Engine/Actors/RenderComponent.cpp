@@ -5,6 +5,9 @@
 #include "EngineStd.h"
 #include "RenderComponent.h"
 #include "..\Event\EventManager.h"
+#include "..\Event\Events.h"
+#include "..\Graphics\MeshSceneNode.h"
+#include "TransformComponent.h"
 
 
 const char* MeshRenderComponent::g_Name = "MeshRenderComponent";
@@ -14,14 +17,8 @@ const char* MeshRenderComponent::g_Name = "MeshRenderComponent";
 //---------------------------------------------------------------------------------------------------------------------
 bool BaseRenderComponent::VInit( TiXmlElement* pData )
    {
-    // color
-    TiXmlElement* pColorNode = pData->FirstChildElement( "Color" );
-    if( pColorNode )
-       {
-       m_color = LoadColor( pColorNode );
-       }
-
-    return VDelegateInit(pData);
+   ENG_ASSERT( pData );
+   return VDelegateInit( pData );
    }
 
 void BaseRenderComponent::VPostInit( void )
@@ -67,49 +64,48 @@ shared_ptr<SceneNode> BaseRenderComponent::VGetSceneNode( void )
    return m_pRootSceneNode;
    }
 
-Color BaseRenderComponent::LoadColor( TiXmlElement* pData )
-   {
-	Color color;
-
-   double r = 1.0;
-   double g = 1.0;
-   double b = 1.0;
-   double a = 1.0;
-
-   pData->Attribute("r", &r);
-   pData->Attribute("g", &g);
-   pData->Attribute("b", &b);
-   pData->Attribute("a", &a);
-
-   color.m_Component.r = (float)r;
-   color.m_Component.g = (float)g;
-   color.m_Component.b = (float)b;
-   color.m_Component.a = (float)a;
-
-	return color;
-   }
-
-
 //---------------------------------------------------------------------------------------------------------------------
 // MeshRenderComponent
 //---------------------------------------------------------------------------------------------------------------------
-bool MeshRenderComponent::VInit( TiXmlElement* pData )
+MeshRenderComponent::MeshRenderComponent( void ) : m_MeshResource( "" )
    {
-   TiXmlElement* pMeshFileNode = pData->FirstChildElement( "MeshFile" );
-   if( pMeshFileNode )
-       {
-       m_MeshResource = Resource( pMeshFileNode->GetText() );
-
-       }
-
-    return VDelegateInit( pData );
+   
    }
 
 // This function is called by PostInit->VGetSceneNode->VCreateSceneNode
 shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
    {
+   // get the transform component
+   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( ActorComponent::GetIdFromName( TransformComponent::g_Name ) ) );
+   if ( !pTransformComponent )
+      {
+      // can't render without a transform
+      return shared_ptr<SceneNode>();
+      }
 
-   return shared_ptr<SceneNode>();
+   WeakBaseRenderComponentPtr wbrcp(this);
+   shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), wbrcp, m_MeshResource, RenderPass::RenderPass_Actor, &pTransformComponent->GetTransform() ) );
+   
+   return pMeshSceneNode;
+   }
+
+bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
+   {
+   TiXmlElement* pMeshFileElement = pData->FirstChildElement( "meshfile" );
+   if( pMeshFileElement )
+      {
+      const char *filePath = pMeshFileElement->Attribute( "path" );
+      if( filePath )
+         {
+         m_MeshResource = Resource( filePath );
+         return true;
+         }
+      else
+         {
+         return false;
+         }
+      }
+   return false;
    }
 
 /*

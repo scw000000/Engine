@@ -205,39 +205,37 @@ private:
 
 
 template <class BaseType, class SubType>
-BaseType* GenericObjectCreationFunction(void) { return new SubType; }
+BaseType* GenericObjectCreationFunction(void) { return ENG_NEW SubType; }
 
 template <class BaseClass, class IdType>
 class GenericObjectFactory
-{
-    typedef BaseClass* (*ObjectCreationFunction)(void);
-    std::map<IdType, ObjectCreationFunction> m_creationFunctions;
+   {
+   typedef BaseClass* (*ObjectCreationFunction)(void);
+   std::map<IdType, ObjectCreationFunction> m_creationFunctions;
 
-public:
-   // relate subClass creation with id
-    template <class SubClass>
-    bool Register(IdType id)
-    {
-        auto findIt = m_creationFunctions.find(id);
-        if (findIt == m_creationFunctions.end())
-        {
+   public:
+      // relate subClass creation with id
+      template <class SubClass>
+      bool Register(IdType id)
+         {
+         auto findIt = m_creationFunctions.find(id);
+         if (findIt == m_creationFunctions.end())
+            {
             m_creationFunctions[id] = &GenericObjectCreationFunction<BaseClass, SubClass>;  // insert() is giving me compiler errors
             return true;
-        }
-
-        return false;
-    }
+            }
+         return false;
+         }
     // Find the relation mapping and create the subClass based on given id
-    BaseClass* Create(IdType id)
-    {
-        auto findIt = m_creationFunctions.find(id);
-        if (findIt != m_creationFunctions.end())
-        {
-            ObjectCreationFunction pFunc = findIt->second;
-            return pFunc();
-        }
-
-        return NULL;
-    }
-};
+   BaseClass* Create(IdType id)
+      {
+      auto findIt = m_creationFunctions.find(id);
+      if (findIt != m_creationFunctions.end())
+         {
+         ObjectCreationFunction pFunc = findIt->second;
+         return pFunc();
+         }
+      return NULL;
+      }
+   };
 

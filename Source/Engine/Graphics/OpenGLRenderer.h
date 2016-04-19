@@ -12,7 +12,9 @@ class OpenGLRenderer : public IRenderer
       virtual void VSetBackgroundColor( Color color ) override; 
 	   virtual GLuint VOnRestore( void ) override;
 	   virtual void VShutdown( void ) override;
+      // This functino is called at the begin of HumanView::Render before calling Scene to Rendoer
 	   virtual bool VPreRender( void ) override;
+      // This functino is called at the end of HumanView::Render after calling Scene to Render
 	   virtual bool VPostRender( void ) override;
 	   //virtual void VCalcLighting( Lights *lights, int maximumLights ) override;
 	   
@@ -30,5 +32,4 @@ class OpenGLRenderer : public IRenderer
       GLuint CompileShader( const GLchar* const* pSrcData, const GLuint shaderID );
    private:
       GLuint m_Program;
-      GLuint m_MVP;
    };

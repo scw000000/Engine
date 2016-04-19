@@ -20,12 +20,12 @@ class XmlResourceExtraData : public IResourceExtraData
 class XmlResourceLoader : public IResourceLoader
    {
    public:
-      virtual bool VUseRawFile() { return false; }
-	   virtual bool VDiscardRawBufferAfterLoad() { return true; }
-      virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize ) { return rawSize; }
-      virtual bool VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle );
-      virtual std::string VGetPattern() { return "*.xml"; }
-
+      virtual bool VUseRawFile() override { return false; }
+	   virtual bool VDiscardRawBufferAfterLoad() override { return true; }
+      virtual unsigned int VGetLoadedResourceSize ( char *rawBuffer, unsigned int rawSize ) override { return rawSize; }
+      virtual bool VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) override;
+      virtual std::string VGetPattern() override { return "*.xml"; }
+      virtual bool VUsePreAllocate( void ) override { return true; }
       // convenience function
       static TiXmlElement* LoadAndReturnRootXmlElement( const char* resourceString );
    };

@@ -175,24 +175,24 @@ Vec3 SceneNode::GetWorldPosition( void ) const
 	return pos;
    }
 
-/*
+
 RootNode::RootNode(): SceneNode( INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(), RenderPass_0, &Mat4x4::g_Identity )
    {
 	m_Children.reserve(RenderPass_Last);
 
-	shared_ptr<SceneNode> staticGroup(ENG_NEW SceneNode(INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Static, &Mat4x4::g_Identity));
+	shared_ptr<SceneNode> staticGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Static, &Mat4x4::g_Identity) );
 	m_Children.push_back(staticGroup);	// RenderPass_Static = 0
 
-	shared_ptr<SceneNode> actorGroup( ENG_NEW SceneNode(INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Actor, &Mat4x4::g_Identity));
+	shared_ptr<SceneNode> actorGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Actor, &Mat4x4::g_Identity) );
 	m_Children.push_back(actorGroup);	// RenderPass_Actor = 1
 
-	shared_ptr<SceneNode> skyGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Sky, &Mat4x4::g_Identity));
+	shared_ptr<SceneNode> skyGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Sky, &Mat4x4::g_Identity) );
 	m_Children.push_back(skyGroup);	// RenderPass_Sky = 2
 
-	shared_ptr<SceneNode> invisibleGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_NotRendered, &Mat4x4::g_Identity));
+	shared_ptr<SceneNode> invisibleGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_NotRendered, &Mat4x4::g_Identity ) );
 	m_Children.push_back(invisibleGroup);	// RenderPass_NotRendered = 3
    }
-   */
+   
 
 // add child into corresponded renderpass node
 bool RootNode::VAddChild( shared_ptr<ISceneNode> child )

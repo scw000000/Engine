@@ -23,7 +23,7 @@ EngineOptions::EngineOptions()
    {
    // set all the options to decent default valu
 	m_Renderer = "OpenGL";
-   m_Level = "default.xml";
+   m_Level = "World\\default.xml";
 	m_runFullSpeed = false;
 	m_ScreenSize = Point(1024,768);
    m_numAIs = 0;

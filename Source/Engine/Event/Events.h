@@ -35,10 +35,11 @@ template <typename T>class BaseEventData : public IEventData
       virtual float VGetTimeStamp( void ) const { return m_TimeStamp; }
    
    public:
-       
-   protected:
-      // GUID of this event
+       // GUID of this event
       static EventType sk_EventType;
+
+   protected:
+      
 
    private:
       
@@ -56,4 +57,30 @@ class EvtData_Destroy_Actor : public BaseEventData<EvtData_Destroy_Actor>
 
    private:
       ActorId m_Id;
+   };
+
+
+class EvtData_New_Render_Component : public BaseEventData<EvtData_New_Render_Component>
+   {
+
+   public:
+      EvtData_New_Render_Component( void ) { m_ActorId = INVALID_ACTOR_ID; }
+
+      explicit EvtData_New_Render_Component(ActorId actorId, shared_ptr<SceneNode> pSceneNode) : m_ActorId(actorId), m_pSceneNode(pSceneNode) { }
+
+      virtual const EventType& VGetEventType(void) const override { return sk_EventType; }
+
+      virtual IEventDataPtr VCopy(void) const override { return IEventDataPtr( ENG_NEW EvtData_New_Render_Component( m_ActorId, m_pSceneNode ) ); }
+
+      virtual const char* GetName(void) const override { return "EvtData_New_Render_Component"; }
+
+      const ActorId GetActorId(void) const { return m_ActorId; }
+
+      shared_ptr<SceneNode> GetSceneNode(void) const { return m_pSceneNode; }
+
+   private:
+      ActorId m_ActorId;
+      
+      shared_ptr<SceneNode> m_pSceneNode;
+   
    };

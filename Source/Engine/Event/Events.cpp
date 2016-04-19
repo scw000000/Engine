@@ -6,5 +6,7 @@
 #include "Events.h"
 
 EventType BaseEventData<EvtData_Destroy_Actor>::sk_EventType(0x220b94dd);
+EventType BaseEventData<EvtData_New_Render_Component>::sk_EventType(0xa75361ae);
+
 
  

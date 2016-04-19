@@ -10,6 +10,8 @@
 class BaseRenderComponent : public ActorComponent
    {
    public:
+      // This function should not override by derived Rendercomponent
+      // override VDelegateInit instedad
       virtual bool VInit( TiXmlElement* pData ) override;
       virtual void VPostInit( void ) override;
 	   //virtual void VOnChanged( void ) override;
@@ -36,32 +38,18 @@ class BaseRenderComponent : public ActorComponent
 class MeshRenderComponent : public BaseRenderComponent
    {
    public:
-	   static const char *g_Name;
+      MeshRenderComponent( void );
 	   virtual const char *VGetName() const { return g_Name; }
-      virtual bool VInit( TiXmlElement* pData ) override;
+
+   public:
+      static const char *g_Name;
 
    protected:
       virtual shared_ptr<SceneNode> VCreateSceneNode( void ) override;  // factory method to create the appropriate scene node
+      virtual bool VDelegateInit( TiXmlElement* pData ) override;
       //virtual void VCreateInheritedXmlElements(TiXmlElement* pBaseElement);
 
    protected:
       Resource m_MeshResource;
 
    };
-
-/*
-class CubeComponent : public BaseRenderComponent
-   {
-   public:
-	   static const char *g_Name;
-	   virtual const char *VGetName() const { return g_Name; }
-
-      CubeComponent( void );
-
-   protected:
-      virtual bool VDelegateInit(TiXmlElement* pData) override;
-      virtual shared_ptr<SceneNode> VCreateSceneNode( void ) override;  // factory method to create the appropriate scene node
-
-      // editor stuff
-      //virtual void VCreateInheritedXmlElements(TiXmlElement* pBaseElement);
-   };*/

@@ -127,6 +127,10 @@ void BaseGameLogic::VOnUpdate( float time, float elapsedTime )
 			break;
 
 		case BGS_MainMenu:
+      if ( !g_pApp->m_EngineOptions.m_Level.empty() )
+				   {
+					VChangeState(BGS_LoadingGameEnvironment);
+				   }
 			break;
 
 		case BGS_LoadingGameEnvironment:
@@ -155,14 +159,14 @@ void BaseGameLogic::VOnUpdate( float time, float elapsedTime )
 
 		case BGS_WaitingForPlayers:
 			if (m_ExpectedPlayers + m_ExpectedRemotePlayers == m_HumanPlayersAttached ) 
-			{
+			   {
 				// The server sends us the level name as a part of the login message. 
 				// We have to wait until it arrives before loading the level
-			//	if (!g_pApp->m_Options.m_Level.empty())
-			//	{
-			//		VChangeState(BGS_LoadingGameEnvironment);
-			//	}
-			}
+				if ( !g_pApp->m_EngineOptions.m_Level.empty() )
+				   {
+					VChangeState(BGS_LoadingGameEnvironment);
+				   }
+			   }
 			break;
 
 		case BGS_Running:

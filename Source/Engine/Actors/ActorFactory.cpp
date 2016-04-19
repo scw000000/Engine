@@ -11,10 +11,16 @@
 #include "Actor.h"
 #include "ActorComponent.h"
 #include "..\ResourceCache\XmlResource.h"
+#include "TransformComponent.h"
+#include "RenderComponent.h"
 
 ActorFactory::ActorFactory( void )
    {
    m_lastActorId = INVALID_ACTOR_ID;
+
+   m_componentFactory.Register<TransformComponent>( ActorComponent::GetIdFromName( TransformComponent::g_Name) );
+   m_componentFactory.Register<MeshRenderComponent>( ActorComponent::GetIdFromName( MeshRenderComponent::g_Name) );
+
    }
 
 // This version of function is different than the source code
@@ -107,5 +113,6 @@ StrongActorComponentPtr ActorFactory::CreateComponent( TiXmlElement* pData )
       ENG_ERROR( "Component failed to initialize: " + std::string( name ) );
       return StrongActorComponentPtr();
       }
+
    return pComponent;
    }

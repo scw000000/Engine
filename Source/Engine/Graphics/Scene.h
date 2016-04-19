@@ -5,6 +5,7 @@
 #include "SceneNodes.h"
 #include "MatrixStack.h"
 #include "SceneNodes.h"
+#include "..\Event\Events.h"
 
 typedef std::map< ActorId, shared_ptr< ISceneNode > > ActorSceneMap;
 
@@ -37,6 +38,7 @@ class Scene
       const Mat4x4 GetTopMatrix() const { return m_MatrixStack.GetTop(); }
 
 	   void AddAlphaSceneNode( AlphaSceneNode *asn ) { m_AlphaSceneNodes.push_back( asn ); }
+      void NewRenderComponentDelegate( IEventDataPtr pEventData );
       shared_ptr<IRenderer> GetRenderer( void ) { return m_pRenderer; }
       shared_ptr<CameraNode> GetCamera( void ) { return m_Camera; }
 

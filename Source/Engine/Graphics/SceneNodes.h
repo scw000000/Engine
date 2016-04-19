@@ -127,7 +127,7 @@ typedef std::list<AlphaSceneNode *> AlphaSceneNodes;
 class RootNode : public SceneNode
    {
    public:
-	 //  RootNode(); 
+	   RootNode( void );
 	   virtual bool VAddChild( shared_ptr<ISceneNode> child );
 	   virtual int VRenderChildren( Scene *pScene );
 	   virtual bool VRemoveChild( ActorId id );
@@ -138,13 +138,13 @@ class RootNode : public SceneNode
 class CameraNode : public SceneNode
    {
    public:
-	//   CameraNode( Mat4x4 const *t, Frustum const &frustum ) 
-	  //    : SceneNode(INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(), RenderPass_0, t),
-	 //     m_Frustum(frustum),
-	  //    m_IsActive(true),
-	   //   m_DebugCamera(false),
-//	      m_pTarget(shared_ptr<SceneNode>()),
-	//      m_CamOffsetVector( 0.0f, 1.0f, -10.0f, 0.0f ) { }
+	   CameraNode( Mat4x4 const *t, Frustum const &frustum ) 
+	      : SceneNode(INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(), RenderPass_0, t),
+	      m_Frustum(frustum),
+	      m_IsActive(true),
+	      m_IsDebugCamera(false),
+         m_pTarget(shared_ptr<SceneNode>()),
+	     m_CamOffsetVector( 0.0f, 1.0f, -10.0f, 0.0f ) { }
 
 	   virtual int VRender( Scene *pScene ) override;
 	   virtual int VOnRestore( Scene *pScene ) override;
@@ -174,9 +174,4 @@ class CameraNode : public SceneNode
 	   bool			m_IsDebugCamera;
 	   shared_ptr<SceneNode> m_pTarget;
 	   Vec4			m_CamOffsetVector;	//Direction of camera relative to target.
-   };
-   
-class MeshSceneNode : public SceneNode
-   {
-   
    };

@@ -42,7 +42,7 @@ class ResHandle
       char *GetBuffer() const { return m_pBuffer; }
      // char *WritableBuffer() { return m_pBuffer; }
       shared_ptr<IResourceExtraData> GetExtraData() const { return m_Extra; }
-      void SetExtra( shared_ptr<IResourceExtraData> extra ) { m_Extra = extra; }
+      void SetExtraData( shared_ptr<IResourceExtraData> extra ) { m_Extra = extra; }
 
    protected:
       Resource m_Resource;
@@ -61,6 +61,7 @@ class DefaultResourceLoader : public IResourceLoader
 	   virtual unsigned int VGetLoadedResourceSize(char *rawBuffer, unsigned int rawSize) { return rawSize; }
 	   virtual bool VLoadResource(char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle) { return true; }
 	   virtual std::string VGetPattern() { return "*"; }
+      virtual bool VUsePreAllocate( void ) override { return true; }
 
    };
 
@@ -93,7 +94,8 @@ class ResCache
       void Free( shared_ptr< ResHandle > gonner );
 
       bool MakeRoom( unsigned int size );
-      char *Allocate( unsigned int size );
+      bool Allocate( char** pAllocBuffer, unsigned int size, bool useRealAllocation );
+      char *PostAllocate( unsigned int size );
       void FreeOneResource();
       void MemoryHasBeenFreed( unsigned int size );
 

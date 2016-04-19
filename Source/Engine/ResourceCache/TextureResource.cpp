@@ -72,7 +72,7 @@ bool TextureResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize
          }
       shared_ptr<GLTextureResourceExtraData> extra = shared_ptr<GLTextureResourceExtraData>( ENG_NEW GLTextureResourceExtraData() );
       extra->m_pSurface = p_Surface;
-      handle->SetExtra( extra );
+      handle->SetExtraData( extra );
       handle->SetSize( extra->m_pSurface->w * extra->m_pSurface->h * extra->m_pSurface->format->BytesPerPixel );
 	   }
 

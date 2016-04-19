@@ -9,9 +9,11 @@
 #include "..\UserInterface\HumanView.h"
 #include "..\UserInterface/GUIManager.h"
 #include "..\ResourceCache\XmlResource.h"
+#include "..\ResourceCache\MeshResource.h"
 #include "..\Event\EventManager.h"
 #include "..\Graphics\OpenGLRenderer.h"
 #include "SDL_image.h"
+
 
 
 EngineApp *g_pApp = NULL;
@@ -124,13 +126,13 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 	//extern shared_ptr<IResourceLoader> CreateDDSResourceLoader();
 	//extern shared_ptr<IResourceLoader> CreateJPGResourceLoader();
    extern shared_ptr<IResourceLoader> CreateXmlResourceLoader();
+   extern shared_ptr<IResourceLoader> CreateObjMeshResourceLoader();
    //extern shared_ptr<IResourceLoader> CreateSdkMeshResourceLoader();
    //extern shared_ptr<IResourceLoader> CreateScriptResourceLoader();
 
-	// Note - register these in order from least specific to most specific! They get pushed onto a list.
-	// RegisterLoader is discussed in Chapter 5, page 142
 
-   m_pResCache->RegisterLoader(CreateXmlResourceLoader());
+   m_pResCache->RegisterLoader( CreateXmlResourceLoader() );
+   m_pResCache->RegisterLoader( CreateObjMeshResourceLoader() );
 
    if( !LoadStrings("English") )
 	   {
@@ -219,7 +221,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    int initFlags= IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF;
    int initted = IMG_Init( initFlags );
 
-   if( ( initted & flags ) != flags) 
+   if( ( initted & initFlags ) != initFlags ) 
       {
       ENG_ERROR( IMG_GetError() );
       }
@@ -549,20 +551,12 @@ void EngineApp::OnUpdateGame( double fTime, float fElapsedTime )
 
 void EngineApp::OnFrameRender( double fTime, float fElapsedTime )
    {
-   // LATER: move these to renderer
-   glClearDepth( 1.0 );
-   // use previously setted clearColr to draw background
-   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
    BaseGameLogic *pGame = g_pApp->m_pGame;
 
 	for(GameViewList::iterator i=pGame->m_gameViews.begin(), end=pGame->m_gameViews.end(); i!=end; ++i)
 	   {
 		(*i)->VOnRender( fTime, fElapsedTime );
 	   }
-
-   SDL_GL_SwapWindow( m_pWindow );
-
    }
 
 // This is a WINDOWS dedicated function

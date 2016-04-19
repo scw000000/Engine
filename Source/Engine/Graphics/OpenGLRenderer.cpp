@@ -6,14 +6,12 @@
 
 OpenGLRenderer::OpenGLRenderer( void )
    {
-   m_Program = 0;
-   m_MVP = 0;
+   
    }
 
 OpenGLRenderer::~OpenGLRenderer( void )
    {
-   m_Program = 0;
-   m_MVP = 0;
+   
    }
 
 void OpenGLRenderer::VSetBackgroundColor( Color color )
@@ -23,31 +21,25 @@ void OpenGLRenderer::VSetBackgroundColor( Color color )
 
 GLuint OpenGLRenderer::VOnRestore( void )
    {
-   m_Program = glCreateProgram();
-   GLuint result =  glGetError();
-   if( result != GL_NO_ERROR )
-      {
-      return result;
-      }
-
-   m_MVP = glGetUniformLocation( m_Program, "MVP");
-
-   return result;
+   
+   return GL_NO_ERROR;
    }
 
 void OpenGLRenderer::VShutdown( void )
    {
-   glDeleteProgram( m_Program );
    }
 
 bool OpenGLRenderer::VPreRender( void )
    {
-   glUseProgram( m_Program );
+   glClearDepth( 1.0 );
+   // use previously setted clearColr to draw background
+   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    return true;
    }
 
 bool OpenGLRenderer::VPostRender( void )
    {
+   SDL_GL_SwapWindow( g_pApp->GetWindow() );
    return true;
    }
 /*

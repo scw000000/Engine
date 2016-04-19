@@ -179,38 +179,58 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
    int allocSize = rawSize + ( (loader->VAddNullZero() ) ? (1) : (0));
    // if the resource do not need additional processing, then just call Allocate, 
    // because we dont need additional buffer ( rawBuffer )
-   char *rawBuffer = loader->VUseRawFile()? Allocate( allocSize ): ENG_NEW char[ allocSize ];
-   memset( rawBuffer, 0, allocSize );
+   char *pRawBuffer = NULL;
+   if( loader->VUseRawFile() )
+      {
+      pRawBuffer = ENG_NEW char[ allocSize ];
+      }
+   else
+      {
+      Allocate( &pRawBuffer, allocSize, true );
+      }
+   memset( pRawBuffer, 0, allocSize );
    // allocate rawBuffer fail or cannot load raw file from zip fIle
-   if( !rawBuffer || !m_file->VGetRawResource( *resource, rawBuffer ) )
+   if( !pRawBuffer || !m_file->VGetRawResource( *resource, pRawBuffer ) )
       {
       return shared_ptr< ResHandle >();
       }
-   char *buffer = NULL;
+   char *pBuffer = NULL;
    unsigned int size = 0;
 
-   if( loader->VUseRawFile() ) // use raw buffer directly
+   if( loader->VUseRawFile() ) // use raw pBuffer directly
       {
-      buffer = rawBuffer;
-      handle = shared_ptr< ResHandle >( ENG_NEW ResHandle( *resource, buffer, rawSize, this ) );
+      pBuffer = pRawBuffer;
+      handle = shared_ptr< ResHandle >( ENG_NEW ResHandle( *resource, pBuffer, rawSize, this ) );
       }
    else // allocate another buffer for processing
       {
-      size = loader->VGetLoadedResourceSize( rawBuffer, rawSize ); // chances are that loader will not use this buffer, so it may return size 0
-      buffer = ( size > 0 )? Allocate( size ): NULL;
-      if( !rawBuffer || ( ( !buffer && size ) ) ) // allocation failed, return null pointer directly
+      if( loader->VUsePreAllocate() )
          {
-         return shared_ptr<ResHandle>();
+         size = loader->VGetLoadedResourceSize( pRawBuffer, rawSize ); // chances are that loader will not use this buffer, so it may return size 0
+         if( !pRawBuffer || !Allocate( &pBuffer, size, true ) ) // allocation failed, return null pointer directly
+            {
+            return shared_ptr<ResHandle>();
+            }
          }
       // set buffer for handle
-      handle = shared_ptr< ResHandle >( ENG_NEW ResHandle( *resource, buffer, size, this ) );
-      // loader store processed data into handle from rawBuffer
-      bool success = loader->VLoadResource( rawBuffer, rawSize, handle ); 
+      handle = shared_ptr< ResHandle >( ENG_NEW ResHandle( *resource, pBuffer, size, this ) );
+      // loader store processed data into handle from pRawBuffer
+      bool success = loader->VLoadResource( pRawBuffer, rawSize, handle ); 
+
+      if( !loader->VUsePreAllocate() )
+         {
+         // the resource has been allocated in 3rd party lib
+         // we only have to test if we can make room for the resource we are allocating
+         if( !Allocate( &pBuffer, handle->GetSize(), false ) )
+            {
+            return shared_ptr<ResHandle>();
+            } 
+         }
 
       if( loader->VDiscardRawBufferAfterLoad() )
          {
          // after processing resource, delete raw data
-         SAFE_DELETE_ARRAY( rawBuffer ); 
+         SAFE_DELETE_ARRAY( pRawBuffer ); 
          }
       
       if( !success ) // process raw file failed 
@@ -255,18 +275,28 @@ bool ResCache::MakeRoom( unsigned int size )
    return true;
    }
 
-char* ResCache::Allocate( unsigned int size )
+bool ResCache::Allocate( char** pAllocBuffer, unsigned int size, bool useRealAllocation )
    {
    if( !MakeRoom( size ) )
       {
-      return NULL;
+      *pAllocBuffer = NULL;
+      return false;
       }
-   char *mem = ENG_NEW char[size];
-   if( mem )
+
+   if( useRealAllocation )
       {
-      m_allocated += size; // update allocated size
+      *pAllocBuffer = ENG_NEW char[size];
+      if( *pAllocBuffer )
+         {
+         m_allocated += size; // update allocated size
+         }
+      return true;
       }
-   return mem;
+   else
+      {
+      *pAllocBuffer = NULL;
+      return true;
+      }
    }
 
 // remove last resource from the list and map

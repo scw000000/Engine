@@ -20,7 +20,7 @@ bool XmlResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, sh
     shared_ptr<XmlResourceExtraData> pExtraData = shared_ptr<XmlResourceExtraData>( ENG_NEW XmlResourceExtraData() );
     pExtraData->ParseXml( rawBuffer );
 
-    handle->SetExtra( shared_ptr<XmlResourceExtraData>( pExtraData) );
+    handle->SetExtraData( shared_ptr<XmlResourceExtraData>( pExtraData) );
 
     return true;
    }

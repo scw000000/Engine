@@ -4,6 +4,8 @@
 
 #include "EngineStd.h"
 #include "Scene.h"
+#include "..\Event\EventManager.h"
+#include "FastDelegate.h"
 
 Scene::Scene( shared_ptr<IRenderer> renderer )
    {
@@ -11,6 +13,11 @@ Scene::Scene( shared_ptr<IRenderer> renderer )
 	m_pRenderer = renderer;
 	//m_LightManager = GCC_NEW LightManager;
    
+   IEventManager* pEventMgr = IEventManager::GetSingleton();
+   pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::NewRenderComponentDelegate ), EvtData_New_Render_Component::sk_EventType );
+   //pEventMgr->VAddListener(fastdelegate::MakeDelegate(this, &Scene::DestroyActorDelegate), EvtData_Destroy_Actor::sk_EventType);
+   //pEventMgr->VAddListener(fastdelegate::MakeDelegate(this, &Scene::MoveActorDelegate), EvtData_Move_Actor::sk_EventType);
+   //pEventMgr->VAddListener(fastdelegate::MakeDelegate(this, &Scene::ModifiedRenderComponentDelegate), EvtData_Modified_Render_Component::sk_EventType);
    }
 
 Scene::~Scene()
@@ -122,4 +129,22 @@ void Scene::RenderAlphaPass()
 		PopMatrix();
 		m_AlphaSceneNodes.pop_back();
 	   }
+   }
+
+void Scene::NewRenderComponentDelegate( IEventDataPtr pEventData )
+   {
+   shared_ptr<EvtData_New_Render_Component> pCastEventData = static_pointer_cast<EvtData_New_Render_Component>( pEventData );
+
+    ActorId actorId = pCastEventData->GetActorId();
+    shared_ptr<SceneNode> pSceneNode( pCastEventData->GetSceneNode() );
+
+    // FUTURE WORK: Add better error handling here.		
+    if ( pSceneNode->VOnRestore(this) != GL_NO_ERROR )
+      {
+		std::string error = "Failed to restore scene node to the scene for actorid " + ToStr(actorId);
+      ENG_ERROR( error );
+      return;
+      }
+
+   AddChild( actorId, pSceneNode );
    }

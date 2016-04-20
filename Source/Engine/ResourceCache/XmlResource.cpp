@@ -10,6 +10,16 @@ void XmlResourceExtraData::ParseXml(char* pRawBuffer)
    m_xmlDocument.Parse( pRawBuffer );
    }
 
+shared_ptr<IResourceLoader> CreateXmlResourceLoader()
+   {
+   return shared_ptr<IResourceLoader>( ENG_NEW XmlResourceLoader() );
+   }
+
+XmlResourceLoader::XmlResourceLoader( void ) : ResourceLoader( std::vector< std::string >( 1, "*.xml" ) )
+   {
+   
+   }
+
 bool XmlResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle )
    {
    if ( rawSize <= 0 )
@@ -23,11 +33,6 @@ bool XmlResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, sh
     handle->SetExtraData( shared_ptr<XmlResourceExtraData>( pExtraData) );
 
     return true;
-   }
-
-shared_ptr<IResourceLoader> CreateXmlResourceLoader()
-   {
-   return shared_ptr<IResourceLoader>( ENG_NEW XmlResourceLoader() );
    }
 
 // The resource handle will be pushed into m_lruResHandleList until engine exist or swapped out

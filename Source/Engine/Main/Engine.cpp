@@ -126,13 +126,15 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 	//extern shared_ptr<IResourceLoader> CreateDDSResourceLoader();
 	//extern shared_ptr<IResourceLoader> CreateJPGResourceLoader();
    extern shared_ptr<IResourceLoader> CreateXmlResourceLoader();
-   extern shared_ptr<IResourceLoader> CreateObjMeshResourceLoader();
+   extern shared_ptr<IResourceLoader> CreateMeshResourceLoader();
+   extern shared_ptr<IResourceLoader> CreateTextureResourceLoader();
    //extern shared_ptr<IResourceLoader> CreateSdkMeshResourceLoader();
    //extern shared_ptr<IResourceLoader> CreateScriptResourceLoader();
 
 
    m_pResCache->RegisterLoader( CreateXmlResourceLoader() );
-   m_pResCache->RegisterLoader( CreateObjMeshResourceLoader() );
+   m_pResCache->RegisterLoader( CreateMeshResourceLoader() );
+   m_pResCache->RegisterLoader( CreateTextureResourceLoader() );
 
    if( !LoadStrings("English") )
 	   {

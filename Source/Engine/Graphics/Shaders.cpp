@@ -7,8 +7,8 @@
 #include "OpenGLRenderer.h"
 #include "Scene.h"
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\GameCode4_VS.hlsl";
-const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\GameCode4_VS.hlsl";
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\VertexShader.vertexshader";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\FragmentShader.fragmentshader";
 
 VertexShader::VertexShader( void )
    {

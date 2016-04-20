@@ -6,30 +6,11 @@
 #include "TextureResource.h"
 #include "SDL_image.h"
 
+const char *TEXTURE_LOADER_PATTERNS[] = { "*.bmp", "*.jpg" };
 
-class BmpResourceLoader : public TextureResourceLoader
+shared_ptr<IResourceLoader> CreateTextureResourceLoader()
    {
-   public:
-	   virtual std::string VGetPattern() { return "*.bmp"; }
-   };
-
-shared_ptr<IResourceLoader> CreateBmpResourceLoader()
-   {
-	return shared_ptr<IResourceLoader>( ENG_NEW BmpResourceLoader() );
-   }
-
-//
-// class JpgResourceLoader					- creates an interface with the Resource cache to load JPG files
-//
-class JpgResourceLoader : public TextureResourceLoader
-   {
-public:
-	virtual std::string VGetPattern() { return "*.jpg"; }
-   };
-
-shared_ptr<IResourceLoader> CreateJPGResourceLoader()
-   {
-	return shared_ptr<IResourceLoader>( ENG_NEW JpgResourceLoader() );
+	return shared_ptr<IResourceLoader>( ENG_NEW TextureResourceLoader() );
    }
 
 GLTextureResourceExtraData::GLTextureResourceExtraData() : m_pSurface(NULL) 
@@ -37,6 +18,10 @@ GLTextureResourceExtraData::GLTextureResourceExtraData() : m_pSurface(NULL)
 
    }
 
+TextureResourceLoader::TextureResourceLoader( void ) : ResourceLoader( std::vector< std::string >( TEXTURE_LOADER_PATTERNS, std::end( TEXTURE_LOADER_PATTERNS ) ) )
+   {
+   
+   }
 
 unsigned int TextureResourceLoader::VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize )
    {

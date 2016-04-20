@@ -130,13 +130,14 @@ class ResHandle;
 class IResourceLoader
    {
    public:
-	   virtual std::string VGetPattern( void ) = 0;
+	   virtual const std::vector< std::string >& VGetPattern( void ) = 0;
 	   virtual bool VUseRawFile( void ) = 0;
 	   virtual bool VDiscardRawBufferAfterLoad( void ) = 0;
       virtual bool VAddNullZero( void ) { return false; }
 	   virtual unsigned int VGetLoadedResourceSize(char *rawBuffer, unsigned int rawSize) = 0;
-	   virtual bool VLoadResource(char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle) = 0;
+	   virtual bool VLoadResource(char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) = 0;
       virtual bool VUsePreAllocate( void ) = 0;
+      virtual bool VIsPatternMatch( const char* str ) = 0;
    };
 
 // Each resource file may contains many ressources

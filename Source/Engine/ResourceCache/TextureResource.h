@@ -26,9 +26,10 @@ class GLTextureResourceExtraData : public IResourceExtraData
 // 
 //  class TextureResourceLoader				- Chapter 14, page 492
 //
-class TextureResourceLoader : public IResourceLoader
+class TextureResourceLoader : public ResourceLoader
 {
 public:
+   TextureResourceLoader( void );
 	virtual bool VUseRawFile() { return false; }
 	virtual bool VDiscardRawBufferAfterLoad() { return true; }
 	virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize );

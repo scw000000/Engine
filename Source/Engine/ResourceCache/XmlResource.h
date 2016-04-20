@@ -17,14 +17,14 @@ class XmlResourceExtraData : public IResourceExtraData
       TiXmlDocument m_xmlDocument;  
    };
 
-class XmlResourceLoader : public IResourceLoader
+class XmlResourceLoader : public ResourceLoader
    {
    public:
+      XmlResourceLoader( void );
       virtual bool VUseRawFile() override { return false; }
 	   virtual bool VDiscardRawBufferAfterLoad() override { return true; }
       virtual unsigned int VGetLoadedResourceSize ( char *rawBuffer, unsigned int rawSize ) override { return rawSize; }
       virtual bool VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) override;
-      virtual std::string VGetPattern() override { return "*.xml"; }
       virtual bool VUsePreAllocate( void ) override { return true; }
       // convenience function
       static TiXmlElement* LoadAndReturnRootXmlElement( const char* resourceString );

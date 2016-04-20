@@ -7,9 +7,16 @@
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
 
-shared_ptr<IResourceLoader> CreateObjMeshResourceLoader()
+const char* MESH_LOADER_PATTERNS[] = { "*.obj" };
+
+shared_ptr<IResourceLoader> CreateMeshResourceLoader()
    {
-   return shared_ptr<IResourceLoader>( ENG_NEW ObjMeshResourceLoader() );
+   return shared_ptr<IResourceLoader>( ENG_NEW MeshResourceLoader() );
+   }
+
+MeshResourceLoader::MeshResourceLoader( void ) : ResourceLoader( std::vector< std::string >( MESH_LOADER_PATTERNS, std::end( MESH_LOADER_PATTERNS ) ) )
+   {
+   
    }
 
 unsigned int MeshResourceLoader::VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize )
@@ -22,7 +29,7 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
    {
    const char* p_Msg = NULL;
    const struct aiScene *p_Scene = aiImportFileFromMemory( rawBuffer, rawSize, aiProcessPreset_TargetRealtime_Quality, p_Msg );
-   if( p_Scene )
+   if( !p_Scene )
       {
       ENG_ERROR( p_Msg );
       return false;

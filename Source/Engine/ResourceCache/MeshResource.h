@@ -21,20 +21,14 @@ class MeshResourceExtraData : public IResourceExtraData
       const struct aiScene* m_pScene;
    };
 
-// TODO: expand this loader to obkj loader
-class MeshResourceLoader : public IResourceLoader
+
+class MeshResourceLoader : public ResourceLoader
    {
    public:
+      MeshResourceLoader( void );
 	   virtual bool VUseRawFile() override { return false; }
 	   virtual bool VDiscardRawBufferAfterLoad() override { return false; } // TODO: check if its right
 	   virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize ) override ;
 	   virtual bool VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) override ;
       virtual bool VUsePreAllocate( void ) override { return false; }
-	   virtual std::string VGetPattern() = 0;
-   };
-
-class ObjMeshResourceLoader : public MeshResourceLoader
-   {
-   public:
-	   virtual std::string VGetPattern( void ) override { return "*.obj"; }
    };

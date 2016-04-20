@@ -36,6 +36,23 @@ ResHandle::~ResHandle()
    m_pResCache->MemoryHasBeenFreed( m_Size );
    }
 
+bool ResourceLoader::VIsPatternMatch( const char* str )  
+   {
+   for( auto pattern : m_Patterns )
+      {
+      if( WildcardMatch( pattern.c_str(), str ) )
+         {
+         return true;
+         }
+      }
+   return false;
+   }
+
+DefaultResourceLoader::DefaultResourceLoader( void ) : ResourceLoader( std::vector< std::string >( 1, "*" ) )
+   {
+
+   }
+
 ResCache::ResCache( const unsigned int sizeInMb, IResourceFile *resFile )
    {
    m_cacheSize = sizeInMb * 1024 * 1024;
@@ -64,6 +81,7 @@ bool ResCache::Init()
    return ret;
    }
 
+// The DefaultResourceLoader is last one in the list, so any loader will match it before it
 void ResCache::RegisterLoader( shared_ptr< IResourceLoader > loader )
    {
    m_ResourceLoaders.push_front( loader );
@@ -156,7 +174,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
    for( auto it = m_ResourceLoaders.begin(); it != m_ResourceLoaders.end(); ++it )
       {
       // find correspond matching loader based on resource name
-      if( WildcardMatch( (*it)->VGetPattern().c_str(), resource->m_name.c_str() ) )
+      if( (*it)->VIsPatternMatch( resource->m_name.c_str() ) )
          {
          loader = (*it);
          break;
@@ -170,9 +188,9 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
       }
    // find correspond file in zip file and return its size
    int rawSize = m_file->VGetRawResourceSize( *resource );
-	if (rawSize < 0)
+	if ( rawSize < 0 )
 	   { 
-		ENG_ASSERT(rawSize > 0 && "Resource size returned -1 - Resource not found");
+		ENG_ASSERT( rawSize > 0 && "Resource size returned -1 - Resource not found" );
 		return shared_ptr<ResHandle>();
 	   }
    // add addition one byte if needed, lua resource loader will use this feature
@@ -182,11 +200,11 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
    char *pRawBuffer = NULL;
    if( loader->VUseRawFile() )
       {
-      pRawBuffer = ENG_NEW char[ allocSize ];
+      Allocate( &pRawBuffer, allocSize, true );
       }
    else
       {
-      Allocate( &pRawBuffer, allocSize, true );
+      pRawBuffer = ENG_NEW char[ allocSize ];
       }
    memset( pRawBuffer, 0, allocSize );
    // allocate rawBuffer fail or cannot load raw file from zip fIle

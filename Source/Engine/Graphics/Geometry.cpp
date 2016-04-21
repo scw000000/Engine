@@ -226,10 +226,10 @@ void Frustum::Init( const float fov, const float aspect, const float nearClipDis
 
    Vec3 origin(0.0f, 0.0f, 0.0f);
 
-	m_Planes[Near].Init( m_NearPlaneVerts[2], m_NearPlaneVerts[1], m_NearPlaneVerts[0] );
-	m_Planes[Far].Init( m_FarPlaneVerts[0], m_FarPlaneVerts[1], m_FarPlaneVerts[2] );
-	m_Planes[Right].Init (m_FarPlaneVerts[2], m_FarPlaneVerts[1], origin );
-	m_Planes[Top].Init( m_FarPlaneVerts[1], m_FarPlaneVerts[0], origin );
-	m_Planes[Left].Init( m_FarPlaneVerts[0], m_FarPlaneVerts[3], origin );
-	m_Planes[Bottom].Init( m_FarPlaneVerts[3], m_FarPlaneVerts[2], origin );
+	m_Planes[Near].Init( m_NearPlaneVerts[0], m_NearPlaneVerts[1], m_NearPlaneVerts[2] );
+	m_Planes[Far].Init( m_FarPlaneVerts[2], m_FarPlaneVerts[1], m_FarPlaneVerts[0] );
+	m_Planes[Right].Init ( origin, m_FarPlaneVerts[1], m_FarPlaneVerts[2] );
+	m_Planes[Top].Init( origin, m_FarPlaneVerts[0], m_FarPlaneVerts[1] );
+	m_Planes[Left].Init( origin, m_FarPlaneVerts[3], m_FarPlaneVerts[0] );
+	m_Planes[Bottom].Init( origin, m_FarPlaneVerts[2], m_FarPlaneVerts[3] );
    }

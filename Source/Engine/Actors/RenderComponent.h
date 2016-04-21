@@ -51,5 +51,5 @@ class MeshRenderComponent : public BaseRenderComponent
 
    protected:
       Resource m_MeshResource;
-
+      Resource m_TextureResource;
    };

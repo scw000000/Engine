@@ -6,19 +6,19 @@
 #include "ResourceCache.h"
 
 // 
-//  class GLTextureResourceExtraData				- not described in the book, see D3DTextureResourceExtraData11
 // TODO: check if openGL need to resotre smaple state
-class GLTextureResourceExtraData : public IResourceExtraData
+class SDLTextureResourceExtraData : public IResourceExtraData
    {
 	friend class TextureResourceLoader;
 
    public:
-	   GLTextureResourceExtraData();
-	   virtual ~GLTextureResourceExtraData( void ) { SDL_FreeSurface( m_pSurface ); }
-	   virtual std::string VToString() override { return "GLTextureResourceExtraData";  }
+	   SDLTextureResourceExtraData();
+	   virtual ~SDLTextureResourceExtraData( void ) { SDL_FreeSurface( m_pSurface ); }
+	   virtual std::string VToString() override { return "SDLTextureResourceExtraData";  }
       void* GetTexture( void ) { return m_pSurface->pixels; };
+      
 
-   protected:
+   public:
       SDL_Surface* m_pSurface;
    };
 

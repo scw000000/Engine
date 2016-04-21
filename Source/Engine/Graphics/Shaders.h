@@ -18,6 +18,7 @@ class VertexShader
 	   GLint SetupRender( Scene *pScene, SceneNode *pNode );
 	   void SetEnableLights(bool enableLights) { m_enableLights = enableLights; }
       GLuint GetVertexShader( void ) { return m_VertexShader; }
+      void ReleaseShader( GLuint program );
 
    protected:
       GLuint m_VertexShader;
@@ -39,6 +40,7 @@ class FragmentShader
       // bind fragment shader to program
 	   GLint SetupRender( Scene *pScene, SceneNode *pNode );
       GLuint GetFragmentShader( void ) { return m_FragmentShader; }
+      void ReleaseShader( GLuint program );
 
    protected:
       GLuint m_FragmentShader;

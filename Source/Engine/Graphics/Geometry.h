@@ -298,11 +298,13 @@ class Plane
    {
    public:
       Plane( void ) { n = g_Up; d = 0.f; };
+      // To make a plane with normal vector points upward, The order of the points 
+      //should be counter clockwise for right handed system 
       void Init( const Vec3& p0, const Vec3& p1, const Vec3& p2 )
          {
          n = glm::cross( p1 - p0, p2 - p0 );
-         // for plane ax + by + cz + w = 0; w = -( ax + by + cz ) = - dot( n, point one plane )
-         float ddd = n.Dot( p0 );
+         // for plane ax + by + cz + d = 0; d = -( ax + by + cz ) = - dot( n, a point on plane )
+         d = -1.0f * n.Dot( p0 );
          Normalize();
          }
       // constructor based on coefficient

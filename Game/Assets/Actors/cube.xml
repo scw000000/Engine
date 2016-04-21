@@ -6,6 +6,7 @@
 
     <MeshRenderComponent>
         <meshfile path="art\cube.obj" />
+		<texturefile path="art\cube.jpg" />
 	</MeshRenderComponent>
 
 </Actor>

@@ -84,15 +84,15 @@ int SceneNode::VPreRender( Scene *pScene )
 
 bool SceneNode::VIsVisible( Scene *pScene ) const
    {
-   Mat4x4 toWorld;
-   Mat4x4 fromWorld;
-  // pScene->GetCamera()->VGetProperties()->Transform( &toWorld, &fromWorld );
-   Vec3 pos = GetWorldPosition();
+   Mat4x4 toRelSpace;
+   Mat4x4 fromRelSpace;
+   pScene->GetCamera()->VGetProperties()->GetRelTransform( &toRelSpace, &fromRelSpace );
+   Vec3 fromWorldPos = GetWorldPosition();
+   
    // transform to camera's local space
-   pos = fromWorld.Xform( pos );
- //  const Frustum &frustum = pScene->GetCamera()->GetFrustum();
-   const Frustum frustum;
-   return frustum.Inside( pos, VGetProperties()->GetRadius() );
+   fromWorldPos = toRelSpace.Xform( fromWorldPos );
+   const Frustum &frustum = pScene->GetCamera()->GetFrustum();
+   return frustum.Inside( fromWorldPos, VGetProperties()->GetRadius() );
    }
 
 

@@ -6,14 +6,14 @@
 #include "TextureResource.h"
 #include "SDL_image.h"
 
-const char *TEXTURE_LOADER_PATTERNS[] = { "*.bmp", "*.jpg" };
+const char *TEXTURE_LOADER_PATTERNS[] = { "*.bmp", "*.jpg", "*.png" };
 
 shared_ptr<IResourceLoader> CreateTextureResourceLoader()
    {
 	return shared_ptr<IResourceLoader>( ENG_NEW TextureResourceLoader() );
    }
 
-GLTextureResourceExtraData::GLTextureResourceExtraData() : m_pSurface(NULL) 
+SDLTextureResourceExtraData::SDLTextureResourceExtraData() : m_pSurface(NULL) 
    {	
 
    }
@@ -55,11 +55,11 @@ bool TextureResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize
          ENG_ERROR( SDL_GetError() );
          return false;
          }
-      shared_ptr<GLTextureResourceExtraData> extra = shared_ptr<GLTextureResourceExtraData>( ENG_NEW GLTextureResourceExtraData() );
+      shared_ptr<SDLTextureResourceExtraData> extra = shared_ptr<SDLTextureResourceExtraData>( ENG_NEW SDLTextureResourceExtraData() );
       extra->m_pSurface = p_Surface;
       handle->SetExtraData( extra );
       handle->SetSize( extra->m_pSurface->w * extra->m_pSurface->h * extra->m_pSurface->format->BytesPerPixel );
 	   }
 
-	return false;
+	return true;
    }

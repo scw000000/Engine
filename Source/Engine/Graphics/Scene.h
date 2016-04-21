@@ -22,18 +22,17 @@ class Scene
       shared_ptr< ISceneNode > FindSceneNode( ActorId id );
       bool AddChild( ActorId id, shared_ptr< ISceneNode > sceneId );
       bool RemoveChild( ActorId id );
+      void SetCamera(shared_ptr<CameraNode> camera) { m_Camera = camera; }
       // This function is called by SceneNode::PreRender
       void PushAndSetMatrix( const Mat4x4 &toWorld )
 	      {
          m_MatrixStack.PushRelMatrix( toWorld );
-		   Mat4x4 mat = m_MatrixStack.GetTop();
 	      }
 
 	   void PopMatrix() 
 	      {
 		   //Scene::PopMatrix - Chapter 16, page 541
 		   m_MatrixStack.Pop(); 
-		   Mat4x4 mat = m_MatrixStack.GetTop();
 	      }
       const Mat4x4 GetTopMatrix() const { return m_MatrixStack.GetTop(); }
 

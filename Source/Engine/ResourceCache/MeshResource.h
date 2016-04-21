@@ -31,4 +31,5 @@ class MeshResourceLoader : public ResourceLoader
 	   virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize ) override ;
 	   virtual bool VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) override ;
       virtual bool VUsePreAllocate( void ) override { return false; }
+    //  virtual bool VAddNullZero( void ) override { return true; }
    };

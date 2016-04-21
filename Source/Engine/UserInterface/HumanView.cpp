@@ -18,19 +18,29 @@ HumanView::HumanView( shared_ptr<IRenderer> p_renderer )
 
 	m_BaseGameState = BGS_Initializing;		// what is the current game state
    
-   // TODO: finish camera part
    if ( p_renderer )
 	   {
 		// Moved to the HumanView class post press
 		m_pScene.reset( ENG_NEW ScreenElementScene( p_renderer ) );
 
-		//Frustum frustum;
-		//frustum.Init(GCC_PI/4.0f, 1.0f, 1.0f, 100.0f);
-		//m_pCamera.reset(GCC_NEW CameraNode(&Mat4x4::g_Identity, frustum));
-		//ENG_ASSERT(m_pScene && m_pCamera && _T("Out of memory"));
+		Frustum frustum;
+		frustum.Init( ENG_PI/2.0f, 1.0f, 3.0f, 100.0f );
+      /*
+      Mat4x4 camMat = glm::lookAt(
+								glm::vec3(0,0,0), // eye
+								glm::vec3(0,0,1), // center
+								glm::vec3(0,1,0)  // up
+						   );*/
+       Mat4x4 camMat ;
+		m_pCamera.reset( ENG_NEW CameraNode( &camMat, frustum ) );
+      std::cout << ToStr( m_pCamera->GetRelDirection() ) << std::endl;
+      std::cout << ToStr( m_pCamera->GetRelPosition() ) << std::endl;
+		ENG_ASSERT( m_pScene && m_pCamera && _T("Out of memory") );
+      Mat4x4 test;
+      std::cout << ToStr( test.GetDirection() ) << std::endl;
 
-		//m_pScene->VAddChild( INVALID_ACTOR_ID, m_pCamera );
-		//m_pScene->SetCamera(m_pCamera);
+		m_pScene->VAddChild( INVALID_ACTOR_ID, m_pCamera );
+		m_pScene->SetCamera( m_pCamera );
 	   }
 
    m_pGUIManager = ENG_NEW GUIManager;
@@ -182,6 +192,7 @@ int HumanView::Ask( MessageBox_Questions question )
 bool HumanView::LoadGame( TiXmlElement* pLevelData )
    {
    VPushElement( m_pScene );  
+   m_pScene->VOnRestore();
    return true;
    }
 

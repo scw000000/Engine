@@ -57,6 +57,7 @@ class HumanView : public IGameView
       BaseGameState m_BaseGameState;					// Added post-press - what is the current game state
       GUIManager* m_pGUIManager;
       shared_ptr<ScreenElementScene> m_pScene; // this scene will be pushed into screen element list by LoadGame( xml level)
+      shared_ptr<CameraNode> m_pCamera;
 
    private:
 

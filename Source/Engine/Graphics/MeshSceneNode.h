@@ -6,10 +6,16 @@
 #include "SceneNodes.h"
 #include "Shaders.h"
 
+// TODO: prevent redundent resource file in MeshComponent
 class MeshSceneNode : public SceneNode
    {
    public:
-	   MeshSceneNode( const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const Resource meshResouce, RenderPass renderPass,  const Mat4x4 *transform );
+	   MeshSceneNode( const ActorId actorId, 
+                     WeakBaseRenderComponentPtr renderComponent, 
+                     const Resource& meshResouce, 
+                     const Resource& textureResource, 
+                     RenderPass renderPass,  
+                     const Mat4x4 *transform);
       ~MeshSceneNode( void );
 	   virtual int VOnRestore( Scene *pScene ) override; ;
 	   virtual int VOnLostDevice( Scene *pScene ) override { return S_OK; }
@@ -24,10 +30,12 @@ class MeshSceneNode : public SceneNode
 	   GLuint            m_Program;
       GLuint            m_VerTexBuffer;
       GLuint            m_UVBuffer;
-      GLuint            m_MVPMatrix;
+      GLuint            m_MVPMatrixUni;
       GLuint            m_Texture;
+      GLuint            m_TextureUni;
       GLuint            m_VertexArray;
       Resource			   m_MeshResource;
+      Resource          m_TextureResource;
 	   VertexShader		m_VertexShader;
 	   FragmentShader		m_FragmentShader;
 

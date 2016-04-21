@@ -7,7 +7,7 @@
 
 void MatrixStack::Push( void )
    {
-   if( m_Stack.size() )
+   if( !m_Stack.size() )
       {
       m_Stack.push( Mat4x4::g_Identity );
       }

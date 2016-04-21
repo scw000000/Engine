@@ -25,16 +25,16 @@ Scene::~Scene()
    
    }
 
+// TODO: move the post render to humanview, because it has GUIManager
 int Scene::OnRender()
    {
- //  if (m_Root && m_Camera)
-   if( m_Root )
+   if ( m_Root && m_Camera )
 	   {
 		// The scene root could be anything, but it
 		// is usually a SceneNode with the identity
 		// matrix
-
-		//m_Camera->SetViewTransform(this);
+      m_pRenderer->VPreRender();
+		m_Camera->SetViewTransform( this );
 
 	//	m_LightManager->CalcLighting(this);
 
@@ -45,6 +45,7 @@ int Scene::OnRender()
 			m_Root->VPostRender( this );
 		   }
 		RenderAlphaPass();
+      m_pRenderer->VPostRender();
 	   }
 	return S_OK;
    }
@@ -139,7 +140,7 @@ void Scene::NewRenderComponentDelegate( IEventDataPtr pEventData )
     shared_ptr<SceneNode> pSceneNode( pCastEventData->GetSceneNode() );
 
     // FUTURE WORK: Add better error handling here.		
-    if ( pSceneNode->VOnRestore(this) != GL_NO_ERROR )
+    if ( pSceneNode->VOnRestore(this) != S_OK )
       {
 		std::string error = "Failed to restore scene node to the scene for actorid " + ToStr(actorId);
       ENG_ERROR( error );

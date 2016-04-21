@@ -67,7 +67,7 @@ shared_ptr<SceneNode> BaseRenderComponent::VGetSceneNode( void )
 //---------------------------------------------------------------------------------------------------------------------
 // MeshRenderComponent
 //---------------------------------------------------------------------------------------------------------------------
-MeshRenderComponent::MeshRenderComponent( void ) : m_MeshResource( "" )
+MeshRenderComponent::MeshRenderComponent( void ) : m_MeshResource( "" ), m_TextureResource( "" )
    {
    
    }
@@ -84,7 +84,7 @@ shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
       }
 
    WeakBaseRenderComponentPtr wbrcp(this);
-   shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), wbrcp, m_MeshResource, RenderPass::RenderPass_Actor, &pTransformComponent->GetTransform() ) );
+   shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), wbrcp, m_MeshResource, m_TextureResource, RenderPass::RenderPass_Actor, &pTransformComponent->GetTransform() ) );
    
    return pMeshSceneNode;
    }
@@ -92,20 +92,33 @@ shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
 bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
    {
    TiXmlElement* pMeshFileElement = pData->FirstChildElement( "meshfile" );
-   if( pMeshFileElement )
+   // Set mesh file path
+   if( !pMeshFileElement )
       {
-      const char *filePath = pMeshFileElement->Attribute( "path" );
-      if( filePath )
-         {
-         m_MeshResource = Resource( filePath );
-         return true;
-         }
-      else
-         {
-         return false;
-         }
+      return false;
       }
-   return false;
+   const char *pMeshFilePath = pMeshFileElement->Attribute( "path" );
+   if( !pMeshFilePath )
+      {
+      return false;
+      }
+   m_MeshResource = Resource( pMeshFilePath );
+
+   // Set texture file path
+   TiXmlElement* pTextureFileElement = pData->FirstChildElement( "texturefile" );
+   if( !pTextureFileElement )
+      {
+      return false;
+      }
+   
+   const char *pTextureFilePath = pTextureFileElement->Attribute( "path" );
+   if( !pTextureFilePath )
+      {
+      return false;
+      }
+   m_TextureResource = Resource( pTextureFilePath );
+
+   return true;;
    }
 
 /*

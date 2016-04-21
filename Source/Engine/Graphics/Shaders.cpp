@@ -50,6 +50,17 @@ GLint VertexShader::SetupRender( Scene *pScene, SceneNode *pNode )
 	return GL_NO_ERROR;
    }
 
+void VertexShader::ReleaseShader( GLuint program )
+   {
+   if( program && m_VertexShader )
+      {
+      glDetachShader( program, m_VertexShader );
+	
+	   glDeleteShader( m_VertexShader );
+      }
+   m_VertexShader = 0;
+   }
+
 FragmentShader::FragmentShader( void )
    {
    m_FragmentShader = 0;
@@ -86,4 +97,15 @@ GLint FragmentShader::OnRestore( Scene *pScene )
 GLint FragmentShader::SetupRender( Scene *pScene, SceneNode *pNode )
    {
    return GL_NO_ERROR;
+   }
+
+void FragmentShader::ReleaseShader( GLuint program )
+   {
+   if( program && m_FragmentShader )
+      {
+      glDetachShader( program, m_FragmentShader );
+	
+	   glDeleteShader( m_FragmentShader );
+      }
+   m_FragmentShader = 0;
    }

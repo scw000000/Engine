@@ -106,18 +106,102 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 
    glGenBuffers( 1, &m_VerTexBuffer );
 	glBindBuffer( GL_ARRAY_BUFFER, m_VerTexBuffer );
+   static const GLfloat g_vertex_buffer_data[] = { 
+		-1.0f,-1.0f,-1.0f,
+		-1.0f,-1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f,
+		 1.0f, 1.0f,-1.0f,
+		-1.0f,-1.0f,-1.0f,
+		-1.0f, 1.0f,-1.0f,
+		 1.0f,-1.0f, 1.0f,
+		-1.0f,-1.0f,-1.0f,
+		 1.0f,-1.0f,-1.0f,
+		 1.0f, 1.0f,-1.0f,
+		 1.0f,-1.0f,-1.0f,
+		-1.0f,-1.0f,-1.0f,
+		-1.0f,-1.0f,-1.0f,
+		-1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f,-1.0f,
+		 1.0f,-1.0f, 1.0f,
+		-1.0f,-1.0f, 1.0f,
+		-1.0f,-1.0f,-1.0f,
+		-1.0f, 1.0f, 1.0f,
+		-1.0f,-1.0f, 1.0f,
+		 1.0f,-1.0f, 1.0f,
+		 1.0f, 1.0f, 1.0f,
+		 1.0f,-1.0f,-1.0f,
+		 1.0f, 1.0f,-1.0f,
+		 1.0f,-1.0f,-1.0f,
+		 1.0f, 1.0f, 1.0f,
+		 1.0f,-1.0f, 1.0f,
+		 1.0f, 1.0f, 1.0f,
+		 1.0f, 1.0f,-1.0f,
+		-1.0f, 1.0f,-1.0f,
+		 1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f,-1.0f,
+		-1.0f, 1.0f, 1.0f,
+		 1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f,
+		 1.0f,-1.0f, 1.0f
+	};
+   // One color for each vertex. They were generated randomly.
+	
+   glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
+   /*
 	glBufferData( GL_ARRAY_BUFFER, 
                  pMeshExtra->m_pScene->mMeshes[0]->mNumVertices * sizeof( aiVector3t<float> ), 
                  &pMeshExtra->m_pScene->mMeshes[0]->mVertices[0], 
                  GL_STATIC_DRAW );
+                 */
 
+   
    glGenBuffers( 1, &m_UVBuffer );
 	glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
+   static const GLfloat g_color_buffer_data[] = { 
+		0.583f,  0.771f,  0.014f,
+		0.609f,  0.115f,  0.436f,
+		0.327f,  0.483f,  0.844f,
+		0.822f,  0.569f,  0.201f,
+		0.435f,  0.602f,  0.223f,
+		0.310f,  0.747f,  0.185f,
+		0.597f,  0.770f,  0.761f,
+		0.559f,  0.436f,  0.730f,
+		0.359f,  0.583f,  0.152f,
+		0.483f,  0.596f,  0.789f,
+		0.559f,  0.861f,  0.639f,
+		0.195f,  0.548f,  0.859f,
+		0.014f,  0.184f,  0.576f,
+		0.771f,  0.328f,  0.970f,
+		0.406f,  0.615f,  0.116f,
+		0.676f,  0.977f,  0.133f,
+		0.971f,  0.572f,  0.833f,
+		0.140f,  0.616f,  0.489f,
+		0.997f,  0.513f,  0.064f,
+		0.945f,  0.719f,  0.592f,
+		0.543f,  0.021f,  0.978f,
+		0.279f,  0.317f,  0.505f,
+		0.167f,  0.620f,  0.077f,
+		0.347f,  0.857f,  0.137f,
+		0.055f,  0.953f,  0.042f,
+		0.714f,  0.505f,  0.345f,
+		0.783f,  0.290f,  0.734f,
+		0.722f,  0.645f,  0.174f,
+		0.302f,  0.455f,  0.848f,
+		0.225f,  0.587f,  0.040f,
+		0.517f,  0.713f,  0.338f,
+		0.053f,  0.959f,  0.120f,
+		0.393f,  0.621f,  0.362f,
+		0.673f,  0.211f,  0.457f,
+		0.820f,  0.883f,  0.371f,
+		0.982f,  0.099f,  0.879f
+	};
+   //glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 	glBufferData( GL_ARRAY_BUFFER, 
                  pMeshExtra->m_pScene->mMeshes[0]->mNumVertices * sizeof( aiVector3t<float> ), 
                  &pMeshExtra->m_pScene->mMeshes[0]->mTextureCoords[0][0], 
                  GL_STATIC_DRAW );
-
+   /*
       for( unsigned int meshIdx = 0; meshIdx < pMeshExtra->m_pScene->mNumMeshes; ++meshIdx )
          {
          for( unsigned int vertexIdx = 0; vertexIdx < pMeshExtra->m_pScene->mMeshes[meshIdx]->mNumVertices; ++vertexIdx )
@@ -146,14 +230,14 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    if( !pTextureResHandle )
       {
       return S_FALSE;
-      }
+      }*/
 
    m_MVPMatrixUni = glGetUniformLocation( m_Program, "MVP");
-   m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler");
+   /*m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler");
 
 	glGenTextures( 1, &m_Texture );
 
-	// "Bind" the newly created texture : all future texture functions will modify this texture
+	//"Bind" the newly created texture : all future texture functions will modify this texture
 	glBindTexture( GL_TEXTURE_2D, m_Texture );
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );	
 
@@ -166,7 +250,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       Mode = GL_RGBA;
       }
  
-   glTexImage2D( GL_TEXTURE_2D, 0, Mode, pSurface->w, pSurface->h, 0, Mode, GL_UNSIGNED_BYTE, pSurface->pixels );
+   glTexImage2D( GL_TEXTURE_2D, 0, Mode, pSurface->w, pSurface->h, 0, Mode, GL_UNSIGNED_BYTE, pSurface->pixels );*/
    
    //SetRadius( CalcBoundingSphere( &extra->m_Mesh11 ) );
    
@@ -179,28 +263,21 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 
 int MeshSceneNode::VRender( Scene *pScene )
    {
-   glEnable( GL_COLOR_ARRAY );
-   glBegin( GL_TRIANGLES );
-   glColor3f( 1.0, 0.0f, 0.0f );
-   glVertex2f( 0,0 );
-   glVertex2f( 0, 500 );
-   glVertex2f( 500, 500 );
-   glEnd();
 	// Use our shader
 	glUseProgram( m_Program );
    
    // Get the projection & view matrix from the camera class
 	Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
-
 	// Send our transformation to the currently bound shader, 
 	// in the "MVP" uniform
 	glUniformMatrix4fv( m_MVPMatrixUni, 1, GL_FALSE, &mWorldViewProjection[0][0]);
 
+   /*
 	// Bind our texture in Texture Unit 0
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, m_Texture );
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
-	glUniform1i( m_MVPMatrixUni, 0);
+	glUniform1i( m_MVPMatrixUni, 0);*/
 
 		// 1rst attribute buffer : vertices
 	glEnableVertexAttribArray( 0 );
@@ -213,13 +290,13 @@ int MeshSceneNode::VRender( Scene *pScene )
 			0,                  // stride
 			(void*)0            // array buffer offset
 	);
-
+   
 	// 2nd attribute buffer : UVs
 	glEnableVertexAttribArray( 1 );
 	glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
 	glVertexAttribPointer(
 			1,                                // attribute
-			2,                                // size
+			3,                                // size
 			GL_FLOAT,                         // type
 			GL_FALSE,                         // normalized?
 			0,                                // stride
@@ -233,12 +310,14 @@ int MeshSceneNode::VRender( Scene *pScene )
       return S_FALSE;
       }
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast<MeshResourceExtraData>( pMeshResHandle->GetExtraData() );
-   pMeshExtra->m_pScene->mMeshes[0]->mPrimitiveTypes;
+
+   // Draw the triangle !
+		glDrawArrays(GL_TRIANGLES, 0, 36); // 3 indices starting at 0 -> 1 triangle
 		// Draw the triangle !
 //	glDrawArrays( GL_TRIANGLES, 0, pMeshExtra->m_pScene->mMeshes[0]->mNumVertices );
 
-//	glDisableVertexAttribArray(0);//
-//	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray(0);//
+	glDisableVertexAttribArray(1);
 
    return S_OK;
    }

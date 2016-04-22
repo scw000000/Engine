@@ -88,9 +88,8 @@ bool SceneNode::VIsVisible( Scene *pScene ) const
    Mat4x4 fromRelSpace;
    pScene->GetCamera()->VGetProperties()->GetRelTransform( &toRelSpace, &fromRelSpace );
    Vec3 fromWorldPos = GetWorldPosition();
-   
    // transform to camera's local space
-   fromWorldPos = toRelSpace.Xform( fromWorldPos );
+   fromWorldPos = -1.0f * toRelSpace.Xform( fromWorldPos );
    const Frustum &frustum = pScene->GetCamera()->GetFrustum();
    return frustum.Inside( fromWorldPos, VGetProperties()->GetRadius() );
    }
@@ -272,7 +271,7 @@ int CameraNode::VOnRestore( Scene *pScene )
 Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene ) const
    {
    Mat4x4 world = pScene->GetTopMatrix();
-	Mat4x4 view = VGetProperties()->GetFromRelSpace();
+	Mat4x4 view = VGetProperties()->GetToRelSpace();
 	//Mat4x4 worldView = world * view;
 	return m_Projection * view * world;
    }

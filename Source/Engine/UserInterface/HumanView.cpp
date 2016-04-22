@@ -24,14 +24,14 @@ HumanView::HumanView( shared_ptr<IRenderer> p_renderer )
 		m_pScene.reset( ENG_NEW ScreenElementScene( p_renderer ) );
 
 		Frustum frustum;
-		frustum.Init( ENG_PI/2.0f, 1.0f, 3.0f, 100.0f );
-      /*
+		frustum.Init( ENG_PI/4.0f, 4.0f / 3.0f, 0.1f, 100.0f );
+      
       Mat4x4 camMat = glm::lookAt(
-								glm::vec3(0,0,0), // eye
-								glm::vec3(0,0,1), // center
-								glm::vec3(0,1,0)  // up
-						   );*/
-       Mat4x4 camMat ;
+								glm::vec3(4,3,-3), // Camera is at (4,3,-3), in World Space
+								glm::vec3(0,0,0), // and looks at the origin
+								glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+						   );
+       //Mat4x4 camMat ;
 		m_pCamera.reset( ENG_NEW CameraNode( &camMat, frustum ) );
       std::cout << ToStr( m_pCamera->GetRelDirection() ) << std::endl;
       std::cout << ToStr( m_pCamera->GetRelPosition() ) << std::endl;

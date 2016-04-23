@@ -17,9 +17,6 @@ bool TransformComponent::VInit(TiXmlElement* pData)
 	//            such as from the editor, its better to grab the current values rather than clear them out.
     
 	Vec3 yawPitchRoll = m_transform.GetYawPitchRoll();
-	yawPitchRoll.x = RADIANS_TO_DEGREES(yawPitchRoll.x);
-	yawPitchRoll.y = RADIANS_TO_DEGREES(yawPitchRoll.y);
-	yawPitchRoll.z = RADIANS_TO_DEGREES(yawPitchRoll.z);
 
 	Vec3 position = m_transform.GetPosition();	
 
@@ -51,7 +48,7 @@ bool TransformComponent::VInit(TiXmlElement* pData)
 	translation.BuildTranslation(position);
 
 	Mat4x4 rotation;
-	rotation.BuildYawPitchRoll( DEGREES_TO_RADIANS(yawPitchRoll.x), DEGREES_TO_RADIANS(yawPitchRoll.y), DEGREES_TO_RADIANS(yawPitchRoll.z) );
+	rotation.BuildYawPitchRollDeg( yawPitchRoll.x, yawPitchRoll.y, yawPitchRoll.z );
 
 	/**
 	// This is not supported yet.

@@ -241,6 +241,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
          // we only have to test if we can make room for the resource we are allocating
          if( !Allocate( &pBuffer, handle->GetSize(), false ) )
             {
+            ENG_ASSERT( false && "Post Allocation Failed" );
             return shared_ptr<ResHandle>();
             } 
          }
@@ -253,6 +254,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
       
       if( !success ) // process raw file failed 
          {
+         ENG_ASSERT( success && "Loader VloadResource Failed" );
          return shared_ptr<ResHandle>();
          }
       }
@@ -261,7 +263,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
       m_lruResHandleList.push_front( handle ); // this resource is newly loaded, put it in the start of list
       m_Resources[ resource->m_name ] = handle; // add resource name & handle mapping
       }
-   ENG_ASSERT( loader && _T( "Default resource loader not found!" ) );
+
    return handle;
    }
 

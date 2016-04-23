@@ -75,7 +75,6 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_FragmentShader.OnRestore( pScene );
 
    // Link the program
-	printf("Linking program\n");
 	glAttachShader( m_Program, m_VertexShader.GetVertexShader() );
 	glAttachShader( m_Program, m_FragmentShader.GetFragmentShader() );
 	glLinkProgram( m_Program );
@@ -94,69 +93,24 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       SAFE_DELETE_ARRAY( p_ErrMsg );
 	   }
 
+   ////////////////////////////////////
+   // Loading Vertex Buffer
+   ////////////////////////////////////
    // Force the Mesh to reload
-   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( &m_MeshResource );  	
-   if( !pMeshResHandle )
-      {
-      return S_FALSE;
-      }
-
-   shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast<MeshResourceExtraData>( pMeshResHandle->GetExtraData() );
-   std::cout << "Loading Mesh" << std::endl;
+   auto pAiScene = MeshResourceLoader::LoadAndReturnScene( m_MeshResource );
 
    glGenBuffers( 1, &m_VerTexBuffer );
 	glBindBuffer( GL_ARRAY_BUFFER, m_VerTexBuffer );
-   static const GLfloat g_vertex_buffer_data[] = { 
-		-1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f,
-		 1.0f, 1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f,-1.0f,
-		 1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f,-1.0f,
-		 1.0f,-1.0f,-1.0f,
-		 1.0f, 1.0f,-1.0f,
-		 1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f,-1.0f,
-		 1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f, 1.0f,
-		-1.0f,-1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		-1.0f,-1.0f, 1.0f,
-		 1.0f,-1.0f, 1.0f,
-		 1.0f, 1.0f, 1.0f,
-		 1.0f,-1.0f,-1.0f,
-		 1.0f, 1.0f,-1.0f,
-		 1.0f,-1.0f,-1.0f,
-		 1.0f, 1.0f, 1.0f,
-		 1.0f,-1.0f, 1.0f,
-		 1.0f, 1.0f, 1.0f,
-		 1.0f, 1.0f,-1.0f,
-		-1.0f, 1.0f,-1.0f,
-		 1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f,-1.0f,
-		-1.0f, 1.0f, 1.0f,
-		 1.0f, 1.0f, 1.0f,
-		-1.0f, 1.0f, 1.0f,
-		 1.0f,-1.0f, 1.0f
-	};
-   // One color for each vertex. They were generated randomly.
-	
-   //glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-   
 	glBufferData( GL_ARRAY_BUFFER, 
-                 pMeshExtra->m_pScene->mMeshes[0]->mNumVertices * sizeof( aiVector3t<float> ), 
-                 &pMeshExtra->m_pScene->mMeshes[0]->mVertices[0], 
+                 pAiScene->mMeshes[0]->mNumVertices * sizeof( aiVector3t<float> ), 
+                 &pAiScene->mMeshes[0]->mVertices[0], 
                  GL_STATIC_DRAW );
-   
-   auto nd = pMeshExtra->m_pScene;
-   for (unsigned int n = 0; n < nd->mNumMeshes; ++n) {
-		const struct aiMesh* mesh = nd->mMeshes[n];
+   ////////////////////////////////////
+   // Loading Vertex Buffer
+   ////////////////////////////////////
+   //auto nd = pMeshExtra->m_pScene;
+   for (unsigned int n = 0; n < pAiScene->mNumMeshes; ++n) {
+		const struct aiMesh* mesh = pAiScene->mMeshes[n];
 
 		if(mesh->mNormals == NULL) {
 			glDisable(GL_LIGHTING);
@@ -189,114 +143,57 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 		}
       }
 
-   Vec3 rev[36];
-   std::cout << "index num :" << pMeshExtra->m_pScene->mMeshes[0]->mNumVertices << std::endl;
-      for( unsigned int meshIdx = 0; meshIdx < pMeshExtra->m_pScene->mNumMeshes; ++meshIdx )
+   std::cout << "index num :" << pAiScene->mMeshes[0]->mNumVertices << std::endl;
+      for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
          {
-         for( unsigned int vertexIdx = 0; vertexIdx < pMeshExtra->m_pScene->mMeshes[meshIdx]->mNumVertices; ++vertexIdx )
+         for( unsigned int vertexIdx = 0; vertexIdx < pAiScene->mMeshes[meshIdx]->mNumVertices; ++vertexIdx )
             {
-            auto vertex = pMeshExtra->m_pScene->mMeshes[meshIdx]->mVertices[vertexIdx];
+            auto vertex =pAiScene->mMeshes[meshIdx]->mVertices[vertexIdx];
             Vec3 vec( vertex.x, vertex.y, vertex.z );
-            rev[35 - vertexIdx] = vec;
             std::cout << "vertex : " << vertexIdx << std::endl;
             std::cout << ToStr( vec ) << std::endl;
-            auto vertexCord = pMeshExtra->m_pScene->mMeshes[meshIdx]->mTextureCoords[0][vertexIdx];
+            auto vertexCord = pAiScene->mMeshes[meshIdx]->mTextureCoords[0][vertexIdx];
             Vec3 vecC( vertexCord.x, vertexCord.y, vertexCord.z );
             std::cout << ToStr( vecC ) << std::endl << std::endl;
             }
          }
-   
-      /*glBufferData( GL_ARRAY_BUFFER, 
-                 36 * sizeof( Vec3 ), 
-                 &rev[0], 
-                 GL_STATIC_DRAW );*/
-
+ 
+   ////////////////////////////////////
+   // Loading UV Buffer
+   ////////////////////////////////////
    glGenBuffers( 1, &m_UVBuffer );
 	glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
-  /* static const GLfloat g_uv_buffer_data[] = { 
-		0.000059f, 0.000004f, 
-		0.000103f, 0.336048f, 
-		0.335973f, 0.335903f, 
-		1.000023f, 0.000013f, 
-		0.667979f, 0.335851f, 
-		0.999958f, 0.336064f, 
-		0.667979f, 0.335851f, 
-		0.336024f, 0.671877f, 
-		0.667969f, 0.671889f, 
-		1.000023f, 0.000013f, 
-		0.668104f, 0.000013f, 
-		0.667979f, 0.335851f, 
-		0.000059f, 0.000004f, 
-		0.335973f, 0.335903f, 
-		0.336098f, 0.000071f, 
-		0.667979f, 0.335851f, 
-		0.335973f, 0.335903f, 
-		0.336024f, 0.671877f, 
-		1.000004f, 0.671847f, 
-		0.999958f, 0.336064f, 
-		0.667979f, 0.335851f, 
-		0.668104f, 0.000013f, 
-		0.335973f, 0.335903f, 
-		0.667979f, 0.335851f, 
-		0.335973f, 0.335903f, 
-		0.668104f, 0.000013f, 
-		0.336098f, 0.000071f, 
-		0.000103f, 0.336048f, 
-		0.000004f, 0.671870f, 
-		0.336024f, 0.671877f, 
-		0.000103f, 0.336048f, 
-		0.336024f, 0.671877f, 
-		0.335973f, 0.335903f, 
-		0.667969f, 0.671889f, 
-		1.000004f, 0.671847f, 
-		0.667979f, 0.335851f
-	};*/
-   //glBufferData(GL_ARRAY_BUFFER, sizeof( g_uv_buffer_data ), g_uv_buffer_data, GL_STATIC_DRAW);
-   aiVector2t<float> *uvBuffer = ENG_NEW aiVector2t<float>[ pMeshExtra->m_pScene->mMeshes[0]->mNumVertices ];
-   for ( unsigned int vertex = 0; vertex < pMeshExtra->m_pScene->mMeshes[0]->mNumVertices; vertex++)
+   
+   // UV coordinates loaded in assimp is 3-dimensions
+   // But GLSL expect 2-dimension coordinates
+   // So we have to translate them
+   aiVector2t<float> *uvBuffer = ENG_NEW aiVector2t<float>[pAiScene->mMeshes[0]->mNumVertices ];
+   for ( unsigned int vertex = 0; vertex < pAiScene->mMeshes[0]->mNumVertices; vertex++)
       {
-      memcpy( &uvBuffer[vertex], &pMeshExtra->m_pScene->mMeshes[0]->mTextureCoords[0][vertex], sizeof( aiVector2t<float> ) );
+      memcpy( &uvBuffer[vertex], &pAiScene->mMeshes[0]->mTextureCoords[0][vertex], sizeof( aiVector2t<float> ) );
       }
 	glBufferData( GL_ARRAY_BUFFER, 
-                 pMeshExtra->m_pScene->mMeshes[0]->mNumVertices * sizeof( aiVector2t<float> ), 
+                 pAiScene->mMeshes[0]->mNumVertices * sizeof( aiVector2t<float> ), 
                  &uvBuffer[0], 
                  GL_STATIC_DRAW );
+   SAFE_DELETE_ARRAY( uvBuffer );
+   ////////////////////////////////////
+   // Loading UV Buffer
+   ////////////////////////////////////
    
-      /*
-      std::cout << "Loading Mesh UV" << std::endl;
 
-      for( unsigned int meshIdx = 0; meshIdx < pMeshExtra->m_pScene->mNumMeshes; ++meshIdx )
-         {
-         for( unsigned int uvChannel = 0; uvChannel < pMeshExtra->m_pScene->mMeshes[meshIdx]->GetNumUVChannels(); ++uvChannel )
-            {
-            for(  unsigned int vertexIdx = 0; vertexIdx < pMeshExtra->m_pScene->mMeshes[meshIdx]->mNumVertices; ++vertexIdx )
-               {
-               auto vertex = pMeshExtra->m_pScene->mMeshes[meshIdx]->mTextureCoords[uvChannel][vertexIdx];
-               std::cout << pMeshExtra->m_pScene->mMeshes[meshIdx]->GetNumUVChannels() << "" << vertexIdx << std::endl;
-               Vec3 vec( vertex.x, vertex.y, 0.f );
-               std::cout << ToStr( vec ) << std::endl;
-               } 
-            }  
-         }*/
-   shared_ptr<ResHandle> pTextureResHandle = g_pApp->m_pResCache->GetHandle( &m_TextureResource );
-   if( !pTextureResHandle )
-      {
-      return S_FALSE;
-      }
-
-   m_MVPMatrixUni = glGetUniformLocation( m_Program, "MVP");
-   m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler");
-
-	glGenTextures( 1, &m_Texture );
+   ////////////////////////////////////
+   // Loading Texture
+   ////////////////////////////////////
+   glGenTextures( 1, &m_Texture );
 
 	//"Bind" the newly created texture : all future texture functions will modify this texture
 	glBindTexture( GL_TEXTURE_2D, m_Texture );
 	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );	
 
-   shared_ptr< SDLTextureResourceExtraData > pTextureExtra = static_pointer_cast< SDLTextureResourceExtraData >( pTextureResHandle->GetExtraData() );
-   auto pSurface = pTextureExtra->m_pSurface;
+   auto pSurface = TextureResourceLoader::LoadAndReturnSurface( m_TextureResource );
+
    int Mode = GL_RGB;
- 
    if( pSurface->format->BytesPerPixel == 4 ) 
       {
       Mode = GL_RGBA;
@@ -305,6 +202,13 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    glTexImage2D( GL_TEXTURE_2D, 0, Mode, pSurface->w, pSurface->h, 0, Mode, GL_UNSIGNED_BYTE, pSurface->pixels );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+   ////////////////////////////////////
+   // Loading Texture
+   ////////////////////////////////////
+
+   m_MVPMatrixUni = glGetUniformLocation( m_Program, "MVP");
+   m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler");
+
    //SetRadius( CalcBoundingSphere( &extra->m_Mesh11 ) );
    
    // resore all of its children
@@ -355,23 +259,15 @@ int MeshSceneNode::VRender( Scene *pScene )
 			0,                                // stride
 			(void*)0                          // array buffer offset
 		);
-
-      // Force the Mesh to reload
-   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( &m_MeshResource );  	
-   if( !pMeshResHandle )
-      {
-      return S_FALSE;
-      }
-   shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast<MeshResourceExtraData>( pMeshResHandle->GetExtraData() );
-
-   // Draw the triangle !
-	//	glDrawArrays(GL_TRIANGLES, 0, 36); // 3 indices starting at 0 -> 1 triangle
-		// Draw the triangle !
+   // Force the Mesh to reload to getting vertex number
+   auto pAiScene = MeshResourceLoader::LoadAndReturnScene( m_MeshResource );
+      
+	// Draw the triangle !
    // Beware of vertex numbers, I may have to use index buffer
-	glDrawArrays( GL_TRIANGLES, 0, pMeshExtra->m_pScene->mMeshes[0]->mNumVertices );
+	glDrawArrays( GL_TRIANGLES, 0, pAiScene->mMeshes[0]->mNumVertices );
 
-	glDisableVertexAttribArray(0);
-	glDisableVertexAttribArray(1);
+	glDisableVertexAttribArray( 0 );
+	glDisableVertexAttribArray( 1 );
 
    return S_OK;
    }

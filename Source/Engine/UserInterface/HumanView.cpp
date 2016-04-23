@@ -27,17 +27,16 @@ HumanView::HumanView( shared_ptr<IRenderer> p_renderer )
 		frustum.Init( ENG_PI/4.0f, 4.0f / 3.0f, 0.1f, 100.0f );
       
       Mat4x4 camMat = glm::lookAt(
-								glm::vec3(4,3,-3), // Camera is at (4,3,-3), in World Space
+								glm::vec3(0,-10,-10), // Camera is at (4,3,-3), in World Space
 								glm::vec3(0,0,0), // and looks at the origin
-								glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
+								glm::vec3(0,10,-10)  // Head is up (set to 0,-1,0 to look upside-down)
 						   );
      // Mat4x4 camMat ;
 		m_pCamera.reset( ENG_NEW CameraNode( &camMat, frustum ) );
+		ENG_ASSERT( m_pScene && m_pCamera && _T("Out of memory") );
+
       std::cout << ToStr( m_pCamera->GetRelDirection() ) << std::endl;
       std::cout << ToStr( m_pCamera->GetRelPosition() ) << std::endl;
-		ENG_ASSERT( m_pScene && m_pCamera && _T("Out of memory") );
-      Mat4x4 test;
-      std::cout << ToStr( test.GetDirection() ) << std::endl;
 
 		m_pScene->VAddChild( INVALID_ACTOR_ID, m_pCamera );
 		m_pScene->SetCamera( m_pCamera );

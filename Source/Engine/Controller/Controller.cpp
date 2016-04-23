@@ -177,7 +177,7 @@ void MovementController::OnUpdate( const unsigned long deltaMilliseconds )
 		// Calculate the new rotation matrix from the camera
 		// yaw and pitch.
 		Mat4x4 matRot;
-		matRot.BuildYawPitchRoll( DEGREES_TO_RADIANS( -m_fYaw ), DEGREES_TO_RADIANS( m_fPitch ), 0 );
+		matRot.BuildYawPitchRollDeg( -m_fYaw , m_fPitch , 0 );
 
 		// Create the new object-to-world matrix, and the
 		// new world-to-object matrix. 

@@ -145,8 +145,10 @@ class Mat4x4 : public glm::mat4
       inline void BuildRotationZ( const float radians ) { *this = glm::rotate( radians , glm::vec3( 0.0f, 0.0f, 1.0f ) ); }
       // Rotate around counterclockwise direction, 
       // Yaw->Yaxis, Pitch->Xaxis, Roll->Zaxis
-      inline void BuildYawPitchRoll( const float yawRadians, const float pitchRadians, const float rollRadians )
+      inline void BuildYawPitchRollRad( const float yawRadians, const float pitchRadians, const float rollRadians )
          { *this = glm::eulerAngleYXZ( yawRadians, pitchRadians, rollRadians ); }
+      inline void BuildYawPitchRollDeg( const float yawRadians, const float pitchRadians, const float rollRadians )
+         { *this = glm::eulerAngleYXZ( DEGREES_TO_RADIANS( yawRadians ), DEGREES_TO_RADIANS( pitchRadians ), DEGREES_TO_RADIANS( rollRadians ) ); }
       inline void BuildRotationQuat( const Quaternion &q ) { *this = mat4_cast( q ); }
       inline void BuildProjection( float fovy, float aspect, float zNear, float zFar );
    public: 

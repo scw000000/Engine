@@ -31,7 +31,7 @@ HumanView::HumanView( shared_ptr<IRenderer> p_renderer )
 								glm::vec3(0,0,0), // and looks at the origin
 								glm::vec3(0,1,0)  // Head is up (set to 0,-1,0 to look upside-down)
 						   );
-       //Mat4x4 camMat ;
+     // Mat4x4 camMat ;
 		m_pCamera.reset( ENG_NEW CameraNode( &camMat, frustum ) );
       std::cout << ToStr( m_pCamera->GetRelDirection() ) << std::endl;
       std::cout << ToStr( m_pCamera->GetRelPosition() ) << std::endl;

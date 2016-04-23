@@ -243,6 +243,10 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       ENG_ERROR( "Not supported renderer type" );
       }
    m_pRenderer->VSetBackgroundColor( g_Black );
+   // Enable depth test
+	glEnable( GL_DEPTH_TEST );
+	// Accept fragment if it closer to the camera than the former one
+	glDepthFunc( GL_LESS ); 
    m_pRenderer->VOnRestore();
    //--------------------------------- 
    // Set Renderer

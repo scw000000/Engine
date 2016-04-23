@@ -35,7 +35,7 @@ void EngineOptions::Init(const char* xmlFileName)
 	// read the XML file
 	// if needed, override the XML file with options passed in on the command line.
 
-	m_pDoc = ENG_NEW TiXmlDocument(xmlFileName);
+	m_pDoc = ENG_NEW TiXmlDocument( xmlFileName );
 	if (m_pDoc && m_pDoc->LoadFile())
 	   {
       TiXmlElement *pRoot = m_pDoc->RootElement();

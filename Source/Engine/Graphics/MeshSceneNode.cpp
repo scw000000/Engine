@@ -65,7 +65,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       if( result != GL_NO_ERROR )
          {
          return result;
-         }
+         } 
       }
 
    m_VertexShader.ReleaseShader( m_Program );
@@ -146,61 +146,14 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 	};
    // One color for each vertex. They were generated randomly.
 	
-  // glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+   //glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
    
 	glBufferData( GL_ARRAY_BUFFER, 
                  pMeshExtra->m_pScene->mMeshes[0]->mNumVertices * sizeof( aiVector3t<float> ), 
                  &pMeshExtra->m_pScene->mMeshes[0]->mVertices[0], 
                  GL_STATIC_DRAW );
-                 
-
    
-   glGenBuffers( 1, &m_UVBuffer );
-	glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
-   static const GLfloat g_color_buffer_data[] = { 
-		0.583f,  0.771f,  0.014f,
-		0.609f,  0.115f,  0.436f,
-		0.327f,  0.483f,  0.844f,
-		0.822f,  0.569f,  0.201f,
-		0.435f,  0.602f,  0.223f,
-		0.310f,  0.747f,  0.185f,
-		0.597f,  0.770f,  0.761f,
-		0.559f,  0.436f,  0.730f,
-		0.359f,  0.583f,  0.152f,
-		0.483f,  0.596f,  0.789f,
-		0.559f,  0.861f,  0.639f,
-		0.195f,  0.548f,  0.859f,
-		0.014f,  0.184f,  0.576f,
-		0.771f,  0.328f,  0.970f,
-		0.406f,  0.615f,  0.116f,
-		0.676f,  0.977f,  0.133f,
-		0.971f,  0.572f,  0.833f,
-		0.140f,  0.616f,  0.489f,
-		0.997f,  0.513f,  0.064f,
-		0.945f,  0.719f,  0.592f,
-		0.543f,  0.021f,  0.978f,
-		0.279f,  0.317f,  0.505f,
-		0.167f,  0.620f,  0.077f,
-		0.347f,  0.857f,  0.137f,
-		0.055f,  0.953f,  0.042f,
-		0.714f,  0.505f,  0.345f,
-		0.783f,  0.290f,  0.734f,
-		0.722f,  0.645f,  0.174f,
-		0.302f,  0.455f,  0.848f,
-		0.225f,  0.587f,  0.040f,
-		0.517f,  0.713f,  0.338f,
-		0.053f,  0.959f,  0.120f,
-		0.393f,  0.621f,  0.362f,
-		0.673f,  0.211f,  0.457f,
-		0.820f,  0.883f,  0.371f,
-		0.982f,  0.099f,  0.879f
-	};
-   glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-	/*glBufferData( GL_ARRAY_BUFFER, 
-                 pMeshExtra->m_pScene->mMeshes[0]->mNumVertices * sizeof( aiVector3t<float> ), 
-                 &pMeshExtra->m_pScene->mMeshes[0]->mTextureCoords[0][0], 
-                 GL_STATIC_DRAW );*/
    auto nd = pMeshExtra->m_pScene;
    for (unsigned int n = 0; n < nd->mNumMeshes; ++n) {
 		const struct aiMesh* mesh = nd->mMeshes[n];
@@ -236,6 +189,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 		}
       }
 
+   Vec3 rev[36];
    std::cout << "index num :" << pMeshExtra->m_pScene->mMeshes[0]->mNumVertices << std::endl;
       for( unsigned int meshIdx = 0; meshIdx < pMeshExtra->m_pScene->mNumMeshes; ++meshIdx )
          {
@@ -243,10 +197,71 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
             {
             auto vertex = pMeshExtra->m_pScene->mMeshes[meshIdx]->mVertices[vertexIdx];
             Vec3 vec( vertex.x, vertex.y, vertex.z );
+            rev[35 - vertexIdx] = vec;
+            std::cout << "vertex : " << vertexIdx << std::endl;
             std::cout << ToStr( vec ) << std::endl;
-
+            auto vertexCord = pMeshExtra->m_pScene->mMeshes[meshIdx]->mTextureCoords[0][vertexIdx];
+            Vec3 vecC( vertexCord.x, vertexCord.y, vertexCord.z );
+            std::cout << ToStr( vecC ) << std::endl << std::endl;
             }
          }
+   
+      /*glBufferData( GL_ARRAY_BUFFER, 
+                 36 * sizeof( Vec3 ), 
+                 &rev[0], 
+                 GL_STATIC_DRAW );*/
+
+   glGenBuffers( 1, &m_UVBuffer );
+	glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
+  /* static const GLfloat g_uv_buffer_data[] = { 
+		0.000059f, 0.000004f, 
+		0.000103f, 0.336048f, 
+		0.335973f, 0.335903f, 
+		1.000023f, 0.000013f, 
+		0.667979f, 0.335851f, 
+		0.999958f, 0.336064f, 
+		0.667979f, 0.335851f, 
+		0.336024f, 0.671877f, 
+		0.667969f, 0.671889f, 
+		1.000023f, 0.000013f, 
+		0.668104f, 0.000013f, 
+		0.667979f, 0.335851f, 
+		0.000059f, 0.000004f, 
+		0.335973f, 0.335903f, 
+		0.336098f, 0.000071f, 
+		0.667979f, 0.335851f, 
+		0.335973f, 0.335903f, 
+		0.336024f, 0.671877f, 
+		1.000004f, 0.671847f, 
+		0.999958f, 0.336064f, 
+		0.667979f, 0.335851f, 
+		0.668104f, 0.000013f, 
+		0.335973f, 0.335903f, 
+		0.667979f, 0.335851f, 
+		0.335973f, 0.335903f, 
+		0.668104f, 0.000013f, 
+		0.336098f, 0.000071f, 
+		0.000103f, 0.336048f, 
+		0.000004f, 0.671870f, 
+		0.336024f, 0.671877f, 
+		0.000103f, 0.336048f, 
+		0.336024f, 0.671877f, 
+		0.335973f, 0.335903f, 
+		0.667969f, 0.671889f, 
+		1.000004f, 0.671847f, 
+		0.667979f, 0.335851f
+	};*/
+   //glBufferData(GL_ARRAY_BUFFER, sizeof( g_uv_buffer_data ), g_uv_buffer_data, GL_STATIC_DRAW);
+   aiVector2t<float> *uvBuffer = ENG_NEW aiVector2t<float>[ pMeshExtra->m_pScene->mMeshes[0]->mNumVertices ];
+   for ( unsigned int vertex = 0; vertex < pMeshExtra->m_pScene->mMeshes[0]->mNumVertices; vertex++)
+      {
+      memcpy( &uvBuffer[vertex], &pMeshExtra->m_pScene->mMeshes[0]->mTextureCoords[0][vertex], sizeof( aiVector2t<float> ) );
+      }
+	glBufferData( GL_ARRAY_BUFFER, 
+                 pMeshExtra->m_pScene->mMeshes[0]->mNumVertices * sizeof( aiVector2t<float> ), 
+                 &uvBuffer[0], 
+                 GL_STATIC_DRAW );
+   
       /*
       std::cout << "Loading Mesh UV" << std::endl;
 
@@ -262,15 +277,15 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
                std::cout << ToStr( vec ) << std::endl;
                } 
             }  
-         }
+         }*/
    shared_ptr<ResHandle> pTextureResHandle = g_pApp->m_pResCache->GetHandle( &m_TextureResource );
    if( !pTextureResHandle )
       {
       return S_FALSE;
-      }*/
+      }
 
    m_MVPMatrixUni = glGetUniformLocation( m_Program, "MVP");
-   /*m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler");
+   m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler");
 
 	glGenTextures( 1, &m_Texture );
 
@@ -287,8 +302,9 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       Mode = GL_RGBA;
       }
  
-   glTexImage2D( GL_TEXTURE_2D, 0, Mode, pSurface->w, pSurface->h, 0, Mode, GL_UNSIGNED_BYTE, pSurface->pixels );*/
-   
+   glTexImage2D( GL_TEXTURE_2D, 0, Mode, pSurface->w, pSurface->h, 0, Mode, GL_UNSIGNED_BYTE, pSurface->pixels );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
    //SetRadius( CalcBoundingSphere( &extra->m_Mesh11 ) );
    
    // resore all of its children
@@ -297,24 +313,24 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 	return S_OK;
    }
 
-
 int MeshSceneNode::VRender( Scene *pScene )
    {
 	// Use our shader
 	glUseProgram( m_Program );
    
+
    // Get the projection & view matrix from the camera class
 	Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
 	// Send our transformation to the currently bound shader, 
 	// in the "MVP" uniform
 	glUniformMatrix4fv( m_MVPMatrixUni, 1, GL_FALSE, &mWorldViewProjection[0][0]);
 
-   /*
+   
 	// Bind our texture in Texture Unit 0
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, m_Texture );
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
-	glUniform1i( m_MVPMatrixUni, 0);*/
+	glUniform1i( m_TextureUni, 0);
 
 		// 1rst attribute buffer : vertices
 	glEnableVertexAttribArray( 0 );
@@ -333,7 +349,7 @@ int MeshSceneNode::VRender( Scene *pScene )
 	glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
 	glVertexAttribPointer(
 			1,                                // attribute
-			3,                                // size
+			2,                                // size
 			GL_FLOAT,                         // type
 			GL_FALSE,                         // normalized?
 			0,                                // stride
@@ -354,7 +370,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    // Beware of vertex numbers, I may have to use index buffer
 	glDrawArrays( GL_TRIANGLES, 0, pMeshExtra->m_pScene->mMeshes[0]->mNumVertices );
 
-	glDisableVertexAttribArray(0);//
+	glDisableVertexAttribArray(0);
 	glDisableVertexAttribArray(1);
 
    return S_OK;

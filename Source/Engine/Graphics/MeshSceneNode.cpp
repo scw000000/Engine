@@ -146,14 +146,14 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 	};
    // One color for each vertex. They were generated randomly.
 	
-   glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+  // glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
 
-   /*
+   
 	glBufferData( GL_ARRAY_BUFFER, 
                  pMeshExtra->m_pScene->mMeshes[0]->mNumVertices * sizeof( aiVector3t<float> ), 
                  &pMeshExtra->m_pScene->mMeshes[0]->mVertices[0], 
                  GL_STATIC_DRAW );
-                 */
+                 
 
    
    glGenBuffers( 1, &m_UVBuffer );
@@ -196,12 +196,47 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 		0.820f,  0.883f,  0.371f,
 		0.982f,  0.099f,  0.879f
 	};
-   //glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
-	glBufferData( GL_ARRAY_BUFFER, 
+   glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
+	/*glBufferData( GL_ARRAY_BUFFER, 
                  pMeshExtra->m_pScene->mMeshes[0]->mNumVertices * sizeof( aiVector3t<float> ), 
                  &pMeshExtra->m_pScene->mMeshes[0]->mTextureCoords[0][0], 
-                 GL_STATIC_DRAW );
-   /*
+                 GL_STATIC_DRAW );*/
+   auto nd = pMeshExtra->m_pScene;
+   for (unsigned int n = 0; n < nd->mNumMeshes; ++n) {
+		const struct aiMesh* mesh = nd->mMeshes[n];
+
+		if(mesh->mNormals == NULL) {
+			glDisable(GL_LIGHTING);
+		} else {
+			glEnable(GL_LIGHTING);
+		}
+
+		for (unsigned int t = 0; t < mesh->mNumFaces; ++t) 
+         {
+
+			auto face = &mesh->mFaces[t];
+			GLenum face_mode;
+          std::cout << "face: " << face->mNumIndices << "prime " << mesh->mPrimitiveTypes << std::endl;
+			switch(face->mNumIndices) 
+            {
+				case 1: face_mode = GL_POINTS; break;
+				case 2: face_mode = GL_LINES; break;
+				case 3: face_mode = GL_TRIANGLES; break;
+				default: face_mode = GL_POLYGON; break;
+			}
+         
+			for(unsigned int i = 0; i < face->mNumIndices; i++) 
+            {
+				int index = face->mIndices[i];
+            auto vertex = mesh->mVertices[index];
+            Vec3 vec( vertex.x, vertex.y, vertex.z );
+            std::cout << "index " << index  << ToStr( vec ) << std::endl;
+			}
+         std::cout << std::endl;
+		}
+      }
+
+   std::cout << "index num :" << pMeshExtra->m_pScene->mMeshes[0]->mNumVertices << std::endl;
       for( unsigned int meshIdx = 0; meshIdx < pMeshExtra->m_pScene->mNumMeshes; ++meshIdx )
          {
          for( unsigned int vertexIdx = 0; vertexIdx < pMeshExtra->m_pScene->mMeshes[meshIdx]->mNumVertices; ++vertexIdx )
@@ -209,8 +244,10 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
             auto vertex = pMeshExtra->m_pScene->mMeshes[meshIdx]->mVertices[vertexIdx];
             Vec3 vec( vertex.x, vertex.y, vertex.z );
             std::cout << ToStr( vec ) << std::endl;
+
             }
          }
+      /*
       std::cout << "Loading Mesh UV" << std::endl;
 
       for( unsigned int meshIdx = 0; meshIdx < pMeshExtra->m_pScene->mNumMeshes; ++meshIdx )
@@ -312,9 +349,10 @@ int MeshSceneNode::VRender( Scene *pScene )
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast<MeshResourceExtraData>( pMeshResHandle->GetExtraData() );
 
    // Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 36); // 3 indices starting at 0 -> 1 triangle
+	//	glDrawArrays(GL_TRIANGLES, 0, 36); // 3 indices starting at 0 -> 1 triangle
 		// Draw the triangle !
-//	glDrawArrays( GL_TRIANGLES, 0, pMeshExtra->m_pScene->mMeshes[0]->mNumVertices );
+   // Beware of vertex numbers, I may have to use index buffer
+	glDrawArrays( GL_TRIANGLES, 0, pMeshExtra->m_pScene->mMeshes[0]->mNumVertices );
 
 	glDisableVertexAttribArray(0);//
 	glDisableVertexAttribArray(1);

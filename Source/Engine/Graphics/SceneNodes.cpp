@@ -17,19 +17,19 @@ SceneNodeProperties::SceneNodeProperties( void )
    //m_AlphaType = AlphaOpaque;
    }
 
-void SceneNodeProperties::GetRelTransform( Mat4x4* const toRelative, Mat4x4* const fromRelative ) const
+void SceneNodeProperties::GetTransform( Mat4x4* const toParent, Mat4x4* const toChild ) const
    {
-   if( toRelative )
+   if( toParent )
       {
-      *toRelative = m_ToRelSpace;
+      *toParent = m_ToParent;
       }
-   if( fromRelative )
+   if( toChild )
       {
-      *fromRelative = m_FromRelSpace;
+      *toChild = m_ToChild;
       }
    }
 
-SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, const Mat4x4 *to, const Mat4x4 *from )
+SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, const Mat4x4 *toPatrent, const Mat4x4 *toChild )
    {
    m_pParent= NULL;
 	m_Props.m_ActorId = actorId;
@@ -37,7 +37,7 @@ SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponen
 	m_Props.m_RenderPass = renderPass;
 	//m_Props.m_AlphaType = AlphaOpaque;
 	m_RenderComponent = renderComponent;
-	VSetRelTransform(to, from); 
+	VSetTransform( toPatrent, toChild ); 
 	SetRadius(0);
    }
 
@@ -45,16 +45,16 @@ SceneNode::~SceneNode()
    {
    }
 
-void SceneNode::VSetRelTransform( const Mat4x4 *toRelative, const Mat4x4 *fromRelative )
+void SceneNode::VSetTransform( const Mat4x4 *toPatrent, const Mat4x4 *toChild )
    {
-   m_Props.m_ToRelSpace = *toRelative;
-   if( fromRelative )
+   m_Props.m_ToParent = *toPatrent;
+   if( toChild )
       {
-      m_Props.m_FromRelSpace = *fromRelative;
+      m_Props.m_ToChild = *toChild;
       }
    else
       {
-      m_Props.m_FromRelSpace = toRelative->Inverse();
+      m_Props.m_ToChild = toPatrent->Inverse();
       }
    }
 
@@ -78,20 +78,28 @@ int SceneNode::VOnUpdate( Scene* pScene, const unsigned long deltaMs )
 
 int SceneNode::VPreRender( Scene *pScene )
    {
-   pScene->PushAndSetMatrix( m_Props.m_ToRelSpace );
+   pScene->PushAndSetMatrix( VGetProperties()->GetToParent() );
    return S_OK;
    }
 
 bool SceneNode::VIsVisible( Scene *pScene ) const
    {
-   Mat4x4 toRelSpace;
-   Mat4x4 fromRelSpace;
-   pScene->GetCamera()->VGetProperties()->GetRelTransform( &toRelSpace, &fromRelSpace );
-   Vec3 fromWorldPos = GetWorldPosition();
+   Mat4x4 toParent;
+   Mat4x4 toChild;
+   pScene->GetCamera()->VGetProperties()->GetTransform( &toParent, &toChild );
+   Vec3 nodeInCamWorldPos = GetWorldPosition();
    // transform to camera's local space
-   fromWorldPos = -1.0f * toRelSpace.Xform( fromWorldPos );
+   nodeInCamWorldPos = toChild.Xform( nodeInCamWorldPos );
+    Mat4x4 camMat = glm::lookAt(
+								glm::vec3(7, 9, 10), // position in World Space
+								glm::vec3(0,0,0), // look target
+								glm::vec3(0, 1, 0)  // Head is up (set to 0,-1,0 to look upside-down)
+						   );
+   // beware! the Z direction of camera in openGL is inversed!
+   //nodeInCamWorldPos.z *= -1.0f; 
    const Frustum &frustum = pScene->GetCamera()->GetFrustum();
-   return frustum.Inside( fromWorldPos, VGetProperties()->GetRadius() );
+   //return true;
+   return frustum.Inside( nodeInCamWorldPos, VGetProperties()->GetRadius() );
    }
 
 
@@ -122,7 +130,7 @@ int SceneNode::VPostRender( Scene *pScene )
 bool SceneNode::VAddChild( shared_ptr<ISceneNode> child )
    {
    m_Children.push_back( child );
-   // child position in relative space
+   // child position in parent's space
    Vec3 childPos = child->GetRelPosition();
    float newRadius = childPos.Length() + child->VGetProperties()->GetRadius();
    m_Props.m_Radius = std::max( m_Props.m_Radius, newRadius );
@@ -246,6 +254,32 @@ bool RootNode::VRemoveChild( ActorId id )
 	return anythingRemoved;
    }
 
+CameraNode::CameraNode( Mat4x4 const *t, Frustum const &frustum ) 
+	      : SceneNode(INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(), RenderPass_0, t),
+	      m_Frustum( frustum ),
+	      m_IsActive( true ),
+	      m_IsDebugCamera( false ),
+         m_pTarget( shared_ptr<SceneNode>() ),
+	      m_CamOffsetVector( 0.0f, 1.0f, -10.0f, 0.0f ),
+         m_View( Mat4x4::ViewMatrix( t->GetPosition(), t->GetPosition() + t->GetDirection(), g_Up ) )
+   {
+   }
+
+CameraNode::CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, Frustum const &frustum ) 
+	      : SceneNode( INVALID_ACTOR_ID, 
+                  WeakBaseRenderComponentPtr(), 
+                  RenderPass_0, 
+                  &Mat4x4::LookAt( eye, center, up ).Inverse() 
+                  ),
+            m_Frustum( frustum ),
+	         m_IsActive( true ),
+	         m_IsDebugCamera( false ),
+            m_pTarget( shared_ptr<SceneNode>() ),
+	         m_CamOffsetVector( 0.0f, 1.0f, -10.0f, 0.0f ),
+            m_View( Mat4x4::ViewMatrix( eye, center, g_Up ) )
+   { 
+   }
+
 //TODO: implement m_Frustum render
 int CameraNode::VRender( Scene *pScene )
    {
@@ -268,31 +302,38 @@ int CameraNode::VOnRestore( Scene *pScene )
 	return S_OK;
    }
 
+void CameraNode::VSetTransform( const Mat4x4 *toParent, const Mat4x4 *toChild ) 
+   { 
+   SceneNode::VSetTransform( toParent, toChild ); 
+   m_View = Mat4x4::ViewMatrix( toParent->GetPosition(), toParent->GetPosition() + toParent->GetDirection(), toParent->GetUp() );
+
+   }
+
 Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene ) const
    {
    Mat4x4 world = pScene->GetTopMatrix();
-	Mat4x4 view = VGetProperties()->GetToRelSpace();
-	//Mat4x4 worldView = world * view;
-	return m_Projection * view * world;
+	Mat4x4 view = VGetProperties()->GetToChild();
+	return m_Projection * m_View * world;
    }
 
 // TODO: check if it's correct
+// I think atWorld should be set by GetWorldPosition
 int CameraNode::SetViewTransform(  Scene *pScene )
    {
    // this code simulates camera pole effect, camera is sticked to target's position +  m_CamOffsetVector
 	if( m_pTarget )
 	   {
       // Get target's local transform
-		Mat4x4 targetToRelSpace = m_pTarget->VGetProperties()->GetToRelSpace();
+		Mat4x4 targetInParentSpace = m_pTarget->VGetProperties()->GetToParent();
 		Vec4 at = m_CamOffsetVector;
-		Vec4 atWorld = targetToRelSpace.Xform( at );
+		Vec4 atWorld = targetInParentSpace.Xform( at );
       // 
 		Vec3 pos = m_pTarget->GetRelPosition() + at;
-		targetToRelSpace.SetPosition(pos);
-		VSetRelTransform( &targetToRelSpace );
+		targetInParentSpace.SetPosition( pos );
+		VSetTransform( &targetInParentSpace );
 	   }
 
-	m_View = VGetProperties()->GetFromRelSpace();
+	//m_View = VGetProperties()->GetToChild();
 
 	return S_OK;
    }

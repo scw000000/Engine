@@ -99,8 +99,10 @@ class Quaternion : public glm::fquat
       void Slerp( const Quaternion &start, const Quaternion &end, float cooef ) { *this = glm::slerp( start, end, cooef ); }
       void GetAxisAngle( Vec3& axis, float &angle ) const { axis = glm::axis( *this ); angle = glm::angle( *this ); }
       
-      void BuildAxisRadian( const Vec3& axis, const float& radian ) { *this = glm::angleAxis( radian, axis ); }
-      void BuildYawPitchRoll( const float yawRadians, const float pitchRadians, const float rollRadians ) { *this = glm::fquat( Vec3( yawRadians, pitchRadians, rollRadians ) ); }
+      void BuildAxisRad( const Vec3& axis, const float& radian ) { *this = glm::angleAxis( radian, axis ); }
+      void BuildYawPitchRollRad( const float yawRadian, const float pitchRadian, const float rollRadian ) { *this = glm::fquat( Vec3( yawRadian, pitchRadian, rollRadian ) ); }
+      void BuildYawPitchRollReg( const float yawDegree, const float pitchDegree, const float rollDegree ) 
+         { *this = glm::fquat( Vec3( DEGREES_TO_RADIANS( yawDegree ), DEGREES_TO_RADIANS( pitchDegree ), DEGREES_TO_RADIANS( rollDegree ) ) ); }
       void Build44Matrix( const class Mat4x4& mat );
       
    public:
@@ -123,7 +125,10 @@ class Mat4x4 : public glm::mat4
          }
       inline Vec3 GetPosition() const { return Vec3( (*this)[3] ); }
       inline Vec3 GetDirection() const;
-      inline Vec3 Mat4x4::GetYawPitchRoll() const;
+      inline Vec3 GetForWard( void ) const;
+      inline Vec3 GetRight( void ) const;
+      inline Vec3 GetUp( void ) const;
+      inline Vec3 Mat4x4::GetPitchYawRoll() const;
       inline Vec4 Xform( const Vec4 &v ) const { return (*this) * v; }
       inline Vec3 Xform( const Vec3 &v ) const { return Vec3( Xform( Vec4( v ) ) ); }
       inline Mat4x4 Inverse() const { return glm::inverse( *this ); }
@@ -145,28 +150,55 @@ class Mat4x4 : public glm::mat4
       inline void BuildRotationZ( const float radians ) { *this = glm::rotate( radians , glm::vec3( 0.0f, 0.0f, 1.0f ) ); }
       // Rotate around counterclockwise direction, 
       // Yaw->Yaxis, Pitch->Xaxis, Roll->Zaxis
-      inline void BuildYawPitchRollRad( const float yawRadians, const float pitchRadians, const float rollRadians )
-         { *this = glm::eulerAngleYXZ( yawRadians, pitchRadians, rollRadians ); }
-      inline void BuildYawPitchRollDeg( const float yawRadians, const float pitchRadians, const float rollRadians )
-         { *this = glm::eulerAngleYXZ( DEGREES_TO_RADIANS( yawRadians ), DEGREES_TO_RADIANS( pitchRadians ), DEGREES_TO_RADIANS( rollRadians ) ); }
+      inline void BuildPitchYawRollRad( const float pitchRadian, const float yawRadian, const float rollRadian )
+         { *this = glm::eulerAngleYXZ( yawRadian, pitchRadian, rollRadian ); }
+      inline void BuildPitchYawRollDeg( const float pitchDegree, const float yawDegree, const float rollDegree )
+         { *this = glm::eulerAngleYXZ( DEGREES_TO_RADIANS( yawDegree ), DEGREES_TO_RADIANS( pitchDegree ), DEGREES_TO_RADIANS( rollDegree ) ); }
       inline void BuildRotationQuat( const Quaternion &q ) { *this = mat4_cast( q ); }
       inline void BuildProjection( float fovy, float aspect, float zNear, float zFar );
+      static Mat4x4 ViewMatrix( const Vec3& eye, const Vec3& center, const Vec3& up ) { return Mat4x4( glm::lookAt( eye, center, up ) ); }
+      // Caution! this matrix is not the same as glm::lookat, the whole direction
+      // is reversed
+      static Mat4x4 LookAt( const Vec3& eye, const Vec3& center, const Vec3& up ){ return ViewMatrix( eye, 2.0f * eye - center, up ) ; }
    public: 
       static const Mat4x4 g_Identity;
+
+   private:
+      inline Vec3 GetXFormDirection( Vec3 vec ) const;
    };
 
 inline Vec3 Mat4x4::GetDirection() const
    {
    // Note - the following code can be used to double check the vector construction above.
-	Mat4x4 justRot = *this;
-	justRot.SetPosition(Vec3(0.f,0.f,0.f));
-	Vec3 forward = justRot.Xform(g_Forward);
+	return this->GetXFormDirection( g_Forward );
+   }
+
+inline Vec3 Mat4x4::GetForWard( void ) const
+   {
+   return this->GetXFormDirection( g_Forward );
+   }
+
+inline Vec3 Mat4x4::GetRight( void ) const
+   {
+   return this->GetXFormDirection( g_Right );
+   }
+
+inline Vec3 Mat4x4::GetUp( void ) const
+   {
+   return this->GetXFormDirection( g_Up );
+   }
+
+inline Vec3 Mat4x4::GetXFormDirection( Vec3 vec ) const
+   {
+   Mat4x4 justRot = *this;
+	justRot.SetPosition( Vec3( 0.f,0.f,0.f ) );
+	Vec3 forward = justRot.Xform( vec );
 	return forward;
    }
 
 inline void Quaternion::Build44Matrix( const Mat4x4& mat ) { *this = glm::quat_cast( mat ); }
 
-inline Vec3 Mat4x4::GetYawPitchRoll() const
+inline Vec3 Mat4x4::GetPitchYawRoll() const
 {
    float yaw, pitch, roll;
 	
@@ -186,7 +218,7 @@ inline Vec3 Mat4x4::GetYawPitchRoll() const
       yaw = 0.0;
    }
 
-	return ( Vec3(yaw, pitch, roll) );
+	return ( Vec3(pitch, yaw, roll) );
 }
 
 inline void Mat4x4::BuildProjection( float fovy, float aspect, float zNear, float zFar )

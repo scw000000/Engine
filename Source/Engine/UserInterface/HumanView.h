@@ -5,6 +5,7 @@
 
 #include "UserInterface.h"
 #include "GUIManager.h"
+#include "..\Controller\Controller.h"
 
 class GUIManager;
 
@@ -58,6 +59,7 @@ class HumanView : public IGameView
       GUIManager* m_pGUIManager;
       shared_ptr<ScreenElementScene> m_pScene; // this scene will be pushed into screen element list by LoadGame( xml level)
       shared_ptr<CameraNode> m_pCamera;
+      shared_ptr<MovementController> m_pController; 
 
    private:
 

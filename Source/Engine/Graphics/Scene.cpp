@@ -139,7 +139,8 @@ void Scene::NewRenderComponentDelegate( IEventDataPtr pEventData )
     ActorId actorId = pCastEventData->GetActorId();
     shared_ptr<SceneNode> pSceneNode( pCastEventData->GetSceneNode() );
 
-    // FUTURE WORK: Add better error handling here.		
+    // TODO: implement and call VOnInit instead of VOnRestore
+    // because it will be called again in HumanView
     if ( pSceneNode->VOnRestore(this) != S_OK )
       {
 		std::string error = "Failed to restore scene node to the scene for actorid " + ToStr(actorId);

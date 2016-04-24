@@ -16,7 +16,7 @@ bool TransformComponent::VInit(TiXmlElement* pData)
 	// [mrmike] - this was changed post-press - because changes to the TransformComponents can come in partial definitions,
 	//            such as from the editor, its better to grab the current values rather than clear them out.
     
-	Vec3 yawPitchRoll = m_transform.GetYawPitchRoll();
+	Vec3 pitchYawRoll = m_transform.GetPitchYawRoll();
 
 	Vec3 position = m_transform.GetPosition();	
 
@@ -32,23 +32,23 @@ bool TransformComponent::VInit(TiXmlElement* pData)
      position = Vec3(x, y, z);
      }
 
-   TiXmlElement* pOrientationElement = pData->FirstChildElement("YawPitchRoll");
+   TiXmlElement* pOrientationElement = pData->FirstChildElement("PitchYawRoll");
    if (pOrientationElement)
      {
      double yaw = 0;
      double pitch = 0;
      double roll = 0;
-     pOrientationElement->Attribute("x", &yaw);
-     pOrientationElement->Attribute("y", &pitch);
+     pOrientationElement->Attribute("x", &pitch);
+     pOrientationElement->Attribute("y", &yaw);
      pOrientationElement->Attribute("z", &roll);
-	  yawPitchRoll = Vec3(yaw, pitch, roll);
+	  pitchYawRoll = Vec3(pitch, yaw, roll);
 	  }
 
 	Mat4x4 translation;
 	translation.BuildTranslation(position);
 
 	Mat4x4 rotation;
-	rotation.BuildYawPitchRollDeg( yawPitchRoll.x, yawPitchRoll.y, yawPitchRoll.z );
+	rotation.BuildPitchYawRollDeg( pitchYawRoll.x, pitchYawRoll.y, pitchYawRoll.z );
 
 	/**
 	// This is not supported yet.

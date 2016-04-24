@@ -5,6 +5,7 @@
 #include "EngineStd.h"
 #include "HumanView.h"
 #include "GUIManager.h"
+#include "..\Controller\Controller.h"
 
 const unsigned int SCREEN_MAX_FRAME_RATE = 60;
 const Uint64 SCREEN_MIN_RENDER_INTERVAL = ( SDL_GetPerformanceFrequency() / SCREEN_MAX_FRAME_RATE );
@@ -26,21 +27,15 @@ HumanView::HumanView( shared_ptr<IRenderer> p_renderer )
 		Frustum frustum;
 		frustum.Init( ENG_PI/4.0f, 4.0f / 3.0f, 0.1f, 100.0f );
       
-      Mat4x4 camMat = glm::lookAt(
-								glm::vec3(0,-10,-10), // Camera is at (4,3,-3), in World Space
-								glm::vec3(0,0,0), // and looks at the origin
-								glm::vec3(0,10,-10)  // Head is up (set to 0,-1,0 to look upside-down)
-						   );
-     // Mat4x4 camMat ;
-		m_pCamera.reset( ENG_NEW CameraNode( &camMat, frustum ) );
-		ENG_ASSERT( m_pScene && m_pCamera && _T("Out of memory") );
-
-      std::cout << ToStr( m_pCamera->GetRelDirection() ) << std::endl;
-      std::cout << ToStr( m_pCamera->GetRelPosition() ) << std::endl;
-
+      m_pCamera.reset( ENG_NEW CameraNode( Vec3(0.0f, 0.0f, 0.0f), // position in World Space
+								Vec3( 0.0f, 0.0f, 1.0f), // look target
+								Vec3( 0.0f, 1.0f, 0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
+                        , frustum ) );
+		ENG_ASSERT( m_pScene && m_pCamera && _T("Out of memory") );     
 		m_pScene->VAddChild( INVALID_ACTOR_ID, m_pCamera );
 		m_pScene->SetCamera( m_pCamera );
-	   }
+	   m_pCamera->VOnRestore( &*m_pScene );
+      }
 
    m_pGUIManager = ENG_NEW GUIManager;
    m_pGUIManager->Init( "GUI/" );
@@ -117,6 +112,12 @@ int HumanView::VOnMsgProc( SDL_Event event )
       {
       return 1;
       }
+
+   if( m_pController && m_pController->VOnMsgProc( event ) )
+      {
+      return true;
+      }
+
 	for( ScreenElementList::reverse_iterator i=m_ScreenElements.rbegin(); i != m_ScreenElements.rend(); ++i )
 	   {
 		if ( (*i)->VIsVisible() )
@@ -163,7 +164,10 @@ int HumanView::VOnMsgProc( SDL_Event event )
 void HumanView::VOnUpdate( const unsigned long deltaMs )
    {
    static bool test = true;
-
+   if( m_pController )
+      {
+      m_pController->OnUpdate( deltaMs );
+      }
    m_pGUIManager->OnUpdate( deltaMs );
    m_pProcessManager->UpdateProcesses( deltaMs );
    for(ScreenElementList::iterator i=m_ScreenElements.begin(); i!=m_ScreenElements.end(); ++i)
@@ -191,7 +195,8 @@ int HumanView::Ask( MessageBox_Questions question )
 bool HumanView::LoadGame( TiXmlElement* pLevelData )
    {
    VPushElement( m_pScene );  
-   m_pScene->VOnRestore();
+   m_pController.reset( ENG_NEW MovementController( m_pCamera, 0, 0, false ) );
+   //m_pScene->VOnRestore();
    return true;
    }
 

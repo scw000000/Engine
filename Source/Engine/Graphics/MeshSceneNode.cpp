@@ -209,7 +209,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_MVPMatrixUni = glGetUniformLocation( m_Program, "MVP");
    m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler");
 
-   //SetRadius( CalcBoundingSphere( &extra->m_Mesh11 ) );
+   SetRadius( 4.0f );
    
    // resore all of its children
 	SceneNode::VOnRestore( pScene );

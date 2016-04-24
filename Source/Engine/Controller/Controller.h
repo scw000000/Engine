@@ -5,45 +5,49 @@
 
 #include "..\Graphics\SceneNodes.h"
 
-class MovementController : public IPointerHandler, public IKeyboardHandler
+class MovementController : public IController
    {
    public:
-	   bool VOnPointerMove(const Point &mousePos, const int radius);
-	   bool VOnPointerButtonDown(const Point &mousePos, const int radius, const std::string &buttonName);
-	   bool VOnPointerButtonUp(const Point &mousePos, const int radius, const std::string &buttonName);
+      MovementController(shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown);
+      virtual bool VOnMsgProc( const SDL_Event& event ) override ;
+	   virtual bool VOnPointerMove( Point motion ) override;
+	   virtual bool VOnPointerButtonDown( Uint8 button  ) override{ m_MouseButton[button] = true; return true; }
+      virtual bool VOnPointerButtonUp( Uint8 button ) override{ m_MouseButton[button] = false; return true; }
 
-	   bool VOnKeyDown(const BYTE c) { m_bKey[c] = true; return true; }
-	   bool VOnKeyUp(const BYTE c) { m_bKey[c] = false; return true; }
+	   virtual bool VOnKeyDown( const SDL_Scancode& keyCode ) override { m_KeyButton[keyCode] = true; return true; }
+	   virtual bool VOnKeyUp( const SDL_Scancode& keyCode ) override { m_KeyButton[keyCode] = false; return true; }
 
-	   const Mat4x4 *GetToWorld() { return &m_matToWorld; }
-	   const Mat4x4 *GetFromWorld() { return &m_matFromWorld; }	
-      public:
-	   MovementController(shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown);
+	   const Mat4x4 *GetToWorld() { return &m_FromWorld; }
+	   const Mat4x4 *GetFromWorld() { return &m_ToWorld; }	
+
+	   
 	   void SetObject(shared_ptr<SceneNode> newObject);
 
 	   void OnUpdate( const unsigned long elapsedMs);
 
     protected:
-	   Mat4x4  m_matFromWorld;
-	   Mat4x4	m_matToWorld;
-      Mat4x4  m_matPosition;
+      Vec3     m_Rotation;
+      Vec3     m_TargetRotation;
+	   Mat4x4  m_FromWorld;
+	   Mat4x4	m_ToWorld;
+      Mat4x4  m_Position;
 
-	   Point					m_lastMousePos;
-	   bool					m_bKey[256];			// Which keys are up and down
-
+	   Point					m_LastMousePos;
+	   bool					m_KeyButton[ SDL_NUM_SCANCODES ];			// Which keys are up and down
+      bool              m_MouseButton[ 256 ];
 	   // Orientation Controls
-	   float		m_fTargetYaw;
-	   float		m_fTargetPitch;
-	   float		m_fYaw;
-	   float		m_fPitch;
-	   float		m_fPitchOnDown;
-	   float		m_fYawOnDown;
-	   float		m_maxSpeed;
-	   float		m_currentSpeed;
+	   float		m_TargetYaw;
+	   float		m_TargetPitch;
+	   float		m_Yaw;
+	   float		m_Pitch;
+	   float		m_PitchOnDown;
+	   float		m_YawOnDown;
+	   float		m_MaxSpeed;
+	   float		m_CurrentSpeed;
 
 	   // Added for Ch19/20 refactor
-	   bool		m_mouseLButtonDown;
-      bool		m_bRotateWhenLButtonDown;
+	   bool		m_isMouseLButtonDown;
+      bool		m_isRotateWhenLButtonDown;
 
 	   shared_ptr<SceneNode> m_object;
    };

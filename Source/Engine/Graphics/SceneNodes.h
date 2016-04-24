@@ -30,9 +30,9 @@ class SceneNodeProperties
       SceneNodeProperties( void );
 
       ActorId GetActorId( void ) const { return m_ActorId; }
-      const Mat4x4& GetToRelSpace( void ) const { return m_ToRelSpace; }
-      const Mat4x4& GetFromRelSpace( void ) const { return m_FromRelSpace; }
-      void GetRelTransform( Mat4x4* const toRelative, Mat4x4* const fromRelative ) const;
+      const Mat4x4& GetToParent( void ) const { return m_ToParent; }
+      const Mat4x4& GetToChild( void ) const { return m_ToChild; }
+      void GetTransform( Mat4x4* const toParent, Mat4x4* const toChild ) const;
 
       const char* Name( void ) const { return m_Name.c_str(); }
 
@@ -47,8 +47,8 @@ class SceneNodeProperties
    protected:
       ActorId m_ActorId;
       std::string m_Name;
-      Mat4x4 m_ToRelSpace;
-      Mat4x4 m_FromRelSpace;
+      Mat4x4 m_ToParent;
+      Mat4x4 m_ToChild;
       float m_Radius;
       RenderPass m_RenderPass;
       Material m_Material;
@@ -72,7 +72,7 @@ class SceneNode : public ISceneNode
 
 	   virtual const SceneNodeProperties* const VGetProperties() const { return &m_Props; }
 
-	   virtual void VSetRelTransform( const Mat4x4 *toRelative, const Mat4x4 *fromRelative = NULL );
+	   virtual void VSetTransform( const Mat4x4 *toParent, const Mat4x4 *toChild = NULL ) override;
 
 	   virtual int VOnRestore( Scene *pScene );
 	   virtual int VOnUpdate( Scene *, const unsigned long elapsedMs );
@@ -91,14 +91,14 @@ class SceneNode : public ISceneNode
 	   void SetAlpha( float alpha );
 	   //float GetAlpha() const { return m_Props.Alpha(); }
       
-      // return position in actor space
-	   virtual Vec3 GetRelPosition( void ) const { return m_Props.m_ToRelSpace.GetPosition(); }
+      // return position in parent space
+	   virtual Vec3 GetRelPosition( void ) const { return m_Props.m_ToParent.GetPosition(); }
 	   // set position in actor space
-      virtual void SetRelPosition( const Vec3 &pos ) { m_Props.m_ToRelSpace.SetPosition( pos ); }
+      virtual void SetRelPosition( const Vec3 &pos ) { m_Props.m_ToParent.SetPosition( pos ); }
 
 	   Vec3 GetWorldPosition( void ) const;
 
-	   Vec3 GetRelDirection( void ) const { return m_Props.m_ToRelSpace.GetDirection(); }
+	   Vec3 GetRelDirection( void ) const { return m_Props.m_ToParent.GetDirection(); }
 
 	   void SetRadius(const float radius) { m_Props.m_Radius = radius; }
 	   //void SetMaterial(const Material &mat) { m_Props.m_Material = mat; }
@@ -138,17 +138,13 @@ class RootNode : public SceneNode
 class CameraNode : public SceneNode
    {
    public:
-	   CameraNode( Mat4x4 const *t, Frustum const &frustum ) 
-	      : SceneNode(INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(), RenderPass_0, t),
-	      m_Frustum(frustum),
-	      m_IsActive(true),
-	      m_IsDebugCamera(false),
-         m_pTarget(shared_ptr<SceneNode>()),
-	     m_CamOffsetVector( 0.0f, 1.0f, -10.0f, 0.0f ) { }
+	   CameraNode( Mat4x4 const *t, Frustum const &frustum );
+      CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, Frustum const &frustum );
 
 	   virtual int VRender( Scene *pScene ) override;
 	   virtual int VOnRestore( Scene *pScene ) override;
 	   virtual bool VIsVisible( Scene *pScene ) const { return m_IsActive; }
+      virtual void VSetTransform( const Mat4x4 *toParent, const Mat4x4 *toChild = NULL );
 
 	   const Frustum &GetFrustum( void ) { return m_Frustum; }
 	   void SetTarget(shared_ptr<SceneNode> pTarget) { m_pTarget = pTarget; }

@@ -75,48 +75,41 @@ int main( int argc, char *argv[] )
    g_pApp->m_EngineOptions.Init( "PlayerOptions.xml" );
 
    g_pApp->InitInstance( 0, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
-   Vec3 v1( 0.0f, 0.0f, 1.0f );
-   Vec3 v2( 1.0, 1.0, 1.0 );
+
+   Vec3 v1( 1.0f, 1.0f, -1.0f );
+   
   // std::cout << ToStr( v1 ) << std::endl;
    Mat4x4 m1( glm::mat4( 1.0f ) );
-   Quaternion aaa;
-   m1.BuildTranslation( Vec3( 1.0f, 2.0f, -3.0f ) );
-  // m1.BuildYawPitchRoll(  DEGREES_TO_RADIANS(10.0f), DEGREES_TO_RADIANS(-20.f), DEGREES_TO_RADIANS(90.f) );
+   
+   m1.BuildPitchYawRollDeg( 0.0f, 45.f, 0.f );
+   m1.BuildTranslation( Vec3( 1.0f, 0.0f, -1.0f ) );
+   std::cout <<  std::endl << ToStr( m1 ) << std::endl<<  std::endl;
+
+   std::cout << ToStr( m1.GetPosition() ) <<  std::endl;
+   std::cout << ToStr( m1.Inverse().GetPosition() ) <<  std::endl;
+   std::cout << ToStr( m1.GetDirection() ) <<  std::endl<<  std::endl;
+   
    Mat4x4 camMat = glm::lookAt(
-				glm::vec3(0, 0,-10), // Camera is at (4,3,-3), in World Space
-				glm::vec3(0,0,-1), // and looks at the origin
+				glm::vec3(1, 0, -1), // Camera is at (4,3,-3), in World Space
+				glm::vec3(2, 0, 0), // and looks at the origin
 				glm::vec3(0,1,0));  // Head is up (set to 0,-1,0 to look upside-down)
    Mat4x4 inv = camMat.Inverse();
-   std::cout << ToStr( camMat ) << std::endl<<  std::endl;
-   std::cout << ToStr( inv ) << std::endl<<  std::endl;
-
-   std::cout <<  std::endl<< ToStr( camMat.Xform( v1 ) ) <<  std::endl;
+    std::cout << "camMat: matrix"<<  std::endl;
+   std::cout <<  std::endl << ToStr( camMat ) << std::endl<<  std::endl;
+   std::cout << "camMat: xform"<<  std::endl;
+   std::cout << ToStr( camMat.Xform( v1 ) ) <<  std::endl;
+   std::cout << "camMat: position"<<  std::endl;
    std::cout << ToStr( camMat.GetPosition() ) <<  std::endl;
+   std::cout << "camMat: direction"<<  std::endl;
    std::cout << ToStr( camMat.GetDirection() ) <<  std::endl<<  std::endl;
+
+   std::cout << ToStr( inv ) << std::endl<<  std::endl;
 
    std::cout << ToStr( inv.Xform( v1 ) ) <<  std::endl;
    std::cout << ToStr( inv.GetPosition() ) <<  std::endl;
    std::cout << ToStr( inv.GetDirection() ) <<  std::endl<<  std::endl;
 
    std::cout << ToStr( inv*camMat ) <<  std::endl;
-  // m1.BuildYawPitchRoll(  DEGREES_TO_RADIANS(10.0f), DEGREES_TO_RADIANS(20.f), DEGREES_TO_RADIANS(30.f) );
-   Vec3 v3 = ENG_DEGREES_OVER_RADIANS * ( m1.GetYawPitchRoll() );
-  // std::cout << ToStr( v3 ) << std::endl;
-   /*
-   std::cout << ToStr( m1 ) << std::endl;
-   m1.BuildTranslation( v1 );
-   std::cout << ToStr( m1 ) << std::endl;
-   std::cout << ToStr( m1.Xform( v2 ) ) << std::endl;
-   m1.SetPosition( m1.Xform( v2 ) );
-   std::cout << ToStr( m1 ) << std::endl;
-   Mat4x4 m2( m1 );
-   std::cout << ToStr( m2 ) << std::endl;
-   m1.BuildRotationX( ENG_PI );
-   std::cout << ToStr( m1.Xform( Vec3( 0.0f, 1.0f, 0.0f ) ) ) << std::endl;*/
- //  std::cout << ToStr( v1.Cross( v2 ) ) << std::endl;
- //  std::cout << ToStr( v1.Dot( v2 ) ) << std::endl;
-//std::cout << ToStr( v1.Length() ) << std::endl;
-//std::cout << ToStr( *v1.Normalize() ) << std::endl;
    g_pApp->MainLoop();
 
    

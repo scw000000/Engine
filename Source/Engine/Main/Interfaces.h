@@ -91,16 +91,22 @@ typedef std::list<shared_ptr<IGameView> > GameViewList;
 class IKeyboardHandler
    {
    public:
-	   virtual bool VOnKeyDown(const BYTE c)=0;
-	   virtual bool VOnKeyUp(const BYTE c)=0;
+	   virtual bool VOnKeyDown( const SDL_Scancode& keyCode ) = 0;
+	   virtual bool VOnKeyUp( const SDL_Scancode& keyCode ) = 0;
    };
 
 class IPointerHandler
    {
    public:
-	   virtual bool VOnPointerMove(const Point &pos, const int radius) = 0;
-	   virtual bool VOnPointerButtonDown(const Point &pos, const int radius, const std::string &buttonName) = 0;
-	   virtual bool VOnPointerButtonUp(const Point &pos, const int radius, const std::string &buttonName) = 0;
+	   virtual bool VOnPointerMove( Point motion ) = 0;
+	   virtual bool VOnPointerButtonDown( Uint8 button ) = 0;
+	   virtual bool VOnPointerButtonUp( Uint8 button ) = 0;
+   };
+
+class IController : public IKeyboardHandler, public IPointerHandler
+   {
+   public:
+      virtual bool VOnMsgProc( const SDL_Event& event ) = 0;
    };
 
 class IJoystickHandler
@@ -195,7 +201,7 @@ class ISceneNode
       
       virtual const SceneNodeProperties *const VGetProperties( void ) const = 0;
 
-	   virtual void VSetRelTransform( const Mat4x4 *toRelative, const Mat4x4 *fromRelative = NULL ) = 0;
+	   virtual void VSetTransform( const Mat4x4 *toParent, const Mat4x4 *toChild = NULL ) = 0;
 
 	   virtual int VOnUpdate( Scene *pScene, const unsigned long deltaMs ) = 0;
 	   virtual int VOnRestore( Scene *pScene ) = 0;

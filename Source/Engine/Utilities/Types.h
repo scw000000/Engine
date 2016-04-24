@@ -52,6 +52,7 @@ public:
 	// construction
 	Point(void) { x = y = 0; }
 	Point(const long newX, const long newY) { x = newX; y = newY; }
+   Point(const Sint32 newX, const Sint32 newY) { x = newX; y = newY; }
 	Point(const Point& newPoint) { x = newPoint.x; y = newPoint.y; }
 	Point(const Point* pNewPoint) { x = pNewPoint->x; y = pNewPoint->y; }
    Point(const POINT& newPoint) { x = newPoint.x; y = newPoint.y; }

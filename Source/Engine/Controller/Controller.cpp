@@ -9,11 +9,8 @@ MovementController::MovementController( shared_ptr<SceneNode> object, float init
    {
 	m_object->VGetProperties()->GetTransform( &m_ToWorld, &m_FromWorld );
 
-  // m_Position = m_ToWorld.GetPosition();
    m_Rotation = m_ToWorld.GetPitchYawRoll();
    m_TargetRotation = m_Rotation;
-	m_TargetYaw = m_Yaw = RADIANS_TO_DEGREES( -initialYaw );
-	m_TargetPitch = m_Pitch = RADIANS_TO_DEGREES( initialPitch );
 
 	m_MaxSpeed = 20.0f;			// 30 meters per second
 	m_CurrentSpeed = 0.0f;
@@ -86,18 +83,21 @@ bool MovementController::VOnPointerMove( Point motion )
 		// Only look around if the left button is down
 		if( m_isMouseLButtonDown )
 		   {
-			m_TargetYaw += motion.x * 0.001f;
-			m_TargetPitch += motion.y * 0.001f;
+
 		   }
 	   }
 	else
 	   {
       int x, y;
       SDL_GetMouseState( &x, &y );
-      m_TargetRotation.y += 0.001f * ( motion.x - g_pApp->GetScreenSize().x / 2.0f ) ;
+      m_TargetRotation.y += 0.005f * ( motion.x - m_LastMousePos.x ) ;
+	   m_TargetRotation.x += 0.005f * ( m_LastMousePos.y - motion.y );
+      m_LastMousePos = motion;
+
+     /* m_TargetRotation.y += 0.001f * ( motion.x - g_pApp->GetScreenSize().x / 2.0f ) ;
 	   m_TargetRotation.x += 0.001f * ( g_pApp->GetScreenSize().y / 2.0f - motion.y );
       m_LastMousePos = motion;
-      SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
+      SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );*/
 	   }
 	return true;
    }

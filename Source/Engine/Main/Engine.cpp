@@ -559,10 +559,12 @@ void EngineApp::OnFrameRender( double fTime, float fElapsedTime )
    {
    BaseGameLogic *pGame = g_pApp->m_pGame;
 
+   g_pApp->m_pRenderer->VPreRender();
 	for(GameViewList::iterator i=pGame->m_gameViews.begin(), end=pGame->m_gameViews.end(); i!=end; ++i)
 	   {
 		(*i)->VOnRender( fTime, fElapsedTime );
 	   }
+    g_pApp->m_pRenderer->VPostRender();
    }
 
 // This is a WINDOWS dedicated function

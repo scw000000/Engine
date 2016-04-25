@@ -97,9 +97,6 @@
     <ClCompile Include="..\Utilities\Math.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\UserInterface\MessageBox.cpp">
-      <Filter>UserInterface</Filter>
-    </ClCompile>
     <ClCompile Include="..\UserInterface\GUIManager.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
@@ -228,9 +225,6 @@
       <Filter>ResourceCache</Filter>
     </ClInclude>
     <ClInclude Include="..\UserInterface\UserInterface.h">
-      <Filter>UserInterface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\UserInterface\MessageBox.h">
       <Filter>UserInterface</Filter>
     </ClInclude>
     <ClInclude Include="..\UserInterface\GUIManager.h">

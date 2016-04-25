@@ -27,7 +27,7 @@ class MeshResourceLoader : public ResourceLoader
    public:
       MeshResourceLoader( void );
 	   virtual bool VUseRawFile() override { return false; }
-	   virtual bool VDiscardRawBufferAfterLoad() override { return false; } // TODO: check if its right
+	   virtual bool VDiscardRawBufferAfterLoad() override { return true; }
 	   virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize ) override ;
 	   virtual bool VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) override ;
       virtual bool VUsePreAllocate( void ) override { return false; }

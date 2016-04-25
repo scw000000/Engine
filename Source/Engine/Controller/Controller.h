@@ -36,8 +36,6 @@ class MovementController : public IController
 	   bool					m_KeyButton[ SDL_NUM_SCANCODES ];			// Which keys are up and down
       bool              m_MouseButton[ 256 ];
 	   // Orientation Controls
-	   float		m_TargetYaw;
-	   float		m_TargetPitch;
 	   float		m_Yaw;
 	   float		m_Pitch;
 	   float		m_PitchOnDown;

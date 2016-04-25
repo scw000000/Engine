@@ -133,7 +133,6 @@
     <ClCompile Include="..\ResourceCache\ZipFile.cpp" />
     <ClCompile Include="..\UserInterface\GUIManager.cpp" />
     <ClCompile Include="..\UserInterface\HumanView.cpp" />
-    <ClCompile Include="..\UserInterface\MessageBox.cpp" />
     <ClCompile Include="..\UserInterface\UserInterface.cpp" />
     <ClCompile Include="..\Utilities\Math.cpp" />
     <ClCompile Include="..\Utilities\Random.cpp" />
@@ -183,7 +182,6 @@
     <ClInclude Include="..\ResourceCache\ZipFile.h" />
     <ClInclude Include="..\UserInterface\GUIManager.h" />
     <ClInclude Include="..\UserInterface\HumanView.h" />
-    <ClInclude Include="..\UserInterface\MessageBox.h" />
     <ClInclude Include="..\UserInterface\UserInterface.h" />
     <ClInclude Include="..\Utilities\Math.h" />
     <ClInclude Include="..\Utilities\String.h" />

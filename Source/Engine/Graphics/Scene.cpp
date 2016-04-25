@@ -33,7 +33,6 @@ int Scene::OnRender()
 		// The scene root could be anything, but it
 		// is usually a SceneNode with the identity
 		// matrix
-      m_pRenderer->VPreRender();
 		m_Camera->SetViewTransform( this );
 
 	//	m_LightManager->CalcLighting(this);
@@ -45,7 +44,6 @@ int Scene::OnRender()
 			m_Root->VPostRender( this );
 		   }
 		RenderAlphaPass();
-      m_pRenderer->VPostRender();
 	   }
 	return S_OK;
    }

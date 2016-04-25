@@ -108,7 +108,6 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    ////////////////////////////////////
    // Loading Vertex Buffer
    ////////////////////////////////////
-   //auto nd = pMeshExtra->m_pScene;
    for (unsigned int n = 0; n < pAiScene->mNumMeshes; ++n) {
 		const struct aiMesh* mesh = pAiScene->mMeshes[n];
 
@@ -159,7 +158,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
          }
  
    ////////////////////////////////////
-   // Loading UV Buffer
+   // Loading UV Buffer & calculate bounding sphere radius
    ////////////////////////////////////
    glGenBuffers( 1, &m_UVBuffer );
 	glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
@@ -168,10 +167,21 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    // But GLSL expect 2-dimension coordinates
    // So we have to translate them
    aiVector2t<float> *uvBuffer = ENG_NEW aiVector2t<float>[pAiScene->mMeshes[0]->mNumVertices ];
+
+   float maxSquareLength = -1.0f;
    for ( unsigned int vertex = 0; vertex < pAiScene->mMeshes[0]->mNumVertices; vertex++)
       {
       memcpy( &uvBuffer[vertex], &pAiScene->mMeshes[0]->mTextureCoords[0][vertex], sizeof( aiVector2t<float> ) );
+
+      auto curSquareLength = pAiScene->mMeshes[0]->mVertices[vertex].SquareLength();
+      if( maxSquareLength < ( curSquareLength ) )
+         {
+         maxSquareLength = curSquareLength;
+         }
       }
+
+   SetRadius( std::sqrt( maxSquareLength ) );
+
 	glBufferData( GL_ARRAY_BUFFER, 
                  pAiScene->mMeshes[0]->mNumVertices * sizeof( aiVector2t<float> ), 
                  &uvBuffer[0], 
@@ -209,7 +219,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_MVPMatrixUni = glGetUniformLocation( m_Program, "MVP");
    m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler");
 
-   SetRadius( 4.0f );
+   
    
    // resore all of its children
 	SceneNode::VOnRestore( pScene );

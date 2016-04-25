@@ -17,19 +17,19 @@ SceneNodeProperties::SceneNodeProperties( void )
    //m_AlphaType = AlphaOpaque;
    }
 
-void SceneNodeProperties::GetTransform( Mat4x4* const toParent, Mat4x4* const toChild ) const
+void SceneNodeProperties::GetTransform( Mat4x4* ToWorld, Mat4x4* pFromWorld ) const
    {
-   if( toParent )
+   if( ToWorld )
       {
-      *toParent = m_ToParent;
+      *ToWorld = m_ToWorld;
       }
-   if( toChild )
+   if( pFromWorld )
       {
-      *toChild = m_ToChild;
+      *pFromWorld = m_FromWorld;
       }
    }
 
-SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, const Mat4x4 *toPatrent, const Mat4x4 *toChild )
+SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, const Mat4x4 *pToWorld, const Mat4x4 *pFromWorld )
    {
    m_pParent= NULL;
 	m_Props.m_ActorId = actorId;
@@ -37,7 +37,7 @@ SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponen
 	m_Props.m_RenderPass = renderPass;
 	//m_Props.m_AlphaType = AlphaOpaque;
 	m_RenderComponent = renderComponent;
-	VSetTransform( toPatrent, toChild ); 
+	VSetTransform( pToWorld, pFromWorld ); 
 	SetRadius(0);
    }
 
@@ -45,16 +45,16 @@ SceneNode::~SceneNode()
    {
    }
 
-void SceneNode::VSetTransform( const Mat4x4 *toPatrent, const Mat4x4 *toChild )
+void SceneNode::VSetTransform( const Mat4x4 *pToWorld, const Mat4x4 *pFromWorld )
    {
-   m_Props.m_ToParent = *toPatrent;
-   if( toChild )
+   m_Props.m_ToWorld = *pToWorld;
+   if( pFromWorld )
       {
-      m_Props.m_ToChild = *toChild;
+      m_Props.m_FromWorld = *pFromWorld;
       }
    else
       {
-      m_Props.m_ToChild = toPatrent->Inverse();
+      m_Props.m_FromWorld = pToWorld->Inverse();
       }
    }
 
@@ -78,18 +78,18 @@ int SceneNode::VOnUpdate( Scene* pScene, const unsigned long deltaMs )
 
 int SceneNode::VPreRender( Scene *pScene )
    {
-   pScene->PushAndSetMatrix( VGetProperties()->GetToParent() );
+   pScene->PushAndSetMatrix( VGetProperties()->GetToWorld() );
    return S_OK;
    }
 
 bool SceneNode::VIsVisible( Scene *pScene ) const
    {
-   Mat4x4 toParent;
-   Mat4x4 toChild;
-   pScene->GetCamera()->VGetProperties()->GetTransform( &toParent, &toChild );
+   Mat4x4 toWorld;
+   Mat4x4 fromWorld;
+   pScene->GetCamera()->VGetProperties()->GetTransform( &toWorld, &fromWorld );
    Vec3 nodeInCamWorldPos = GetWorldPosition();
    // transform to camera's local space
-   nodeInCamWorldPos = toChild.Xform( nodeInCamWorldPos );
+   nodeInCamWorldPos = fromWorld.Xform( nodeInCamWorldPos );
     Mat4x4 camMat = glm::lookAt(
 								glm::vec3(7, 9, 10), // position in World Space
 								glm::vec3(0,0,0), // look target
@@ -302,17 +302,17 @@ int CameraNode::VOnRestore( Scene *pScene )
 	return S_OK;
    }
 
-void CameraNode::VSetTransform( const Mat4x4 *toParent, const Mat4x4 *toChild ) 
+void CameraNode::VSetTransform( const Mat4x4 *pToWorld, const Mat4x4 *pFromWorld ) 
    { 
-   SceneNode::VSetTransform( toParent, toChild ); 
-   m_View = Mat4x4::ViewMatrix( toParent->GetPosition(), toParent->GetPosition() + toParent->GetDirection(), toParent->GetUp() );
+   SceneNode::VSetTransform( pToWorld, pFromWorld ); 
+   m_View = Mat4x4::ViewMatrix( pToWorld->GetPosition(), pToWorld->GetPosition() + pToWorld->GetDirection(), pToWorld->GetUp() );
 
    }
 
 Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene ) const
    {
    Mat4x4 world = pScene->GetTopMatrix();
-	Mat4x4 view = VGetProperties()->GetToChild();
+	Mat4x4 view = VGetProperties()->GetFromWorld();
 	return m_Projection * m_View * world;
    }
 
@@ -324,7 +324,7 @@ int CameraNode::SetViewTransform(  Scene *pScene )
 	if( m_pTarget )
 	   {
       // Get target's local transform
-		Mat4x4 targetInParentSpace = m_pTarget->VGetProperties()->GetToParent();
+		Mat4x4 targetInParentSpace = m_pTarget->VGetProperties()->GetToWorld();
 		Vec4 at = m_CamOffsetVector;
 		Vec4 atWorld = targetInParentSpace.Xform( at );
       // 
@@ -333,7 +333,7 @@ int CameraNode::SetViewTransform(  Scene *pScene )
 		VSetTransform( &targetInParentSpace );
 	   }
 
-	//m_View = VGetProperties()->GetToChild();
+	//m_View = VGetProperties()->GetFromWorld();
 
 	return S_OK;
    }

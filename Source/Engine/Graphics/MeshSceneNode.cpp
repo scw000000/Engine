@@ -174,10 +174,8 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       memcpy( &uvBuffer[vertex], &pAiScene->mMeshes[0]->mTextureCoords[0][vertex], sizeof( aiVector2t<float> ) );
 
       auto curSquareLength = pAiScene->mMeshes[0]->mVertices[vertex].SquareLength();
-      if( maxSquareLength < ( curSquareLength ) )
-         {
-         maxSquareLength = curSquareLength;
-         }
+
+      maxSquareLength = std::max( maxSquareLength, curSquareLength );
       }
 
    SetRadius( std::sqrt( maxSquareLength ) );
@@ -218,8 +216,6 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 
    m_MVPMatrixUni = glGetUniformLocation( m_Program, "MVP");
    m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler");
-
-   
    
    // resore all of its children
 	SceneNode::VOnRestore( pScene );

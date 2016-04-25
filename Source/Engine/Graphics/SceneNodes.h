@@ -98,7 +98,7 @@ class SceneNode : public ISceneNode
 
 	   Vec3 GetWorldPosition( void ) const;
 
-	   Vec3 GetRelDirection( void ) const { return m_Props.m_ToWorld.GetDirection(); }
+	   Vec3 GetRelForward( void ) const { return m_Props.m_ToWorld.GetForward(); }
 
 	   void SetRadius(const float radius) { m_Props.m_Radius = radius; }
 	   //void SetMaterial(const Material &mat) { m_Props.m_Material = mat; }

@@ -87,7 +87,7 @@ int main( int argc, char *argv[] )
 
    std::cout << ToStr( m1.GetPosition() ) <<  std::endl;
    std::cout << ToStr( m1.Inverse().GetPosition() ) <<  std::endl;
-   std::cout << ToStr( m1.GetDirection() ) <<  std::endl<<  std::endl;
+   std::cout << ToStr( m1.GetForward() ) <<  std::endl<<  std::endl;
    
    Mat4x4 camMat = glm::lookAt(
 				glm::vec3(1, 0, -1), // Camera is at (4,3,-3), in World Space
@@ -101,13 +101,13 @@ int main( int argc, char *argv[] )
    std::cout << "camMat: position"<<  std::endl;
    std::cout << ToStr( camMat.GetPosition() ) <<  std::endl;
    std::cout << "camMat: direction"<<  std::endl;
-   std::cout << ToStr( camMat.GetDirection() ) <<  std::endl<<  std::endl;
+   std::cout << ToStr( camMat.GetForward() ) <<  std::endl<<  std::endl;
 
    std::cout << ToStr( inv ) << std::endl<<  std::endl;
 
    std::cout << ToStr( inv.Xform( v1 ) ) <<  std::endl;
    std::cout << ToStr( inv.GetPosition() ) <<  std::endl;
-   std::cout << ToStr( inv.GetDirection() ) <<  std::endl<<  std::endl;
+   std::cout << ToStr( inv.GetForward() ) <<  std::endl<<  std::endl;
 
    std::cout << ToStr( inv*camMat ) <<  std::endl;
    g_pApp->MainLoop();

@@ -261,7 +261,7 @@ CameraNode::CameraNode( Mat4x4 const *t, Frustum const &frustum )
 	      m_IsDebugCamera( false ),
          m_pTarget( shared_ptr<SceneNode>() ),
 	      m_CamOffsetVector( 0.0f, 1.0f, -10.0f, 0.0f ),
-         m_View( Mat4x4::ViewMatrix( t->GetPosition(), t->GetPosition() + t->GetDirection(), g_Up ) )
+         m_View( Mat4x4::ViewMatrix( t->GetPosition(), t->GetPosition() + t->GetForward(), g_Up ) )
    {
    }
 
@@ -305,7 +305,7 @@ int CameraNode::VOnRestore( Scene *pScene )
 void CameraNode::VSetTransform( const Mat4x4 *pToWorld, const Mat4x4 *pFromWorld ) 
    { 
    SceneNode::VSetTransform( pToWorld, pFromWorld ); 
-   m_View = Mat4x4::ViewMatrix( pToWorld->GetPosition(), pToWorld->GetPosition() + pToWorld->GetDirection(), pToWorld->GetUp() );
+   m_View = Mat4x4::ViewMatrix( pToWorld->GetPosition(), pToWorld->GetPosition() + pToWorld->GetForward(), pToWorld->GetUp() );
 
    }
 

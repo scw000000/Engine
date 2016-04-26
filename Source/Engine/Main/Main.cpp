@@ -78,45 +78,48 @@ int main( int argc, char *argv[] )
 
    Vec3 v1( 1.0f, 1.0f, -1.0f );
    
-  // std::cout << ToStr( v1 ) << std::endl;
-   Mat4x4 m1( glm::mat4( 1.0f ) );
-   
-   m1.BuildPitchYawRollDeg( 0.0f, 45.f, 0.f );
-   m1.BuildTranslation( Vec3( 1.0f, 0.0f, -1.0f ) );
-   std::cout <<  std::endl << ToStr( m1 ) << std::endl<<  std::endl;
+   Quaternion quat;
+   quat.BuildPitchYawRollReg( -45.f, 45.f, 0.0f );
+   Transform transform( &Vec3( 1.0f, 2.0f, 3.0f ), &quat );
+   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetForward() ) << std::endl<<  std::endl;
+   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetPitchYawRollDeg() ) << std::endl<<  std::endl;
+   transform.AddPitchDeg( 30.f );
+   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetPitchYawRollDeg() ) << std::endl<<  std::endl;
+   transform.AddYawDeg( 180.f );
+   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetPitchYawRollDeg() ) << std::endl<<  std::endl;
+  /* transform.AddRollDeg( -40.f );
+   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetPitchYawRollDeg() ) << std::endl<<  std::endl;*/
+   transform.AddPitchDeg( 60.f );
+   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetPitchYawRollDeg() ) << std::endl<<  std::endl;
+   transform.AddYawDeg( 70.f );
+   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetPitchYawRollDeg() ) << std::endl<<  std::endl;
+   std::cout << std::endl;
+   transform.SetTransform( &Mat4x4() );
+   //Mat4x4 camMat = glm::lookAt(
+			//	glm::vec3(1, 0, -1), // Camera is at (4,3,-3), in World Space
+			//	glm::vec3(2, 0, 0), // and looks at the origin
+			//	glm::vec3(0,1,0));  // Head is up (set to 0,-1,0 to look upside-down)
+   //Mat4x4 inv = camMat.Inverse();
+   // std::cout << "camMat: matrix"<<  std::endl;
+   //std::cout <<  std::endl << ToStr( camMat ) << std::endl<<  std::endl;
+   //std::cout << "camMat: xform"<<  std::endl;
+   //std::cout << ToStr( camMat.Xform( v1 ) ) <<  std::endl;
+   //std::cout << "camMat: position"<<  std::endl;
+   //std::cout << ToStr( camMat.GetPosition() ) <<  std::endl;
+   //std::cout << "camMat: direction"<<  std::endl;
+   //std::cout << ToStr( camMat.GetForward() ) <<  std::endl<<  std::endl;
 
-   std::cout << ToStr( m1.GetPosition() ) <<  std::endl;
-   std::cout << ToStr( m1.Inverse().GetPosition() ) <<  std::endl;
-   std::cout << ToStr( m1.GetForward() ) <<  std::endl<<  std::endl;
-   
-   Mat4x4 camMat = glm::lookAt(
-				glm::vec3(1, 0, -1), // Camera is at (4,3,-3), in World Space
-				glm::vec3(2, 0, 0), // and looks at the origin
-				glm::vec3(0,1,0));  // Head is up (set to 0,-1,0 to look upside-down)
-   Mat4x4 inv = camMat.Inverse();
-    std::cout << "camMat: matrix"<<  std::endl;
-   std::cout <<  std::endl << ToStr( camMat ) << std::endl<<  std::endl;
-   std::cout << "camMat: xform"<<  std::endl;
-   std::cout << ToStr( camMat.Xform( v1 ) ) <<  std::endl;
-   std::cout << "camMat: position"<<  std::endl;
-   std::cout << ToStr( camMat.GetPosition() ) <<  std::endl;
-   std::cout << "camMat: direction"<<  std::endl;
-   std::cout << ToStr( camMat.GetForward() ) <<  std::endl<<  std::endl;
+   //std::cout << ToStr( inv ) << std::endl<<  std::endl;
 
-   std::cout << ToStr( inv ) << std::endl<<  std::endl;
+   //std::cout << ToStr( inv.Xform( v1 ) ) <<  std::endl;
+   //std::cout << ToStr( inv.GetPosition() ) <<  std::endl;
+   //std::cout << ToStr( inv.GetForward() ) <<  std::endl<<  std::endl;
 
-   std::cout << ToStr( inv.Xform( v1 ) ) <<  std::endl;
-   std::cout << ToStr( inv.GetPosition() ) <<  std::endl;
-   std::cout << ToStr( inv.GetForward() ) <<  std::endl<<  std::endl;
-
-   std::cout << ToStr( inv*camMat ) <<  std::endl;
+   //std::cout << ToStr( inv*camMat ) <<  std::endl;
    g_pApp->MainLoop();
 
-   
-  // g_pApp->Run();
 
    Logger::Destroy();
-  // ENG_NEW int();
 
    return 0;
    }

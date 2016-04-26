@@ -233,3 +233,19 @@ void Frustum::Init( const float fov, const float aspect, const float nearClipDis
 	m_Planes[Left].Init( origin, m_FarPlaneVerts[3], m_FarPlaneVerts[0] );
 	m_Planes[Bottom].Init( origin, m_FarPlaneVerts[2], m_FarPlaneVerts[3] );
    }
+
+Transform::Transform( const Mat4x4* pToWorld, const Mat4x4* pFromWorld )
+   {
+   m_ToWorld = *pToWorld;
+   m_FromWorld = ( pFromWorld )? *pFromWorld: pToWorld->Inverse();
+   } 
+
+Transform::Transform( const Vec3* position, const Quaternion* rotation )
+   {
+   if( rotation )
+      {
+      m_ToWorld.BuildRotationQuat( *rotation );
+      }
+   m_ToWorld.SetPosition( *position );
+   m_FromWorld = m_ToWorld.Inverse();
+   }

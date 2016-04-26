@@ -16,7 +16,7 @@ bool TransformComponent::VInit(TiXmlElement* pData)
 	// [mrmike] - this was changed post-press - because changes to the TransformComponents can come in partial definitions,
 	//            such as from the editor, its better to grab the current values rather than clear them out.
     
-	Vec3 pitchYawRoll = m_transform.GetPitchYawRoll();
+	Vec3 pitchYawRoll = m_transform.GetPitchYawRollRad();
 
 	Vec3 position = m_transform.GetPosition();	
 

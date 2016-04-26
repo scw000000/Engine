@@ -8,8 +8,9 @@
 MovementController::MovementController( shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown ) : m_object( object )
    {
 	m_object->VGetProperties()->GetTransform( &m_ToWorld, &m_FromWorld );
+   m_Transform.SetTransform( &m_ToWorld );
 
-   m_Rotation = m_ToWorld.GetPitchYawRoll();
+   m_Rotation = m_ToWorld.GetPitchYawRollRad();
    m_TargetRotation = m_Rotation;
 
 	m_MaxSpeed = 20.0f;			// 30 meters per second
@@ -163,6 +164,8 @@ void MovementController::OnUpdate( const unsigned long deltaMilliseconds )
       m_TargetRotation.x = std::max(-90.0f, std::min(90.0f, m_TargetRotation.x));
 		m_Rotation.x += (m_TargetRotation.x - m_Rotation.x ) * ( .5f );
 
+      m_Transform.SetPitchYawRollRad( m_Rotation );
+      m_object->VSetTransform( &m_Transform.GetToWorld(), &m_Transform.GetFromWorld() );
 		// Calculate the new rotation matrix from the camera
 		// yaw and pitch.
 		Mat4x4 matRot;
@@ -172,7 +175,7 @@ void MovementController::OnUpdate( const unsigned long deltaMilliseconds )
 		// new world-to-object matrix.
 		m_ToWorld = m_Position * matRot;
 		m_FromWorld = m_ToWorld.Inverse(); 
-		m_object->VSetTransform( &m_ToWorld, &m_FromWorld );
+		//m_object->VSetTransform( &m_ToWorld, &m_FromWorld );
 	   }
 
 	if ( bTranslating )
@@ -195,9 +198,9 @@ void MovementController::OnUpdate( const unsigned long deltaMilliseconds )
 		m_ToWorld.SetPosition(pos);
 
 		m_FromWorld = m_ToWorld.Inverse();
-		m_object->VSetTransform( &m_ToWorld, &m_FromWorld );
-
-      
+		//m_object->VSetTransform( &m_ToWorld, &m_FromWorld );
+      m_Transform.SetPosition( pos );
+      m_object->VSetTransform( &m_Transform.GetToWorld(), &m_Transform.GetFromWorld() );
 	   }
 	else
 	   {

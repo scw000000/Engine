@@ -31,6 +31,7 @@ class MovementController : public IController
 	   Mat4x4  m_FromWorld;
 	   Mat4x4	m_ToWorld;
       Mat4x4  m_Position;
+      Transform m_Transform;
 
 	   Point					m_LastMousePos;
 	   bool					m_KeyButton[ SDL_NUM_SCANCODES ];			// Which keys are up and down

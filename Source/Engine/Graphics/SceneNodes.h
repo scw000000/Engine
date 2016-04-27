@@ -32,7 +32,7 @@ class SceneNodeProperties
       ActorId GetActorId( void ) const { return m_ActorId; }
       const Mat4x4& GetToWorld( void ) const { return m_ToWorld; }
       const Mat4x4& GetFromWorld( void ) const { return m_FromWorld; }
-      void GetTransform( Mat4x4* ToWorld, Mat4x4* pFromWorld ) const;
+      void GetTransform( Mat4x4* ToWorld, Mat4x4* pFromWorld = NULL ) const;
 
       const char* Name( void ) const { return m_Name.c_str(); }
 

@@ -5,25 +5,19 @@
 #include "EngineStd.h"
 #include "Controller.h"
 
-MovementController::MovementController( shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown ) : m_object( object )
+MovementController::MovementController( shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown, float smoothness ) : m_object( object )
    {
-	m_object->VGetProperties()->GetTransform( &m_ToWorld, &m_FromWorld );
-   m_Transform.SetTransform( &m_ToWorld );
+   Mat4x4 toWorld;
+	m_object->VGetProperties()->GetTransform( &toWorld );
+   m_Transform.SetTransform( &toWorld );
+   m_Transform2.SetTransform( &toWorld );
 
-   m_Rotation = m_ToWorld.GetPitchYawRollRad();
-   m_TargetRotation = m_Rotation;
-
-	m_MaxSpeed = 20.0f;			// 30 meters per second
+	m_MaxSpeed = 30.0f;			// 30 meters per second
 	m_CurrentSpeed = 0.0f;
-
-	Vec3 pos = m_ToWorld.GetPosition();
-
-	m_Position.BuildTranslation( pos );
+   m_Smoothness = std::max( 0.0f, std::min( 0.99f, smoothness ) );
 
    memset( &m_KeyButton[0], 0x00, sizeof( bool ) * SDL_NUM_SCANCODES );
-   int x, y;
-   SDL_GetMouseState( &x, &y );
-   m_LastMousePos = Point( x, y );
+
 	m_isMouseLButtonDown = false;
 	m_isRotateWhenLButtonDown = rotateWhenLButtonDown;  
    }
@@ -84,22 +78,17 @@ bool MovementController::VOnPointerMove( Point motion )
 		// Only look around if the left button is down
 		if( m_isMouseLButtonDown )
 		   {
-
+         m_TargetRotShift.x += 0.005f * ( g_pApp->GetScreenSize().GetY() / 2 - motion.y );
+         m_TargetRotShift.y += 0.005f * ( motion.x - g_pApp->GetScreenSize().GetX() / 2 ) ;
+         SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
 		   }
 	   }
 	else
 	   {
-      int x, y;
-      SDL_GetMouseState( &x, &y );
-      m_TargetRotation.y += 0.005f * ( motion.x - m_LastMousePos.x ) ;
-	   m_TargetRotation.x += 0.005f * ( m_LastMousePos.y - motion.y );
-      m_LastMousePos = motion;
-
-     /* m_TargetRotation.y += 0.001f * ( motion.x - g_pApp->GetScreenSize().x / 2.0f ) ;
-	   m_TargetRotation.x += 0.001f * ( g_pApp->GetScreenSize().y / 2.0f - motion.y );
-      m_LastMousePos = motion;
-      SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );*/
+      m_TargetRotShift.x += 0.005f * ( g_pApp->GetScreenSize().GetY() / 2 - motion.y );
+      m_TargetRotShift.y += 0.005f * ( motion.x - g_pApp->GetScreenSize().GetX() / 2 ) ;    
 	   }
+   SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
 	return true;
    }
 
@@ -109,101 +98,94 @@ bool MovementController::VOnPointerMove( Point motion )
 void MovementController::OnUpdate( const unsigned long deltaMilliseconds )
    {
 	bool bTranslating = false;
-	Vec4 atWorld( 0.f, 0.f, 0.f,0.f );
-	Vec4 rightWorld( 0.f, 0.f, 0.f, 0.f );
-	Vec4 upWorld( 0.f, 0.f, 0.f, 0.f );
-	if ( m_KeyButton[ SDL_SCANCODE_W ] || m_KeyButton[ SDL_SCANCODE_S ] )
-	   {
-		// In D3D, the "look at" default is always
-		// the positive Z axis.
-      Vec4 at = g_Forward4; 
-		if ( m_KeyButton[ SDL_SCANCODE_S ] )
-			at *= -1;
+   Vec3 direction( 0.0f, 0.0f, 0.0f );
 
-		// This will give us the "look at" vector 
-		// in world space - we'll use that to move
-		// the camera.
-		atWorld = m_ToWorld.Xform( at );
+   if ( m_KeyButton[ SDL_SCANCODE_W ] || m_KeyButton[ SDL_SCANCODE_S ] )
+	   {
+      direction += ( m_KeyButton[SDL_SCANCODE_W] )? m_Transform.GetToWorld().GetForward(): -1.0f * m_Transform.GetToWorld().GetForward();
 		bTranslating = true;
 	   }
 
 	if ( m_KeyButton[ SDL_SCANCODE_A ] || m_KeyButton[ SDL_SCANCODE_D ])
 	   {
-		// In D3D, the "right" default is always
-		// the positive X axis.
-		Vec4 right = g_Right4; 
-		if ( m_KeyButton[ SDL_SCANCODE_A ] )
-			right *= -1;
-
-		// This will give us the "right" vector 
-		// in world space - we'll use that to move
-		// the camera
-		rightWorld = m_ToWorld.Xform( right );
-		bTranslating = true;
-	   }
+      direction += ( m_KeyButton[SDL_SCANCODE_D] )? m_Transform.GetToWorld().GetRight(): -1.0f * m_Transform.GetToWorld().GetRight();
+	   bTranslating = true;      
+      }
 
 	if ( m_KeyButton[ SDL_SCANCODE_SPACE ] || m_KeyButton[ SDL_SCANCODE_C ] || m_KeyButton[ SDL_SCANCODE_X ])
 	   {
-		// In D3D, the "up" default is always
-		// the positive Y axis.
-		Vec4 up = g_Up4; 
-		if ( !m_KeyButton[ SDL_SCANCODE_SPACE ] )
-			up *= -1;
+      direction += (! m_KeyButton[SDL_SCANCODE_C] )? m_Transform.GetToWorld().GetUp(): -1.0f * m_Transform.GetToWorld().GetUp();
+	   bTranslating = true;
+      }
 
-		//Unlike strafing, Up is always up no matter
-		//which way you are looking
-		upWorld = up;
-		bTranslating = true;
-	   }
-
-	//Handling rotation as a result of mouse position
+   if ( m_KeyButton[ SDL_SCANCODE_UP ] || m_KeyButton[ SDL_SCANCODE_DOWN ] )
 	   {
-		// The secret formula!!! Don't give it away!
-		//If you are seeing this now, then you must be some kind of elite hacker!
-      m_Rotation.y += ( m_TargetRotation.y - m_Rotation.y ) * ( .5f );
-      m_TargetRotation.x = std::max(-90.0f, std::min(90.0f, m_TargetRotation.x));
-		m_Rotation.x += (m_TargetRotation.x - m_Rotation.x ) * ( .5f );
+      if( m_KeyButton[SDL_SCANCODE_UP] )
+         {
+         m_TargetRotShift.x += 0.05f * ( 1.0f );
+         }
+      else
+         {
+         m_TargetRotShift.x += 0.05f * ( -1.0f );
+         }
 
-      m_Transform.SetPitchYawRollRad( m_Rotation );
-      m_object->VSetTransform( &m_Transform.GetToWorld(), &m_Transform.GetFromWorld() );
-		// Calculate the new rotation matrix from the camera
-		// yaw and pitch.
-		Mat4x4 matRot;
-		matRot.BuildPitchYawRollRad( m_Rotation.x, m_Rotation.y, m_Rotation.z);
+      }
 
-		// Create the new object-to-world matrix, and the
-		// new world-to-object matrix.
-		m_ToWorld = m_Position * matRot;
-		m_FromWorld = m_ToWorld.Inverse(); 
-		//m_object->VSetTransform( &m_ToWorld, &m_FromWorld );
-	   }
+   if ( m_KeyButton[ SDL_SCANCODE_LEFT ] || m_KeyButton[ SDL_SCANCODE_RIGHT ] )
+	   {
+      if( m_KeyButton[SDL_SCANCODE_LEFT] )
+         {
+         m_TargetRotShift.y += 0.05f * ( 1.0f );
+         }
+      else
+         {
+         m_TargetRotShift.y += 0.05f * ( -1.0f );
+         }
 
-	if ( bTranslating )
+      }
+
+   /*m_Transform.AddPitchYawRollRad( m_TargetRotShift * ( 1 - m_Smoothness ) );*/
+
+   // m_Transform2.AddYawRad( Vec.y );
+   // m_Transform2.AddPitchRad( Vec.x );
+ // m_TargetRotShift *= m_Smoothness;
+  //
+  /* m_Transform2.AddPitchYawRollRad( Vec3( Vec.x, 0.0f, 0.0f ) );
+   m_Transform2.AddPitchYawRollRad( Vec3( 0.0f, Vec.y, 0.0f ) );*/
+
+   m_Transform2.AddPitchYawRollRad( m_TargetRotShift * ( 1 - m_Smoothness ) );
+   m_TargetRotShift *= m_Smoothness;
+
+  // Vec3 rotation = m_Transform2.GetPitchYawRollRad();
+  /*std::cout <<  "y  in local : " <<ToStr( m_Transform2.GetQuaternion().Inverse().XForm( g_Up ) ) << std::endl;
+  std::cout <<  "up in world : " <<ToStr( m_Transform2.GetQuaternion().XForm( g_Up ) ) << std::endl;*/
+ // std::cout <<  "test        : " <<ToStr( m_Transform2.GetQuaternion().Inverse().XForm( m_Transform2.GetQuaternion().XForm( g_Forward ) ) ) << std::endl;
+  // rotation += m_TargetRotShift * ( 1 - m_Smoothness );
+
+  // m_TargetRotShift *= m_Smoothness;
+  //// rotation.x = std::max( DEGREES_TO_RADIANS( -89.f ), std::min( DEGREES_TO_RADIANS( 89.f ), rotation.x ) );
+  //// rotation.z = .0f;
+  // m_Transform.SetPitchYawRollRad( rotation );
+
+   if ( bTranslating )
 	   {
 		float elapsedTime = (float)deltaMilliseconds / 1000.0f;
-
-		Vec3 direction = atWorld + rightWorld + upWorld;
 		direction.Normalize(); 
 
 		// Ramp the acceleration by the elapsed time.
 		float numberOfSeconds = 5.f;
 		m_CurrentSpeed += m_MaxSpeed * ( (elapsedTime * elapsedTime) / numberOfSeconds);
-		if ( m_CurrentSpeed > m_MaxSpeed )
+		if( m_CurrentSpeed > m_MaxSpeed )
+         {
 			m_CurrentSpeed = m_MaxSpeed;
+         }
+		   direction *= m_CurrentSpeed;
+		   m_Transform.SetPosition( m_Transform.GetPosition() + direction );
+	      }
+	   else
+	      {
+		   m_CurrentSpeed = 0.0f;
+	      }
 
-		direction *= m_CurrentSpeed;
-
-		Vec3 pos = m_Position.GetPosition() + direction;
-		m_Position.SetPosition(pos);
-		m_ToWorld.SetPosition(pos);
-
-		m_FromWorld = m_ToWorld.Inverse();
-		//m_object->VSetTransform( &m_ToWorld, &m_FromWorld );
-      m_Transform.SetPosition( pos );
-      m_object->VSetTransform( &m_Transform.GetToWorld(), &m_Transform.GetFromWorld() );
-	   }
-	else
-	   {
-		m_CurrentSpeed = 0.0f;
-	   }
+   m_object->VSetTransform( &m_Transform2.GetToWorld() );
    }

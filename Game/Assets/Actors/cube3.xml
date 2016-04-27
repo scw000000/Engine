@@ -1,0 +1,12 @@
+<Actor type="Cube" resource="actors\cube.xml">
+
+	<TransformComponent>
+		<Position x="10" y="0" z="0"/>
+	</TransformComponent>
+
+    <MeshRenderComponent>
+        <meshfile path="art\cube.obj" />
+		<texturefile path="art\cube.jpg" />
+	</MeshRenderComponent>
+
+</Actor>

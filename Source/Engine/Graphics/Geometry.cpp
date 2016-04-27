@@ -249,3 +249,15 @@ Transform::Transform( const Vec3* position, const Quaternion* rotation )
    m_ToWorld.SetPosition( *position );
    m_FromWorld = m_ToWorld.Inverse();
    }
+
+Transform2::Transform2( const Mat4x4* pToWorld, const Mat4x4* pFromWorld )
+   {
+   m_Quat = pToWorld->GetQuaternion();
+   m_Position = pToWorld->GetPosition();
+   } 
+
+Transform2::Transform2( const Vec3* position, const Quaternion* rotation )
+   {
+   m_Position = *position;
+   m_Quat = *rotation;
+   }

@@ -192,7 +192,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 	m_screenSize = Point( screenWidth, screenHeight );
 
    SDL_ShowCursor( SDL_DISABLE );
-
+   SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
    // setup opengl rendering context
    SDL_GLContext glContext = SDL_GL_CreateContext( m_pWindow );
    if( !glContext )

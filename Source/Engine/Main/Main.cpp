@@ -80,21 +80,28 @@ int main( int argc, char *argv[] )
    
    Quaternion quat;
    quat.BuildPitchYawRollReg( -45.f, 45.f, 0.0f );
-   Transform transform( &Vec3( 1.0f, 2.0f, 3.0f ), &quat );
+
+
+   /*Transform transform( &Vec3( 1.0f, 2.0f, 3.0f ), &quat );
    std::cout <<  std::endl << ToStr( transform.GetToWorld().GetForward() ) << std::endl<<  std::endl;
-   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetPitchYawRollDeg() ) << std::endl<<  std::endl;
-   transform.AddPitchDeg( 30.f );
-   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetPitchYawRollDeg() ) << std::endl<<  std::endl;
-   transform.AddYawDeg( 180.f );
-   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetPitchYawRollDeg() ) << std::endl<<  std::endl;
-  /* transform.AddRollDeg( -40.f );
-   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetPitchYawRollDeg() ) << std::endl<<  std::endl;*/
-   transform.AddPitchDeg( 60.f );
-   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetPitchYawRollDeg() ) << std::endl<<  std::endl;
-   transform.AddYawDeg( 70.f );
-   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetPitchYawRollDeg() ) << std::endl<<  std::endl;
-   std::cout << std::endl;
-   transform.SetTransform( &Mat4x4() );
+   std::cout <<  std::endl << ToStr( transform.GetPitchYawRollDeg() ) << std::endl<<  std::endl;
+   quat = transform.GetQuaternion();
+   Quaternion quat2;
+   Vec3 up =  transform.GetToWorld().GetUp();
+   quat2.BuildAxisRad( g_Up, DEGREES_TO_RADIANS( 47 ) );
+   transform.AddRotation( quat2 );
+   std::cout <<  std::endl << ToStr( transform.GetPitchYawRollDeg() ) << std::endl<<  std::endl;
+
+
+   transform.AddPitchYawRollDeg( 0.f, 47.0f, 0.0f );
+   std::cout <<  std::endl << ToStr( transform.GetPitchYawRollDeg() ) << std::endl<<  std::endl;
+   transform.AddPitchYawRollDeg( 0.f, -47.0f, 0.0f );
+   std::cout <<  std::endl << ToStr( transform.GetPitchYawRollDeg() ) << std::endl<<  std::endl;*/
+
+  /* transform.AddPitchYawRollDeg( Vec3( 0.f, 47.0f, 0.0f ) );
+   std::cout <<  std::endl << ToStr( transform.GetPitchYawRollDeg() ) << std::endl<<  std::endl;
+   transform.AddPitchYawRollDeg(  Vec3(  0.f, -47.0f, 0.0f ) );
+   std::cout <<  std::endl << ToStr( transform.GetPitchYawRollDeg() ) << std::endl<<  std::endl;*/
    //Mat4x4 camMat = glm::lookAt(
 			//	glm::vec3(1, 0, -1), // Camera is at (4,3,-3), in World Space
 			//	glm::vec3(2, 0, 0), // and looks at the origin

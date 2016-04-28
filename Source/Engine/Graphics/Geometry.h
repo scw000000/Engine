@@ -55,6 +55,7 @@ class Vec3 : public glm::vec3
       Vec3 operator*( const float other ) const { return Vec3( this->x * other, this->y * other, this->z * other ); }
       Vec3 operator/( const float other ) const { return Vec3( this->x / other, this->y / other, this->z / other ); }
 
+      Vec3 operator*( const Vec3& other ) const { return Vec3( this->x * other.x, this->y * other.y, this->z * other.z ); }
       Vec3 operator/( const Vec3& other ) const { return Vec3( this->x / other.x, this->y / other.y, this->z / other.z ); }
 
       Vec3& operator*=( const float other ) { return ( *this = *this * other ); }
@@ -506,17 +507,16 @@ class Transform
 
       Transform& operator *= ( const Transform& transform )
          {
-         this->SetRotation( m_Quat * transform.GetQuaternion() );
-         this->SetPosition( m_Pos + transform.GetPosition() );
+         this->SetRotation( transform.GetQuaternion() * m_Quat );
+         this->SetPosition( transform.GetQuaternion() * ( transform.GetScale() * m_Pos ) + transform.GetPosition() );
          this->SetScale( m_Scale * transform.GetScale() );
+        // Ret.Translation = B->Rotation*(B->Scale3D*A->Translation) + B->Translation;
          return *this;
          };
 
       Transform operator * ( const Transform& transform ) const
          {
-         Transform newTransform( *this );
-         newTransform *= transform;
-         return newTransform;
+         return Transform ( *this ) *= transform;
          };
 
       Vec4 operator* ( const Vec4& vec ) const
@@ -539,7 +539,7 @@ class Transform
       inline Vec3 GetRight( void ) const;
       inline Vec3 GetUp( void ) const;
 
-      inline void SetTransform( const Mat4x4* toWorld);
+      inline void SetTransform( const Mat4x4& toWorld );
 
       void SetPosition( const Vec3& position ){ m_Pos = position; }
       void SetPosition( float x, float y, float z ) { SetPosition( Vec3( x, y, z ) ); }
@@ -608,11 +608,12 @@ inline Vec3 Transform::GetUp( void ) const
    return m_Quat * g_Up;
    }
 
-inline void Transform::SetTransform( const Mat4x4* toWorld )
+inline void Transform::SetTransform( const Mat4x4& toWorld )
    {
-   this->SetRotation( toWorld->GetQuaternion() );
-   this->SetPosition( toWorld->GetToWorldPosition() );
-   this->SetScale( toWorld->GetScale() );
+   Mat4x4 temp( toWorld );
+   this->SetRotation( temp.GetQuaternion() );
+   this->SetPosition( toWorld.GetToWorldPosition() );
+   this->SetScale( toWorld.GetScale() );
    }
 
 inline void Transform::SetRotation( const Quaternion& quat )
@@ -680,7 +681,7 @@ inline void Transform::AddFromWorldPitchYawRollDeg( const float pitchDeg, const 
    this->AddFromWorldPitchYawRollRad( Vec3( DEGREES_TO_RADIANS( pitchDeg ), DEGREES_TO_RADIANS( yawDeg ), DEGREES_TO_RADIANS( rollDeg ) ) );
    }
       
- Mat4x4 Transform::GetToWorld( void ) const 
+inline Mat4x4 Transform::GetToWorld( void ) const 
    {
    Mat4x4 toWorld = Mat4x4::g_Identity;
    toWorld.SetToWorldPosition( m_Pos );
@@ -691,7 +692,7 @@ inline void Transform::AddFromWorldPitchYawRollDeg( const float pitchDeg, const 
    return toWorld;
    }
 
- Mat4x4 Transform::GetFromWorld( void ) const 
+ inline Mat4x4 Transform::GetFromWorld( void ) const 
    {
    Mat4x4 fromWorld = Mat4x4::g_Identity;
    fromWorld.MultScale( 1.0f / m_Scale );     

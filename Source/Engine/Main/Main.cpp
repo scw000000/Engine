@@ -77,26 +77,27 @@ int main( int argc, char *argv[] )
    g_pApp->InitInstance( 0, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
 
    Transform transform( Vec3( 12.0f, 68.0f, -16.0f ), Vec3( 21.0f, 31.0f, 61.0f ), Quaternion( Vec3( 30.9f, 50.f ,68.f ) ) );
-   //  Transform transform( &Vec3( 1.0f, 2.0f, 3.0f ), &Vec3( 1.0f, 1.0f, 1.0f ), &Quaternion::g_Identity );
+  /* auto tmt = Transform( transform.GetToWorld() );
+    std::cout << "tm :  "<< std::endl << ToStr( transform.GetToWorld() ) << std::endl<< std::endl;
+     std::cout << "tmtm :  "<< std::endl << ToStr( tmt.GetToWorld() ) << std::endl<< std::endl;*/
+
+   Transform transform2( Vec3( 12.0f, 68.0f, -16.0f ), Vec3( 21.0f, 31.0f, 61.0f ), Quaternion( Vec3( 33.9f, 125.f ,-68.f ) ) );
+
+   auto m1 = transform.GetToWorld();
+   auto m2 = transform2.GetToWorld();
   
-   Mat4x4 toWorld = transform.GetToWorld();
+   auto m12t = Transform( m1 * m2 );
 
-    std::cout << "fr :  "<< std::endl << ToStr( toWorld.GetRight() ) << std::endl<< std::endl;
+    std::cout << "tm12 :  "<< std::endl << ToStr( m1 * m2 ) << std::endl<< std::endl;
+   auto t12 = ( transform * transform2 );
+   auto t12m = t12.GetToWorld();
+   std::cout << "t12m :  "<< std::endl << ToStr( t12m ) << std::endl<< std::endl;
+   std::cout << "t12m inv:  "<< std::endl << ToStr( t12m.Inverse() ) << std::endl<< std::endl;
+   auto t21 = ( transform2 * transform );
+   auto t21m = t21.GetToWorld();
 
-   std::cout << "to :  "<< std::endl << ToStr( toWorld ) << std::endl<< std::endl;
-
-   std::cout << "inv:  "<< std::endl << ToStr( toWorld.Inverse() ) << std::endl<< std::endl;
-
-   Mat4x4 fromWorld = transform.GetFromWorld();
-
-   std::cout << "from: "<< std::endl << ToStr( fromWorld ) << std::endl<< std::endl;
-
-   std::cout << ToStr( toWorld * fromWorld ) << std::endl<< std::endl;
-
-
-
-   std::cout << "real: "<< std::endl << ToStr( toWorld * toWorld.Inverse() ) << std::endl<< std::endl;
-
+   std::cout << "t21m :  "<< std::endl << ToStr( t21m ) << std::endl<< std::endl;
+   std::cout << "t21m inv:  "<< std::endl << ToStr( t21m.Inverse() ) << std::endl<< std::endl;
    g_pApp->MainLoop();
 
 

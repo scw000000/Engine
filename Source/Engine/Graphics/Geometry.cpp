@@ -240,7 +240,10 @@ void Frustum::Init( const float fov, const float aspect, const float nearClipDis
 
 Transform::Transform( const Mat4x4& toWorld )
    {
-   m_Quat = toWorld.GetQuaternion();
+   Mat4x4 temp( toWorld );
+   temp.MultScale( 1.0f / temp.GetScale() );
+   m_Quat = temp.GetQuaternion();
+
    m_Pos = toWorld.GetToWorldPosition();
    m_Scale = toWorld.GetScale();
    } 

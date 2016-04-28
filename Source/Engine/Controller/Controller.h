@@ -24,7 +24,6 @@ class MovementController : public IController
     protected:
       Vec3     m_TargetRotShift;
       Transform m_Transform;
-      Transform2 m_Transform2;
 
 	   Point					m_LastMousePos;
 	   bool					m_KeyButton[ SDL_NUM_SCANCODES ];			// Which keys are up and down

@@ -5,8 +5,12 @@
 #include "EngineStd.h"
 #include "Geometry.h"
 
+
+const Vec3 Vec3::g_Zero( 0.0f, 0.0f, 0.0f );
+const Vec3 Vec3::g_Identity( 1.0f, 1.0f, 1.0f );
 const Mat4x4 Mat4x4::g_Identity( glm::mat4( 1.0f ) );
-const Quaternion Quaternion::g_Identity( glm::fquat( 0, 0, 0, 1 ) );
+const Quaternion Quaternion::g_Identity( 1.0f, 0.0f, 0.0f, 0.0f );
+const Transform Transform::g_Identity( &Vec3::g_Zero, &Vec3::g_Identity, &Quaternion::g_Identity );
 
 bool Plane::Inside( Vec3 p ) const
    {
@@ -236,28 +240,27 @@ void Frustum::Init( const float fov, const float aspect, const float nearClipDis
 
 Transform::Transform( const Mat4x4* pToWorld, const Mat4x4* pFromWorld )
    {
-   m_ToWorld = *pToWorld;
-   m_FromWorld = ( pFromWorld )? *pFromWorld: pToWorld->Inverse();
+   m_Quat = pToWorld->GetQuaternion();
+   m_Pos = pToWorld->GetPosition();
+   m_Scale = pToWorld->GetScale();
    } 
 
-Transform::Transform( const Vec3* position, const Quaternion* rotation )
+Transform::Transform( const Vec3* position, const Vec3* scale,const Quaternion* rotation )
    {
+   if( position )
+      {
+      m_Pos = *position;
+      }
+   
+
+   if( scale )
+      {
+      m_Scale = *scale;
+      }
+
    if( rotation )
       {
-      m_ToWorld.BuildRotationQuat( *rotation );
+      m_Quat = *rotation;
       }
-   m_ToWorld.SetPosition( *position );
-   m_FromWorld = m_ToWorld.Inverse();
-   }
 
-Transform2::Transform2( const Mat4x4* pToWorld, const Mat4x4* pFromWorld )
-   {
-   m_Quat = pToWorld->GetQuaternion();
-   m_Position = pToWorld->GetPosition();
-   } 
-
-Transform2::Transform2( const Vec3* position, const Quaternion* rotation )
-   {
-   m_Position = *position;
-   m_Quat = *rotation;
    }

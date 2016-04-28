@@ -10,6 +10,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtc/matrix_access.hpp>
 
 #define GLM_FORCE_RADIANS 
 
@@ -75,6 +76,10 @@ class Vec3 : public glm::vec3
          return ( glm::cross<float, glm::highp>( (*this), b ) );
          }
 
+   public:
+      static const Vec3 g_Zero;
+      static const Vec3 g_Identity;
+
    private:
    };
 
@@ -107,8 +112,10 @@ class Mat4x4;
 class Quaternion : public glm::fquat
    {
    public:
-      Quaternion( void ) : glm::fquat() { }
+      Quaternion( void ) : glm::fquat( 1.0f, 0.0f, 0.0f, 0.0f ) { }
       Quaternion( glm::fquat &q) : glm::fquat(q) { }
+      Quaternion( const float w, const float x, const float y, const float z ) : glm::fquat( w, x, y, z ) { }
+      Quaternion( const Vec3& pitchYawRollRad ) : glm::fquat( pitchYawRollRad ){}
 
       Vec3 GetPitchYawRollRad( void ) const { return glm::eulerAngles( *this ); }
       Vec3 GetPitchYawRollDeg( void ) const { Vec3 vec = this->GetPitchYawRollRad(); return Vec3( RADIANS_TO_DEGREES( vec.x ), RADIANS_TO_DEGREES( vec.y ), RADIANS_TO_DEGREES( vec.z ) ); };
@@ -177,14 +184,21 @@ class Mat4x4 : public glm::mat4
          (*this)[3] = pos;
          }
       inline Vec3 GetPosition( void ) const { return Vec3( (*this)[3] ); }
+
+      inline Vec3 GetScale( void ) const { return Vec3( (float) glm::row( *this, 0 ).length(), (float) glm::row( *this, 1 ).length(), (float) glm::row( *this, 2 ).length() ); }
+
       inline Vec3 GetForward( void ) const;
       inline Vec3 GetRight( void ) const;
       inline Vec3 GetUp( void ) const;
+
       inline Vec3 GetPitchYawRollRad( void ) const;
       inline Vec3 GetPitchYawRollDeg( void ) const;
+
       Quaternion GetQuaternion( void ) const { return glm::quat_cast( *this ); }
+
       inline Vec4 Xform( const Vec4 &v ) const { return (*this) * v; }
       inline Vec3 Xform( const Vec3 &v ) const { return Vec3( Xform( Vec4( v ) ) ); }
+
       inline Mat4x4 Inverse() const { return glm::inverse( *this ); }
       // glm matrix is column major order
       inline void BuildTranslation( const Vec3 &pos ) {
@@ -194,7 +208,7 @@ class Mat4x4 : public glm::mat4
          { 
          *this = glm::translate( *this, Vec3( x, y, z ) );
          }
-      inline void BuildRotationXRad( const float radians ) { *this = glm::rotate( radians , glm::vec3( 1.0f, 0.0f, 0.0f ) ); }
+      inline void BuildRotationXRad( const float radians ) { *this = glm::rotate( radians , glm::vec3( -1.0f, 0.0f, 0.0f ) ); }
       inline void BuildRotationYRad( const float radians ) { *this = glm::rotate( radians , glm::vec3( 0.0f, 1.0f, 0.0f ) ); }
       inline void BuildRotationZRad( const float radians ) { *this = glm::rotate( radians , glm::vec3( 0.0f, 0.0f, 1.0f ) ); }
       // Rotate around counterclockwise direction, 
@@ -211,11 +225,16 @@ class Mat4x4 : public glm::mat4
          { this->BuildPitchYawRollRad( DEGREES_TO_RADIANS( pitchDegree ), DEGREES_TO_RADIANS( yawDegree ), DEGREES_TO_RADIANS( rollDegree ) ); }
       // Caution: This will wipe out your position infomation
       inline void BuildRotationQuat( const Quaternion &q ) { *this = mat4_cast( q ); }
+
+      inline void BuildScale( const Vec3 scale ) { *this = glm::scale( *this, scale ); };
+
       inline void BuildProjection( float fovy, float aspect, float zNear, float zFar );
+
       static Mat4x4 ViewMatrix( const Vec3& eye, const Vec3& center, const Vec3& up ) { return Mat4x4( glm::lookAt( eye, center, up ) ); }
       // Caution! this matrix is not the same as glm::lookat, the whole direction
       // is reversed
       static Mat4x4 LookAt( const Vec3& eye, const Vec3& center, const Vec3& up ){ return ViewMatrix( eye, 2.0f * eye - center, up ) ; }
+
    public: 
       static const Mat4x4 g_Identity;
 
@@ -457,298 +476,131 @@ class Frustum
 class Transform
    {
    public:
-      Transform( void ) {  };
+      Transform( void ) : m_Pos( Vec3::g_Zero ), m_Scale( Vec3::g_Identity ), m_Quat( Quaternion::g_Identity ) {  };
       Transform( const Mat4x4* pToWorld, const Mat4x4* pFromWorld = NULL );
-      Transform( const Vec3* position, const Quaternion* rotation = NULL );
-
-      inline void SetTransform( const Mat4x4* toWorld, const Mat4x4* pFromWorld = NULL );
-
-      void SetPosition( Vec3 position ){ m_ToWorld.SetPosition( position ); UpDateFromWorld(); }
-      void SetPosition( float x, float y, float z ) { SetPosition( Vec3( x, y, z ) ); }
-
-      inline void SetRotation( const Quaternion& quat );
-      inline void AddRotation( const Quaternion& quat );
-
-      inline void SetPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad );     
-      void SetPitchYawRollRad( const Vec3& vec ){ SetPitchYawRollRad( vec.x, vec.y, vec.z ); }
-
-      inline void SetPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg );
-      void SetPitchYawRollDeg( const Vec3& vec ){ SetPitchYawRollDeg( vec.x, vec.y, vec.z ); }
-
-      inline void AddPitchYawRollRad( const Vec3& pitchYawRollRad );
-
-      inline void AddPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad );
-      inline void AddPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg );
-
-      inline void AddPitchDeg( const float pitchDeg );
-      inline void AddYawDeg( const float yawDeg );
-      inline void AddRollDeg( const float rollDeg );
-
-      const Mat4x4& GetToWorld( void ) const { return m_ToWorld; }
-      const Mat4x4& GetFromWorld( void ) const { return m_FromWorld; }
-
-      Quaternion GetQuaternion( void ) const { return m_ToWorld.GetQuaternion(); }
-      Vec3       GetPitchYawRollRad( void ) const { return m_ToWorld.GetPitchYawRollRad(); }
-      Vec3       GetPitchYawRollDeg( void ) const { return m_ToWorld.GetPitchYawRollDeg(); }
-
-      Vec3       GetPosition( void ) const { return m_ToWorld.GetPosition(); }
-
-   private:
-      void UpDateFromWorld( void ){ m_FromWorld = m_ToWorld.Inverse(); }
-      void UpDateToWorld( void ){ m_ToWorld = m_FromWorld.Inverse(); }
-      inline void SetRotation( const Mat4x4& rotation );
-
-   private:
-      Mat4x4 m_ToWorld;
-      Mat4x4 m_FromWorld;
-   };
-
-inline void Transform::SetTransform( const Mat4x4* toWorld, const Mat4x4* pFromWorld )
-   {
-   m_ToWorld = *toWorld;
-   m_FromWorld = ( pFromWorld )? *pFromWorld: m_ToWorld.Inverse();
-   }
-
-
-
-inline void Transform::SetRotation( const Quaternion& quat )
-   {
-   Mat4x4 rotation = quat.GetRotMatrix();
-   this->SetRotation( rotation );
-   }
-
-inline void Transform::AddRotation( const Quaternion& quat )
-   {
-   Quaternion curQuat = this->GetQuaternion();
-   curQuat = quat * curQuat;
-   this->SetRotation( curQuat );
-   }
-
-inline void Transform::SetPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad )
-   { 
-   //Mat4x4 rotation;
-   //rotation.BuildPitchYawRollRad( pitchRad, yawRad, rollRad );
-   Quaternion quat;
-   quat.BuildPitchYawRollRad( pitchRad, yawRad, rollRad );
-
-   this->SetRotation( quat.GetRotMatrix() );
-   }
-
-inline void Transform::SetPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg ) 
-   { 
-   this->SetPitchYawRollRad( DEGREES_TO_RADIANS( pitchDeg ), DEGREES_TO_RADIANS( yawDeg ), DEGREES_TO_RADIANS( rollDeg ) );
-   }
-
-inline void Transform::AddPitchYawRollRad( const Vec3& pitchYawRollRad )
-   {
-   Vec3 eulerAngle = this->GetPitchYawRollRad();
-   Quaternion quatPitch;
-   quatPitch.BuildAxisRad( -g_Right, eulerAngle.x + pitchYawRollRad.x );
-   Quaternion quatYaw;
-   quatYaw.BuildAxisRad( g_Up, eulerAngle.y + pitchYawRollRad.y );
-   Quaternion quatRoll;
-   quatRoll.BuildAxisRad( g_Forward, eulerAngle.z + pitchYawRollRad.z );
-
-   this->SetRotation( quatYaw *quatPitch *  quatRoll );
-
-   /*Quaternion rotation = this->GetQuaternion();
-   rotation.AddPitchYawRollRad( pitchYawRollRad );
-   this->SetRotation( rotation );*/
-   }
-
-inline void Transform::AddPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad )
-   {
-   this->AddPitchYawRollRad( Vec3( pitchRad, yawRad, rollRad ) );
-   }
-
-inline void Transform::AddPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg )
-   {
-   this->AddPitchYawRollRad( Vec3( DEGREES_TO_RADIANS( pitchDeg ), DEGREES_TO_RADIANS( yawDeg ), DEGREES_TO_RADIANS( rollDeg ) ) );
-   }
-
-inline void Transform::AddPitchDeg( const float pitchDeg )
-   {
-   this->AddPitchYawRollDeg( pitchDeg, 0.0f, 0.0f );
-   }
-
-inline void Transform::AddYawDeg( const float yawDeg )
-   {
-   this->AddPitchYawRollDeg( 0.0f, yawDeg, 0.0f );
-   }
-
-inline void Transform::AddRollDeg( const float rollDeg )
-   {
-   this->AddPitchYawRollDeg( 0.0f, 0.0f, rollDeg );
-   }
-
-inline void Transform::SetRotation( const Mat4x4& rotation )
-   {
-   Vec3 position = this->GetPosition(); 
-   m_ToWorld = rotation;
-   this->SetPosition( position );
-   }
-
-class Transform2
-   {
-   public:
-      Transform2( void ) {  };
-      Transform2( const Mat4x4* pToWorld, const Mat4x4* pFromWorld = NULL );
-      Transform2( const Vec3* position, const Quaternion* rotation = NULL );
+      Transform( const Vec3* position, const Vec3* scale = &Vec3::g_Identity, const Quaternion* rotation = &Quaternion::g_Identity );
 
       inline void SetTransform( const Mat4x4* toWorld);
 
-      void SetPosition( const Vec3& position ){ m_Position = position; }
+      void SetPosition( const Vec3& position ){ m_Pos = position; }
       void SetPosition( float x, float y, float z ) { SetPosition( Vec3( x, y, z ) ); }
 
       inline void SetRotation( const Quaternion& quat );
-      inline void AddRotation( const Quaternion& quat );
 
+      void SetScale( const Vec3& scale ){ m_Scale = scale; }
+
+      inline void AddToWorldRotation( const Quaternion& quat );
+      inline void AddFromWorldRotation( const Quaternion& quat );
+
+      inline void SetPitchYawRollRad( const Vec3& pitchYawRollRad );
       inline void SetPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad );     
-      void SetPitchYawRollRad( const Vec3& vec ){ SetPitchYawRollRad( vec.x, vec.y, vec.z ); }
 
       inline void SetPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg );
       void SetPitchYawRollDeg( const Vec3& vec ){ SetPitchYawRollDeg( vec.x, vec.y, vec.z ); }
 
-      inline void AddPitchYawRollRad( const Vec3& pitchYawRollRad );
-      inline void AddPitchRad( const float pitch );
-      inline void AddYawRad( const float yaw );
-      inline void AddRollRad( const float roll );
-
-      inline void AddPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad );
-      inline void AddPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg );
-
-      inline void AddPitchDeg( const float pitchDeg );
-      inline void AddYawDeg( const float yawDeg );
-      inline void AddRollDeg( const float rollDeg );
+      inline void AddToWorldPitchYawRollRad( const Vec3& pitchYawRollRad );
+      inline void AddToWorldPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad );
+      inline void AddToWorldPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg );
+      
+      inline void AddFromWorldPitchYawRollRad( const Vec3& pitchYawRollRad );
+      inline void AddFromWorldPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad );
+      inline void AddFromWorldPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg );
 
       Mat4x4 GetToWorld( void ) const 
          {
          Mat4x4 toWorld;
          toWorld = m_Quat.GetRotMatrix();
-         toWorld.SetPosition( m_Position );
+         toWorld.BuildScale( m_Scale );
+         toWorld.SetPosition( m_Pos );
          return toWorld;
          }
-     // const Mat4x4& GetFromWorld( void ) const { return m_FromWorld; }
 
       Quaternion GetQuaternion( void ) const { return m_Quat; }
       Vec3       GetPitchYawRollRad( void ) const { return m_Quat.GetPitchYawRollRad(); }
       Vec3       GetPitchYawRollDeg( void ) const { return m_Quat.GetPitchYawRollDeg(); }
 
-      Vec3       GetPosition( void ) const { return m_Position; }
+      Vec3       GetPosition( void ) const { return m_Pos; }
+
+   public:
+      const static Transform g_Identity;
 
    private:
 
    private:
       Quaternion  m_Quat;
-      Vec3        m_Position;
+      Vec3        m_Scale;
+      Vec3        m_Pos;
    };
 
-inline void Transform2::SetTransform( const Mat4x4* toWorld)
+inline void Transform::SetTransform( const Mat4x4* toWorld )
    {
-   m_Quat = toWorld->GetQuaternion();
-   m_Position = toWorld->GetPosition();
+   this->SetRotation( toWorld->GetQuaternion() );
+   this->SetPosition( toWorld->GetPosition() );
+   this->SetScale( toWorld->GetScale() );
    }
 
-inline void Transform2::SetRotation( const Quaternion& quat )
+inline void Transform::SetRotation( const Quaternion& quat )
    {
+   m_Quat = quat;
    }
 
-inline void Transform2::AddRotation( const Quaternion& quat )
+inline void Transform::AddToWorldRotation( const Quaternion& quat )
    {
-   
+   this->SetRotation( quat * m_Quat );
    }
 
-
-inline void Transform2::SetPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad )
+inline void Transform::AddFromWorldRotation( const Quaternion& quat )
    {
-   
+   this->SetRotation( m_Quat * quat );
+   }
+
+inline void Transform::SetPitchYawRollRad( const Vec3& pitchYawRollRad )
+   {
+   this->SetRotation( Quaternion( pitchYawRollRad ) );
    } 
 
-
-      
-inline void Transform2::SetPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg )
+inline void Transform::SetPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad )
    {
+   this->SetPitchYawRollRad( Vec3( pitchRad, yawRad, rollRad ) );
+   } 
+      
+inline void Transform::SetPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg )
+   {
+   this->SetPitchYawRollRad( Vec3( DEGREES_TO_RADIANS( pitchDeg ), DEGREES_TO_RADIANS( yawDeg ), DEGREES_TO_RADIANS( rollDeg ) ) );
    }
      
 /*
 m_Quat * quat -> local rotation
 quat * m_Quat->Global rotation
 */
-      
-inline void Transform2::AddPitchYawRollRad( const Vec3& pitchYawRollRad )
+    
+inline void Transform::AddToWorldPitchYawRollRad( const Vec3& pitchYawRollRad )
    {
-   if( pitchYawRollRad.x != 0.f )
-      {
-      Quaternion quatPitch;
-      quatPitch.BuildAxisRad( m_Quat * (-g_Right), pitchYawRollRad.x );
-      m_Quat = quatPitch * m_Quat;
-      }
-   if( pitchYawRollRad.y != 0.f )
-      {
-      Quaternion quatYaw;
-      quatYaw.BuildAxisRad(  (  g_Up ), pitchYawRollRad.y );
-      m_Quat = quatYaw * m_Quat;
-      }
-   if( pitchYawRollRad.z != 0.f )
-      {
-      Quaternion quatRoll;
-      quatRoll.BuildAxisRad( m_Quat * (-g_Forward), pitchYawRollRad.z );
-      m_Quat = quatRoll * m_Quat;
-      }
+   this->SetRotation( Quaternion( pitchYawRollRad ) * m_Quat );
    }
 
-inline void Transform2::AddPitchRad( const float pitch )
+inline void Transform::AddToWorldPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad )
    {
-   if( std::abs( pitch ) <= 0.001f )
-      {
-      return;
-      }
-   Quaternion quatPitch;
-   quatPitch.BuildAxisRad( -g_Right, pitch );
-   m_Quat = m_Quat * quatPitch;
-   m_Quat.Normalize();
-   }
-      
-inline void Transform2::AddYawRad( const float yaw )
-   {
-    if( std::abs( yaw ) <= 0.01f )
-      {
-      return;
-      }
-    std::cout <<  yaw << std::endl;
-   Quaternion quatYaw;
-   quatYaw.BuildAxisRad( g_Up, yaw );
-   m_Quat = m_Quat * quatYaw;
-   m_Quat.Normalize();
-   }
-      
-inline void Transform2::AddRollRad( const float roll )
-   {
-   Quaternion quatRoll;
-   quatRoll.BuildAxisRad( g_Forward, roll );
-   m_Quat = m_Quat * quatRoll;
+   this->AddToWorldPitchYawRollRad( Vec3( pitchRad, yawRad, rollRad ) );
    }
 
-      
-inline void Transform2::AddPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad )
+inline void Transform::AddToWorldPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg )
    {
-   }
-      
-inline void Transform2::AddPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg )
-   {
-   
+   this->AddToWorldPitchYawRollRad( Vec3( DEGREES_TO_RADIANS( pitchDeg ), DEGREES_TO_RADIANS( yawDeg ), DEGREES_TO_RADIANS( rollDeg ) ) );
    }
 
-      
-inline void Transform2::AddPitchDeg( const float pitchDeg )
+inline void Transform::AddFromWorldPitchYawRollRad( const Vec3& pitchYawRollRad )
    {
+   this->SetRotation( m_Quat * Quaternion( pitchYawRollRad ) );
+   }
+
+inline void Transform::AddFromWorldPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad )
+   {
+   this->AddFromWorldPitchYawRollRad( Vec3( pitchRad, yawRad, rollRad ) );
+   }
+
+inline void Transform::AddFromWorldPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg )
+   {
+   this->AddFromWorldPitchYawRollRad( Vec3( DEGREES_TO_RADIANS( pitchDeg ), DEGREES_TO_RADIANS( yawDeg ), DEGREES_TO_RADIANS( rollDeg ) ) );
    }
       
-inline void Transform2::AddYawDeg( const float yawDeg )
-   {
-   }
-      
-inline void Transform2::AddRollDeg( const float rollDeg )
-   {
-   
-   }

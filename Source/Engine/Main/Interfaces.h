@@ -201,7 +201,7 @@ class ISceneNode
       
       virtual const SceneNodeProperties *const VGetProperties( void ) const = 0;
 
-	   virtual void VSetTransform( const Mat4x4 *ToWorld, const Mat4x4 *pFromWorld = NULL ) = 0;
+	   virtual void VSetTransform( const Transform& transform ) = 0;
 
 	   virtual int VOnUpdate( Scene *pScene, const unsigned long deltaMs ) = 0;
 	   virtual int VOnRestore( Scene *pScene ) = 0;

@@ -115,9 +115,6 @@
     <ClCompile Include="..\Graphics\Scene.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\Graphics\MatrixStack.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Event\Events.cpp">
       <Filter>Event</Filter>
     </ClCompile>
@@ -155,6 +152,9 @@
       <Filter>ResourceCache</Filter>
     </ClCompile>
     <ClCompile Include="..\Graphics\MeshSceneNode.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\TransformStack.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -242,9 +242,6 @@
     <ClInclude Include="..\Graphics\Scene.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\Graphics\MatrixStack.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\Event\Events.h">
       <Filter>Event</Filter>
     </ClInclude>
@@ -282,6 +279,9 @@
       <Filter>ResourceCache</Filter>
     </ClInclude>
     <ClInclude Include="..\Graphics\MeshSceneNode.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\TransformStack.h">
       <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>

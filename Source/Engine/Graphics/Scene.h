@@ -3,7 +3,7 @@
 // Filename: Scene.h
 ////////////////////////////////////////////////////////////////////////////////
 #include "SceneNodes.h"
-#include "MatrixStack.h"
+#include "TransformStack.h"
 #include "SceneNodes.h"
 #include "..\Event\Events.h"
 
@@ -24,17 +24,17 @@ class Scene
       bool RemoveChild( ActorId id );
       void SetCamera(shared_ptr<CameraNode> camera) { m_Camera = camera; }
       // This function is called by SceneNode::PreRender
-      void PushAndSetMatrix( const Mat4x4 &toWorld )
+      void PushAndSetTransform( const Transform& transform )
 	      {
-         m_MatrixStack.PushRelMatrix( toWorld );
+         m_TransformStack.Push( transform );
 	      }
 
-	   void PopMatrix() 
+	   void PopTransform() 
 	      {
 		   //Scene::PopMatrix - Chapter 16, page 541
-		   m_MatrixStack.Pop(); 
+		   m_TransformStack.Pop(); 
 	      }
-      const Mat4x4 GetTopMatrix() const { return m_MatrixStack.GetTop(); }
+      const Mat4x4 GetTopMatrix() { return m_TransformStack.GetTop(); }
 
 	   void AddAlphaSceneNode( AlphaSceneNode *asn ) { m_AlphaSceneNodes.push_back( asn ); }
       void NewRenderComponentDelegate( IEventDataPtr pEventData );
@@ -48,7 +48,7 @@ class Scene
       shared_ptr<SceneNode>         m_Root;
       shared_ptr<CameraNode>        m_Camera;
       shared_ptr<IRenderer>         m_pRenderer;
-      MatrixStack                   m_MatrixStack;
+      TransformStack                m_TransformStack;
       AlphaSceneNodes               m_AlphaSceneNodes;
       ActorSceneMap                 m_ActorMap;
       // LightManager *m_pLightManager;

@@ -15,7 +15,7 @@ class MeshSceneNode : public SceneNode
                      const Resource& meshResouce, 
                      const Resource& textureResource, 
                      RenderPass renderPass,  
-                     const Mat4x4 *transform);
+                     const Transform& transform);
       ~MeshSceneNode( void );
 	   virtual int VOnRestore( Scene *pScene ) override; ;
 	   virtual int VOnLostDevice( Scene *pScene ) override { return S_OK; }

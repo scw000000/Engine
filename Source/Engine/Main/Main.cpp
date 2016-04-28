@@ -76,7 +76,7 @@ int main( int argc, char *argv[] )
 
    g_pApp->InitInstance( 0, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
 
-   Transform transform( &Vec3( 12.0f, 68.0f, -16.0f ), &Vec3( 21.0f, 31.0f, 61.0f ), &Quaternion( Vec3( 30.9f, 50.f ,68.f ) ) );
+   Transform transform( Vec3( 12.0f, 68.0f, -16.0f ), Vec3( 21.0f, 31.0f, 61.0f ), Quaternion( Vec3( 30.9f, 50.f ,68.f ) ) );
    //  Transform transform( &Vec3( 1.0f, 2.0f, 3.0f ), &Vec3( 1.0f, 1.0f, 1.0f ), &Quaternion::g_Identity );
   
    Mat4x4 toWorld = transform.GetToWorld();

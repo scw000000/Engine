@@ -15,18 +15,18 @@ class TransformComponent : public ActorComponent
 	   static const char* g_Name;
 	   virtual const char* VGetName() const { return g_Name; }
 
-      TransformComponent(void) : m_transform( Mat4x4::g_Identity ) { }
+      TransformComponent(void) : m_Transform( Transform::g_Identity ) { }
       virtual bool VInit(TiXmlElement* pData) override;
    //   virtual TiXmlElement* VGenerateXml(void) override;
 
    // transform functions
-      Mat4x4 GetTransform(void) const { return m_transform; }
-      void SetTransform(const Mat4x4& newTransform) { m_transform = newTransform; }
-      Vec3 GetToWorldPosition(void) const { return m_transform.GetToWorldPosition(); }
-      void SetToWorldPosition(const Vec3& pos) { m_transform.SetToWorldPosition(pos); }
-      Vec3 GetForward(void) const { return m_transform.GetForward(); }
+      Transform GetTransform(void) const { return m_Transform; }
+      void SetTransform(const Transform& newTransform) { m_Transform = newTransform; }
+      Vec3 GetToWorldPosition(void) const { return m_Transform.GetPosition(); }
+      void SetToWorldPosition(const Vec3& pos) { m_Transform.SetPosition( pos ); }
+      Vec3 GetForward(void) const { return m_Transform.GetForward(); }
    
    private:
-      Mat4x4 m_transform;
+      Transform m_Transform;
    };
 

@@ -22,6 +22,7 @@ class MovementController : public IController
 	   void OnUpdate( const unsigned long elapsedMs);
 
     protected:
+      shared_ptr<SceneNode> m_object;
       Vec3     m_TargetRotShift;
       Transform m_Transform;
 
@@ -37,5 +38,5 @@ class MovementController : public IController
 	   bool		m_isMouseLButtonDown;
       bool		m_isRotateWhenLButtonDown;
 
-	   shared_ptr<SceneNode> m_object;
+	   
    };

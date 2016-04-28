@@ -10,7 +10,7 @@ const Vec3 Vec3::g_Zero( 0.0f, 0.0f, 0.0f );
 const Vec3 Vec3::g_Identity( 1.0f, 1.0f, 1.0f );
 const Mat4x4 Mat4x4::g_Identity( glm::mat4( 1.0f ) );
 const Quaternion Quaternion::g_Identity( 1.0f, 0.0f, 0.0f, 0.0f );
-const Transform Transform::g_Identity( &Vec3::g_Zero, &Vec3::g_Identity, &Quaternion::g_Identity );
+const Transform Transform::g_Identity( Vec3::g_Zero, Vec3::g_Identity, Quaternion::g_Identity );
 
 bool Plane::Inside( Vec3 p ) const
    {
@@ -238,36 +238,14 @@ void Frustum::Init( const float fov, const float aspect, const float nearClipDis
 	m_Planes[Bottom].Init( origin, m_FarPlaneVerts[2], m_FarPlaneVerts[3] );
    }
 
-Transform::Transform( const Mat4x4* pToWorld, const Mat4x4* pFromWorld )
+Transform::Transform( const Mat4x4& toWorld )
    {
-   m_Quat = pToWorld->GetQuaternion();
-   m_Pos = pToWorld->GetToWorldPosition();
-   m_Scale = pToWorld->GetScale();
+   m_Quat = toWorld.GetQuaternion();
+   m_Pos = toWorld.GetToWorldPosition();
+   m_Scale = toWorld.GetScale();
    } 
 
-Transform::Transform( const Vec3* position, const Vec3* scale,const Quaternion* rotation )
+Transform::Transform( const Vec3& position, const Vec3& scale,const Quaternion& rotation ) : m_Pos( position ), m_Scale( scale ), m_Quat( rotation )
    {
-   if( position )
-      {
-      m_Pos = *position;
-      }
    
-
-   if( scale )
-      {
-      m_Scale = *scale;
-      }
-   else
-      {
-      m_Scale = Vec3::g_Identity;
-      }
-
-   if( rotation )
-      {
-      m_Quat = *rotation;
-      }
-   else
-      {
-      m_Quat = Quaternion::g_Identity;
-      }
    }

@@ -102,7 +102,7 @@
     <ClCompile Include="..\Event\Events.cpp" />
     <ClCompile Include="..\Graphics\Geometry.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
-    <ClCompile Include="..\Graphics\MatrixStack.cpp" />
+    <ClCompile Include="..\Graphics\TransformStack.cpp" />
     <ClCompile Include="..\Graphics\MeshSceneNode.cpp" />
     <ClCompile Include="..\Graphics\OpenGLRenderer.cpp" />
     <ClCompile Include="..\Graphics\Scene.cpp" />
@@ -156,7 +156,7 @@
     <ClInclude Include="..\Event\Events.h" />
     <ClInclude Include="..\Graphics\Geometry.h" />
     <ClInclude Include="..\Graphics\Material.h" />
-    <ClInclude Include="..\Graphics\MatrixStack.h" />
+    <ClInclude Include="..\Graphics\TransformStack.h" />
     <ClInclude Include="..\Graphics\MeshSceneNode.h" />
     <ClInclude Include="..\Graphics\OpenGLRenderer.h" />
     <ClInclude Include="..\Graphics\Scene.h" />

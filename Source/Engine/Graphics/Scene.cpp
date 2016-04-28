@@ -122,10 +122,10 @@ void Scene::RenderAlphaPass()
 	while ( !m_AlphaSceneNodes.empty() )
 	   {
 		AlphaSceneNodes::reverse_iterator i = m_AlphaSceneNodes.rbegin();
-		PushAndSetMatrix( (*i)->m_Concat );
+		PushAndSetTransform( (*i)->m_Concat );
 		(*i)->m_pNode->VRender(this);
 		delete (*i);
-		PopMatrix();
+		PopTransform();
 		m_AlphaSceneNodes.pop_back();
 	   }
    }

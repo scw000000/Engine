@@ -10,12 +10,9 @@ MovementController::MovementController( shared_ptr<SceneNode> object,
                                         float initialPitch, 
                                         bool rotateWhenLButtonDown, 
                                         float smoothness ) : 
-                                        m_object( object )
+                                        m_object( object ),
+                                        m_Transform( object->VGetProperties()->GetTransform() )
    {
-   Mat4x4 toWorld;
-	m_object->VGetProperties()->GetTransform( &toWorld );
-   m_Transform.SetTransform( &toWorld );
-
 	m_MaxSpeed = 40.0f / 1000.f;			// 40 meters per Ms
 	m_CurrentSpeed = 0.0f;
    m_MsToMaxSpeed = 1500.f;
@@ -152,6 +149,8 @@ void MovementController::OnUpdate( const unsigned long deltaMilliseconds )
    m_Transform.AddToWorldPitchYawRollRad( Vec3( 0.0f, rotVal.y, 0.0f ) );
    m_TargetRotShift *= m_Smoothness;
 
+   //std::cout<< "up: " << ToStr( m_Transform.GetUp() ) << std::endl; 
+   //std::cout<< "fo: " << ToStr( m_Transform.GetForward() ) << std::endl; 
    if ( bTranslating )
 	   {
 		float elapsedTime = (float)deltaMilliseconds / 1000.0f;
@@ -174,5 +173,5 @@ void MovementController::OnUpdate( const unsigned long deltaMilliseconds )
 		m_CurrentSpeed = 0.0f;
 	   }
 
-   m_object->VSetTransform( &m_Transform.GetToWorld() );
+   m_object->VSetTransform( m_Transform );
    }

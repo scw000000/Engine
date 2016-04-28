@@ -84,7 +84,7 @@ shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
       }
 
    WeakBaseRenderComponentPtr wbrcp(this);
-   shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), wbrcp, m_MeshResource, m_TextureResource, RenderPass::RenderPass_Actor, &pTransformComponent->GetTransform() ) );
+   shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), wbrcp, m_MeshResource, m_TextureResource, RenderPass::RenderPass_Actor, pTransformComponent->GetTransform() ) );
    
    return pMeshSceneNode;
    }

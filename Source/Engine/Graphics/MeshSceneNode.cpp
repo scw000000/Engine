@@ -8,7 +8,7 @@
 #include "..\ResourceCache\TextureResource.h"
 
 MeshSceneNode::MeshSceneNode( 
-   const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const Resource& meshResouce, const Resource& textureResource, RenderPass renderPass,  const Mat4x4 *transform )
+   const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const Resource& meshResouce, const Resource& textureResource, RenderPass renderPass,  const Transform& transform )
    : SceneNode( actorId, renderComponent, renderPass, transform ), m_MeshResource( meshResouce.m_name ), m_TextureResource( textureResource.m_name )
    {
    m_Program = 0;

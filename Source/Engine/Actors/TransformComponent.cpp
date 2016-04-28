@@ -18,7 +18,7 @@ bool TransformComponent::VInit(TiXmlElement* pData)
     
 	Vec3 pitchYawRoll = m_transform.GetPitchYawRollRad();
 
-	Vec3 position = m_transform.GetPosition();	
+	Vec3 position = m_transform.GetToWorldPosition();	
 
    TiXmlElement* pPositionElement = pData->FirstChildElement("Position");
    if (pPositionElement)
@@ -45,7 +45,7 @@ bool TransformComponent::VInit(TiXmlElement* pData)
 	  }
 
 	Mat4x4 translation;
-	translation.BuildTranslation(position);
+	translation.AddTranslation( position );
 
 	Mat4x4 rotation;
 	rotation.BuildPitchYawRollDeg( pitchYawRoll.x, pitchYawRoll.y, pitchYawRoll.z );

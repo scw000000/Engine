@@ -241,7 +241,7 @@ void Frustum::Init( const float fov, const float aspect, const float nearClipDis
 Transform::Transform( const Mat4x4* pToWorld, const Mat4x4* pFromWorld )
    {
    m_Quat = pToWorld->GetQuaternion();
-   m_Pos = pToWorld->GetPosition();
+   m_Pos = pToWorld->GetToWorldPosition();
    m_Scale = pToWorld->GetScale();
    } 
 
@@ -257,10 +257,17 @@ Transform::Transform( const Vec3* position, const Vec3* scale,const Quaternion* 
       {
       m_Scale = *scale;
       }
+   else
+      {
+      m_Scale = Vec3::g_Identity;
+      }
 
    if( rotation )
       {
       m_Quat = *rotation;
       }
-
+   else
+      {
+      m_Quat = Quaternion::g_Identity;
+      }
    }

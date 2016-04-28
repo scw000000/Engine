@@ -92,9 +92,9 @@ class SceneNode : public ISceneNode
 	   //float GetAlpha() const { return m_Props.Alpha(); }
       
       // return position in parent space
-	   virtual Vec3 GetRelPosition( void ) const { return m_Props.m_ToWorld.GetPosition(); }
+	   virtual Vec3 GetToWorldPosition( void ) const { return m_Props.m_ToWorld.GetToWorldPosition(); }
 	   // set position in actor space
-      virtual void SetRelPosition( const Vec3 &pos ) { m_Props.m_ToWorld.SetPosition( pos ); }
+      virtual void SetToWorldPosition( const Vec3 &pos ) { m_Props.m_ToWorld.SetToWorldPosition( pos ); }
 
 	   Vec3 GetWorldPosition( void ) const;
 

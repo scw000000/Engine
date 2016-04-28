@@ -16,8 +16,9 @@ MovementController::MovementController( shared_ptr<SceneNode> object,
 	m_object->VGetProperties()->GetTransform( &toWorld );
    m_Transform.SetTransform( &toWorld );
 
-	m_MaxSpeed = 30.0f;			// 30 meters per second
+	m_MaxSpeed = 40.0f / 1000.f;			// 40 meters per Ms
 	m_CurrentSpeed = 0.0f;
+   m_MsToMaxSpeed = 1500.f;
    m_Smoothness = std::max( 0.0f, std::min( 0.99f, smoothness ) );
 
    memset( &m_KeyButton[0], 0x00, sizeof( bool ) * SDL_NUM_SCANCODES );
@@ -103,22 +104,21 @@ void MovementController::OnUpdate( const unsigned long deltaMilliseconds )
    {
 	bool bTranslating = false;
    Vec3 direction( 0.0f, 0.0f, 0.0f );
-
    if ( m_KeyButton[ SDL_SCANCODE_W ] || m_KeyButton[ SDL_SCANCODE_S ] )
 	   {
-      direction += ( m_KeyButton[SDL_SCANCODE_W] )? m_Transform.GetToWorld().GetForward(): -1.0f * m_Transform.GetToWorld().GetForward();
-		bTranslating = true;
+      direction += ( m_KeyButton[SDL_SCANCODE_W] )? g_Forward: -1.0f * g_Forward;
+      bTranslating = true;
 	   }
 
 	if ( m_KeyButton[ SDL_SCANCODE_A ] || m_KeyButton[ SDL_SCANCODE_D ])
 	   {
-      direction += ( m_KeyButton[SDL_SCANCODE_D] )? m_Transform.GetToWorld().GetRight(): -1.0f * m_Transform.GetToWorld().GetRight();
+      direction += ( m_KeyButton[SDL_SCANCODE_D] )? g_Right: -1.0f * g_Right;
 	   bTranslating = true;      
       }
 
 	if ( m_KeyButton[ SDL_SCANCODE_SPACE ] || m_KeyButton[ SDL_SCANCODE_C ] || m_KeyButton[ SDL_SCANCODE_X ])
 	   {
-      direction += (! m_KeyButton[SDL_SCANCODE_C] )? m_Transform.GetToWorld().GetUp(): -1.0f * m_Transform.GetToWorld().GetUp();
+      direction += ( m_KeyButton[SDL_SCANCODE_C] )? -1.0f * g_Up: g_Up;
 	   bTranslating = true;
       }
 
@@ -156,21 +156,23 @@ void MovementController::OnUpdate( const unsigned long deltaMilliseconds )
 	   {
 		float elapsedTime = (float)deltaMilliseconds / 1000.0f;
 		direction.Normalize(); 
-
 		// Ramp the acceleration by the elapsed time.
-		float numberOfSeconds = 5.f;
-		m_CurrentSpeed += m_MaxSpeed * ( (elapsedTime * elapsedTime) / numberOfSeconds);
+		float numberOfSeconds = 2.f;
+      // a = maxV * numOfSeconds -> after numOfSecconds the scene node will reach max speed
+      m_CurrentSpeed += m_MaxSpeed * ( deltaMilliseconds / m_MsToMaxSpeed );
+	   //	m_CurrentSpeed += m_MaxSpeed * ( (elapsedTime * elapsedTime) / numberOfSeconds);
 		if( m_CurrentSpeed > m_MaxSpeed )
          {
 			m_CurrentSpeed = m_MaxSpeed;
          }
-		   direction *= m_CurrentSpeed;
-		   m_Transform.SetPosition( m_Transform.GetPosition() + direction );
-	      }
-	   else
-	      {
-		   m_CurrentSpeed = 0.0f;
-	      }
+     
+		direction *= m_CurrentSpeed * deltaMilliseconds;
+      m_Transform.AddFromWorldPosition( direction );
+	   }
+	else
+	   {
+		m_CurrentSpeed = 0.0f;
+	   }
 
    m_object->VSetTransform( &m_Transform.GetToWorld() );
    }

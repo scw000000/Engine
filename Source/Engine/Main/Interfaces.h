@@ -212,8 +212,8 @@ class ISceneNode
 	   virtual int VRenderChildren( Scene *pScene )=0;
 	   virtual int VPostRender( Scene *pScene ) = 0;
 
-      virtual Vec3 GetRelPosition( void ) const = 0;
-      virtual void SetRelPosition( const Vec3& pos ) = 0;
+      virtual Vec3 GetToWorldPosition( void ) const = 0;
+      virtual void SetToWorldPosition( const Vec3& pos ) = 0;
 
 	   virtual bool VAddChild( shared_ptr<ISceneNode> kid )=0;
 	   virtual bool VRemoveChild( ActorId id ) = 0;

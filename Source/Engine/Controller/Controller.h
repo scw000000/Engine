@@ -31,6 +31,7 @@ class MovementController : public IController
 	   // Orientation Controls
 	   float		m_MaxSpeed;
 	   float		m_CurrentSpeed;
+      float    m_MsToMaxSpeed;
       float    m_Smoothness;
 	   // Added for Ch19/20 refactor
 	   bool		m_isMouseLButtonDown;

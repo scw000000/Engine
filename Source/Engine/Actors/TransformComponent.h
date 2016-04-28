@@ -22,8 +22,8 @@ class TransformComponent : public ActorComponent
    // transform functions
       Mat4x4 GetTransform(void) const { return m_transform; }
       void SetTransform(const Mat4x4& newTransform) { m_transform = newTransform; }
-      Vec3 GetPosition(void) const { return m_transform.GetPosition(); }
-      void SetPosition(const Vec3& pos) { m_transform.SetPosition(pos); }
+      Vec3 GetToWorldPosition(void) const { return m_transform.GetToWorldPosition(); }
+      void SetToWorldPosition(const Vec3& pos) { m_transform.SetToWorldPosition(pos); }
       Vec3 GetForward(void) const { return m_transform.GetForward(); }
    
    private:

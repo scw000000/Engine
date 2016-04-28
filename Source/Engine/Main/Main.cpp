@@ -76,53 +76,27 @@ int main( int argc, char *argv[] )
 
    g_pApp->InitInstance( 0, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
 
-   Vec3 v1( 1.0f, 1.0f, -1.0f );
-   
-   Quaternion quat;
-   quat.BuildPitchYawRollReg( -45.f, 45.f, 0.0f );
+   Transform transform( &Vec3( 12.0f, 68.0f, -16.0f ), &Vec3( 21.0f, 31.0f, 61.0f ), &Quaternion( Vec3( 30.9f, 50.f ,68.f ) ) );
+   //  Transform transform( &Vec3( 1.0f, 2.0f, 3.0f ), &Vec3( 1.0f, 1.0f, 1.0f ), &Quaternion::g_Identity );
+  
+   Mat4x4 toWorld = transform.GetToWorld();
+
+    std::cout << "fr :  "<< std::endl << ToStr( toWorld.GetRight() ) << std::endl<< std::endl;
+
+   std::cout << "to :  "<< std::endl << ToStr( toWorld ) << std::endl<< std::endl;
+
+   std::cout << "inv:  "<< std::endl << ToStr( toWorld.Inverse() ) << std::endl<< std::endl;
+
+   Mat4x4 fromWorld = transform.GetFromWorld();
+
+   std::cout << "from: "<< std::endl << ToStr( fromWorld ) << std::endl<< std::endl;
+
+   std::cout << ToStr( toWorld * fromWorld ) << std::endl<< std::endl;
 
 
-   /*Transform transform( &Vec3( 1.0f, 2.0f, 3.0f ), &quat );
-   std::cout <<  std::endl << ToStr( transform.GetToWorld().GetForward() ) << std::endl<<  std::endl;
-   std::cout <<  std::endl << ToStr( transform.GetPitchYawRollDeg() ) << std::endl<<  std::endl;
-   quat = transform.GetQuaternion();
-   Quaternion quat2;
-   Vec3 up =  transform.GetToWorld().GetUp();
-   quat2.BuildAxisRad( g_Up, DEGREES_TO_RADIANS( 47 ) );
-   transform.AddRotation( quat2 );
-   std::cout <<  std::endl << ToStr( transform.GetPitchYawRollDeg() ) << std::endl<<  std::endl;
 
+   std::cout << "real: "<< std::endl << ToStr( toWorld * toWorld.Inverse() ) << std::endl<< std::endl;
 
-   transform.AddPitchYawRollDeg( 0.f, 47.0f, 0.0f );
-   std::cout <<  std::endl << ToStr( transform.GetPitchYawRollDeg() ) << std::endl<<  std::endl;
-   transform.AddPitchYawRollDeg( 0.f, -47.0f, 0.0f );
-   std::cout <<  std::endl << ToStr( transform.GetPitchYawRollDeg() ) << std::endl<<  std::endl;*/
-
-  /* transform.AddPitchYawRollDeg( Vec3( 0.f, 47.0f, 0.0f ) );
-   std::cout <<  std::endl << ToStr( transform.GetPitchYawRollDeg() ) << std::endl<<  std::endl;
-   transform.AddPitchYawRollDeg(  Vec3(  0.f, -47.0f, 0.0f ) );
-   std::cout <<  std::endl << ToStr( transform.GetPitchYawRollDeg() ) << std::endl<<  std::endl;*/
-   //Mat4x4 camMat = glm::lookAt(
-			//	glm::vec3(1, 0, -1), // Camera is at (4,3,-3), in World Space
-			//	glm::vec3(2, 0, 0), // and looks at the origin
-			//	glm::vec3(0,1,0));  // Head is up (set to 0,-1,0 to look upside-down)
-   //Mat4x4 inv = camMat.Inverse();
-   // std::cout << "camMat: matrix"<<  std::endl;
-   //std::cout <<  std::endl << ToStr( camMat ) << std::endl<<  std::endl;
-   //std::cout << "camMat: xform"<<  std::endl;
-   //std::cout << ToStr( camMat.Xform( v1 ) ) <<  std::endl;
-   //std::cout << "camMat: position"<<  std::endl;
-   //std::cout << ToStr( camMat.GetPosition() ) <<  std::endl;
-   //std::cout << "camMat: direction"<<  std::endl;
-   //std::cout << ToStr( camMat.GetForward() ) <<  std::endl<<  std::endl;
-
-   //std::cout << ToStr( inv ) << std::endl<<  std::endl;
-
-   //std::cout << ToStr( inv.Xform( v1 ) ) <<  std::endl;
-   //std::cout << ToStr( inv.GetPosition() ) <<  std::endl;
-   //std::cout << ToStr( inv.GetForward() ) <<  std::endl<<  std::endl;
-
-   //std::cout << ToStr( inv*camMat ) <<  std::endl;
    g_pApp->MainLoop();
 
 

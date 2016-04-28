@@ -131,7 +131,7 @@ bool SceneNode::VAddChild( shared_ptr<ISceneNode> child )
    {
    m_Children.push_back( child );
    // child position in parent's space
-   Vec3 childPos = child->GetRelPosition();
+   Vec3 childPos = child->GetToWorldPosition();
    float newRadius = childPos.Length() + child->VGetProperties()->GetRadius();
    m_Props.m_Radius = std::max( m_Props.m_Radius, newRadius );
    return true; 
@@ -174,7 +174,7 @@ void SceneNode::SetAlpha( float alpha )
 // Sum up relative position from child to root node in order to get position in world space
 Vec3 SceneNode::GetWorldPosition( void ) const
    {
-   Vec3 pos = GetRelPosition();
+   Vec3 pos = GetToWorldPosition();
 	if ( m_pParent )
 	   {
 		pos += m_pParent->GetWorldPosition();
@@ -261,7 +261,7 @@ CameraNode::CameraNode( Mat4x4 const *t, Frustum const &frustum )
 	      m_IsDebugCamera( false ),
          m_pTarget( shared_ptr<SceneNode>() ),
 	      m_CamOffsetVector( 0.0f, 1.0f, -10.0f, 0.0f ),
-         m_View( Mat4x4::ViewMatrix( t->GetPosition(), t->GetPosition() + t->GetForward(), g_Up ) )
+         m_View( Mat4x4::ViewMatrix( t->GetToWorldPosition(), t->GetToWorldPosition() + t->GetForward(), g_Up ) )
    {
    }
 
@@ -305,7 +305,7 @@ int CameraNode::VOnRestore( Scene *pScene )
 void CameraNode::VSetTransform( const Mat4x4 *pToWorld, const Mat4x4 *pFromWorld ) 
    { 
    SceneNode::VSetTransform( pToWorld, pFromWorld ); 
-   m_View = Mat4x4::ViewMatrix( pToWorld->GetPosition(), pToWorld->GetPosition() + pToWorld->GetForward(), pToWorld->GetUp() );
+   m_View = Mat4x4::ViewMatrix( pToWorld->GetToWorldPosition(), pToWorld->GetToWorldPosition() + pToWorld->GetForward(), pToWorld->GetUp() );
 
    }
 
@@ -328,8 +328,8 @@ int CameraNode::SetViewTransform(  Scene *pScene )
 		Vec4 at = m_CamOffsetVector;
 		Vec4 atWorld = targetInParentSpace.Xform( at );
       // 
-		Vec3 pos = m_pTarget->GetRelPosition() + at;
-		targetInParentSpace.SetPosition( pos );
+		Vec3 pos = m_pTarget->GetToWorldPosition() + at;
+		targetInParentSpace.SetToWorldPosition( pos );
 		VSetTransform( &targetInParentSpace );
 	   }
 

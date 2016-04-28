@@ -47,16 +47,18 @@ class Vec3 : public glm::vec3
       Vec3( const double _x, const double _y, const double _z ) : glm::vec3( _x, _y, _z ) { }
      // Vec3( const Vec4 &v4 ) { x = v4.x; y = v4.y; z = v4.z; }
 
-      Vec3 operator-( void ){ return Vec3( -( this->x ), -( this->y ), -( this->z ) ); }
       Vec3 operator+( const Vec3& other ) const { return Vec3( this->x + other.x, this->y + other.y, this->z + other.z ); }
       Vec3 operator-( const Vec3& other ) const { return Vec3( this->x - other.x, this->y - other.y, this->z - other.z ); }
       Vec3& operator+=( const Vec3& other ) { return ( *this = *this + other ); }
       Vec3& operator-=( const Vec3& other ) { return *this += (-other); }
 
-      Vec3 operator*( const float& other ) const { return Vec3( this->x * other, this->y * other, this->z * other ); }
-      Vec3 operator/( const float& other ) const { return Vec3( this->x / other, this->y / other, this->z / other ); }
-      Vec3& operator*=( const float& other ) { return ( *this = *this * other ); }
-      Vec3& operator/=( const float& other ) { return ( *this = *this / other ); }
+      Vec3 operator*( const float other ) const { return Vec3( this->x * other, this->y * other, this->z * other ); }
+      Vec3 operator/( const float other ) const { return Vec3( this->x / other, this->y / other, this->z / other ); }
+
+      Vec3 operator/( const Vec3& other ) const { return Vec3( this->x / other.x, this->y / other.y, this->z / other.z ); }
+
+      Vec3& operator*=( const float other ) { return ( *this = *this * other ); }
+      Vec3& operator/=( const float other ) { return ( *this = *this / other ); }
 
       inline float Length(){ return glm::length<float, glm::highp, glm::tvec3>( (*this) ); }
 	   inline Vec3(const class Vec4 &v4);
@@ -82,6 +84,13 @@ class Vec3 : public glm::vec3
 
    private:
    };
+
+inline Vec3 operator-( const Vec3& left ){ return Vec3( -( left.x ), -( left.y ), -( left.z ) ); }
+
+inline Vec3 operator*( float scalar, const Vec3& right ) { return Vec3( right.x * scalar, right.y * scalar, right.z * scalar ); }
+
+inline Vec3 operator/( const float scalar, const Vec3& right ) { return Vec3( scalar / right.x, scalar / right.y, scalar / right.z ); }
+
 
 extern Vec3 g_Up;
 extern Vec3 g_Right;
@@ -116,6 +125,8 @@ class Quaternion : public glm::fquat
       Quaternion( glm::fquat &q) : glm::fquat(q) { }
       Quaternion( const float w, const float x, const float y, const float z ) : glm::fquat( w, x, y, z ) { }
       Quaternion( const Vec3& pitchYawRollRad ) : glm::fquat( pitchYawRollRad ){}
+
+      Vec3 operator*( const Vec3& vec ) const { return Vec3( static_cast<glm::fquat>( *this ) * vec ); }
 
       Vec3 GetPitchYawRollRad( void ) const { return glm::eulerAngles( *this ); }
       Vec3 GetPitchYawRollDeg( void ) const { Vec3 vec = this->GetPitchYawRollRad(); return Vec3( RADIANS_TO_DEGREES( vec.x ), RADIANS_TO_DEGREES( vec.y ), RADIANS_TO_DEGREES( vec.z ) ); };
@@ -172,20 +183,22 @@ class Quaternion : public glm::fquat
 class Mat4x4 : public glm::mat4
    {
    public:
-      Mat4x4() : glm::mat4() { }
+      Mat4x4() : glm::mat4( ) { }
       Mat4x4( glm::mat4 &mat) : glm::mat4( mat ) { }
 
-      inline void SetPosition( Vec3 const &pos )
+      inline void SetToWorldPosition( Vec3 const &pos )
          {
          (*this)[3] = Vec4( pos );
          }
-      inline void SetPosition( Vec4 const &pos )
+      inline void SetToWorldPosition( Vec4 const &pos )
          {
          (*this)[3] = pos;
          }
-      inline Vec3 GetPosition( void ) const { return Vec3( (*this)[3] ); }
+      inline Vec3 GetToWorldPosition( void ) const { return Vec3( (*this)[3] ); }
+      
+      // Get Scale from each column's length
+      inline Vec3 GetScale( void ) const { return Vec3( Vec3( (*this)[0] ).Length(), Vec3( (*this)[1] ).Length(), Vec3( (*this)[2] ).Length() ); }
 
-      inline Vec3 GetScale( void ) const { return Vec3( (float) glm::row( *this, 0 ).length(), (float) glm::row( *this, 1 ).length(), (float) glm::row( *this, 2 ).length() ); }
 
       inline Vec3 GetForward( void ) const;
       inline Vec3 GetRight( void ) const;
@@ -199,15 +212,20 @@ class Mat4x4 : public glm::mat4
       inline Vec4 Xform( const Vec4 &v ) const { return (*this) * v; }
       inline Vec3 Xform( const Vec3 &v ) const { return Vec3( Xform( Vec4( v ) ) ); }
 
-      inline Mat4x4 Inverse() const { return glm::inverse( *this ); }
+      // get rotated vector without shift value
+      inline Vec3 GetXFormDirection( const Vec3& vec ) const;
+
+      inline Mat4x4 Inverse( void ) const { return glm::inverse( *this ); }
       // glm matrix is column major order
-      inline void BuildTranslation( const Vec3 &pos ) {
+      inline void AddTranslation( const Vec3 &pos ) {
          *this = glm::translate( *this, pos );
          }
-      inline void BuildTranslation( const float x, const float y, const float z ) 
+      inline void AddTranslation( const float x, const float y, const float z ) 
          { 
          *this = glm::translate( *this, Vec3( x, y, z ) );
          }
+      
+
       inline void BuildRotationXRad( const float radians ) { *this = glm::rotate( radians , glm::vec3( -1.0f, 0.0f, 0.0f ) ); }
       inline void BuildRotationYRad( const float radians ) { *this = glm::rotate( radians , glm::vec3( 0.0f, 1.0f, 0.0f ) ); }
       inline void BuildRotationZRad( const float radians ) { *this = glm::rotate( radians , glm::vec3( 0.0f, 0.0f, 1.0f ) ); }
@@ -226,9 +244,14 @@ class Mat4x4 : public glm::mat4
       // Caution: This will wipe out your position infomation
       inline void BuildRotationQuat( const Quaternion &q ) { *this = mat4_cast( q ); }
 
-      inline void BuildScale( const Vec3 scale ) { *this = glm::scale( *this, scale ); };
+      inline void MultScale( const Vec3& scale ) { *this = glm::scale( *this, scale ); };
+      
 
       inline void BuildProjection( float fovy, float aspect, float zNear, float zFar );
+
+      static Mat4x4 GetShiftMatrix( const Vec3& shift ) { Mat4x4 mat = g_Identity; mat.AddTranslation( shift ); return mat; }
+
+      static Mat4x4 GetScaleMatrix( const Vec3& scale ) { Mat4x4 mat = g_Identity; mat.MultScale( scale ); return mat; }
 
       static Mat4x4 ViewMatrix( const Vec3& eye, const Vec3& center, const Vec3& up ) { return Mat4x4( glm::lookAt( eye, center, up ) ); }
       // Caution! this matrix is not the same as glm::lookat, the whole direction
@@ -239,7 +262,7 @@ class Mat4x4 : public glm::mat4
       static const Mat4x4 g_Identity;
 
    private:
-      inline Vec3 GetXFormDirection( Vec3 vec ) const;
+      
    };
 
  inline Mat4x4 Quaternion::GetRotMatrix( void ) const 
@@ -249,23 +272,23 @@ class Mat4x4 : public glm::mat4
 
 inline Vec3 Mat4x4::GetForward( void ) const
    {
-   return this->GetXFormDirection( g_Forward );
+   return Vec3( (*this)[2] );
    }
 
 inline Vec3 Mat4x4::GetRight( void ) const
    {
-   return this->GetXFormDirection( g_Right );
+   return Vec3( -(*this)[0] );
    }
 
 inline Vec3 Mat4x4::GetUp( void ) const
    {
-   return this->GetXFormDirection( g_Up );
+   return Vec3( (*this)[1] );
    }
 
-inline Vec3 Mat4x4::GetXFormDirection( Vec3 vec ) const
+inline Vec3 Mat4x4::GetXFormDirection( const Vec3& vec ) const
    {
    Mat4x4 justRot = *this;
-	justRot.SetPosition( Vec3( 0.f,0.f,0.f ) );
+	justRot.SetToWorldPosition( Vec3( 0.f,0.f,0.f ) );
 	Vec3 forward = justRot.Xform( vec );
 	return forward;
    }
@@ -274,7 +297,7 @@ inline void Quaternion::Build44Matrix( const Mat4x4& mat ) { *this = glm::quat_c
 
 inline Vec3 Mat4x4::GetPitchYawRollRad( void ) const
 {
-   Quaternion quat = this->GetQuaternion();
+   //Quaternion quat = this->GetQuaternion();
    //return quat.GetPitchYawRollRad();
    float yaw, pitch, roll;
 	
@@ -480,6 +503,20 @@ class Transform
       Transform( const Mat4x4* pToWorld, const Mat4x4* pFromWorld = NULL );
       Transform( const Vec3* position, const Vec3* scale = &Vec3::g_Identity, const Quaternion* rotation = &Quaternion::g_Identity );
 
+      Transform operator *= ( const Transform& transform )
+         {
+         this->SetRotation( m_Quat * transform.GetQuaternion() );
+         this->SetPosition( m_Pos + transform.GetPosition() );
+         this->SetScale( m_Scale * transform.GetScale() );
+         };
+
+      Transform operator * ( const Transform& transform ) const
+         {
+         Transform newTransform( *this );
+         newTransform *= transform;
+         return newTransform;
+         };
+
       inline void SetTransform( const Mat4x4* toWorld);
 
       void SetPosition( const Vec3& position ){ m_Pos = position; }
@@ -506,20 +543,37 @@ class Transform
       inline void AddFromWorldPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad );
       inline void AddFromWorldPitchYawRollDeg( const float pitchDeg, const float yawDeg, const float rollDeg );
 
+      void AddToWorldPosition( const Vec3& shiftVec ){ this->SetPosition( m_Pos + shiftVec ); }
+      void AddFromWorldPosition( const Vec3& shiftVec ){ this->AddToWorldPosition( m_Quat * shiftVec ); }
+
       Mat4x4 GetToWorld( void ) const 
          {
-         Mat4x4 toWorld;
-         toWorld = m_Quat.GetRotMatrix();
-         toWorld.BuildScale( m_Scale );
-         toWorld.SetPosition( m_Pos );
+         Mat4x4 toWorld = Mat4x4::g_Identity;
+         toWorld.SetToWorldPosition( m_Pos );
+         toWorld = toWorld * m_Quat.GetRotMatrix();
+    //     toWorld.AddTranslation( m_Pos );   
+         toWorld.MultScale( m_Scale );
+         
          return toWorld;
          }
+
+      Mat4x4 GetFromWorld( void ) const 
+         {
+         Mat4x4 fromWorld = Mat4x4::g_Identity;
+         fromWorld.MultScale( 1.0f / m_Scale );     
+         fromWorld = fromWorld * m_Quat.Inverse().GetRotMatrix();    
+         fromWorld.AddTranslation( -m_Pos );       
+         return fromWorld;
+         }
+
 
       Quaternion GetQuaternion( void ) const { return m_Quat; }
       Vec3       GetPitchYawRollRad( void ) const { return m_Quat.GetPitchYawRollRad(); }
       Vec3       GetPitchYawRollDeg( void ) const { return m_Quat.GetPitchYawRollDeg(); }
 
       Vec3       GetPosition( void ) const { return m_Pos; }
+
+      Vec3       GetScale( void ) const { return m_Scale; }
 
    public:
       const static Transform g_Identity;
@@ -529,13 +583,13 @@ class Transform
    private:
       Quaternion  m_Quat;
       Vec3        m_Scale;
-      Vec3        m_Pos;
+      Vec3        m_Pos; // it is expressed in ToWorld location
    };
 
 inline void Transform::SetTransform( const Mat4x4* toWorld )
    {
    this->SetRotation( toWorld->GetQuaternion() );
-   this->SetPosition( toWorld->GetPosition() );
+   this->SetPosition( toWorld->GetToWorldPosition() );
    this->SetScale( toWorld->GetScale() );
    }
 

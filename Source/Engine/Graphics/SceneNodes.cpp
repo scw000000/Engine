@@ -64,20 +64,20 @@ int SceneNode::VOnUpdate( Scene* pScene, const unsigned long deltaMs )
 
 int SceneNode::VPreRender( Scene *pScene )
    {
-   pScene->PushAndSetTransform( VGetProperties()->GetTransform() );
+   pScene->PushAndSetTransform( VGetProperties().GetTransform() );
    return S_OK;
    }
 
 bool SceneNode::VIsVisible( Scene *pScene ) const
    {
    Mat4x4 fromWorld;
-   Transform camTransform = pScene->GetCamera()->VGetProperties()->GetTransform();
+   Transform camTransform = pScene->GetCamera()->VGetProperties().GetTransform();
    Vec3 nodeInCamWorldPos = GetWorldPosition();
    // transform to camera's local space
    nodeInCamWorldPos = camTransform.GetFromWorld().Xform( nodeInCamWorldPos );
    const Frustum &frustum = pScene->GetCamera()->GetFrustum();
    //return true;
-   return frustum.Inside( nodeInCamWorldPos, VGetProperties()->GetRadius() );
+   return frustum.Inside( nodeInCamWorldPos, VGetProperties().GetRadius() );
    }
 
 
@@ -110,7 +110,7 @@ bool SceneNode::VAddChild( shared_ptr<ISceneNode> child )
    m_Children.push_back( child );
    // child position in parent's space
    Vec3 childPos = child->GetToWorldPosition();
-   float newRadius = childPos.Length() + child->VGetProperties()->GetRadius();
+   float newRadius = childPos.Length() + child->VGetProperties().GetRadius();
    m_Props.m_Radius = std::max( m_Props.m_Radius, newRadius );
    return true; 
    }
@@ -119,7 +119,7 @@ bool SceneNode::VRemoveChild( ActorId id )
    {
    for( auto it = m_Children.begin(); it != m_Children.end(); ++it )
 	   {
-		ActorId childId = (*it)->VGetProperties()->GetActorId();
+		ActorId childId = (*it)->VGetProperties().GetActorId();
       if( childId != INVALID_ACTOR_ID && childId == id )
 		   {
 			m_Children.erase( it );	//this can be expensive for vectors
@@ -182,7 +182,7 @@ RootNode::RootNode(): SceneNode( INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(),
 // add child into corresponded renderpass node
 bool RootNode::VAddChild( shared_ptr<ISceneNode> child )
    {
-   RenderPass pass = child->VGetProperties()->GetRenderPass();
+   RenderPass pass = child->VGetProperties().GetRenderPass();
 	if ( (unsigned)pass >= m_Children.size() || !m_Children[pass] )
 	   {
 		ENG_ASSERT(0 && _T("There is no such render pass"));
@@ -290,7 +290,7 @@ void CameraNode::VSetTransform( const Transform& transform )
 Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene ) const
    {
    Mat4x4 world = pScene->GetTopMatrix();
-	Mat4x4 view = VGetProperties()->GetFromWorld();
+	Mat4x4 view = VGetProperties().GetFromWorld();
 	return m_Projection * m_View * world;
    }
 

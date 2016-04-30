@@ -72,7 +72,7 @@ MeshRenderComponent::MeshRenderComponent( void ) : m_MeshResource( "" ), m_Textu
    
    }
 
-// This function is called by PostInit->VGetSceneNode->VCreateSceneNode
+// This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
 shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
    {
    // get the transform component

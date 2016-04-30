@@ -1,26 +1,46 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: RenderComponent.h
-////////////////////////////////////////////////////////////////////////////////
-
+/*!
+ * \file RenderComponent.h
+ * \date 2016/04/30 21:47
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ * TODO: refactor to support component with  multi sceneNode
+ * LATER: add functions for editor 
+ * \note
+*/
 #include "ActorComponent.h"
 
-// Later: add functions for editor
-// TODO: refactor to support component with  multi sceneNode
 class BaseRenderComponent : public ActorComponent
    {
    public:
-      // This function should not override by derived Rendercomponent
-      // override VDelegateInit instedad
+      /**
+       * @brief Put_brief_description_here
+       *
+       * This function should not override by derived Rendercomponent
+       * you should override VDelegateInit instead
+       * @param  pData TiXmlElement * pData
+       * @return bool
+       */
       virtual bool VInit( TiXmlElement* pData ) override;
       virtual void VPostInit( void ) override;
 	   //virtual void VOnChanged( void ) override;
       //virtual TiXmlElement* VGenerateXml(void) override;
 
    protected:
-      // loads the SceneNode specific data (represented in the <SceneNode> tag)
+      /**
+       * @brief loads the SceneNode specific data ( represented in the <SceneNode> tag )
+       *
+       * @param  pData TiXmlElement * pData
+       * @return bool
+       */
       virtual bool VDelegateInit( TiXmlElement* pData ) { return true; }
-      virtual shared_ptr<SceneNode> VCreateSceneNode( void ) = 0;  // factory method to create the appropriate scene node
+      // factory method to create the appropriate scene node
+      // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
+      virtual shared_ptr<SceneNode> VCreateSceneNode( void ) = 0;  
       Color LoadColor( TiXmlElement* pData );
 
    protected:
@@ -44,8 +64,14 @@ class MeshRenderComponent : public BaseRenderComponent
    public:
       static const char *g_Name;
 
-   protected:
-      virtual shared_ptr<SceneNode> VCreateSceneNode( void ) override;  // factory method to create the appropriate scene node
+   protected:     
+      /**
+       * @brief factory method to create the appropriate scene node
+       *
+       * @param   void
+       * @return shared_ptr<SceneNode>
+       */
+      virtual shared_ptr<SceneNode> VCreateSceneNode( void ) override; 
       virtual bool VDelegateInit( TiXmlElement* pData ) override;
       //virtual void VCreateInheritedXmlElements(TiXmlElement* pBaseElement);
 

@@ -3,6 +3,8 @@
 // Filename: OpenGLRenderer.h
 ////////////////////////////////////////////////////////////////////////////////
 
+#define MAXIMUM_LIGHTS_SUPPORTED (8)
+
 class OpenGLRenderer : public IRenderer
    {
    public:

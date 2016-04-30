@@ -157,6 +157,12 @@
     <ClCompile Include="..\Graphics\TransformStack.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Graphics\Light.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Actors\LightRenderComponent.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -283,6 +289,12 @@
     </ClInclude>
     <ClInclude Include="..\Graphics\TransformStack.h">
       <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Light.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Actors\LightRenderComponent.h">
+      <Filter>Actors</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

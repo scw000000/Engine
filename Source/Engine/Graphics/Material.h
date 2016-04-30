@@ -7,17 +7,17 @@ class Material
    {
    public:
       Material( void );
-      void SetAmbient(const Color &color);
-	   const Color GetAmbient() { return m_Ambient; }
+      void SetAmbient( const Color &color );
+	   Color GetAmbient() const { return m_Ambient; }
 
-	   void SetDiffuse(const Color &color);
+	   void SetDiffuse( const Color &color );
 	   const Color GetDiffuse() { return m_Diffuse; }
 
-	   void SetSpecular(const Color &color, const float shininess);
-	   void GetSpecular(Color &_color, float &_power) { _color = m_Specular; _power = m_Shininess; }
+	   void SetSpecular( const Color &color, const float shininess );
+	   void GetSpecular( Color &_color, float &_power ) { _color = m_Specular; _power = m_Shininess; }
 
 	   void SetEmissive(const Color &color);
-	   const Color GetEmissive() { return m_Emissive; }
+	   Color GetEmissive() const { return m_Emissive; }
 
 	   void SetAlpha(const float alpha);
 	   bool HasAlpha( void ) const { return GetAlpha() != fOPAQUE; }

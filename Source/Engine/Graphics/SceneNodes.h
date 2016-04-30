@@ -45,7 +45,7 @@ class SceneNodeProperties
       RenderPass GetRenderPass( void ) const { return m_RenderPass; }
       float GetRadius( void ) const { return m_Radius; }
       
-      const Material& GetMaterial( void ) const {}
+      Material& GetMaterial( void ) { return m_Material; }
 
    protected:
       ActorId m_ActorId;
@@ -72,7 +72,7 @@ class SceneNode : public ISceneNode
 
 	   virtual ~SceneNode();
 
-	   virtual const SceneNodeProperties* const VGetProperties() const { return &m_Props; }
+	   virtual const SceneNodeProperties& VGetProperties() const { return m_Props; }
 
 	   virtual void VSetTransform( const Transform& transform );
 

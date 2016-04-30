@@ -173,6 +173,8 @@ enum RenderPass
 
 class Scene;
 class SceneNodeProperties;
+class LightNode;
+typedef std::list<shared_ptr<LightNode> > Lights;
 
 class IRenderer
    {
@@ -199,7 +201,7 @@ class ISceneNode
    public:
 	   virtual ~ISceneNode() { };
       
-      virtual const SceneNodeProperties *const VGetProperties( void ) const = 0;
+      virtual const SceneNodeProperties& VGetProperties( void ) const = 0;
 
 	   virtual void VSetTransform( const Transform& transform ) = 0;
 

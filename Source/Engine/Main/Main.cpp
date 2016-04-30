@@ -75,29 +75,43 @@ int main( int argc, char *argv[] )
    g_pApp->m_EngineOptions.Init( "PlayerOptions.xml" );
 
    g_pApp->InitInstance( 0, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
+   //Vec3 t1 = Vec3( 1.0f, 1.0f, 1.0f );
+   //Vec3 s1 = Vec3( 41.0f, 21.0f, 51.0f );
+   //Quaternion r1 = Quaternion( Vec3( 155.f, 45.f ,32.f ) );
+   //Transform transform( t1, s1, r1 );
+   //Mat4x4 m1 = Mat4x4::GetTranslateMatrix( t1 ) * Mat4x4::GetRotMatrix( r1 ) * Mat4x4::GetScaleMatrix( s1 );
+   //Transform mt( m1 );
+   //auto ddd = r1 * mt.GetQuaternion().Inverse();
 
-   Transform transform( Vec3( 12.0f, 68.0f, -16.0f ), Vec3( 21.0f, 31.0f, 61.0f ), Quaternion( Vec3( 30.9f, 50.f ,68.f ) ) );
-  /* auto tmt = Transform( transform.GetToWorld() );
-    std::cout << "tm :  "<< std::endl << ToStr( transform.GetToWorld() ) << std::endl<< std::endl;
-     std::cout << "tmtm :  "<< std::endl << ToStr( tmt.GetToWorld() ) << std::endl<< std::endl;*/
 
-   Transform transform2( Vec3( 12.0f, 68.0f, -16.0f ), Vec3( 21.0f, 31.0f, 61.0f ), Quaternion( Vec3( 33.9f, 125.f ,-68.f ) ) );
+   //m1 = transform.GetToWorld();
+   //std::cout << "scale :  "<< std::endl << ToStr( m1.GetScale() ) << std::endl<< std::endl;
+   //std::cout << "transloat :  "<< std::endl << ToStr( m1.GetToWorldPosition() ) << std::endl<< std::endl;
 
-   auto m1 = transform.GetToWorld();
-   auto m2 = transform2.GetToWorld();
+   //Transform transform2( Vec3( 12.0f, 68.0f, -16.0f ), Vec3( 3.0f, 4.0f, 111.0f ), Quaternion( Vec3( 33.9f, 125.f ,-68.f ) ) );
+   //auto t12 = ( transform * transform2 );
+   //auto m2 = transform2.GetToWorld();
   
-   auto m12t = Transform( m1 * m2 );
+   //auto m12t = Transform( m1 * m2 );
 
-    std::cout << "tm12 :  "<< std::endl << ToStr( m1 * m2 ) << std::endl<< std::endl;
-   auto t12 = ( transform * transform2 );
-   auto t12m = t12.GetToWorld();
-   std::cout << "t12m :  "<< std::endl << ToStr( t12m ) << std::endl<< std::endl;
-   std::cout << "t12m inv:  "<< std::endl << ToStr( t12m.Inverse() ) << std::endl<< std::endl;
-   auto t21 = ( transform2 * transform );
-   auto t21m = t21.GetToWorld();
+   //std::cout << "rot (ideal) :  "<< std::endl << ToStr( m12t.GetQuaternion() ) << std::endl<< std::endl;
+   //std::cout << "rot (shou;d) :  "<< std::endl << ToStr( t12.GetQuaternion() ) << std::endl<< std::endl;
+   //std::cout << "rotinv (shou;d) :  "<< std::endl << ToStr( t12.GetQuaternion().Inverse() ) << std::endl<< std::endl;
 
-   std::cout << "t21m :  "<< std::endl << ToStr( t21m ) << std::endl<< std::endl;
-   std::cout << "t21m inv:  "<< std::endl << ToStr( t21m.Inverse() ) << std::endl<< std::endl;
+   //std::cout << "scale (ideal) :  "<< std::endl << ToStr( m12t.GetScale() ) << std::endl<< std::endl;
+   //std::cout << "scale (shou;d) :  "<< std::endl << ToStr( t12.GetScale() ) << std::endl<< std::endl;
+
+   //std::cout << "tm12(ideal) :  "<< std::endl << ToStr( m2 * m1 ) << std::endl<< std::endl;
+
+   //
+   //auto t12m = t12.GetToWorld();
+   //std::cout << "t12m (should) :  "<< std::endl << ToStr( t12m ) << std::endl<< std::endl;
+   //std::cout << "t12m inv:  "<< std::endl << ToStr( t12m.Inverse() ) << std::endl<< std::endl;
+   //auto t21 = ( transform2 * transform );
+   //auto t21m = t21.GetToWorld();
+
+   //std::cout << "t21m :  "<< std::endl << ToStr( t21m ) << std::endl<< std::endl;
+   //std::cout << "t21m inv:  "<< std::endl << ToStr( t21m.Inverse() ) << std::endl<< std::endl;
    g_pApp->MainLoop();
 
 

@@ -238,14 +238,25 @@ void Frustum::Init( const float fov, const float aspect, const float nearClipDis
 	m_Planes[Bottom].Init( origin, m_FarPlaneVerts[2], m_FarPlaneVerts[3] );
    }
 
+//Transform::Transform( const Mat4x4& toWorld )
+//   {
+//   m_ToWorld = toWorld;
+//   } 
+//
+//Transform::Transform( const Vec3& position, const Vec3& scale,const Quaternion& rotation ) : m_Pos( position ), m_Scale( scale ), m_Quat( rotation )
+//   {
+//   
+//   }
+
 Transform::Transform( const Mat4x4& toWorld )
    {
    Mat4x4 temp( toWorld );
-   temp.MultScale( 1.0f / temp.GetScale() );
+   m_Scale = toWorld.GetScale();
+   temp.MultScale( 1.0f / m_Scale );
    m_Quat = temp.GetQuaternion();
+   m_Quat.Normalize();
 
    m_Pos = toWorld.GetToWorldPosition();
-   m_Scale = toWorld.GetScale();
    } 
 
 Transform::Transform( const Vec3& position, const Vec3& scale,const Quaternion& rotation ) : m_Pos( position ), m_Scale( scale ), m_Quat( rotation )

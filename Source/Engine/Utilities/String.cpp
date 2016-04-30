@@ -398,9 +398,14 @@ string ToStr(const Vec4& vec)
    return string("(" + ToStr(vec.x) + "," + ToStr(vec.y) + "," + ToStr(vec.z) + "," + ToStr(vec.w) + ")");
    }
 
+string ToStr( const Quaternion& quat )
+   {
+   return string("(" + ToStr(quat.x) + "," + ToStr(quat.y) + "," + ToStr(quat.z) + "," + ToStr(quat.w) + ")");
+   }
+
 std::string ToStr(const Mat4x4& mat)
    {
-   return ToStr( mat[0] ) + "\n" + ToStr( mat[1] ) + "\n" + ToStr( mat[2] ) + "\n" + ToStr( mat[3] );
+   return ToStr( mat.GetRow( 0 ) ) + "\n" + ToStr( mat.GetRow( 1 ) ) + "\n" + ToStr( mat.GetRow( 2 ) ) + "\n" + ToStr( mat.GetRow( 3 ) );
    }
 
 //---------------------------------------------------------------------------------------------------------------------

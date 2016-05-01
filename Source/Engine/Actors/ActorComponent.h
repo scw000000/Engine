@@ -1,7 +1,18 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: ActorComponent.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file ActorComponent.h
+ * \date 2016/05/01 10:03
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  TODO: implement a xml file parser for returning necessary xml data
+ *  such as color, transform, etc....
+ *
+ * \note
+ */
 
 //////////////
 // INCLUDES //

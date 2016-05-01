@@ -9,21 +9,25 @@
 #include "..\Actors\TransformComponent.h"
 #include "..\Actors\RenderComponent.h"
 
-SceneNodeProperties::SceneNodeProperties( void )
+SceneNodeProperties::SceneNodeProperties( void ) : m_pTransform( ENG_NEW Transform() )
    {
    m_ActorId = INVALID_ACTOR_ID;
    m_Radius = 0;
    m_RenderPass = RenderPass_0;
-   m_Transform = Transform::g_Identity;
    //m_AlphaType = AlphaOpaque;
    }
 
-Transform SceneNodeProperties::GetTransform( void ) const
+TransformPtr SceneNodeProperties::GetTransformPtr( void ) const
    {
-   return m_Transform;
+   return m_pTransform;
    }
 
-SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, const Transform& transform )
+const Transform& SceneNodeProperties::GetTransform( void ) const
+   {
+   return *m_pTransform;
+   }
+
+SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, TransformPtr pNewTransform )
    {
    m_pParent= NULL;
 	m_Props.m_ActorId = actorId;
@@ -31,7 +35,7 @@ SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponen
 	m_Props.m_RenderPass = renderPass;
 	//m_Props.m_AlphaType = AlphaOpaque;
 	m_RenderComponent = renderComponent;
-	VSetTransform( transform ); 
+	VSetTransformPtr( pNewTransform ); 
 	SetRadius( 0.0f );
    }
 
@@ -39,10 +43,17 @@ SceneNode::~SceneNode()
    {
    }
 
-void SceneNode::VSetTransform( const Transform& transform )
+void SceneNode::VSetTransformPtr( TransformPtr pNewTransform )
    {
-   m_Props.m_Transform = transform;
+   m_Props.m_pTransform = pNewTransform;
    }
+
+void SceneNode::VSetTransform( const Transform& newTransform )
+   {
+   *m_Props.m_pTransform = newTransform;
+   }
+
+
 
 int SceneNode::VOnRestore( Scene *pScene )
    {
@@ -64,17 +75,17 @@ int SceneNode::VOnUpdate( Scene* pScene, const unsigned long deltaMs )
 
 int SceneNode::VPreRender( Scene *pScene )
    {
-   pScene->PushAndSetTransform( VGetProperties().GetTransform() );
+   pScene->PushAndSetTransform( VGetProperties().GetTransformPtr() );
    return S_OK;
    }
 
 bool SceneNode::VIsVisible( Scene *pScene ) const
    {
    Mat4x4 fromWorld;
-   Transform camTransform = pScene->GetCamera()->VGetProperties().GetTransform();
+   const Transform& pCamTransform = pScene->GetCamera()->VGetProperties().GetTransform();
    Vec3 nodeInCamWorldPos = GetWorldPosition();
    // transform to camera's local space
-   nodeInCamWorldPos = camTransform.GetFromWorld().Xform( nodeInCamWorldPos );
+   nodeInCamWorldPos = pCamTransform.GetFromWorld().Xform( nodeInCamWorldPos );
    const Frustum &frustum = pScene->GetCamera()->GetFrustum();
    //return true;
    return frustum.Inside( nodeInCamWorldPos, VGetProperties().GetRadius() );
@@ -138,7 +149,7 @@ int SceneNode::VOnLostDevice( Scene *pScene )
    return S_OK;
    }
 
-// TODO: finish inplementation
+// TODO: finish implementation
 void SceneNode::SetAlpha( float alpha )
    {
    for( auto it : m_Children )
@@ -161,20 +172,20 @@ Vec3 SceneNode::GetWorldPosition( void ) const
    }
 
 
-RootNode::RootNode(): SceneNode( INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(), RenderPass_0, Transform::g_Identity )
+RootNode::RootNode(): SceneNode( INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(), RenderPass_0 ) 
    {
 	m_Children.reserve(RenderPass_Last);
 
-	shared_ptr<SceneNode> staticGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Static, Transform::g_Identity ) );
+	shared_ptr<SceneNode> staticGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Static ) );
 	m_Children.push_back(staticGroup);	// RenderPass_Static = 0
 
-	shared_ptr<SceneNode> actorGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Actor, Transform::g_Identity ) );
+	shared_ptr<SceneNode> actorGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Actor ) );
 	m_Children.push_back(actorGroup);	// RenderPass_Actor = 1
 
-	shared_ptr<SceneNode> skyGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Sky, Transform::g_Identity ) );
+	shared_ptr<SceneNode> skyGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Sky ) );
 	m_Children.push_back(skyGroup);	// RenderPass_Sky = 2
 
-	shared_ptr<SceneNode> invisibleGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_NotRendered, Transform::g_Identity ) );
+	shared_ptr<SceneNode> invisibleGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_NotRendered ) );
 	m_Children.push_back(invisibleGroup);	// RenderPass_NotRendered = 3
    }
    
@@ -232,14 +243,14 @@ bool RootNode::VRemoveChild( ActorId id )
 	return anythingRemoved;
    }
 
-CameraNode::CameraNode( const Transform& t, Frustum const &frustum ) 
-	      : SceneNode(INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(), RenderPass_0, t),
+CameraNode::CameraNode( TransformPtr pTransform, Frustum const &frustum ) 
+	      : SceneNode(INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(), RenderPass_0, pTransform ),
 	      m_Frustum( frustum ),
 	      m_IsActive( true ),
 	      m_IsDebugCamera( false ),
          m_pTarget( shared_ptr<SceneNode>() ),
 	      m_CamOffsetVector( 0.0f, 1.0f, -10.0f, 0.0f ),
-         m_View( Mat4x4::ViewMatrix( t.GetPosition(), t.GetPosition() + t.GetForward(), g_Up ) )
+         m_View( Mat4x4::ViewMatrix( pTransform->GetPosition(), pTransform->GetPosition() + pTransform->GetForward(), g_Up ) )
    {
    }
 
@@ -247,7 +258,7 @@ CameraNode::CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, Fru
 	      : SceneNode( INVALID_ACTOR_ID, 
                   WeakBaseRenderComponentPtr(), 
                   RenderPass_0, 
-                  Mat4x4::LookAt( eye, center, up ).Inverse() 
+                  TransformPtr ( ENG_NEW Transform( Mat4x4::LookAt( eye, center, up ).Inverse() ) )
                   ),
             m_Frustum( frustum ),
 	         m_IsActive( true ),
@@ -280,14 +291,14 @@ int CameraNode::VOnRestore( Scene *pScene )
 	return S_OK;
    }
 
-void CameraNode::VSetTransform( const Transform& transform ) 
+void CameraNode::VSetTransform( const Transform& newTransform ) 
    { 
-   SceneNode::VSetTransform( transform ); 
-   m_View = Mat4x4::ViewMatrix( transform.GetPosition(), transform.GetPosition() + transform.GetForward(), transform.GetUp() );
+   SceneNode::VSetTransform( newTransform ); 
+   m_View = Mat4x4::ViewMatrix( newTransform.GetPosition(), newTransform.GetPosition() + newTransform.GetForward(), newTransform.GetUp() );
 
    }
 
-Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene ) const
+Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene )
    {
    Mat4x4 world = pScene->GetTopMatrix();
 	Mat4x4 view = VGetProperties().GetFromWorld();

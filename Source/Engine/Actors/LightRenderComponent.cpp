@@ -7,6 +7,8 @@
 #include "TransformComponent.h"
 #include "..\Graphics\Light.h"
 
+const char* LightRenderComponent::g_Name = "LightRenderComponent";
+
 //---------------------------------------------------------------------------------------------------------------------
 // LightRenderComponent
 //---------------------------------------------------------------------------------------------------------------------
@@ -48,6 +50,12 @@ bool LightRenderComponent::VDelegateInit( TiXmlElement* pData )
 		pShapeNode->Attribute("phi", &temp );
 		m_Props.m_Phi = (float) temp;	
 	   }
+   // color
+   TiXmlElement* pColorNode = pData->FirstChildElement( "Color" );
+   if( pColorNode )
+      {
+      m_Props.m_Color = BaseRenderComponent::LoadColor( pColorNode );
+      }
     return true;
 }
 

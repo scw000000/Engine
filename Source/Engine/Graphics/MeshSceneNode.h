@@ -15,7 +15,7 @@ class MeshSceneNode : public SceneNode
                      const Resource& meshResouce, 
                      const Resource& textureResource, 
                      RenderPass renderPass,  
-                     const Transform& transform);
+                     TransformPtr pTransform );
       ~MeshSceneNode( void );
 	   virtual int VOnRestore( Scene *pScene ) override; ;
 	   virtual int VOnLostDevice( Scene *pScene ) override { return S_OK; }
@@ -38,6 +38,6 @@ class MeshSceneNode : public SceneNode
       Resource          m_TextureResource;
 	   VertexShader		m_VertexShader;
 	   FragmentShader		m_FragmentShader;
-
+      Material          m_Material;
 	//float CalcBoundingSphere(CDXUTSDKMesh *mesh11);			// this was added post press.
    };

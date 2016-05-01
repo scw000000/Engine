@@ -40,7 +40,7 @@ TiXmlElement* BaseRenderComponent::VGenerateXml(void)
 {
     TiXmlElement* pBaseElement = VCreateBaseElement();
 
-    // color
+     color
     TiXmlElement* pColor = GCC_NEW TiXmlElement("Color");
     pColor->SetAttribute("r", ToStr(m_color.r).c_str());
     pColor->SetAttribute("g", ToStr(m_color.g).c_str());
@@ -48,7 +48,7 @@ TiXmlElement* BaseRenderComponent::VGenerateXml(void)
     pColor->SetAttribute("a", ToStr(m_color.a).c_str());
     pBaseElement->LinkEndChild(pColor);
 
-    // create XML for inherited classes
+     create XML for inherited classes
     VCreateInheritedXmlElements(pBaseElement);
 
     return pBaseElement;
@@ -120,6 +120,29 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
 
    return true;;
    }
+
+Color BaseRenderComponent::LoadColor( TiXmlElement* pData )
+   {
+   Color color;
+
+   double r = 1.0;
+   double g = 1.0;
+   double b = 1.0;
+   double a = 1.0;
+
+   pData->Attribute( "r", &r );
+   pData->Attribute( "g", &g );
+   pData->Attribute( "b", &b );
+   pData->Attribute( "a", &a );
+
+   color.m_Component.r = ( float ) r;
+   color.m_Component.g = ( float ) g;
+   color.m_Component.b = ( float ) b;
+   color.m_Component.a = ( float ) a;
+
+   return color;
+   }
+
 
 /*
 void MeshRenderComponent::VCreateInheritedXmlElements(TiXmlElement *)

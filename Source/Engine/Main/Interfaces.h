@@ -202,8 +202,10 @@ class ISceneNode
 	   virtual ~ISceneNode() { };
       
       virtual const SceneNodeProperties& VGetProperties( void ) const = 0;
+      virtual SceneNodeProperties& VGetProperties( void ) = 0;
 
-	   virtual void VSetTransform( const Transform& transform ) = 0;
+	   virtual void VSetTransformPtr( TransformPtr pNewTransform ) = 0;
+      virtual void VSetTransform( const Transform& newTransform ) = 0;
 
 	   virtual int VOnUpdate( Scene *pScene, const unsigned long deltaMs ) = 0;
 	   virtual int VOnRestore( Scene *pScene ) = 0;

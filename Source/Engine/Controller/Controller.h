@@ -8,6 +8,17 @@
 class MovementController : public IController
    {
    public:
+
+      /**
+       * @brief  This controller will copy transform of its owner instead of using pointer
+       *
+       * @param  object shared_ptr<SceneNode> object
+       * @param  initialYaw float initialYaw
+       * @param  initialPitch float initialPitch
+       * @param  rotateWhenLButtonDown bool rotateWhenLButtonDown
+       * @param  smoothness float smoothness
+       * @return 
+       */
       MovementController(shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown, float smoothness = 0.7f);
       virtual bool VOnMsgProc( const SDL_Event& event ) override ;
 	   virtual bool VOnPointerMove( Point motion ) override;
@@ -24,7 +35,7 @@ class MovementController : public IController
     protected:
       shared_ptr<SceneNode> m_object;
       Vec3     m_TargetRotShift;
-      Transform m_Transform;
+      TransformPtr m_pTransform;
 
 	   Point					m_LastMousePos;
 	   bool					m_KeyButton[ SDL_NUM_SCANCODES ];			// Which keys are up and down

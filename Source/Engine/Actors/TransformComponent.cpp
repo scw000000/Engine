@@ -16,9 +16,11 @@ bool TransformComponent::VInit(TiXmlElement* pData)
 	// [mrmike] - this was changed post-press - because changes to the TransformComponents can come in partial definitions,
 	//            such as from the editor, its better to grab the current values rather than clear them out.
     
-	Vec3 pitchYawRoll = m_Transform.GetPitchYawRollRad();
+	Vec3 pitchYawRoll = m_pTransform->GetPitchYawRollRad();
 
-	Vec3 position = m_Transform.GetPosition();	
+	Vec3 position = m_pTransform->GetPosition();	
+
+   Vec3 scale = m_pTransform->GetScale();
 
    TiXmlElement* pPositionElement = pData->FirstChildElement("Position");
    if (pPositionElement)
@@ -80,8 +82,8 @@ bool TransformComponent::VInit(TiXmlElement* pData)
 	**/
 
     //m_Transform = rotation * translation;
-    m_Transform.SetRotation( rotation );
-    m_Transform.SetPosition( position );
-    m_Transform.SetScale( Vec3::g_Identity );
+    m_pTransform->SetRotation( rotation );
+    m_pTransform->SetPosition( position );
+    m_pTransform->SetScale( scale );
     return true;
 }

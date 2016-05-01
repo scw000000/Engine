@@ -33,14 +33,14 @@ class LightNode : public SceneNode
 	   LightProperties m_LightProps;
 
    public:
-	   LightNode(const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const LightProperties &props, const Transform& t = Transform::g_Identity );
+	   LightNode(const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const LightProperties &props, TransformPtr pTransform );
    };
 
 class GLLightNode : public LightNode
    {
    public:
-	   GLLightNode(const ActorId actorId, WeakBaseRenderComponentPtr renderComponent,  const LightProperties &lightProps, const Transform& t)
-		   : LightNode( actorId, renderComponent, lightProps,  t ) { }
+	   GLLightNode(const ActorId actorId, WeakBaseRenderComponentPtr renderComponent,  const LightProperties &lightProps, TransformPtr pTransform )
+		   : LightNode( actorId, renderComponent, lightProps, pTransform ) { }
 
       virtual int VOnRestore( Scene *pScene ) override { return S_OK; } ;
       virtual int VOnUpdate( Scene *, const unsigned long deltaMs ) override;

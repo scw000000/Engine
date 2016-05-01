@@ -1,13 +1,25 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Material.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file Material.h
+ * \date 2016/05/01 9:09
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
+
 
 class Material
    {
    public:
       Material( void );
-      void SetAmbient( const Color &color );
+
+      void SetAmbient( const Color& color );
 	   Color GetAmbient() const { return m_Ambient; }
 
 	   void SetDiffuse( const Color &color );

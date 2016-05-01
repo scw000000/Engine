@@ -1,6 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: SceneNodes.h
+/*!
+ * \file SceneNodes.h
+ * \date 2016/05/01 10:08
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  TODO: make data of actor component shared with scene node instead of copying it
+ *
+ * \note
+ */
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "Material.h"
@@ -32,10 +43,18 @@ class SceneNodeProperties
       ActorId GetActorId( void ) const { return m_ActorId; }
    //   const Mat4x4& GetToWorld( void ) const { return m_ToWorld; }
       const Mat4x4& GetFromWorld( void ) const { 
-         //return m_Transform.GetFromWorld(); 
-         return m_Transform.Inverse().GetToWorld();
+         return m_pTransform->GetFromWorld(); 
+         /*return m_pTransform.Inverse().GetToWorld();*/
          }
-      Transform GetTransform( void ) const;
+      TransformPtr GetTransformPtr( void ) const;
+
+      /**
+       * @brief If you don't want to the change value of transform, call it instead of GetTransformPtr 
+       *
+       * @param   void
+       * @return const Transform&
+       */
+       const Transform& GetTransform( void ) const;
 
       const char* Name( void ) const { return m_Name.c_str(); }
 
@@ -45,15 +64,15 @@ class SceneNodeProperties
       RenderPass GetRenderPass( void ) const { return m_RenderPass; }
       float GetRadius( void ) const { return m_Radius; }
       
-      Material& GetMaterial( void ) { return m_Material; }
+      /*Material& GetMaterial( void ) { return m_Material; }*/
 
    protected:
       ActorId m_ActorId;
       std::string m_Name;
-      Transform m_Transform;
+      TransformPtr m_pTransform;
       float m_Radius;
       RenderPass m_RenderPass;
-      Material m_Material;
+      /*Material m_Material;*/
       //AlphaType m_AlphaType;
 
    private:
@@ -68,42 +87,51 @@ class SceneNode : public ISceneNode
 
    public:
       // TODO: finish constructor
-	   SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, const Transform& transform = Transform::g_Identity );
+	   SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ) );
 
 	   virtual ~SceneNode();
 
-	   virtual const SceneNodeProperties& VGetProperties() const { return m_Props; }
+      virtual const SceneNodeProperties& VGetProperties() const override { return m_Props; }
 
-	   virtual void VSetTransform( const Transform& transform );
+	   /**
+	    * @brief non constant version of getter function
+	    *
+	    * @return SceneNodeProperties&
+	    */
+      virtual SceneNodeProperties& VGetProperties() override { 
+        return const_cast< SceneNodeProperties& >(static_cast< const SceneNode* >(this)->VGetProperties() );
+         }
 
-	   virtual int VOnRestore( Scene *pScene );
-	   virtual int VOnUpdate( Scene *, const unsigned long elapsedMs );
+	   virtual void VSetTransformPtr( TransformPtr pNewTransform ) override;
+      virtual void VSetTransform( const Transform& newTransform ) override;
 
-	   virtual int VPreRender( Scene *pScene );
-	   virtual bool VIsVisible( Scene *pScene ) const;
+	   virtual int VOnRestore( Scene *pScene ) override;
+	   virtual int VOnUpdate( Scene *, const unsigned long elapsedMs ) override;
+
+	   virtual int VPreRender( Scene *pScene ) override;
+	   virtual bool VIsVisible( Scene *pScene ) const override;
 	   virtual int VRender( Scene *pScene ) { return S_OK; } 
-	   virtual int VRenderChildren( Scene *pScene );
-	   virtual int VPostRender( Scene *pScene );
+	   virtual int VRenderChildren( Scene *pScene ) override;
+	   virtual int VPostRender( Scene *pScene ) override;
 
-	   virtual bool VAddChild( shared_ptr<ISceneNode> child );
-	   virtual bool VRemoveChild( ActorId id );
-	   virtual int VOnLostDevice( Scene *pScene );
+	   virtual bool VAddChild( shared_ptr<ISceneNode> child ) override;
+	   virtual bool VRemoveChild( ActorId id ) override;
+	   virtual int VOnLostDevice( Scene *pScene ) override;
 	   //virtual int VPick(Scene *pScene, RayCast *pRayCast);
 
 	   void SetAlpha( float alpha );
 	   //float GetAlpha() const { return m_Props.Alpha(); }
       
       // return position in parent space
-	   virtual Vec3 GetToWorldPosition( void ) const { return m_Props.m_Transform.GetPosition(); }
+	   virtual Vec3 GetToWorldPosition( void ) const override { return m_Props.m_pTransform->GetPosition(); }
 	   // set position in actor space
-      virtual void SetToWorldPosition( const Vec3 &pos ) { m_Props.m_Transform.SetPosition( pos ); }
+      virtual void SetToWorldPosition( const Vec3 &pos )  override { m_Props.m_pTransform->SetPosition( pos ); }
 
 	   Vec3 GetWorldPosition( void ) const;
 
-	   Vec3 GetRelForward( void ) const { return m_Props.m_Transform.GetForward(); }
-
 	   void SetRadius(const float radius) { m_Props.m_Radius = radius; }
-	   //void SetMaterial(const Material &mat) { m_Props.m_Material = mat; }
+
+	   /*void SetMaterial( const Material& mat ) { m_Props.m_Material = mat; }*/
 
    protected:
 	   SceneNodeList			m_Children;
@@ -117,7 +145,7 @@ class SceneNode : public ISceneNode
 struct AlphaSceneNode
    {
 	shared_ptr<ISceneNode> m_pNode;
-	Transform m_Concat;
+	TransformPtr m_Concat;
 	float m_ScreenZ;
 
 	// For the STL sort...
@@ -140,20 +168,20 @@ class RootNode : public SceneNode
 class CameraNode : public SceneNode
    {
    public:
-	   CameraNode( const Transform& t, Frustum const &frustum );
+	   CameraNode( TransformPtr pTransform, Frustum const &frustum );
       CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, Frustum const &frustum );
 
 	   virtual int VRender( Scene *pScene ) override;
 	   virtual int VOnRestore( Scene *pScene ) override;
 	   virtual bool VIsVisible( Scene *pScene ) const { return m_IsActive; }
-      virtual void VSetTransform( const Transform& transform );
+      virtual void VSetTransform( const Transform& newTransform ) override ;
 
 	   const Frustum &GetFrustum( void ) { return m_Frustum; }
 	   void SetTarget(shared_ptr<SceneNode> pTarget) { m_pTarget = pTarget; }
 	   void ClearTarget( void ) { m_pTarget = shared_ptr<SceneNode>(); }
 	   shared_ptr<SceneNode> GetTarget( void ) { return m_pTarget; }
 
-	   Mat4x4 GetWorldViewProjection(Scene *pScene) const;
+	   Mat4x4 GetWorldViewProjection(Scene *pScene);
 	   int SetViewTransform(Scene *pScene);
 
 	   Mat4x4 GetProjection() { return m_Projection; }

@@ -18,7 +18,7 @@ class BaseRenderComponent : public ActorComponent
    {
    public:
       /**
-       * @brief Put_brief_description_here
+       * @brief set member variable from xml elements
        *
        * This function should not override by derived Rendercomponent
        * you should override VDelegateInit instead
@@ -41,7 +41,7 @@ class BaseRenderComponent : public ActorComponent
       // factory method to create the appropriate scene node
       // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
       virtual shared_ptr<SceneNode> VCreateSceneNode( void ) = 0;  
-      Color LoadColor( TiXmlElement* pData );
+      static Color LoadColor( TiXmlElement* pData );
 
    protected:
       shared_ptr<SceneNode> m_pRootSceneNode;

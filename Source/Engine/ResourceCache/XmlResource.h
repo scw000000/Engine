@@ -1,7 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: XmlResource.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file XmlResource.h
+ * \date 2016/05/01 10:01
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief get Xml node by using tinyXml library
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "ResourceCache.h"
 #include <tinyxml.h>

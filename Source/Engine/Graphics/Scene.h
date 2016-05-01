@@ -24,9 +24,9 @@ class Scene
       bool RemoveChild( ActorId id );
       void SetCamera(shared_ptr<CameraNode> camera) { m_Camera = camera; }
       // This function is called by SceneNode::PreRender
-      void PushAndSetTransform( const Transform& transform )
+      void PushAndSetTransform( TransformPtr pTransform )
 	      {
-         m_TransformStack.Push( transform );
+         m_TransformStack.Push( *pTransform );
 	      }
 
 	   void PopTransform() 

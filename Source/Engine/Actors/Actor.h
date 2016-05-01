@@ -42,10 +42,10 @@ class Actor
             }
          }
     template <class ComponentType>
-    weak_ptr<ComponentType> GetComponent(const char *name)
+    weak_ptr<ComponentType> GetComponent( const char* name )
       {
 		ComponentId id = ActorComponent::GetIdFromName( name );
-      return <ComponentType>GetComponent( id );
+      return GetComponent<ComponentType>( id );
       }
 
    private:

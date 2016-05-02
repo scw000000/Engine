@@ -19,6 +19,9 @@ class Material
    public:
       Material( void );
 
+      void SetTextureResource( const Resource& newTextureRes );
+      Resource GetTextureResource( void ) const { return m_TextureResource; };
+
       void SetAmbient( const Color& color );
 	   Color GetAmbient() const { return m_Ambient; }
 
@@ -38,9 +41,10 @@ class Material
 	   void ApplyMaterial( void );
 
    private:
-      Color   m_Diffuse;       
-      Color   m_Ambient;      
-      Color   m_Specular;      
-      Color   m_Emissive;      
-      float   m_Shininess;         
+      Resource m_TextureResource;
+      Color    m_Diffuse;       
+      Color    m_Ambient;      
+      Color    m_Specular;      
+      Color    m_Emissive;      
+      float    m_Shininess;         
    };

@@ -16,7 +16,7 @@ class LightRenderComponent : public BaseRenderComponent
 	   static const char *g_Name;
 	   virtual const char *VGetName() const { return g_Name; }
       LightRenderComponent( void );
-      const LightProperties& GetLightProperties( void ) const{ return m_Props; };
+      const LightProperties& GetLightProperties( void ) const{ return *m_pLightProps; };
 
    protected:
       virtual bool VDelegateInit( TiXmlElement* pData ) override;
@@ -26,6 +26,6 @@ class LightRenderComponent : public BaseRenderComponent
       //virtual void VCreateInheritedXmlElements(TiXmlElement* pBaseElement);
 
    protected:
-      LightProperties m_Props; 
+      LightPropertiesPtr m_pLightProps; 
 
    };

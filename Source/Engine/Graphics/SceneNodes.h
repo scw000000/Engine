@@ -127,6 +127,8 @@ class SceneNode : public ISceneNode
 	   // set position in actor space
       virtual void SetToWorldPosition( const Vec3 &pos )  override { m_Props.m_pTransform->SetPosition( pos ); }
 
+      Vec3 GetForward( void ) const { return m_Props.m_pTransform->GetForward(); }
+
 	   Vec3 GetWorldPosition( void ) const;
 
 	   void SetRadius(const float radius) { m_Props.m_Radius = radius; }

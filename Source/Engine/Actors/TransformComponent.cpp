@@ -1,8 +1,18 @@
 #pragma once
+/*!
+ * \file TransformComponent.cpp
+ * \date 2016/05/02 9:51
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
-///////////////////////
-// MY CLASS INCLUDES //
-///////////////////////
 #include "EngineStd.h"
 #include "TransformComponent.h"
 

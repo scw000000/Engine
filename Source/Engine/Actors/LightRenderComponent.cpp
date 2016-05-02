@@ -12,7 +12,7 @@ const char* LightRenderComponent::g_Name = "LightRenderComponent";
 //---------------------------------------------------------------------------------------------------------------------
 // LightRenderComponent
 //---------------------------------------------------------------------------------------------------------------------
-LightRenderComponent::LightRenderComponent(void)
+LightRenderComponent::LightRenderComponent(void) : m_pLightProps( ENG_NEW( LightProperties ) )
    {
    }
 
@@ -28,13 +28,13 @@ bool LightRenderComponent::VDelegateInit( TiXmlElement* pData )
 	   {
 		double temp;
 		pAttenuationNode->Attribute( "const", &temp );
-		m_Props.m_Attenuation[0] = (float) temp;
+		m_pLightProps->m_Attenuation[0] = (float) temp;
 
 		pAttenuationNode->Attribute( "linear", &temp );
-		m_Props.m_Attenuation[1] = (float) temp;
+		m_pLightProps->m_Attenuation[1] = (float) temp;
 
 		pAttenuationNode->Attribute( "exp", &temp );
-		m_Props.m_Attenuation[2] = (float) temp;
+		m_pLightProps->m_Attenuation[2] = (float) temp;
 	   }
 
     TiXmlElement* pShapeNode = NULL;
@@ -42,22 +42,22 @@ bool LightRenderComponent::VDelegateInit( TiXmlElement* pData )
    if (pShapeNode)
 	   {
 		pShapeNode->Attribute( "range", &temp );
-		m_Props.m_Range = (float) temp;
+		m_pLightProps->m_Range = (float) temp;
 		pShapeNode->Attribute("falloff", &temp );
-		m_Props.m_Falloff = (float) temp;
+		m_pLightProps->m_Falloff = (float) temp;
 		pShapeNode->Attribute("theta", &temp );		
-		m_Props.m_Theta = (float) temp;
+		m_pLightProps->m_Theta = (float) temp;
 		pShapeNode->Attribute("phi", &temp );
-		m_Props.m_Phi = (float) temp;	
+		m_pLightProps->m_Phi = (float) temp;	
 	   }
-   // color
-   TiXmlElement* pColorNode = pData->FirstChildElement( "Color" );
-   if( pColorNode )
+
+   TiXmlElement* pDiffuseNode = pData->FirstChildElement( "Diffuse" );
+   if( pDiffuseNode )
       {
-      m_Props.m_Color = BaseRenderComponent::LoadColor( pColorNode );
+      m_pLightProps->m_Diffuse = BaseRenderComponent::LoadColor( pDiffuseNode );
       }
     return true;
-}
+   }
 
 shared_ptr<SceneNode> LightRenderComponent::VCreateSceneNode(void)
    {
@@ -70,7 +70,7 @@ shared_ptr<SceneNode> LightRenderComponent::VCreateSceneNode(void)
 		   {
          case Renderer::Renderer_OpenGL :
             {
-				return shared_ptr<SceneNode>( ENG_NEW LightNode( m_pOwner->GetId(), weakThis, m_Props, pTransformComponent->GetTransform( ) ) );  
+				return shared_ptr<SceneNode>( ENG_NEW LightNode( m_pOwner->GetId(), weakThis, m_pLightProps, pTransformComponent->GetTransform( ) ) );  
             }
          default:
 				ENG_ASSERT( 0 && "Unknown Renderer Implementation in GridRenderComponent" );

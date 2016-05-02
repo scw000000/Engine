@@ -7,12 +7,10 @@
 #include "..\Event\EventManager.h"
 #include "FastDelegate.h"
 
-Scene::Scene( shared_ptr<IRenderer> renderer )
+Scene::Scene( shared_ptr<IRenderer> renderer ) : m_Root( ENG_NEW RootNode ), m_pLightManager( ENG_NEW LightManager )
    {
-   m_Root = shared_ptr< SceneNode > ( ENG_NEW RootNode() );
-	m_pRenderer = renderer;
-	//m_LightManager = GCC_NEW LightManager;
-   
+   m_pRenderer = renderer;
+	
    IEventManager* pEventMgr = IEventManager::GetSingleton();
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::NewRenderComponentDelegate ), EvtData_New_Render_Component::sk_EventType );
    //pEventMgr->VAddListener(fastdelegate::MakeDelegate(this, &Scene::DestroyActorDelegate), EvtData_Destroy_Actor::sk_EventType);
@@ -35,7 +33,7 @@ int Scene::OnRender()
 		// matrix
 		m_Camera->SetViewTransform( this );
 
-	//	m_LightManager->CalcLighting(this);
+		m_pLightManager->CalcLighting( this );
 
 		if ( m_Root->VPreRender( this ) == S_OK )
 		   {
@@ -91,13 +89,22 @@ shared_ptr< ISceneNode > Scene::FindSceneNode( ActorId id )
 	return i->second;
    }
 
-bool Scene::AddChild( ActorId id, shared_ptr< ISceneNode > sceneId )
+bool Scene::AddChild( ActorId id, shared_ptr< ISceneNode > pNode )
    {
    if( id != INVALID_ACTOR_ID )
       {
-      m_ActorMap[id] = sceneId;
+      m_ActorMap[id] = pNode;
       }
-   return m_Root->VAddChild( sceneId );
+
+   //  If this node is light node, it is not renderable and it should be added to light manager
+   shared_ptr<LightNode> pLight = dynamic_pointer_cast< LightNode >( pNode );
+   if( pLight != NULL && m_pLightManager->m_Lights.size( ) + 1 < MAXIMUM_LIGHTS_SUPPORTED )
+      {
+      m_pLightManager->m_Lights.push_back( pLight );
+      return true;
+      }
+
+   return m_Root->VAddChild( pNode );
    }
 
 

@@ -247,6 +247,8 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 	glEnable( GL_DEPTH_TEST );
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc( GL_LESS ); 
+   // Cull triangles which normal is not towards the camera
+   glEnable( GL_CULL_FACE );
    m_pRenderer->VOnRestore();
    //--------------------------------- 
    // Set Renderer

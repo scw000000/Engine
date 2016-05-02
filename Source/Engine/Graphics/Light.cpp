@@ -7,10 +7,10 @@
 #include "..\Actors\LightRenderComponent.h"
 
 
-LightNode::LightNode( const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const LightProperties &props, TransformPtr pTransform )
+LightNode::LightNode( const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const LightPropertiesPtr& props, TransformPtr pTransform )
  : SceneNode( actorId, renderComponent,  RenderPass_NotRendered, pTransform ) 
    {
-	m_LightProps = props;
+	m_pLightProps = props;
    }
 
 int GLLightNode::VOnUpdate( Scene *, const unsigned long deltaMs )
@@ -22,32 +22,28 @@ int GLLightNode::VOnUpdate( Scene *, const unsigned long deltaMs )
    }
 
 
-//
-// LightManager::CalcLighting					- Chapter 16, page 554
-//
-void LightManager::CalcLighting(Scene *pScene)
+void LightManager::CalcLighting( Scene *pScene )
    {
 	//// FUTURE WORK: There might be all kinds of things you'd want to do here for optimization, especially turning off lights on actors that can't be seen, etc.
-	//pScene->GetRenderer()->VCalcLighting( &m_Lights, MAXIMUM_LIGHTS_SUPPORTED );
 
-	//int count = 0;
+	int count = 0;
 
-	//ENG_ASSERT( m_Lights.size() < MAXIMUM_LIGHTS_SUPPORTED );
-	//for( Lights::iterator i=m_Lights.begin(); i!=m_Lights.end(); ++i, ++count )
-	//   {
-	//	shared_ptr<LightNode> light = *i;
+	ENG_ASSERT( m_Lights.size() < MAXIMUM_LIGHTS_SUPPORTED );
+	for( Lights::iterator i = m_Lights.begin(); i != m_Lights.end(); ++i, ++count )
+	   {
+		shared_ptr<LightNode> light = *i;
+      auto pLightProps = light->GetLightPropertiesPtr();
+		if (count == 0)
+		   {
+			// the ambient color is decided by 1st light color in the lights
+         Color ambient = pLightProps->m_Diffuse;
+			m_vLightAmbient = Vec4( ambient.m_Component.r, ambient.m_Component.g, ambient.m_Component.b, 1.0f ); 		
+		   } 
 
-	//	if (count==0)
-	//	   {
-	//		// Light 0 is the only one we use for ambient lighting. The rest are ignored in the simple shaders used for GameCode4.
-	//		Color ambient = light->VGetProperties().GetMaterial().GetAmbient();
-	//		m_vLightAmbient = Vec4( ambient.m_Component.r, ambient.m_Component.g, ambient.m_Component.b, 1.0f ); 		
-	//	   }
-
-	//	Vec3 lightDir = light->GetDirection();
-	//	m_vLightDir[count] = Vec4(lightDir.x, lightDir.y, lightDir.z, 1.0f);
-	//	m_vLightDiffuse[count] = light->VGetProperties()->GetMaterial().GetDiffuse();
-	//   }
+		Vec3 lightDir = light->GetForward();
+		m_vLightDir[count] = Vec4( lightDir.x, lightDir.y, lightDir.z, 1.0f );
+		m_vLightDiffuse[count] = pLightProps->m_Diffuse;
+	   }
    }  
 
 

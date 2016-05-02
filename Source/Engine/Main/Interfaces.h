@@ -173,6 +173,8 @@ enum RenderPass
 
 class Scene;
 class SceneNodeProperties;
+class Material;
+typedef shared_ptr<Material> MaterialPtr;
 class LightNode;
 typedef std::list<shared_ptr<LightNode> > Lights;
 

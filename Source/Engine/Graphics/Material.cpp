@@ -5,13 +5,18 @@
 #include "EngineStd.h"
 #include "Material.h"
 
-Material::Material( void )
+Material::Material( void ) : m_TextureResource( "art\\default.jpg" )
    {
    m_Diffuse = g_White;        
    m_Ambient = Color( 0.10f, 0.10f, 0.10f, 1.0f );       
    m_Specular = g_White;       
    m_Emissive = g_Black;      
    m_Shininess = 0.f;          
+   }
+
+void Material::SetTextureResource( const Resource& newTexture )
+   {
+   m_TextureResource = newTexture;
    }
 
 void Material::SetAmbient( const Color &color )

@@ -1,23 +1,46 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Mesh.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file MeshSceneNode.cpp
+ * \date 2016/05/02 11:10
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "EngineStd.h"
 #include "MeshSceneNode.h"
 #include "..\ResourceCache\MeshResource.h"
 #include "..\ResourceCache\TextureResource.h"
+#include "OpenGLRenderer.h"
 
 MeshSceneNode::MeshSceneNode( 
-   const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const Resource& meshResouce, const Resource& textureResource, RenderPass renderPass, TransformPtr pTransform )
-   : SceneNode( actorId, renderComponent, renderPass, pTransform ), m_MeshResource( meshResouce.m_name ), m_TextureResource( textureResource.m_name )
+   const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const Resource& meshResouce, const MaterialPtr& pMaterialPtr, RenderPass renderPass, TransformPtr pTransform )
+   : SceneNode( actorId, renderComponent, renderPass, pTransform ), m_MeshResource( meshResouce.m_name ), m_pMaterial( pMaterialPtr )
    {
    m_Program = 0;
    m_VerTexBuffer = 0;
    m_UVBuffer = 0;
-   m_MVPMatrixUni = 0;
+   m_MVPMatrix = 0;
    m_Texture = 0;
    m_TextureUni = 0;
    m_VertexArray = 0;
+
+   m_NormalBuffer = 0;
+
+   m_ToWorldMatrix = 0;
+   m_LightPosWorldSpace = 0;
+   m_LigthDirection = 0;
+   m_LightDiffuse = 0;
+   m_LightPower = 0;
+   m_LightAmbient = 0;
+   m_LightNumber = 0;
+   m_MaterialAmbient = 0;
+   m_MaterialDiffuse = 0;
    }
 
 MeshSceneNode::~MeshSceneNode( void )
@@ -49,6 +72,12 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       {
       glDeleteBuffers( 1, &m_UVBuffer );
       m_UVBuffer = 0;
+      }
+
+   if( m_NormalBuffer )
+      {
+      glDeleteBuffers( 1, &m_NormalBuffer );
+      m_NormalBuffer = 0;
       }
 
    if( m_TextureUni )
@@ -93,130 +122,29 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       SAFE_DELETE_ARRAY( p_ErrMsg );
 	   }
 
-   ////////////////////////////////////
-   // Loading Vertex Buffer
-   ////////////////////////////////////
-   // Force the Mesh to reload
-   auto pAiScene = MeshResourceLoader::LoadAndReturnScene( m_MeshResource );
 
-   glGenBuffers( 1, &m_VerTexBuffer );
-	glBindBuffer( GL_ARRAY_BUFFER, m_VerTexBuffer );
-	glBufferData( GL_ARRAY_BUFFER, 
-                 pAiScene->mMeshes[0]->mNumVertices * sizeof( aiVector3t<float> ), 
-                 &pAiScene->mMeshes[0]->mVertices[0], 
-                 GL_STATIC_DRAW );
-   ////////////////////////////////////
-   // Loading Vertex Buffer
-   ////////////////////////////////////
-   for (unsigned int n = 0; n < pAiScene->mNumMeshes; ++n) {
-		const struct aiMesh* mesh = pAiScene->mMeshes[n];
-
-		if(mesh->mNormals == NULL) {
-			glDisable(GL_LIGHTING);
-		} else {
-			glEnable(GL_LIGHTING);
-		}
-
-		for (unsigned int t = 0; t < mesh->mNumFaces; ++t) 
-         {
-
-			auto face = &mesh->mFaces[t];
-			GLenum face_mode;
-          std::cout << "face: " << face->mNumIndices << "prime " << mesh->mPrimitiveTypes << std::endl;
-			switch(face->mNumIndices) 
-            {
-				case 1: face_mode = GL_POINTS; break;
-				case 2: face_mode = GL_LINES; break;
-				case 3: face_mode = GL_TRIANGLES; break;
-				default: face_mode = GL_POLYGON; break;
-			}
-         
-			for(unsigned int i = 0; i < face->mNumIndices; i++) 
-            {
-				int index = face->mIndices[i];
-            auto vertex = mesh->mVertices[index];
-            Vec3 vec( vertex.x, vertex.y, vertex.z );
-            std::cout << "index " << index  << ToStr( vec ) << std::endl;
-			}
-         std::cout << std::endl;
-		}
-      }
-
-   std::cout << "index num :" << pAiScene->mMeshes[0]->mNumVertices << std::endl;
-      for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
-         {
-         for( unsigned int vertexIdx = 0; vertexIdx < pAiScene->mMeshes[meshIdx]->mNumVertices; ++vertexIdx )
-            {
-            auto vertex =pAiScene->mMeshes[meshIdx]->mVertices[vertexIdx];
-            Vec3 vec( vertex.x, vertex.y, vertex.z );
-            std::cout << "vertex : " << vertexIdx << std::endl;
-            std::cout << ToStr( vec ) << std::endl;
-            auto vertexCord = pAiScene->mMeshes[meshIdx]->mTextureCoords[0][vertexIdx];
-            Vec3 vecC( vertexCord.x, vertexCord.y, vertexCord.z );
-            std::cout << ToStr( vecC ) << std::endl << std::endl;
-            }
-         }
- 
-   ////////////////////////////////////
-   // Loading UV Buffer & calculate bounding sphere radius
-   ////////////////////////////////////
-   glGenBuffers( 1, &m_UVBuffer );
-	glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
+   OpenGLRenderer::LoadTexture( &m_Texture, m_pMaterial->GetTextureResource() );
    
-   // UV coordinates loaded in assimp is 3-dimensions
-   // But GLSL expect 2-dimension coordinates
-   // So we have to translate them
-   aiVector2t<float> *uvBuffer = ENG_NEW aiVector2t<float>[pAiScene->mMeshes[0]->mNumVertices ];
+   float radius;
 
-   float maxSquareLength = -1.0f;
-   for ( unsigned int vertex = 0; vertex < pAiScene->mMeshes[0]->mNumVertices; vertex++)
-      {
-      memcpy( &uvBuffer[vertex], &pAiScene->mMeshes[0]->mTextureCoords[0][vertex], sizeof( aiVector2t<float> ) );
+   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &radius, &m_UVBuffer, NULL, m_MeshResource );
 
-      auto curSquareLength = pAiScene->mMeshes[0]->mVertices[vertex].SquareLength();
+   SetRadius( radius );
 
-      maxSquareLength = std::max( maxSquareLength, curSquareLength );
-      }
+   m_MVPMatrix          = glGetUniformLocation( m_Program, "MVP" );
+   m_TextureUni         = glGetUniformLocation( m_Program, "myTextureSampler" );
+  
 
-   SetRadius( std::sqrt( maxSquareLength ) );
+   m_ToWorldMatrix      = glGetUniformLocation( m_Program, "M" );
+   m_LightPosWorldSpace = glGetUniformLocation( m_Program, "LightPosition_WorldSpace" );
+   m_LigthDirection     = glGetUniformLocation( m_Program, "LighDirection" );
+   m_LightDiffuse       = glGetUniformLocation( m_Program, "LightDiffuse" );
+   m_LightPower         = glGetUniformLocation( m_Program, "LightPower" );
+   m_LightAmbient       = glGetUniformLocation( m_Program, "LightAmbient" );
+   m_LightNumber        = glGetUniformLocation( m_Program, "LightNumber" );
+   m_MaterialAmbient    = glGetUniformLocation( m_Program, "MaterialDiffuse" );
+   m_MaterialDiffuse    = glGetUniformLocation( m_Program, "MaterialAmbient" );
 
-	glBufferData( GL_ARRAY_BUFFER, 
-                 pAiScene->mMeshes[0]->mNumVertices * sizeof( aiVector2t<float> ), 
-                 &uvBuffer[0], 
-                 GL_STATIC_DRAW );
-   SAFE_DELETE_ARRAY( uvBuffer );
-   ////////////////////////////////////
-   // Loading UV Buffer
-   ////////////////////////////////////
-   
-
-   ////////////////////////////////////
-   // Loading Texture
-   ////////////////////////////////////
-   glGenTextures( 1, &m_Texture );
-
-	//"Bind" the newly created texture : all future texture functions will modify this texture
-	glBindTexture( GL_TEXTURE_2D, m_Texture );
-	glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );	
-
-   auto pSurface = TextureResourceLoader::LoadAndReturnSurface( m_TextureResource );
-
-   int Mode = GL_RGB;
-   if( pSurface->format->BytesPerPixel == 4 ) 
-      {
-      Mode = GL_RGBA;
-      }
- 
-   glTexImage2D( GL_TEXTURE_2D, 0, Mode, pSurface->w, pSurface->h, 0, Mode, GL_UNSIGNED_BYTE, pSurface->pixels );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-   ////////////////////////////////////
-   // Loading Texture
-   ////////////////////////////////////
-
-   m_MVPMatrixUni = glGetUniformLocation( m_Program, "MVP");
-   m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler");
-   
    // resore all of its children
 	SceneNode::VOnRestore( pScene );
 
@@ -233,7 +161,8 @@ int MeshSceneNode::VRender( Scene *pScene )
 	Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
 	// Send our transformation to the currently bound shader, 
 	// in the "MVP" uniform
-	glUniformMatrix4fv( m_MVPMatrixUni, 1, GL_FALSE, &mWorldViewProjection[0][0]);
+   // 1-> how many matrix, GL_FALSE->should transpose or not
+	glUniformMatrix4fv( m_MVPMatrix, 1, GL_FALSE, &mWorldViewProjection[0][0]);
 
    
 	// Bind our texture in Texture Unit 0

@@ -76,6 +76,6 @@ class MeshRenderComponent : public BaseRenderComponent
       //virtual void VCreateInheritedXmlElements(TiXmlElement* pBaseElement);
 
    protected:
+      MaterialPtr m_pMaterial;
       Resource m_MeshResource;
-      Resource m_TextureResource;
    };

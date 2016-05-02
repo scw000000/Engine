@@ -1,9 +1,22 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Light.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file Light.h
+ * \date 2016/05/02 14:13
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "SceneNodes.h"
 #include "OpenGLRenderer.h"
+
+struct LightProperties;
+typedef shared_ptr<LightProperties> LightPropertiesPtr;
 
 // Note: Light color is stored in the Material structure, which is already present in all SceneNodes.
 
@@ -12,7 +25,7 @@
 //
 struct LightProperties
    {
-   Color m_Color;
+   Color m_Diffuse;
 	float	m_Attenuation[3];  /* Attenuation coefficients */
 	float	m_Range;
 	float	m_Falloff;
@@ -30,26 +43,33 @@ struct LightProperties
 class LightNode : public SceneNode
    {
    protected:
-	   LightProperties m_LightProps;
+	   LightPropertiesPtr m_pLightProps;
 
    public:
-	   LightNode(const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const LightProperties &props, TransformPtr pTransform );
+	   LightNode(const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
+
+      const LightPropertiesPtr& GetLightPropertiesPtr( void ) const { return m_pLightProps; };
    };
 
 class GLLightNode : public LightNode
    {
    public:
-	   GLLightNode(const ActorId actorId, WeakBaseRenderComponentPtr renderComponent,  const LightProperties &lightProps, TransformPtr pTransform )
-		   : LightNode( actorId, renderComponent, lightProps, pTransform ) { }
+	   GLLightNode(const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform )
+		   : LightNode( actorId, renderComponent, pLightProps, pTransform ) { }
 
       virtual int VOnRestore( Scene *pScene ) override { return S_OK; } ;
       virtual int VOnUpdate( Scene *, const unsigned long deltaMs ) override;
    };
 
 
-//
-// class LightManager					- Chapter 16, 553
-//
+/*!
+ * \class LightManager
+ *
+ * \brief 
+ *  LATER: implement more dedicated ambient color and available light calculation
+ * \author SCW
+ * \date 05 2016li
+ */
 class LightManager
    {
 	friend class Scene;
@@ -60,12 +80,18 @@ class LightManager
       Color			   m_vLightDiffuse[ MAXIMUM_LIGHTS_SUPPORTED ];
 	   Vec4  			m_vLightAmbient;
 
-public:
-	void CalcLighting( Scene *pScene );
-   // copy all of lights that effects this node into 
-	void CalcLighting( SceneNode *pNode );
-	int GetLightCount(const SceneNode *node) { return m_Lights.size(); }
-	const Vec4 *GetLightAmbient(const SceneNode *node) { return &m_vLightAmbient; }
-	const Vec4 *GetLightDirection(const SceneNode *node) { return m_vLightDir; }
-	const Color *GetLightDiffuse(const SceneNode *node) { return m_vLightDiffuse; }
-};
+   public:
+	   /**
+	    * @brief This function is called by Scene::OnRender
+	    *
+	    * @param  pScene Scene * pScene
+	    * @return void
+	    */
+	    void CalcLighting( Scene *pScene );
+      // copy all of lights that effects this node into 
+	   void CalcLighting( SceneNode *pNode );
+	   int GetLightCount(const SceneNode *node) { return m_Lights.size(); }
+	   const Vec4 *GetLightAmbient(const SceneNode *node) { return &m_vLightAmbient; }
+	   const Vec4 *GetLightDirection(const SceneNode *node) { return m_vLightDir; }
+	   const Color *GetLightDiffuse(const SceneNode *node) { return m_vLightDiffuse; }
+   };

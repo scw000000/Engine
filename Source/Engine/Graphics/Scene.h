@@ -6,6 +6,7 @@
 #include "TransformStack.h"
 #include "SceneNodes.h"
 #include "..\Event\Events.h"
+#include "Light.h"
 
 typedef std::map< ActorId, shared_ptr< ISceneNode > > ActorSceneMap;
 
@@ -20,7 +21,7 @@ class Scene
       int OnLostDevice( void );
       int OnUpdate( const unsigned long deltaMs );
       shared_ptr< ISceneNode > FindSceneNode( ActorId id );
-      bool AddChild( ActorId id, shared_ptr< ISceneNode > sceneId );
+      bool AddChild( ActorId id, shared_ptr< ISceneNode > pNode );
       bool RemoveChild( ActorId id );
       void SetCamera(shared_ptr<CameraNode> camera) { m_Camera = camera; }
       // This function is called by SceneNode::PreRender
@@ -51,6 +52,6 @@ class Scene
       TransformStack                m_TransformStack;
       AlphaSceneNodes               m_AlphaSceneNodes;
       ActorSceneMap                 m_ActorMap;
-      // LightManager *m_pLightManager;
+      shared_ptr<LightManager>      m_pLightManager;
       
    };

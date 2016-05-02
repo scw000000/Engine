@@ -14,8 +14,17 @@ class VertexShader
       // This function is called in SceneNode::Onrestore
       // reload and compile vertex shader
 	   GLint OnRestore( Scene *pScene );
-      // This function is called at begin of SceneNode::VRender
-	   GLint SetupRender( Scene *pScene, SceneNode *pNode );
+      // 
+	   /**
+	    * @brief  
+	    *
+       *  This function is called at begin of SceneNode::VRender 
+       *  The original implementation of SetupRender
+	    * @param  pScene Scene * pScene
+	    * @param  pNode SceneNode * pNode
+	    * @return GLint
+	    */
+	    GLint SetupRender( Scene *pScene, SceneNode *pNode );
 	   void SetEnableLights(bool enableLights) { m_enableLights = enableLights; }
       GLuint GetVertexShader( void ) { return m_VertexShader; }
       void ReleaseShader( GLuint program );

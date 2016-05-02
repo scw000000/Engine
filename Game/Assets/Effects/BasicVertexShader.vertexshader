@@ -30,14 +30,19 @@ void main()
 
 	// Output position of the vertex, in clip space : MVP * position
 	gl_Position =  MVP * vec4( VertexPosition_Modelspace, 1 );
-	vec3 vertexPosition_Worldspace = ( M * vec4( VertexPosition_Modelspace, 1 ) ).xyz;
-	float cos = clamp( normalize( M * VertexNormal_Modelspace ), 0, 1 )
+	
+	vec3 vecPosition_Worldspace = ( M * vec4( VertexPosition_Modelspace, 1 ) ).xyz;
+	float vecNormal_WorldSpace = normalize( M * VertexNormal_Modelspace );
+	float dotProduct;
+	float dist;
 	TotalDiffuseColor = vec3( 0, 0, 0 );
 	
+		
 	for( int i = 0; i < LightNumber; ++i )
 		{
-		float dist = distance( vertexPosition_Worldspace, LightPosition_WorldSpace[i] );
-		TotalDiffuseColor += LightDiffuse[i] * LightPower[i] * cos / ( dist * dist );
+		dotProduct = max( 0, dot( vecNormal_WorldSpace, LighDirection[i] ) );
+		dist = distance( vecPosition_Worldspace, LightPosition_WorldSpace[i] );
+		TotalDiffuseColor += LightDiffuse[i] * LightPower[i] * dotProduct / ( dist * dist );
 		}
 		
 	TotalDiffuseColor = MaterialAmbient * LightAmbient + MaterialDiffuse * TotalDiffuseColor;

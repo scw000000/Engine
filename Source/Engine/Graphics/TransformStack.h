@@ -18,7 +18,7 @@ class TransformStack
 
    private:
       void PushCurTransform( void );
-      void UpdateTopMatrix( void );
+      const Mat4x4& GetTop( void );
 
    private:
       std::stack<Transform> m_Stack;

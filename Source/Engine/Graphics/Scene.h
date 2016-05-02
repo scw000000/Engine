@@ -35,12 +35,13 @@ class Scene
 		   //Scene::PopMatrix - Chapter 16, page 541
 		   m_TransformStack.Pop(); 
 	      }
-      const Mat4x4 GetTopMatrix() { return m_TransformStack.GetTop(); }
+      Mat4x4 GetTopMatrix() { return m_TransformStack.GetTop(); }
 
 	   void AddAlphaSceneNode( AlphaSceneNode *asn ) { m_AlphaSceneNodes.push_back( asn ); }
       void NewRenderComponentDelegate( IEventDataPtr pEventData );
       shared_ptr<IRenderer> GetRenderer( void ) { return m_pRenderer; }
       shared_ptr<CameraNode> GetCamera( void ) { return m_Camera; }
+      shared_ptr<LightManager> GetLightManagerPtr( void ){ return m_pLightManager; }
 
    protected:
       void RenderAlphaPass();

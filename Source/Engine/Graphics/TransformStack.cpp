@@ -24,7 +24,7 @@ void TransformStack::Pop( void )
    isMatrixDirty = true;
    }
 
-Mat4x4 TransformStack::GetTop() 
+const Mat4x4& TransformStack::GetTop( void )
    {
    if( isMatrixDirty )
       {

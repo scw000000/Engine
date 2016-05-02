@@ -300,7 +300,7 @@ void CameraNode::VSetTransform( const Transform& newTransform )
 
 Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene )
    {
-   Mat4x4 world = pScene->GetTopMatrix();
+   const Mat4x4& world = pScene->GetTopMatrix();
 	Mat4x4 view = VGetProperties().GetFromWorld();
 	return m_Projection * m_View * world;
    }

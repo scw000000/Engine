@@ -98,10 +98,9 @@ bool Scene::AddChild( ActorId id, shared_ptr< ISceneNode > pNode )
 
    //  If this node is light node, it is not renderable and it should be added to light manager
    shared_ptr<LightNode> pLight = dynamic_pointer_cast< LightNode >( pNode );
-   if( pLight != NULL && m_pLightManager->m_Lights.size( ) + 1 < MAXIMUM_LIGHTS_SUPPORTED )
+   if( pLight != NULL )
       {
-      m_pLightManager->m_Lights.push_back( pLight );
-      return true;
+      return m_pLightManager->AddLightNode( pLight );
       }
 
    return m_Root->VAddChild( pNode );

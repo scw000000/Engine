@@ -127,7 +127,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    
    float radius;
 
-   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &radius, &m_UVBuffer, NULL, m_MeshResource );
+   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &radius, &m_UVBuffer, &m_NormalBuffer, m_MeshResource );
 
    SetRadius( radius );
 
@@ -164,7 +164,26 @@ int MeshSceneNode::VRender( Scene *pScene )
    // 1-> how many matrix, GL_FALSE->should transpose or not
 	glUniformMatrix4fv( m_MVPMatrix, 1, GL_FALSE, &mWorldViewProjection[0][0]);
 
-   
+   auto pLightManager = pScene->GetLightManagerPtr();
+   glUniformMatrix4fv( m_ToWorldMatrix, 1, GL_FALSE, &pScene->GetTopMatrix()[0][0] );
+
+   glUniform3fv( m_LightPosWorldSpace, pLightManager->GetActiveLightCount(), ( const GLfloat* ) pLightManager->GetLightPosWorldSpace() );
+   glUniform3fv( m_LigthDirection, pLightManager->GetActiveLightCount(), ( const GLfloat* ) pLightManager->GetLightDirection() );
+   glUniform4fv( m_LightDiffuse, pLightManager->GetActiveLightCount(), ( const GLfloat* ) pLightManager->GetLightDiffuse() );
+   glUniform1fv( m_LightPower, pLightManager->GetActiveLightCount(), ( const GLfloat* ) pLightManager->GetLightPower() );
+   glUniform4fv( m_LightAmbient, 1, ( const GLfloat* ) pLightManager->GetLightAmbient() );
+   glUniform1i( m_LightNumber, pLightManager->GetActiveLightCount() );
+
+
+
+   //m_LightPosWorldSpace = glGetUniformLocation( m_Program, "LightPosition_WorldSpace" );
+   //m_LigthDirection = glGetUniformLocation( m_Program, "LighDirection" );
+   //m_LightDiffuse = glGetUniformLocation( m_Program, "LightDiffuse" );
+   //m_LightPower = glGetUniformLocation( m_Program, "LightPower" );
+   //m_LightAmbient = glGetUniformLocation( m_Program, "LightAmbient" );
+   //m_LightNumber = glGetUniformLocation( m_Program, "LightNumber" );
+   //m_MaterialAmbient = glGetUniformLocation( m_Program, "MaterialDiffuse" );
+   //m_MaterialDiffuse = glGetUniformLocation( m_Program, "MaterialAmbient" );
 	// Bind our texture in Texture Unit 0
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, m_Texture );

@@ -26,11 +26,7 @@ typedef shared_ptr<LightProperties> LightPropertiesPtr;
 struct LightProperties
    {
    Color m_Diffuse;
-	float	m_Attenuation[3];  /* Attenuation coefficients */
-	float	m_Range;
-	float	m_Falloff;
-	float	m_Theta;
-	float	m_Phi;
+   float m_Power;
    };
 
 
@@ -75,23 +71,32 @@ class LightManager
 	friend class Scene;
 
    protected:
-	   Lights			m_Lights;
-	   Vec4				m_vLightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
-      Color			   m_vLightDiffuse[ MAXIMUM_LIGHTS_SUPPORTED ];
-	   Vec4  			m_vLightAmbient;
+	   Lights	m_Lights;
+      Lights   m_ActiveLights;
+      Vec3     m_LightPosWorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
+      float     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Color		m_LightDiffuse[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Color		m_LightAmbient;
 
    public:
 	   /**
 	    * @brief This function is called by Scene::OnRender
 	    *
+       *  Decide which lights can be active light
+       *
 	    * @param  pScene Scene * pScene
 	    * @return void
 	    */
-	    void CalcLighting( Scene *pScene );
+	   void CalcLighting( Scene *pScene );
       // copy all of lights that effects this node into 
-	   void CalcLighting( SceneNode *pNode );
-	   int GetLightCount(const SceneNode *node) { return m_Lights.size(); }
-	   const Vec4 *GetLightAmbient(const SceneNode *node) { return &m_vLightAmbient; }
-	   const Vec4 *GetLightDirection(const SceneNode *node) { return m_vLightDir; }
-	   const Color *GetLightDiffuse(const SceneNode *node) { return m_vLightDiffuse; }
+      void CalcLighting( SceneNode *pNode );
+	   int GetActiveLightCount( void ) const { return m_ActiveLights.size(); }
+	   bool AddLightNode( shared_ptr<LightNode> pNewLight );   
+      
+      Vec3* GetLightPosWorldSpace( void ) { return m_LightPosWorldSpace; }
+      Vec3* GetLightDirection( void ) { return m_LightDir; }
+      float* GetLightPower( void ) { return m_LightPower; }
+      Color* GetLightDiffuse( void ) { return m_LightDiffuse; }
+      Vec3* GetLightAmbient( void ) { return &m_LightAmbient; }
    };

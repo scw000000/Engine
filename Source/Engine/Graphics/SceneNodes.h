@@ -42,7 +42,7 @@ class SceneNodeProperties
 
       ActorId GetActorId( void ) const { return m_ActorId; }
    //   const Mat4x4& GetToWorld( void ) const { return m_ToWorld; }
-      const Mat4x4& GetFromWorld( void ) const { 
+      Mat4x4 GetFromWorld( void ) const { 
          return m_pTransform->GetFromWorld(); 
          /*return m_pTransform.Inverse().GetToWorld();*/
          }

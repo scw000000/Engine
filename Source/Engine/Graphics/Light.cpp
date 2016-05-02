@@ -24,38 +24,51 @@ int GLLightNode::VOnUpdate( Scene *, const unsigned long deltaMs )
 
 void LightManager::CalcLighting( Scene *pScene )
    {
-	//// FUTURE WORK: There might be all kinds of things you'd want to do here for optimization, especially turning off lights on actors that can't be seen, etc.
+	//// LATER: There might be all kinds of things you'd want to do here for optimization, especially turning off lights on actors that can't be seen, etc.
 
-	int count = 0;
 
-	ENG_ASSERT( m_Lights.size() < MAXIMUM_LIGHTS_SUPPORTED );
-	for( Lights::iterator i = m_Lights.begin(); i != m_Lights.end(); ++i, ++count )
-	   {
-		shared_ptr<LightNode> light = *i;
-      auto pLightProps = light->GetLightPropertiesPtr();
-		if (count == 0)
-		   {
-			// the ambient color is decided by 1st light color in the lights
-         Color ambient = pLightProps->m_Diffuse;
-			m_vLightAmbient = Vec4( ambient.m_Component.r, ambient.m_Component.g, ambient.m_Component.b, 1.0f ); 		
-		   } 
+	ENG_ASSERT( m_ActiveLights.size() <= MAXIMUM_LIGHTS_SUPPORTED );
 
-		Vec3 lightDir = light->GetForward();
-		m_vLightDir[count] = Vec4( lightDir.x, lightDir.y, lightDir.z, 1.0f );
-		m_vLightDiffuse[count] = pLightProps->m_Diffuse;
-	   }
+   for( Lights::iterator lightIt = m_ActiveLights.begin( ); lightIt != m_ActiveLights.end( ); ++lightIt )
+      {
+      if( lightIt == m_ActiveLights.begin() )
+         {
+         m_LightAmbient = lightIt->get()->GetLightPropertiesPtr()->m_Diffuse;
+         }
+      memcpy( m_LightPosWorldSpace, &lightIt->get( )->GetWorldPosition( ), sizeof( Vec3 ) );
+      memcpy( m_LightDir, &lightIt->get( )->GetForward( ), sizeof( Vec3 ) );
+      memcpy( m_LightPower, &lightIt->get( )->GetLightPropertiesPtr( )->m_Power, sizeof( float ) );
+      memcpy( m_LightDiffuse, &lightIt->get( )->GetLightPropertiesPtr( )->m_Diffuse, sizeof( Color ) );
+      }
    }  
 
 
 void LightManager::CalcLighting( SceneNode *pNode )
    {
-	/*int count = GetLightCount( pNode );
+   
+	/*int count = m_ActiveLights( pNode );
 	if (count)
 	   {
+            Vec3     m_LightPosWorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Vec3     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Color		m_LightDiffuse[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Vec3		m_LightAmbient;
 		pLighting->m_vLightAmbient = *GetLightAmbient(pNode);
 		memcpy(pLighting->m_vLightDir, GetLightDirection(pNode), sizeof( Vec4 ) * count );
 		memcpy(pLighting->m_vLightDiffuse, GetLightDiffuse(pNode), sizeof( Vec4 ) * count);
 		pLighting->m_nNumLights = count;
 	   }*/
+   }
+
+bool LightManager::AddLightNode( shared_ptr<LightNode> pNewLight )
+   {
+ 
+   m_Lights.push_back( pNewLight );
+   if( m_ActiveLights.size() + 1 < MAXIMUM_LIGHTS_SUPPORTED )
+      {
+      m_ActiveLights.push_back( pNewLight );
+      }
+   return true;
    }
 

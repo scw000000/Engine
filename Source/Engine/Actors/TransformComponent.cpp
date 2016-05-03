@@ -77,19 +77,19 @@ bool TransformComponent::VInit(TiXmlElement* pData)
 		Vec3 lookAt((float)x, (float)y, (float)z);
 		rotation.BuildRotationLookAt(translation.GetPosition(), lookAt, g_Up);
     }
-
-    TiXmlElement* pScaleElement = pData->FirstChildElement("Scale");
-    if (pScaleElement)
-    {
-        double x = 0;
-        double y = 0;
-        double z = 0;
-        pScaleElement->Attribute("x", &x);
-        pScaleElement->Attribute("y", &y);
-        pScaleElement->Attribute("z", &z);
-        m_scale = Vec3((float)x, (float)y, (float)z);
-    }
-	**/
+    */
+    TiXmlElement* pScaleElement = pData->FirstChildElement( "Scale" );
+   if (pScaleElement)
+      {
+      double x = 0;
+      double y = 0;
+      double z = 0;
+      pScaleElement->Attribute( "x", &x );
+      pScaleElement->Attribute( "y", &y );
+      pScaleElement->Attribute( "z", &z );
+      scale = Vec3( (float)x, (float)y, (float)z );
+      }
+	
 
     //m_Transform = rotation * translation;
     m_pTransform->SetRotation( rotation );

@@ -3,10 +3,11 @@
 	<TransformComponent>
 		<Position x="0" y="0" z="-10"/>
 	</TransformComponent>
-
+	
     <MeshRenderComponent>
-        <meshfile path="art\cube.obj" />
-		<texturefile path="art\cube.jpg" />
+        <Mesh path="art\cube.obj" />
+		<Texture path="art\cube.jpg" />
 	</MeshRenderComponent>
 
+	
 </Actor>

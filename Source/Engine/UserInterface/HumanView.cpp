@@ -25,7 +25,7 @@ HumanView::HumanView( shared_ptr<IRenderer> p_renderer )
 		m_pScene.reset( ENG_NEW ScreenElementScene( p_renderer ) );
 
 		Frustum frustum;
-		frustum.Init( ENG_PI/4.0f, 4.0f / 3.0f, 0.1f, 100.0f );
+		frustum.Init( ENG_PI/4.0f, 4.0f / 3.0f, 0.1f, 2000.0f );
       
       m_pCamera.reset( ENG_NEW CameraNode( Vec3(0.0f, 0.0f, 0.0f), // position in World Space
 								Vec3( 0.0f, 0.0f, 1.0f), // look target

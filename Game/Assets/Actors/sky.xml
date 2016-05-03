@@ -1,0 +1,13 @@
+<Actor type="Sky" resource="actors\sky.xml">
+
+	<TransformComponent>
+		<Position x="0" y="0" z="0"/>
+		<Scale x="500" y="500" z="500"/>
+	</TransformComponent>
+
+    <SkyRenderComponent>
+        <Mesh path="art\sphere.obj" />
+		<Texture path="art\SkyDome-Cloud-Medium-MidMorning.png" />
+	</SkyRenderComponent>
+
+</Actor>

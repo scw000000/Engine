@@ -77,5 +77,5 @@ class MeshRenderComponent : public BaseRenderComponent
 
    protected:
       MaterialPtr m_pMaterial;
-      Resource m_MeshResource;
+      shared_ptr<Resource> m_pMeshResource;
    };

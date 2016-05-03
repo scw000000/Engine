@@ -96,6 +96,7 @@
     <ClCompile Include="..\Actors\ActorFactory.cpp" />
     <ClCompile Include="..\Actors\LightRenderComponent.cpp" />
     <ClCompile Include="..\Actors\RenderComponent.cpp" />
+    <ClCompile Include="..\Actors\SkyRenderComponent.cpp" />
     <ClCompile Include="..\Actors\TransformComponent.cpp" />
     <ClCompile Include="..\Controller\Controller.cpp" />
     <ClCompile Include="..\Debugging\Logger.cpp" />
@@ -104,6 +105,7 @@
     <ClCompile Include="..\Graphics\Geometry.cpp" />
     <ClCompile Include="..\Graphics\Light.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
+    <ClCompile Include="..\Graphics\SkySceneNode.cpp" />
     <ClCompile Include="..\Graphics\TransformStack.cpp" />
     <ClCompile Include="..\Graphics\MeshSceneNode.cpp" />
     <ClCompile Include="..\Graphics\OpenGLRenderer.cpp" />
@@ -152,6 +154,7 @@
     <ClInclude Include="..\Actors\ActorFactory.h" />
     <ClInclude Include="..\Actors\LightRenderComponent.h" />
     <ClInclude Include="..\Actors\RenderComponent.h" />
+    <ClInclude Include="..\Actors\SkyRenderComponent.h" />
     <ClInclude Include="..\Actors\TransformComponent.h" />
     <ClInclude Include="..\Controller\Controller.h" />
     <ClInclude Include="..\Debugging\Logger.h" />
@@ -160,6 +163,7 @@
     <ClInclude Include="..\Graphics\Geometry.h" />
     <ClInclude Include="..\Graphics\Light.h" />
     <ClInclude Include="..\Graphics\Material.h" />
+    <ClInclude Include="..\Graphics\SkySceneNode.h" />
     <ClInclude Include="..\Graphics\TransformStack.h" />
     <ClInclude Include="..\Graphics\MeshSceneNode.h" />
     <ClInclude Include="..\Graphics\OpenGLRenderer.h" />

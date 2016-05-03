@@ -13,6 +13,8 @@
 #include "..\ResourceCache\XmlResource.h"
 #include "TransformComponent.h"
 #include "RenderComponent.h"
+#include "LightRenderComponent.h"
+#include "SkyRenderComponent.h"
 
 ActorFactory::ActorFactory( void )
    {
@@ -20,7 +22,8 @@ ActorFactory::ActorFactory( void )
 
    m_componentFactory.Register<TransformComponent>( ActorComponent::GetIdFromName( TransformComponent::g_Name) );
    m_componentFactory.Register<MeshRenderComponent>( ActorComponent::GetIdFromName( MeshRenderComponent::g_Name) );
-
+   m_componentFactory.Register<LightRenderComponent>( ActorComponent::GetIdFromName( LightRenderComponent::g_Name) );
+   m_componentFactory.Register<SkyRenderComponent>( ActorComponent::GetIdFromName( SkyRenderComponent::g_Name) );
    }
 
 // This version of function is different than the source code

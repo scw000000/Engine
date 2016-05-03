@@ -18,9 +18,16 @@
 #include "..\ResourceCache\TextureResource.h"
 #include "OpenGLRenderer.h"
 
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\BasicVertexShader.vertexshader";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\BasicFragmentShader.fragmentshader";
+
 MeshSceneNode::MeshSceneNode( 
-   const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const Resource& meshResouce, const MaterialPtr& pMaterialPtr, RenderPass renderPass, TransformPtr pTransform )
-   : SceneNode( actorId, renderComponent, renderPass, pTransform ), m_MeshResource( meshResouce.m_name ), m_pMaterial( pMaterialPtr )
+   const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, shared_ptr<Resource> pMeshResouce, const MaterialPtr& pMaterialPtr, RenderPass renderPass, TransformPtr pTransform )
+   : SceneNode( actorId, renderComponent, renderPass, pTransform ), 
+   m_pMeshResource( pMeshResouce ), 
+   m_pMaterial( pMaterialPtr ),
+   m_VertexShader( VERTEX_SHADER_FILE_NAME ),
+   m_FragmentShader( FRAGMENT_SHADER_FILE_NAME )
    {
    m_Program = 0;
    m_VerTexBuffer = 0;
@@ -35,7 +42,7 @@ MeshSceneNode::MeshSceneNode(
    m_ToWorldMatrix = 0;
    m_LightPosWorldSpace = 0;
    m_LigthDirection = 0;
-   m_LightDiffuse = 0;
+   m_LightColor = 0;
    m_LightPower = 0;
    m_LightAmbient = 0;
    m_LightNumber = 0;
@@ -127,7 +134,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    
    float radius;
 
-   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &radius, &m_UVBuffer, &m_NormalBuffer, m_MeshResource );
+   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &radius, &m_UVBuffer, &m_NormalBuffer, *m_pMeshResource );
 
    SetRadius( radius );
 
@@ -138,12 +145,16 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_ToWorldMatrix      = glGetUniformLocation( m_Program, "M" );
    m_LightPosWorldSpace = glGetUniformLocation( m_Program, "LightPosition_WorldSpace" );
    m_LigthDirection     = glGetUniformLocation( m_Program, "LighDirection" );
-   m_LightDiffuse       = glGetUniformLocation( m_Program, "LightDiffuse" );
+   m_LightColor       = glGetUniformLocation( m_Program, "LightColor" );
    m_LightPower         = glGetUniformLocation( m_Program, "LightPower" );
    m_LightAmbient       = glGetUniformLocation( m_Program, "LightAmbient" );
    m_LightNumber        = glGetUniformLocation( m_Program, "LightNumber" );
-   m_MaterialAmbient    = glGetUniformLocation( m_Program, "MaterialDiffuse" );
-   m_MaterialDiffuse    = glGetUniformLocation( m_Program, "MaterialAmbient" );
+
+   m_EyeDirWorldSpace   = glGetUniformLocation( m_Program, "EyeDirection_WorldSpace" );
+   
+   m_MaterialDiffuse    = glGetUniformLocation( m_Program, "MaterialDiffuse" );
+   m_MaterialAmbient    = glGetUniformLocation( m_Program, "MaterialAmbient" );
+
 
    // resore all of its children
 	SceneNode::VOnRestore( pScene );
@@ -164,26 +175,28 @@ int MeshSceneNode::VRender( Scene *pScene )
    // 1-> how many matrix, GL_FALSE->should transpose or not
 	glUniformMatrix4fv( m_MVPMatrix, 1, GL_FALSE, &mWorldViewProjection[0][0]);
 
-   auto pLightManager = pScene->GetLightManagerPtr();
+   
    glUniformMatrix4fv( m_ToWorldMatrix, 1, GL_FALSE, &pScene->GetTopMatrix()[0][0] );
 
-   glUniform3fv( m_LightPosWorldSpace, pLightManager->GetActiveLightCount(), ( const GLfloat* ) pLightManager->GetLightPosWorldSpace() );
-   glUniform3fv( m_LigthDirection, pLightManager->GetActiveLightCount(), ( const GLfloat* ) pLightManager->GetLightDirection() );
-   glUniform4fv( m_LightDiffuse, pLightManager->GetActiveLightCount(), ( const GLfloat* ) pLightManager->GetLightDiffuse() );
-   glUniform1fv( m_LightPower, pLightManager->GetActiveLightCount(), ( const GLfloat* ) pLightManager->GetLightPower() );
-   glUniform4fv( m_LightAmbient, 1, ( const GLfloat* ) pLightManager->GetLightAmbient() );
-   glUniform1i( m_LightNumber, pLightManager->GetActiveLightCount() );
+   auto pLightManager = pScene->GetLightManagerPtr();
+   
+   auto i = pLightManager->GetLightDirection()[0];
+   
+   glUniform3fv( glGetUniformLocation( m_Program, "LightPosition_WorldSpace" ), MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPosWorldSpace( ) );
+   glUniform3fv( glGetUniformLocation( m_Program, "LighDirection" ), MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightDirection( ) );
+   glUniform3fv( glGetUniformLocation( m_Program, "LightColor" ), MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor( ) );
+   glUniform1fv( glGetUniformLocation( m_Program, "LightPower" ), MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower( ) );
+   glUniform3fv( glGetUniformLocation( m_Program, "LightAmbient" ), 1, ( const GLfloat* ) pLightManager->GetLightAmbient( ) );
+   glUniform1i( glGetUniformLocation( m_Program, "LightNumber" ), pLightManager->GetActiveLightCount( ) );
 
 
+   glUniform3fv( glGetUniformLocation( m_Program, "EyeDirection_WorldSpace" ), 1, ( const GLfloat* ) &pScene->GetCamera()->GetForward() );
+   
 
-   //m_LightPosWorldSpace = glGetUniformLocation( m_Program, "LightPosition_WorldSpace" );
-   //m_LigthDirection = glGetUniformLocation( m_Program, "LighDirection" );
-   //m_LightDiffuse = glGetUniformLocation( m_Program, "LightDiffuse" );
-   //m_LightPower = glGetUniformLocation( m_Program, "LightPower" );
-   //m_LightAmbient = glGetUniformLocation( m_Program, "LightAmbient" );
-   //m_LightNumber = glGetUniformLocation( m_Program, "LightNumber" );
-   //m_MaterialAmbient = glGetUniformLocation( m_Program, "MaterialDiffuse" );
-   //m_MaterialDiffuse = glGetUniformLocation( m_Program, "MaterialAmbient" );
+   glUniform3fv( glGetUniformLocation( m_Program, "MaterialAmbient" ), 1, ( const GLfloat* ) m_pMaterial->GetAmbient( ) );
+   glUniform3fv( glGetUniformLocation( m_Program, "MaterialDiffuse" ), 1, ( const GLfloat* ) m_pMaterial->GetDiffuse( ) );
+
+
 	// Bind our texture in Texture Unit 0
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, m_Texture );
@@ -213,8 +226,20 @@ int MeshSceneNode::VRender( Scene *pScene )
 			0,                                // stride
 			(void*)0                          // array buffer offset
 		);
+
+   glEnableVertexAttribArray( 2 );
+   glBindBuffer( GL_ARRAY_BUFFER, m_NormalBuffer );
+   glVertexAttribPointer(
+      2,                  // attribute
+      3,                  // size
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      ( void* ) 0            // array buffer offset
+      );
+
    // Force the Mesh to reload to getting vertex number
-   auto pAiScene = MeshResourceLoader::LoadAndReturnScene( m_MeshResource );
+   auto pAiScene = MeshResourceLoader::LoadAndReturnScene( *m_pMeshResource );
       
 	// Draw the triangle !
    // Beware of vertex numbers, I may have to use index buffer
@@ -222,6 +247,7 @@ int MeshSceneNode::VRender( Scene *pScene )
 
 	glDisableVertexAttribArray( 0 );
 	glDisableVertexAttribArray( 1 );
+   glDisableVertexAttribArray( 2 );
 
    return S_OK;
    }

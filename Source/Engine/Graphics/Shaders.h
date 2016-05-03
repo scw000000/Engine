@@ -9,7 +9,7 @@ class Scene;
 class VertexShader
    {
    public:
-	   VertexShader( void );
+	   VertexShader( const char* pResourceFile );
 	   ~VertexShader( void );
       // This function is called in SceneNode::Onrestore
       // reload and compile vertex shader
@@ -34,13 +34,15 @@ class VertexShader
       GLuint m_MVPMatrix;
       GLuint m_WorldMatrix;
 	   bool	m_enableLights;
+      Resource m_ShaderResource;
+
    };
 
 class FragmentShader
    {
    public:
       
-	   FragmentShader( void );
+	   FragmentShader( const char* pResourceFile );
 	   ~FragmentShader( void );
       // This function is called in SceneNode::Onrestore
       // reload and compile fragment shader
@@ -53,4 +55,5 @@ class FragmentShader
 
    protected:
       GLuint m_FragmentShader;
+      Resource m_ShaderResource;
    };

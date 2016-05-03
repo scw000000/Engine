@@ -5,8 +5,8 @@
 	</TransformComponent>
 
     <MeshRenderComponent>
-        <meshfile path="art\cube.obj" />
-		<texturefile path="art\cube.jpg" />
+        <Mesh path="art\cube.obj" />
+		<Texture path="art\cube.jpg" />
 	</MeshRenderComponent>
 
 </Actor>

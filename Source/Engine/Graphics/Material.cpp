@@ -8,7 +8,7 @@
 Material::Material( void ) : m_TextureResource( "art\\default.jpg" )
    {
    m_Diffuse = g_White;        
-   m_Ambient = Color( 0.10f, 0.10f, 0.10f, 1.0f );       
+   m_Ambient = Color( 0.20f, 0.20f, 0.20f, 1.0f );       
    m_Specular = g_White;       
    m_Emissive = g_Black;      
    m_Shininess = 0.f;          

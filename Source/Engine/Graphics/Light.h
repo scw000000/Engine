@@ -25,7 +25,7 @@ typedef shared_ptr<LightProperties> LightPropertiesPtr;
 //
 struct LightProperties
    {
-   Color m_Diffuse;
+   Color m_Color;
    float m_Power;
    };
 
@@ -76,7 +76,7 @@ class LightManager
       Vec3     m_LightPosWorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
       Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
       float     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
-      Color		m_LightDiffuse[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Color		m_LightColor[ MAXIMUM_LIGHTS_SUPPORTED ];
       Color		m_LightAmbient;
 
    public:
@@ -97,6 +97,6 @@ class LightManager
       Vec3* GetLightPosWorldSpace( void ) { return m_LightPosWorldSpace; }
       Vec3* GetLightDirection( void ) { return m_LightDir; }
       float* GetLightPower( void ) { return m_LightPower; }
-      Color* GetLightDiffuse( void ) { return m_LightDiffuse; }
-      Vec3* GetLightAmbient( void ) { return &m_LightAmbient; }
+      Color* GetLightColor( void ) { return m_LightColor; }
+      Color* GetLightAmbient( void ) { return &m_LightAmbient; }
    };

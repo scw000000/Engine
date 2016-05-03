@@ -67,7 +67,7 @@ shared_ptr<SceneNode> BaseRenderComponent::VGetSceneNode( void )
 //---------------------------------------------------------------------------------------------------------------------
 // MeshRenderComponent
 //---------------------------------------------------------------------------------------------------------------------
-MeshRenderComponent::MeshRenderComponent( void ) : m_MeshResource( "" ), m_pMaterial( ENG_NEW Material )
+MeshRenderComponent::MeshRenderComponent( void ) : m_pMeshResource( ENG_NEW Resource( "" ) ), m_pMaterial( ENG_NEW Material )
    {
    
    }
@@ -84,14 +84,14 @@ shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
       }
 
    WeakBaseRenderComponentPtr wbrcp(this);
-   shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), wbrcp, m_MeshResource, m_pMaterial, RenderPass::RenderPass_Actor, pTransformComponent->GetTransform() ) );
+   shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), wbrcp, m_pMeshResource, m_pMaterial, RenderPass::RenderPass_Actor, pTransformComponent->GetTransform() ) );
    
    return pMeshSceneNode;
    }
 
 bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
    {
-   TiXmlElement* pMeshFileElement = pData->FirstChildElement( "meshfile" );
+   TiXmlElement* pMeshFileElement = pData->FirstChildElement( "Mesh" );
    // Set mesh file path
    if( pMeshFileElement )
       {
@@ -100,7 +100,7 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
          {
          return false;
          }
-      m_MeshResource = Resource( pMeshFilePath );
+      m_pMeshResource = shared_ptr<Resource>( ENG_NEW Resource( pMeshFilePath ) );
       }
    else
       {
@@ -108,7 +108,7 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
       }
    
    // Set texture file path
-   TiXmlElement* pTextureFileElement = pData->FirstChildElement( "texturefile" );
+   TiXmlElement* pTextureFileElement = pData->FirstChildElement( "Texture" );
    if( pTextureFileElement )
       {
       const char *pTextureFilePath = pTextureFileElement->Attribute( "path" );
@@ -125,7 +125,7 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
       {
       return false;      
       }
-   return true;;
+   return true;
    }
 
 Color BaseRenderComponent::LoadColor( TiXmlElement* pData )

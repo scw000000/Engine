@@ -5,8 +5,13 @@
 	</TransformComponent>
 
     <MeshRenderComponent>
-        <meshfile path="art\cube.obj" />
-		<texturefile path="art\cube.jpg" />
+        <Mesh path="art\cube.obj" />
+		<Texture path="art\cube.jpg" />
 	</MeshRenderComponent>
+	
+	<LightRenderComponent>
+		<Diffuse r="1" g="1" b="1" a="1"/>
+		<Power magnitude="150"/>
+	</LightRenderComponent>
 
 </Actor>

@@ -1,0 +1,14 @@
+<Actor type="Cube" resource="actors\cube.xml">
+
+	<TransformComponent>
+		<Position x="0" y="0" z="0"/>
+	</TransformComponent>
+
+    <MeshRenderComponent>
+        <Mesh path="art\sphere.obj" />
+		<Texture path="art\SkyDome-Cloud-Medium-MidMorning.png" />
+	</MeshRenderComponent>
+	
+
+
+</Actor>

@@ -8,6 +8,8 @@
 		<Actor resource="actors\cube2.xml" />
 		<Actor resource="actors\cube3.xml" />
 		<Actor resource="actors\cube4.xml" />
+		<Actor resource="actors\shpere.xml" />
+		<Actor resource="actors\sky.xml" />
     </StaticActors>
 
 </World>

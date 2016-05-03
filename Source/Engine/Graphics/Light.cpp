@@ -33,12 +33,12 @@ void LightManager::CalcLighting( Scene *pScene )
       {
       if( lightIt == m_ActiveLights.begin() )
          {
-         m_LightAmbient = lightIt->get()->GetLightPropertiesPtr()->m_Diffuse;
+         m_LightAmbient = lightIt->get()->GetLightPropertiesPtr()->m_Color * 0.2f;
          }
       memcpy( m_LightPosWorldSpace, &lightIt->get( )->GetWorldPosition( ), sizeof( Vec3 ) );
       memcpy( m_LightDir, &lightIt->get( )->GetForward( ), sizeof( Vec3 ) );
       memcpy( m_LightPower, &lightIt->get( )->GetLightPropertiesPtr( )->m_Power, sizeof( float ) );
-      memcpy( m_LightDiffuse, &lightIt->get( )->GetLightPropertiesPtr( )->m_Diffuse, sizeof( Color ) );
+      memcpy( m_LightColor, &lightIt->get( )->GetLightPropertiesPtr( )->m_Color, sizeof( Color ) );
       }
    }  
 

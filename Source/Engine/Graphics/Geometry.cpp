@@ -138,8 +138,7 @@ Color Color::operator - ( const Color& color) const
 
 Color Color::operator * ( float scale ) const
    {
-   Color ret( *this );
-   return ( ret *= scale );
+   return ( Color( *this ) *= scale );
    }
 
 Color Color::operator / ( float scale ) const

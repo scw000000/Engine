@@ -15,13 +15,13 @@
 #include "SceneNodes.h"
 #include "Shaders.h"
 
-// TODO: prevent redundent resource file in MeshComponent
+
 class MeshSceneNode : public SceneNode
    {
    public:
 	   MeshSceneNode( const ActorId actorId, 
                      WeakBaseRenderComponentPtr renderComponent, 
-                     const Resource& meshResouce, 
+                     shared_ptr<Resource> pMeshResouce, 
                      const MaterialPtr& pMaterialPtr, 
                      RenderPass renderPass,  
                      TransformPtr pTransform );
@@ -52,7 +52,7 @@ class MeshSceneNode : public SceneNode
       GLuint            m_Texture;
       GLuint            m_TextureUni;
       GLuint            m_VertexArray;
-      Resource			   m_MeshResource;
+      shared_ptr<Resource>	 m_pMeshResource;
       MaterialPtr       m_pMaterial;
 	   VertexShader		m_VertexShader;
 	   FragmentShader		m_FragmentShader;
@@ -62,10 +62,12 @@ class MeshSceneNode : public SceneNode
       GLuint            m_ToWorldMatrix;
       GLuint            m_LightPosWorldSpace;
       GLuint            m_LigthDirection;
-      GLuint            m_LightDiffuse;
+      GLuint            m_LightColor;
       GLuint            m_LightPower;
       GLuint            m_LightAmbient;
       GLuint            m_LightNumber;
+
+      GLuint            m_EyeDirWorldSpace;
 
       GLuint            m_MaterialAmbient;
       GLuint            m_MaterialDiffuse;

@@ -19,43 +19,21 @@ LightRenderComponent::LightRenderComponent(void) : m_pLightProps( ENG_NEW( Light
 // This function is calle by BaseRenderComponent
 bool LightRenderComponent::VDelegateInit( TiXmlElement* pData )
    {
-   TiXmlElement* pLight = pData->FirstChildElement("Light");
-
-	double temp;
-   TiXmlElement* pAttenuationNode = NULL;
-	pAttenuationNode = pLight->FirstChildElement("Attenuation");
-   if (pAttenuationNode)
-	   {
-		double temp;
-		pAttenuationNode->Attribute( "const", &temp );
-		m_pLightProps->m_Attenuation[0] = (float) temp;
-
-		pAttenuationNode->Attribute( "linear", &temp );
-		m_pLightProps->m_Attenuation[1] = (float) temp;
-
-		pAttenuationNode->Attribute( "exp", &temp );
-		m_pLightProps->m_Attenuation[2] = (float) temp;
-	   }
-
-    TiXmlElement* pShapeNode = NULL;
-	pShapeNode = pLight->FirstChildElement("Shape");
-   if (pShapeNode)
-	   {
-		pShapeNode->Attribute( "range", &temp );
-		m_pLightProps->m_Range = (float) temp;
-		pShapeNode->Attribute("falloff", &temp );
-		m_pLightProps->m_Falloff = (float) temp;
-		pShapeNode->Attribute("theta", &temp );		
-		m_pLightProps->m_Theta = (float) temp;
-		pShapeNode->Attribute("phi", &temp );
-		m_pLightProps->m_Phi = (float) temp;	
-	   }
-
    TiXmlElement* pDiffuseNode = pData->FirstChildElement( "Diffuse" );
    if( pDiffuseNode )
       {
-      m_pLightProps->m_Diffuse = BaseRenderComponent::LoadColor( pDiffuseNode );
+      m_pLightProps->m_Color = BaseRenderComponent::LoadColor( pDiffuseNode );
       }
+
+   TiXmlElement* pPowerNode = NULL;
+	pPowerNode = pData->FirstChildElement("Power");
+   if ( pPowerNode )
+	   {
+      double temp;
+		pPowerNode->Attribute( "magnitude", &temp );
+		m_pLightProps->m_Power = (float) temp;
+	   }
+
     return true;
    }
 

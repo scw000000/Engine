@@ -163,6 +163,12 @@
     <ClCompile Include="..\Actors\LightRenderComponent.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
+    <ClCompile Include="..\Graphics\SkySceneNode.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Actors\SkyRenderComponent.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -294,6 +300,12 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\Actors\LightRenderComponent.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SkySceneNode.h">
+      <Filter>Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Actors\SkyRenderComponent.h">
       <Filter>Actors</Filter>
     </ClInclude>
   </ItemGroup>

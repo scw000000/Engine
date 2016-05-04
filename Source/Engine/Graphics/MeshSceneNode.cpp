@@ -93,41 +93,54 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       m_Texture = 0;
       }
 
-   GLint result = GL_FALSE;
-   if( !m_Program )
+   if( m_Program )
       {
-      m_Program = glCreateProgram();
-      result =  glGetError();
-      if( result != GL_NO_ERROR )
-         {
-         return result;
-         } 
+      glDeleteProgram( m_Program );
+      m_Program = 0;
       }
 
-   m_VertexShader.ReleaseShader( m_Program );
-   m_FragmentShader.ReleaseShader( m_Program );
+   /*m_VertexShader.ReleaseShader( m_Program );
+   m_FragmentShader.ReleaseShader( m_Program );*/
 
    m_VertexShader.OnRestore( pScene );
    m_FragmentShader.OnRestore( pScene );
 
-   // Link the program
-	glAttachShader( m_Program, m_VertexShader.GetVertexShader() );
-	glAttachShader( m_Program, m_FragmentShader.GetFragmentShader() );
-	glLinkProgram( m_Program );
+   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.GetVertexShader(), m_FragmentShader.GetFragmentShader() );
+
+   m_VertexShader.ReleaseShader( m_Program );
+   m_FragmentShader.ReleaseShader( m_Program );
+
+ //  GLint result = GL_FALSE;
+ //  if( !m_Program )
+ //     {
+ //     m_Program = glCreateProgram();
+ //     result =  glGetError();
+ //     if( result != GL_NO_ERROR )
+ //        {
+ //        return result;
+ //        } 
+ //     }
+
+ //  // Link the program
+	//glAttachShader( m_Program, m_VertexShader.GetVertexShader() );
+	//glAttachShader( m_Program, m_FragmentShader.GetFragmentShader() );
+	//glLinkProgram( m_Program );
+
+ //  
+ //  int infoLogLength;
+	//// Check the program
+	//glGetProgramiv( m_Program, GL_LINK_STATUS, &result );
+	//glGetProgramiv( m_Program, GL_INFO_LOG_LENGTH, &infoLogLength );
+
+	//if ( infoLogLength > 0 )
+ //     {
+ //     GLchar* p_ErrMsg = new GLchar[ infoLogLength + 1];
+	//	glGetProgramInfoLog( m_Program, infoLogLength, NULL, p_ErrMsg );
+	//	ENG_ERROR( p_ErrMsg );
+ //     SAFE_DELETE_ARRAY( p_ErrMsg );
+	//   }
 
    
-   int infoLogLength;
-	// Check the program
-	glGetProgramiv( m_Program, GL_LINK_STATUS, &result );
-	glGetProgramiv( m_Program, GL_INFO_LOG_LENGTH, &infoLogLength );
-
-	if ( infoLogLength > 0 )
-      {
-      GLchar* p_ErrMsg = new GLchar[ infoLogLength + 1];
-		glGetProgramInfoLog( m_Program, infoLogLength, NULL, p_ErrMsg );
-		ENG_ERROR( p_ErrMsg );
-      SAFE_DELETE_ARRAY( p_ErrMsg );
-	   }
 
 
    OpenGLRenderer::LoadTexture( &m_Texture, m_pMaterial->GetTextureResource() );
@@ -180,21 +193,19 @@ int MeshSceneNode::VRender( Scene *pScene )
 
    auto pLightManager = pScene->GetLightManagerPtr();
    
-   auto i = pLightManager->GetLightDirection()[0];
+   glUniform3fv( m_LightPosWorldSpace, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPosWorldSpace( ) );
+   glUniform3fv( m_LigthDirection, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightDirection( ) );
+   glUniform3fv( m_LightColor, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor( ) );
+   glUniform1fv( m_LightPower, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower( ) );
+   glUniform3fv( m_LightAmbient, 1, ( const GLfloat* ) pLightManager->GetLightAmbient( ) );
+   glUniform1i( m_LightNumber, pLightManager->GetActiveLightCount( ) );
+
+
+   glUniform3fv( m_EyeDirWorldSpace, 1, ( const GLfloat* ) &pScene->GetCamera()->GetForward() );
    
-   glUniform3fv( glGetUniformLocation( m_Program, "LightPosition_WorldSpace" ), MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPosWorldSpace( ) );
-   glUniform3fv( glGetUniformLocation( m_Program, "LighDirection" ), MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightDirection( ) );
-   glUniform3fv( glGetUniformLocation( m_Program, "LightColor" ), MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor( ) );
-   glUniform1fv( glGetUniformLocation( m_Program, "LightPower" ), MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower( ) );
-   glUniform3fv( glGetUniformLocation( m_Program, "LightAmbient" ), 1, ( const GLfloat* ) pLightManager->GetLightAmbient( ) );
-   glUniform1i( glGetUniformLocation( m_Program, "LightNumber" ), pLightManager->GetActiveLightCount( ) );
-
-
-   glUniform3fv( glGetUniformLocation( m_Program, "EyeDirection_WorldSpace" ), 1, ( const GLfloat* ) &pScene->GetCamera()->GetForward() );
+   glUniform3fv( m_MaterialDiffuse, 1, ( const GLfloat* ) m_pMaterial->GetDiffuse( ) );
+   glUniform3fv( m_MaterialAmbient, 1, ( const GLfloat* ) m_pMaterial->GetAmbient( ) );
    
-
-   glUniform3fv( glGetUniformLocation( m_Program, "MaterialAmbient" ), 1, ( const GLfloat* ) m_pMaterial->GetAmbient( ) );
-   glUniform3fv( glGetUniformLocation( m_Program, "MaterialDiffuse" ), 1, ( const GLfloat* ) m_pMaterial->GetDiffuse( ) );
 
 
 	// Bind our texture in Texture Unit 0

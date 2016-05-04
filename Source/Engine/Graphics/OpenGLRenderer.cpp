@@ -208,3 +208,39 @@ GLuint OpenGLRenderer::CompileShader( const GLchar* const* pSrcData, const GLuin
 	   }
    return result;
    }
+
+GLuint OpenGLRenderer::GenerateProgram( GLuint vertexShader, GLuint fragmentShader )
+   {
+   GLint result = GL_FALSE;
+   GLuint program = glCreateProgram( );
+
+
+   result = glGetError( );
+   if( result != GL_NO_ERROR )
+      {
+      ENG_ASSERT( 0 && "Program create failed " );
+      return 0;
+      }
+
+   // Link the program
+   glAttachShader( program, vertexShader );
+   glAttachShader( program, fragmentShader );
+   glLinkProgram( program );
+
+
+   int infoLogLength;
+   // Check the program
+   glGetProgramiv( program, GL_LINK_STATUS, &result );
+   glGetProgramiv( program, GL_INFO_LOG_LENGTH, &infoLogLength );
+
+   if( infoLogLength > 0 )
+      {
+      GLchar* p_ErrMsg = new GLchar[infoLogLength + 1];
+      glGetProgramInfoLog( program, infoLogLength, NULL, p_ErrMsg );
+      ENG_ERROR( p_ErrMsg );
+      SAFE_DELETE_ARRAY( p_ErrMsg );
+      return 0;
+      }
+
+   return program;
+   }

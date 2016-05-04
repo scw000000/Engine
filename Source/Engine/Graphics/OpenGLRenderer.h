@@ -47,7 +47,9 @@ class OpenGLRenderer : public IRenderer
 	   //virtual void VDrawLine( const Vec3& from,const Vec3& to,const Color& color )=0;
       
 
-      GLuint CompileShader( const GLchar* const* pSrcData, const GLuint shaderID );
+      static GLuint CompileShader( const GLchar* const* pSrcData, const GLuint shaderID );
+
+      static GLuint GenerateProgram( GLuint vertexShader, GLuint fragmentShader );
    private:
 
    };

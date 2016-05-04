@@ -76,41 +76,19 @@ int SkySceneNode::VOnRestore( Scene *pScene )
       m_Texture = 0;
       }
 
-   GLint result = GL_FALSE;
-   if( !m_Program )
+   if( m_Program )
       {
-      m_Program = glCreateProgram();
-      result =  glGetError();
-      if( result != GL_NO_ERROR )
-         {
-         return result;
-         } 
+      glDeleteProgram( m_Program );
+      m_Program = 0;
       }
-
-   m_VertexShader.ReleaseShader( m_Program );
-   m_FragmentShader.ReleaseShader( m_Program );
 
    m_VertexShader.OnRestore( pScene );
    m_FragmentShader.OnRestore( pScene );
 
-   // Link the program
-	glAttachShader( m_Program, m_VertexShader.GetVertexShader() );
-	glAttachShader( m_Program, m_FragmentShader.GetFragmentShader() );
-	glLinkProgram( m_Program );
+   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.GetVertexShader( ), m_FragmentShader.GetFragmentShader( ) );
 
-   
-   int infoLogLength;
-	// Check the program
-	glGetProgramiv( m_Program, GL_LINK_STATUS, &result );
-	glGetProgramiv( m_Program, GL_INFO_LOG_LENGTH, &infoLogLength );
-
-	if ( infoLogLength > 0 )
-      {
-      GLchar* p_ErrMsg = new GLchar[ infoLogLength + 1];
-		glGetProgramInfoLog( m_Program, infoLogLength, NULL, p_ErrMsg );
-		ENG_ERROR( p_ErrMsg );
-      SAFE_DELETE_ARRAY( p_ErrMsg );
-	   }
+   m_VertexShader.ReleaseShader( m_Program );
+   m_FragmentShader.ReleaseShader( m_Program );
 
 
    OpenGLRenderer::LoadTexture( &m_Texture, *m_pTextureResource );

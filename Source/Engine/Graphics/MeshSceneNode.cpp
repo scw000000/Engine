@@ -22,10 +22,10 @@ const char* const VERTEX_SHADER_FILE_NAME = "Effects\\BasicVertexShader.vertexsh
 const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\BasicFragmentShader.fragmentshader";
 
 MeshSceneNode::MeshSceneNode( 
-   const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, shared_ptr<Resource> pMeshResouce, const MaterialPtr& pMaterialPtr, RenderPass renderPass, TransformPtr pTransform )
-   : SceneNode( actorId, renderComponent, renderPass, pTransform ), 
+   const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, shared_ptr<Resource> pMeshResouce, MaterialPtr pMaterial, RenderPass renderPass, TransformPtr pTransform )
+   : SceneNode( actorId, renderComponent, renderPass, pTransform, pMaterial ), 
    m_pMeshResource( pMeshResouce ), 
-   m_pMaterial( pMaterialPtr ),
+  // m_pMaterial(  ),
    m_VertexShader( VERTEX_SHADER_FILE_NAME ),
    m_FragmentShader( FRAGMENT_SHADER_FILE_NAME )
    {
@@ -152,7 +152,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    
 
 
-   OpenGLRenderer::LoadTexture( &m_Texture, m_pMaterial->GetTextureResource() );
+   OpenGLRenderer::LoadTexture( &m_Texture, m_Props.GetMaterialPtr()->GetTextureResource() );
    
    float radius;
 
@@ -212,8 +212,8 @@ int MeshSceneNode::VRender( Scene *pScene )
 
    glUniform3fv( m_EyeDirWorldSpace, 1, ( const GLfloat* ) &pScene->GetCamera()->GetForward() );
    
-   glUniform3fv( m_MaterialDiffuse, 1, ( const GLfloat* ) m_pMaterial->GetDiffuse( ) );
-   glUniform3fv( m_MaterialAmbient, 1, ( const GLfloat* ) m_pMaterial->GetAmbient( ) );
+   glUniform4fv( m_MaterialDiffuse, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse( ) );
+   glUniform3fv( m_MaterialAmbient, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient( ) );
    
 
 

@@ -24,13 +24,18 @@ void TransformStack::Pop( void )
    isMatrixDirty = true;
    }
 
-Mat4x4 TransformStack::GetTop( void )
+Mat4x4 TransformStack::GetTopMatrix( void )
    {
    if( isMatrixDirty )
       {
       this->UpdateTopMatrix();
       }
    return m_TopMatrix; 
+   }
+
+Transform TransformStack::GetTopTransForm( void ) const
+   {
+   return m_Stack.top();
    }
 
 void TransformStack::PushCurTransform( void )

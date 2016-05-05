@@ -30,12 +30,18 @@ class Scene
          m_TransformStack.Push( *pTransform );
 	      }
 
+      void PushAndSetTransform( Transform transform )
+         {
+         m_TransformStack.Push( transform );
+         }
+
 	   void PopTransform() 
 	      {
 		   //Scene::PopMatrix - Chapter 16, page 541
 		   m_TransformStack.Pop(); 
 	      }
-      Mat4x4 GetTopMatrix() { return m_TransformStack.GetTop(); }
+      Mat4x4 GetTopMatrix() { return m_TransformStack.GetTopMatrix(); }
+      Transform GetTopTransform( void ) const{ return m_TransformStack.GetTopTransForm(); };
 
 	   void AddAlphaSceneNode( AlphaSceneNode *asn ) { m_AlphaSceneNodes.push_back( asn ); }
       void NewRenderComponentDelegate( IEventDataPtr pEventData );

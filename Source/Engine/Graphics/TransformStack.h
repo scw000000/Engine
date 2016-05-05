@@ -14,7 +14,8 @@ class TransformStack
       TransformStack( void );
       void Push( const Transform& transform );
       void Pop( void );
-      Mat4x4 GetTop();
+      Mat4x4 GetTopMatrix( void );
+      Transform GetTopTransForm( void ) const;
 
    private:
       void PushCurTransform( void );

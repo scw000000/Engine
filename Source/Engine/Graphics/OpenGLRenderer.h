@@ -50,6 +50,8 @@ class OpenGLRenderer : public IRenderer
       static GLuint CompileShader( const GLchar* const* pSrcData, const GLuint shaderID );
 
       static GLuint GenerateProgram( GLuint vertexShader, GLuint fragmentShader );
+
+      static void SetRenderAlpha( bool isAlpha );
    private:
 
    };

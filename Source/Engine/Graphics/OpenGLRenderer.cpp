@@ -270,3 +270,20 @@ GLuint OpenGLRenderer::GenerateProgram( GLuint vertexShader, GLuint fragmentShad
 
    return program;
    }
+
+void OpenGLRenderer::SetRenderAlpha( bool isAlpha )
+   {
+   if( isAlpha )
+      {
+      // Enable blending
+      glEnable( GL_BLEND );
+      glDisable( GL_CULL_FACE );
+      glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+      }
+   else
+      {
+      glDisable( GL_BLEND );
+      glEnable( GL_CULL_FACE );
+      }
+   
+   }

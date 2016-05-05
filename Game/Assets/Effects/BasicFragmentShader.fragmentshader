@@ -2,11 +2,11 @@
 
 // Interpolated values from the vertex shaders
 in vec2 UV;
-in vec3 TotalDiffuseColor;
+in vec4 TotalDiffuseColor;
 in vec3 TotalSpecularColor;
 
 // Ouput data
-out vec3 color;
+out vec4 color;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTextureSampler;
@@ -14,5 +14,6 @@ uniform sampler2D myTextureSampler;
 void main(){
 
 	// Output color = color of the texture at the specified UV
-	color = texture( myTextureSampler, UV ).rgb * TotalDiffuseColor + TotalSpecularColor;
+	color.rgb = texture( myTextureSampler, UV ).rgb * TotalDiffuseColor.rgb + TotalSpecularColor;
+	color.a = TotalDiffuseColor.a;
 }

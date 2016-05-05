@@ -178,6 +178,9 @@ typedef shared_ptr<Material> MaterialPtr;
 class LightNode;
 typedef std::list<shared_ptr<LightNode> > Lights;
 
+
+
+
 class IRenderer
    {
    public:
@@ -224,6 +227,7 @@ class ISceneNode
 	   virtual bool VAddChild( shared_ptr<ISceneNode> kid )=0;
 	   virtual bool VRemoveChild( ActorId id ) = 0;
 	   virtual int VOnLostDevice( Scene *pScene ) = 0;
+
 //	   virtual int VPick( Scene *pScene, RayCast *pRayCast ) = 0;
    };
 

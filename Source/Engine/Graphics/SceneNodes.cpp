@@ -9,12 +9,12 @@
 #include "..\Actors\TransformComponent.h"
 #include "..\Actors\RenderComponent.h"
 
-SceneNodeProperties::SceneNodeProperties( void ) : m_pTransform( ENG_NEW Transform() )
+SceneNodeProperties::SceneNodeProperties( void ) : m_pTransform( ENG_NEW Transform() ), m_pMaterial()
    {
    m_ActorId = INVALID_ACTOR_ID;
    m_Radius = 0;
    m_RenderPass = RenderPass_0;
-   //m_AlphaType = AlphaOpaque;
+   
    }
 
 TransformPtr SceneNodeProperties::GetTransformPtr( void ) const
@@ -27,7 +27,24 @@ const Transform& SceneNodeProperties::GetTransform( void ) const
    return *m_pTransform;
    }
 
-SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, TransformPtr pNewTransform )
+void SceneNodeProperties::SetAlpha( const float alpha )
+   {
+   if( m_pMaterial )
+      {
+      m_pMaterial->SetAlpha( alpha );
+      }
+   }
+
+float SceneNodeProperties::GetAlpha( void ) const 
+   { 
+   if( m_pMaterial )
+      { 
+      return m_pMaterial->GetAlpha(); 
+      } 
+   return fOPAQUE; 
+   }
+
+SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, TransformPtr pNewTransform, MaterialPtr pMaterial )
    {
    m_pParent= NULL;
 	m_Props.m_ActorId = actorId;
@@ -35,6 +52,7 @@ SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponen
 	m_Props.m_RenderPass = renderPass;
 	//m_Props.m_AlphaType = AlphaOpaque;
 	m_RenderComponent = renderComponent;
+   m_Props.m_pMaterial = pMaterial;
 	VSetTransformPtr( pNewTransform ); 
 	SetRadius( 0.0f );
    }
@@ -101,9 +119,32 @@ int SceneNode::VRenderChildren( Scene *pScene )
          {
          if( it->VIsVisible( pScene ) )
             {
-            it->VRender( pScene );
+            float alpha = it->VGetProperties().GetAlpha( );
+            if( alpha == fOPAQUE )
+               {
+               it->VRender( pScene );
+               }
+            else if( alpha != fTRANSPARENT )
+               {
+               // The object isn't totally transparent...
+               AlphaSceneNode *asn = ENG_NEW AlphaSceneNode;
+               ENG_ASSERT( asn );
+               asn->m_pNode = it;
+               asn->m_Concat = pScene->GetTopTransform();
+
+               Vec4 worldPos( asn->m_Concat.GetPosition() );
+
+               Mat4x4 fromWorld = pScene->GetCamera( )->VGetProperties().GetFromWorld();
+
+               Vec4 screenPos = fromWorld.Xform( worldPos );
+
+               asn->m_ScreenZ = screenPos.z;
+
+               pScene->AddAlphaSceneNode( asn );
+               }
+
+            it->VRenderChildren( pScene );
             }
-         it->VRenderChildren( pScene );
          }
       it->VPostRender( pScene );
       }

@@ -12,6 +12,7 @@ Material::Material( void ) : m_TextureResource( "art\\default.jpg" )
    m_Specular = g_White;       
    m_Emissive = g_Black;      
    m_Shininess = 0.f;          
+   m_AlphaType = AlphaOpaque;
    }
 
 void Material::SetTextureResource( const Resource& newTexture )
@@ -42,6 +43,7 @@ void Material::SetEmissive( const Color &color )
 
 void Material::SetAlpha( float alpha )
    {
+   m_AlphaType = AlphaType::AlphaMaterial;
 	m_Diffuse.SetAlpha( alpha );
    }
 

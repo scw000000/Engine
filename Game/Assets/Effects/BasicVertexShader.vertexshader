@@ -7,7 +7,7 @@ layout(location = 2) in vec3 VertexNormal_Modelspace;
 
 // Output data ; will be interpolated for each fragment.
 out vec2 UV;
-out vec3 TotalDiffuseColor;
+out vec4 TotalDiffuseColor;
 out vec3 TotalSpecularColor;
 
 // Values that stay constant for the whole mesh.
@@ -23,7 +23,7 @@ uniform int     LightNumber;
 
 uniform vec3	EyeDirection_WorldSpace;
 
-uniform vec3 	MaterialDiffuse;
+uniform vec4 	MaterialDiffuse;
 uniform vec3	MaterialAmbient;
 
 
@@ -39,7 +39,7 @@ void main()
 	float cosAlpha;
 	float dotProduct;
 	float dist;
-	TotalDiffuseColor = vec3( 0, 0, 0 );
+	TotalDiffuseColor.rgb = vec3( 0, 0, 0 );
 	TotalSpecularColor = vec3( 0, 0, 0 );
 		
 	for( int i = 0; i < LightNumber; ++i )
@@ -56,14 +56,14 @@ void main()
 		cosAlpha = clamp( dot( -EyeDirection_WorldSpace, reflection ), 0, 1 );
 		
 		float temp = LightPower[i] / ( dist * dist );
-		TotalDiffuseColor +=  LightColor[i] * temp * dotProduct;
+		TotalDiffuseColor.rgb +=  LightColor[i] * temp * dotProduct;
 		TotalSpecularColor +=  vec3( 0.3, 0.3, 0.3 ) * LightColor[i] * temp * pow( cosAlpha,5 );
 		}
 
-	//TotalDiffuseColor = MaterialAmbient * LightAmbient + MaterialDiffuse * TotalDiffuseColor;
-	TotalDiffuseColor = LightAmbient + TotalDiffuseColor;
+	//TotalDiffuseColor = MaterialAmbient * LightAmbient + MaterialDiffuse.rgb * TotalDiffuseColor;
+	TotalDiffuseColor.rgb = LightAmbient + TotalDiffuseColor.rgb;
 	
-	
+	TotalDiffuseColor.a = MaterialDiffuse.a;
 	
 	// UV of the vertex. No special space for this one.
 	UV = VertexUV;

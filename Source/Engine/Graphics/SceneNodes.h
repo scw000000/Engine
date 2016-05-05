@@ -21,17 +21,15 @@ class BaseRenderComponent;
 
 typedef BaseRenderComponent* WeakBaseRenderComponentPtr;
 
+
 //   This enum defines the different types of alpha blending
 //   types that can be set on a scene node.
-enum AlphaType
-   {
-	AlphaOpaque,
-	AlphaTexture,
-	AlphaMaterial,
-	AlphaVertex
+enum AlphaType {
+   AlphaOpaque,
+   AlphaTexture,
+   AlphaMaterial,
+   AlphaVertex
    };
-
-
 
 // TODO: implement rest graphic class such as material, alpha, render component.... 
 class SceneNodeProperties
@@ -42,10 +40,7 @@ class SceneNodeProperties
 
       ActorId GetActorId( void ) const { return m_ActorId; }
    //   const Mat4x4& GetToWorld( void ) const { return m_ToWorld; }
-      Mat4x4 GetFromWorld( void ) const { 
-         return m_pTransform->GetFromWorld(); 
-         /*return m_pTransform.Inverse().GetToWorld();*/
-         }
+      Mat4x4 GetFromWorld( void ) const { return m_pTransform->GetFromWorld(); }
       TransformPtr GetTransformPtr( void ) const;
 
       /**
@@ -54,17 +49,18 @@ class SceneNodeProperties
        * @param   void
        * @return const Transform&
        */
-       const Transform& GetTransform( void ) const;
+      const Transform& GetTransform( void ) const;
 
       const char* Name( void ) const { return m_Name.c_str(); }
 
-      //bool HasAlpha( void ) const {};
-      // virtual float Alpha( void ) const {}
+      void SetAlpha( const float alpha );
+      float GetAlpha( void ) const;
 
       RenderPass GetRenderPass( void ) const { return m_RenderPass; }
       float GetRadius( void ) const { return m_Radius; }
       
-      /*Material& GetMaterial( void ) { return m_Material; }*/
+      MaterialPtr GetMaterialPtr( void ) { return m_pMaterial; }
+      void SetMaterialPtr( MaterialPtr pMaterial ) { pMaterial = m_pMaterial; }
 
    protected:
       ActorId m_ActorId;
@@ -72,8 +68,7 @@ class SceneNodeProperties
       TransformPtr m_pTransform;
       float m_Radius;
       RenderPass m_RenderPass;
-      /*Material m_Material;*/
-      //AlphaType m_AlphaType;
+      MaterialPtr m_pMaterial;
 
    private:
 
@@ -87,7 +82,7 @@ class SceneNode : public ISceneNode
 
    public:
       // TODO: finish constructor
-	   SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ) );
+	   SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ), MaterialPtr pMaterial = MaterialPtr() );
 
 	   virtual ~SceneNode();
 
@@ -119,8 +114,8 @@ class SceneNode : public ISceneNode
 	   virtual int VOnLostDevice( Scene *pScene ) override;
 	   //virtual int VPick(Scene *pScene, RayCast *pRayCast);
 
-	   void SetAlpha( float alpha );
-	   //float GetAlpha() const { return m_Props.Alpha(); }
+      void SetAlpha( float alpha );
+	   float GetAlpha() const { return m_Props.GetAlpha(); }
       
       // return position in parent space
 	   virtual Vec3 GetToWorldPosition( void ) const override { return m_Props.m_pTransform->GetPosition(); }
@@ -147,10 +142,12 @@ class SceneNode : public ISceneNode
 struct AlphaSceneNode
    {
 	shared_ptr<ISceneNode> m_pNode;
-	TransformPtr m_Concat;
+	Transform m_Concat;
 	float m_ScreenZ;
 
 	// For the STL sort...
+   // To render alpha object, they must be rendered from back to front
+   // to get desired effect
 	bool const operator <(AlphaSceneNode const &other) { return m_ScreenZ < other.m_ScreenZ; }
    };
 

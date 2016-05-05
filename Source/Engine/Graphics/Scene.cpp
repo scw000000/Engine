@@ -121,19 +121,21 @@ bool Scene::RemoveChild( ActorId id )
 
 void Scene::RenderAlphaPass()
    {
- //  shared_ptr<IRenderState> alphaPass = m_Renderer->VPrepareAlphaPass();
-
+   //  shared_ptr<IRenderState> alphaPass = m_Renderer->VPrepareAlphaPass();
+   OpenGLRenderer::SetRenderAlpha( true );
 	m_AlphaSceneNodes.sort();
    // rendering from back to front in order to make visual effort of transparant objects
 	while ( !m_AlphaSceneNodes.empty() )
 	   {
 		AlphaSceneNodes::reverse_iterator i = m_AlphaSceneNodes.rbegin();
 		PushAndSetTransform( (*i)->m_Concat );
-		(*i)->m_pNode->VRender(this);
-		delete (*i);
+		(*i)->m_pNode->VRender( this );
+		SAFE_DELETE( *i );
 		PopTransform();
 		m_AlphaSceneNodes.pop_back();
 	   }
+
+   OpenGLRenderer::SetRenderAlpha( false );
    }
 
 void Scene::NewRenderComponentDelegate( IEventDataPtr pEventData )

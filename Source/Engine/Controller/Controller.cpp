@@ -1,6 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Controller.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file Controller.cpp
+ * \date 2016/05/05 15:40
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "EngineStd.h"
 #include "Controller.h"
@@ -87,8 +97,8 @@ bool MovementController::VOnPointerMove( Point motion )
 	   }
 	else
 	   {
-      m_TargetRotShift.x += 0.001f * ( g_pApp->GetScreenSize().GetY() / 2 - motion.y );
-      m_TargetRotShift.y += 0.001f * ( motion.x - g_pApp->GetScreenSize().GetX() / 2 ) ;    
+      m_TargetRotShift.x += 0.001f * ( motion.y - g_pApp->GetScreenSize().GetY() / 2 );
+      m_TargetRotShift.y += 0.001f * ( g_pApp->GetScreenSize().GetX() / 2 - motion.x ) ;    
 	   }
    SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
 	return true;

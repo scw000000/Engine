@@ -22,7 +22,7 @@ class MeshSceneNode : public SceneNode
 	   MeshSceneNode( const ActorId actorId, 
                      WeakBaseRenderComponentPtr renderComponent, 
                      shared_ptr<Resource> pMeshResouce, 
-                     const MaterialPtr& pMaterialPtr, 
+                     MaterialPtr pMaterial, 
                      RenderPass renderPass,  
                      TransformPtr pTransform );
       ~MeshSceneNode( void );
@@ -56,10 +56,9 @@ class MeshSceneNode : public SceneNode
       GLuint            m_TextureUni;
       GLuint            m_VertexArray;
       shared_ptr<Resource>	 m_pMeshResource;
-      MaterialPtr       m_pMaterial;
+    //  MaterialPtr       m_pMaterial;
 	   VertexShader		m_VertexShader;
 	   FragmentShader		m_FragmentShader;
-      Material          m_Material;
 
       GLuint            m_NormalBuffer;
       GLuint            m_ToWorldMatrix;

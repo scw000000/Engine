@@ -1,6 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: RenderComponent.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file RenderComponent.cpp
+ * \date 2016/05/05 15:43
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "EngineStd.h"
 #include "RenderComponent.h"
@@ -106,25 +116,45 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
       {
       return false;
       }
-   
    // Set texture file path
-   TiXmlElement* pTextureFileElement = pData->FirstChildElement( "Texture" );
-   if( pTextureFileElement )
+   TiXmlElement* pMaterialElement = pData->FirstChildElement( "Material" );
+   if( pMaterialElement )
       {
-      const char *pTextureFilePath = pTextureFileElement->Attribute( "path" );
-      if( !pTextureFilePath )
+      TiXmlElement* pTextureFileElement = pMaterialElement->FirstChildElement( "Texture" );
+      if( pTextureFileElement )
          {
-         return false;
+         const char *pTextureFilePath = pTextureFileElement->Attribute( "path" );
+         if( pTextureFilePath )
+            {
+            m_pMaterial->SetTextureResource( Resource( pTextureFilePath ) );
+            }
          }
-      else
+      TiXmlElement* pDiffuseElement = pMaterialElement->FirstChildElement( "Diffuse" );
+      if( pDiffuseElement )
          {
-         m_pMaterial->SetTextureResource( Resource( pTextureFilePath ) );
+         m_pMaterial->SetDiffuse( BaseRenderComponent::LoadColor( pDiffuseElement ) );
          }
       }
-   else
-      {
-      return false;      
-      }
+
+   //// Set texture file path
+   //TiXmlElement* pTextureFileElement = pData->FirstChildElement( "Texture" );
+   //if( pTextureFileElement )
+   //   {
+   //   const char *pTextureFilePath = pTextureFileElement->Attribute( "path" );
+   //   if( !pTextureFilePath )
+   //      {
+   //      return false;
+   //      }
+   //   else
+   //      {
+   //      m_pMaterial->SetTextureResource( Resource( pTextureFilePath ) );
+   //      }
+   //   }
+   //else
+   //   {
+   //   return false;      
+   //   }
+
    return true;
    }
 

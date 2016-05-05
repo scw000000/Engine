@@ -33,6 +33,7 @@ SkySceneNode::SkySceneNode(
    m_Program = 0;
    m_VerTexBuffer = 0;
    m_UVBuffer = 0;
+   m_IndexBuffer = 0;
    m_MVPMatrix = 0;
    m_Texture = 0;
    m_TextureUni = 0;
@@ -70,6 +71,12 @@ int SkySceneNode::VOnRestore( Scene *pScene )
       m_UVBuffer = 0;
       }
 
+   if( m_IndexBuffer )
+      {
+      glDeleteBuffers( 1, &m_IndexBuffer );
+      m_IndexBuffer = 0;
+      }
+
    if( m_TextureUni )
       {
       glDeleteTextures( 1, &m_TextureUni );
@@ -95,7 +102,7 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    
    float radius;
 
-   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &radius, &m_UVBuffer, NULL, *m_pMeshResource );
+   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &radius, &m_UVBuffer, &m_IndexBuffer, NULL,*m_pMeshResource );
 
    m_MVPMatrix          = glGetUniformLocation( m_Program, "MVP" );
    m_TextureUni         = glGetUniformLocation( m_Program, "myTextureSampler" );
@@ -154,9 +161,20 @@ int SkySceneNode::VRender( Scene *pScene )
    // Force the Mesh to reload to getting vertex number
    auto pAiScene = MeshResourceLoader::LoadAndReturnScene( *m_pMeshResource );
       
-	// Draw the triangle !
-   // Beware of vertex numbers, I may have to use index buffer
-	glDrawArrays( GL_TRIANGLES, 0, pAiScene->mMeshes[0]->mNumVertices );
+	//// Draw the triangle !
+ //  // Beware of vertex numbers, I may have to use index buffer
+	//glDrawArrays( GL_TRIANGLES, 0, pAiScene->mMeshes[0]->mNumVertices );
+
+   // Index buffer
+   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer );
+
+   // Draw the triangles !
+   glDrawElements(
+      GL_TRIANGLES,      // mode
+      pAiScene->mMeshes[0]->mNumFaces * 3,    // count
+      GL_UNSIGNED_INT,   // type
+      ( void* ) 0           // element array buffer offset
+      );
 
 	glDisableVertexAttribArray( 0 );
 	glDisableVertexAttribArray( 1 );

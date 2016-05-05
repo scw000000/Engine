@@ -54,6 +54,7 @@ class SkySceneNode : public SceneNode
 	   GLuint               m_Program;
       GLuint               m_VerTexBuffer;
       GLuint               m_UVBuffer;
+      GLuint               m_IndexBuffer;
       GLuint               m_MVPMatrix;
       GLuint               m_Texture;
       GLuint               m_TextureUni;

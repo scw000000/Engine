@@ -82,24 +82,85 @@ void OpenGLRenderer::LoadTexture( GLuint* textureId, Resource& textureResource )
   
    }
 
-void OpenGLRenderer::LoadMesh( GLuint* vertexBuffer, float* radius, GLuint* uvBuffer, GLuint* normalBuffer, Resource& meshResource )
+void OpenGLRenderer::LoadMesh( GLuint* vertexBuffer, float* radius, GLuint* uvBuffer, GLuint* indexBuffer, GLuint* normalBuffer, Resource& meshResource )
    {
    auto pAiScene = MeshResourceLoader::LoadAndReturnScene( meshResource );
+   auto pMesh = pAiScene->mMeshes[0];
 
    glGenBuffers( 1, vertexBuffer );
    glBindBuffer( GL_ARRAY_BUFFER, *vertexBuffer );
    glBufferData( GL_ARRAY_BUFFER,
-                 pAiScene->mMeshes[0]->mNumVertices * sizeof( aiVector3t<float> ),
-                 &pAiScene->mMeshes[0]->mVertices[0],
+                 pMesh->mNumVertices * sizeof( aiVector3t<float> ),
+                 &pMesh->mVertices[0],
                  GL_STATIC_DRAW );
 
    *radius = -1.0f;
-   for( unsigned int vertex = 0; vertex < pAiScene->mMeshes[0]->mNumVertices; vertex++ )
+
+   // UV coordinates loaded in assimp is 3-dimensions
+   // But GLSL expect 2-dimension coordinates
+   // So we have to translate them
+   aiVector2t<float> *uvVertices = NULL;
+
+
+
+   if( uvBuffer )
       {
-      auto curSquareLength = pAiScene->mMeshes[0]->mVertices[vertex].SquareLength( );
-      *radius = std::max( *radius, curSquareLength );
+      uvVertices = ENG_NEW aiVector2t<float>[pMesh->mNumVertices];
+      glGenBuffers( 1, uvBuffer );
       }
-   /*
+
+   for( unsigned int vertex = 0; vertex < pMesh->mNumVertices; vertex++ )
+      {
+      auto curSquareLength = pMesh->mVertices[vertex].SquareLength( );
+      *radius = std::max( *radius, curSquareLength );
+      if( uvBuffer )
+         {
+         memcpy( &uvVertices[vertex], &pMesh->mTextureCoords[0][vertex], sizeof( aiVector2t<float> ) );
+         }
+      }
+
+   if( uvBuffer )
+      {
+      glBindBuffer( GL_ARRAY_BUFFER, *uvBuffer );
+      glBufferData( GL_ARRAY_BUFFER,
+                   pMesh->mNumVertices * sizeof( aiVector2t<float> ),
+                    &uvVertices[0],
+                    GL_STATIC_DRAW );
+      SAFE_DELETE_ARRAY( uvVertices );
+      }
+   // Loading UV Buffer & calculate bounding sphere radius
+
+
+   if( normalBuffer )
+      {
+      glGenBuffers( 1, normalBuffer );
+      glBindBuffer( GL_ARRAY_BUFFER, *normalBuffer );
+      glBufferData( GL_ARRAY_BUFFER,
+                    pMesh->mNumVertices * sizeof( aiVector3t<float> ),
+                    &pMesh->mNormals[0],
+                    GL_STATIC_DRAW );
+
+      }
+
+   if( indexBuffer )
+      {
+      std::vector<unsigned int> indexes( pMesh->mNumFaces * 3, 0 );
+      for( unsigned int t = 0; t < pMesh->mNumFaces; ++t )
+         {
+         const aiFace& face = pMesh->mFaces[t];
+         ENG_ASSERT( face.mNumIndices == 3 && "Warning: Mesh face with not exactly 3 indices, ignoring this primitive." );
+         indexes[ t * 3 + 0] = face.mIndices[0];
+         indexes[ t * 3 + 1] = face.mIndices[1];
+         indexes[ t * 3 + 2] = face.mIndices[2];
+         }
+      glGenBuffers( 1, indexBuffer );
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, *indexBuffer );
+      glBufferData( GL_ELEMENT_ARRAY_BUFFER,
+                    indexes.size() * sizeof( unsigned int ),
+                    &indexes[0],
+                    GL_STATIC_DRAW );
+      }
+    /*
       for( unsigned int n = 0; n < pAiScene->mNumMeshes; ++n )
       {
       const struct aiMesh* mesh = pAiScene->mMeshes[n];
@@ -152,41 +213,6 @@ void OpenGLRenderer::LoadMesh( GLuint* vertexBuffer, float* radius, GLuint* uvBu
       std::cout << ToStr( vecC ) << std::endl << std::endl;
       }
       }*/
-
-   
-   // Loading UV Buffer & calculate bounding sphere radius
-   if( uvBuffer )
-      {
-      glGenBuffers( 1, uvBuffer );
-      glBindBuffer( GL_ARRAY_BUFFER, *uvBuffer );
-
-      // UV coordinates loaded in assimp is 3-dimensions
-      // But GLSL expect 2-dimension coordinates
-      // So we have to translate them
-      aiVector2t<float> *uvBuffer = ENG_NEW aiVector2t<float>[pAiScene->mMeshes[0]->mNumVertices];
-
-      for( unsigned int vertex = 0; vertex < pAiScene->mMeshes[0]->mNumVertices; vertex++ )
-         {
-         memcpy( &uvBuffer[vertex], &pAiScene->mMeshes[0]->mTextureCoords[0][vertex], sizeof( aiVector2t<float> ) );
-         }
-
-      glBufferData( GL_ARRAY_BUFFER,
-                    pAiScene->mMeshes[0]->mNumVertices * sizeof( aiVector2t<float> ),
-                    &uvBuffer[0],
-                    GL_STATIC_DRAW );
-      SAFE_DELETE_ARRAY( uvBuffer );
-      }
-
-   if( normalBuffer )
-      {
-      glGenBuffers( 1, normalBuffer );
-      glBindBuffer( GL_ARRAY_BUFFER, *normalBuffer );
-      glBufferData( GL_ARRAY_BUFFER,
-                    pAiScene->mMeshes[0]->mNumVertices * sizeof( aiVector3t<float> ),
-                    &pAiScene->mMeshes[0]->mNormals[0],
-                    GL_STATIC_DRAW );
-
-      }
    }
 
 GLuint OpenGLRenderer::CompileShader( const GLchar* const* pSrcData, const GLuint shaderID )

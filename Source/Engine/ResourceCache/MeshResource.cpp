@@ -31,7 +31,7 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
    //aiProcessPreset_TargetRealtime_Quality // aiProcess_JoinIdenticalVertices
    const struct aiScene *p_Scene = aiImportFileFromMemory( rawBuffer, 
                                                            rawSize, 
-                                                           aiProcess_Triangulate | aiProcess_SortByPType, 
+                                                           aiProcessPreset_TargetRealtime_Quality | aiProcess_Triangulate | aiProcess_SortByPType, 
                                                            p_Msg );
    if( !p_Scene )
       {

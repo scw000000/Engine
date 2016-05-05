@@ -40,7 +40,7 @@ class OpenGLRenderer : public IRenderer
 	   //virtual void VCalcLighting( Lights *lights, int maximumLights ) override;
 
       static void LoadTexture( GLuint* textureId, Resource& textureResource );
-      static void LoadMesh( GLuint* vertexBuffer, float* radius, GLuint* uvBuffer, GLuint* normalBuffer, Resource& meshResource );
+      static void LoadMesh( GLuint* vertexBuffer, float* radius, GLuint* uvBuffer, GLuint* indexBuffer, GLuint* normalBuffer, Resource& meshResource );
 	   
       //virtual shared_ptr<IRenderState> VPrepareAlphaPass( void )=0;
 	   //virtual shared_ptr<IRenderState> VPrepareSkyBoxPass( void )=0;

@@ -57,7 +57,7 @@ void HumanView::VOnRender( double fTime, float fElapsedTime )
    {
    m_currTick = SDL_GetPerformanceCounter();
    
-   if( m_currTick == m_lastDraw ) // alreay draw in this tick, leave now
+   if( m_currTick == m_lastDraw ) // already draw in this tick, leave now
       {
       return;
       }
@@ -78,7 +78,7 @@ void HumanView::VOnRender( double fTime, float fElapsedTime )
          }
       }
 
-   // Render GUI last, becaouse its on top of screen
+   // Render GUI last, because its on top of the screen
    m_pGUIManager->OnRender( fTime, fElapsedTime );
    }
 

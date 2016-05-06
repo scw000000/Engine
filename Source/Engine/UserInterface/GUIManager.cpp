@@ -91,9 +91,11 @@ void GUIManager::OnUpdate( const unsigned long deltaMs )
 
 void GUIManager::OnRender( double fTime, float fElapsedTime )
    {
-   s_pRenderer->beginRendering();
-   m_pContext->draw();
-   s_pRenderer->endRendering();
+    glDisable( GL_CULL_FACE );
+   //CEGUI::System::getSingleton().renderAllGUIContexts();
+    s_pRenderer->beginRendering( );
+    m_pContext->draw( );
+    s_pRenderer->endRendering( );
    }
 
 int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event

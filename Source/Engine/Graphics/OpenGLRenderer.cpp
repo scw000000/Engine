@@ -215,6 +215,27 @@ void OpenGLRenderer::LoadMesh( GLuint* vertexBuffer, float* radius, GLuint* uvBu
       }*/
    }
 
+GLuint OpenGLRenderer::GenerateShader( Resource* shaderRes, GLuint shaderType )
+   {
+   // Create the shaders
+   GLuint shader = glCreateShader( shaderType );
+
+
+   shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( shaderRes );  // this actually loads the shader file from the zip file
+
+   if( !pResourceHandle )
+      {
+      ENG_ERROR( "Invalid shader file path" );
+      }
+   // Compile Vertex Shader
+   ENG_LOG( "Renderer", "Compiling vertex shader: " + shaderRes->m_name );
+
+   GLchar* p_VSSourcePointer = ( GLchar* ) pResourceHandle->GetBuffer( );
+   CompileShader( &p_VSSourcePointer, shader );
+
+   return shader;
+   }
+
 GLuint OpenGLRenderer::CompileShader( const GLchar* const* pSrcData, const GLuint shaderID )
    {
    glShaderSource( shaderID, 1, pSrcData, NULL);

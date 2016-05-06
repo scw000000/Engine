@@ -17,27 +17,28 @@ VertexShader::~VertexShader( void )
    {
    }
 
-GLint VertexShader::OnRestore( Scene* pScene )
+void VertexShader::OnRestore( Scene* pScene )
    {
-   shared_ptr<OpenGLRenderer> p_OpenGLRenderer = static_pointer_cast<OpenGLRenderer>( pScene->GetRenderer() );
-	
-   // Create the shaders
-	m_VertexShader = glCreateShader( GL_VERTEX_SHADER );
+   m_VertexShader = OpenGLRenderer::GenerateShader( &m_ShaderResource, GL_VERTEX_SHADER );
+ //  shared_ptr<OpenGLRenderer> p_OpenGLRenderer = static_pointer_cast<OpenGLRenderer>( pScene->GetRenderer() );
+	//
+ //  // Create the shaders
+	//m_VertexShader = glCreateShader( GL_VERTEX_SHADER );
 
 
-   shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( &m_ShaderResource );  // this actually loads the shader file from the zip file
+ //  shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( &m_ShaderResource );  // this actually loads the shader file from the zip file
 
-   if( !pResourceHandle )
-      {
-      ENG_ERROR( "Invalid shader file path" );
-      }
-	// Compile Vertex Shader
-   ENG_LOG( "Renderer", "Compiling vertex shader: " + m_ShaderResource.m_name );
+ //  if( !pResourceHandle )
+ //     {
+ //     ENG_ERROR( "Invalid shader file path" );
+ //     }
+	//// Compile Vertex Shader
+ //  ENG_LOG( "Renderer", "Compiling vertex shader: " + m_ShaderResource.m_name );
 
-   GLchar* p_VSSourcePointer = ( GLchar* )pResourceHandle->GetBuffer();
-   GLint result = p_OpenGLRenderer->CompileShader( &p_VSSourcePointer, m_VertexShader );
+ //  GLchar* p_VSSourcePointer = ( GLchar* )pResourceHandle->GetBuffer();
+ //  GLint result = p_OpenGLRenderer->CompileShader( &p_VSSourcePointer, m_VertexShader );
 
-   return result;
+ //  return result;
    }
 
 // This function is called in sceneNode::VRender
@@ -69,27 +70,28 @@ FragmentShader::~FragmentShader( void )
 
    }
 
-GLint FragmentShader::OnRestore( Scene *pScene )
+void FragmentShader::OnRestore( Scene *pScene )
    {
-   shared_ptr<OpenGLRenderer> p_OpenGLRenderer = static_pointer_cast<OpenGLRenderer>( pScene->GetRenderer() );
-	
-   // Create the shaders
-	m_FragmentShader = glCreateShader( GL_FRAGMENT_SHADER );
-   // load resource
+   m_FragmentShader = OpenGLRenderer::GenerateShader( &m_ShaderResource, GL_FRAGMENT_SHADER );
+ //  shared_ptr<OpenGLRenderer> p_OpenGLRenderer = static_pointer_cast<OpenGLRenderer>( pScene->GetRenderer() );
+	//
+ //  // Create the shaders
+	//m_FragmentShader = glCreateShader( GL_FRAGMENT_SHADER );
+ //  // load resource
 
-   shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( &m_ShaderResource );  // this actually loads the shader file from the zip file
-   if( !pResourceHandle )
-      {
-      ENG_ERROR( "Invalid shader file path" );
-      }
+ //  shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( &m_ShaderResource );  // this actually loads the shader file from the zip file
+ //  if( !pResourceHandle )
+ //     {
+ //     ENG_ERROR( "Invalid shader file path" );
+ //     }
 
-	// Compile Vertex Shader
-   ENG_LOG( "Renderer", "Compiling vertex shader: " + m_ShaderResource.m_name );
+	//// Compile Vertex Shader
+ //  ENG_LOG( "Renderer", "Compiling vertex shader: " + m_ShaderResource.m_name );
 
-   GLchar* p_VSSourcePointer = ( GLchar* )pResourceHandle->GetBuffer();
-   GLint result = p_OpenGLRenderer->CompileShader( &p_VSSourcePointer, m_FragmentShader );
+ //  GLchar* p_VSSourcePointer = ( GLchar* )pResourceHandle->GetBuffer();
+ //  GLint result = p_OpenGLRenderer->CompileShader( &p_VSSourcePointer, m_FragmentShader );
 
-   return result;
+   //return result;
    }
 
 GLint FragmentShader::SetupRender( Scene *pScene, SceneNode *pNode )

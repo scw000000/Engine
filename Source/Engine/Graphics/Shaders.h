@@ -13,7 +13,7 @@ class VertexShader
 	   ~VertexShader( void );
       // This function is called in SceneNode::Onrestore
       // reload and compile vertex shader
-	   GLint OnRestore( Scene *pScene );
+	   void OnRestore( Scene *pScene );
       // 
 	   /**
 	    * @brief  
@@ -46,7 +46,7 @@ class FragmentShader
 	   ~FragmentShader( void );
       // This function is called in SceneNode::Onrestore
       // reload and compile fragment shader
-	   GLint OnRestore( Scene *pScene );
+	   void OnRestore( Scene *pScene );
       // This function is called at begin of SceneNode::VRender
       // bind fragment shader to program
 	   GLint SetupRender( Scene *pScene, SceneNode *pNode );

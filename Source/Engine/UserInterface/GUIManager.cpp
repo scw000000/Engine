@@ -64,7 +64,8 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
 
 void GUIManager::Destory( void )
    {
-   CEGUI::System::getSingleton().destroyGUIContext( *m_pContext );
+   CEGUI::System::destroy(); 
+   CEGUI::OpenGL3Renderer::destroy( static_cast<CEGUI::OpenGL3Renderer&>( *s_pRenderer ) ); 
    }
 
 void GUIManager::LoadScheme( const std::string& schemeFile )
@@ -91,11 +92,11 @@ void GUIManager::OnUpdate( const unsigned long deltaMs )
 
 void GUIManager::OnRender( double fTime, float fElapsedTime )
    {
-    glDisable( GL_CULL_FACE );
    //CEGUI::System::getSingleton().renderAllGUIContexts();
-    s_pRenderer->beginRendering( );
+    CEGUI::System::getSingleton().renderAllGUIContexts();
+   /* s_pRenderer->beginRendering( );
     m_pContext->draw( );
-    s_pRenderer->endRendering( );
+    s_pRenderer->endRendering( );*/
    }
 
 int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event

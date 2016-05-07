@@ -55,61 +55,16 @@ MeshSceneNode::MeshSceneNode(
 
 MeshSceneNode::~MeshSceneNode( void )
    {
-   if( m_Program )
-      {
-      glDeleteProgram( m_Program );
-      }
+   ReleaseResource();
    }
 
 // now load the reouce into VRam
 int MeshSceneNode::VOnRestore( Scene *pScene )
    {
-   if( m_VertexArray )
-      {
-      glDeleteVertexArrays( 1, &m_VertexArray );
-      m_VertexArray = 0;
-      }
+   ReleaseResource();
+
 	glGenVertexArrays( 1, &m_VertexArray );
 	glBindVertexArray( m_VertexArray );
-
-   if( m_VerTexBuffer )
-      {
-      glDeleteBuffers( 1, &m_VerTexBuffer );
-      m_VerTexBuffer = 0;
-      }
-
-   if( m_UVBuffer )
-      {
-      glDeleteBuffers( 1, &m_UVBuffer );
-      m_UVBuffer = 0;
-      }
-
-   if( m_IndexBuffer )
-      {
-      glDeleteBuffers( 1, &m_IndexBuffer );
-      m_IndexBuffer = 0;
-      }
-   
-   if( m_NormalBuffer )
-      {
-      glDeleteBuffers( 1, &m_NormalBuffer );
-      m_NormalBuffer = 0;
-      }
-
-   if( m_TextureUni )
-      {
-      glDeleteTextures( 1, &m_TextureUni );
-      m_Texture = 0;
-      }
-
-   if( m_Program )
-      {
-      glDeleteProgram( m_Program );
-      m_Program = 0;
-      }
-
-   /*m_VertexShader.ReleaseShader( m_Program );
-   m_FragmentShader.ReleaseShader( m_Program );*/
 
    m_VertexShader.OnRestore( pScene );
    m_FragmentShader.OnRestore( pScene );
@@ -140,16 +95,6 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 	//// Check the program
 	//glGetProgramiv( m_Program, GL_LINK_STATUS, &result );
 	//glGetProgramiv( m_Program, GL_INFO_LOG_LENGTH, &infoLogLength );
-
-	//if ( infoLogLength > 0 )
- //     {
- //     GLchar* p_ErrMsg = new GLchar[ infoLogLength + 1];
-	//	glGetProgramInfoLog( m_Program, infoLogLength, NULL, p_ErrMsg );
-	//	ENG_ERROR( p_ErrMsg );
- //     SAFE_DELETE_ARRAY( p_ErrMsg );
-	//   }
-
-   
 
 
    OpenGLRenderer::LoadTexture( &m_Texture, m_Props.GetMaterialPtr()->GetTextureResource() );
@@ -188,7 +133,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    {
 	// Use our shader
 	glUseProgram( m_Program );
-   
+   glBindVertexArray( m_VertexArray );
 
    // Get the projection & view matrix from the camera class
 	Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
@@ -261,10 +206,6 @@ int MeshSceneNode::VRender( Scene *pScene )
    // Force the Mesh to reload to getting vertex number
    auto pAiScene = MeshResourceLoader::LoadAndReturnScene( *m_pMeshResource );
       
-	//// Draw the triangle !
- //  // Beware of vertex numbers, I may have to use index buffer
-	//glDrawArrays( GL_TRIANGLES, 0, pAiScene->mMeshes[0]->mNumVertices );
-
    // Index buffer
    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer );
 
@@ -276,9 +217,55 @@ int MeshSceneNode::VRender( Scene *pScene )
       ( void* ) 0           // element array buffer offset
       );
 
-	glDisableVertexAttribArray( 0 );
-	glDisableVertexAttribArray( 1 );
+   glDisableVertexAttribArray( 0 );
+   glDisableVertexAttribArray( 1 );
    glDisableVertexAttribArray( 2 );
 
    return S_OK;
+   }
+
+void MeshSceneNode::ReleaseResource( void )
+   {
+   if( m_VertexArray )
+      {
+      glDeleteVertexArrays( 1, &m_VertexArray );
+      m_VertexArray = 0;
+      }
+
+   if( m_VerTexBuffer )
+      {
+      glDeleteBuffers( 1, &m_VerTexBuffer );
+      m_VerTexBuffer = 0;
+      }
+
+   if( m_UVBuffer )
+      {
+      glDeleteBuffers( 1, &m_UVBuffer );
+      m_UVBuffer = 0;
+      }
+
+   if( m_IndexBuffer )
+      {
+      glDeleteBuffers( 1, &m_IndexBuffer );
+      m_IndexBuffer = 0;
+      }
+
+   if( m_NormalBuffer )
+      {
+      glDeleteBuffers( 1, &m_NormalBuffer );
+      m_NormalBuffer = 0;
+      }
+
+   if( m_TextureUni )
+      {
+      glDeleteTextures( 1, &m_Texture );
+      m_Texture = 0;
+      }
+
+   if( m_Program )
+      {
+      glDeleteProgram( m_Program );
+      m_Program = 0;
+      }
+   
    }

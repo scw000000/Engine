@@ -100,7 +100,7 @@ bool MovementController::VOnPointerMove( Point motion )
       m_TargetRotShift.x += 0.001f * ( motion.y - g_pApp->GetScreenSize().GetY() / 2 );
       m_TargetRotShift.y += 0.001f * ( g_pApp->GetScreenSize().GetX() / 2 - motion.x ) ;    
 	   }
-  // SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
+   SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
 	return true;
    }
 

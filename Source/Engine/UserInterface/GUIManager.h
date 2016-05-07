@@ -17,6 +17,7 @@ class GUIManager
    public:
       GUIManager( void );
       void Init( const std::string& resourceDirectory );
+      void ShutDown( void );
       void Destory( void );
       
       void LoadScheme( const std::string& schemeFile );

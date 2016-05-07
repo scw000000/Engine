@@ -43,13 +43,13 @@ HumanView::HumanView( shared_ptr<IRenderer> p_renderer )
 
 
 HumanView::~HumanView()
-{
+   {
 	while (!m_ScreenElements.empty())
 	   {
 		m_ScreenElements.pop_front();		
 	   }
-
 	SAFE_DELETE( m_pProcessManager );
+   m_pGUIManager->Destory();
    SAFE_DELETE( m_pGUIManager );
 	}
 

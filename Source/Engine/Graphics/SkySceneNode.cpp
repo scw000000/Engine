@@ -42,52 +42,15 @@ SkySceneNode::SkySceneNode(
 
 SkySceneNode::~SkySceneNode( void )
    {
-   if( m_Program )
-      {
-      glDeleteProgram( m_Program );
-      }
+   ReleaseResource();
    }
 
 // now load the reouce into VRam
 int SkySceneNode::VOnRestore( Scene *pScene )
    {
-   if( m_VertexArray )
-      {
-      glDeleteVertexArrays( 1, &m_VertexArray );
-      m_VertexArray = 0;
-      }
-	glGenVertexArrays( 1, &m_VertexArray );
-	glBindVertexArray( m_VertexArray );
-
-   if( m_VerTexBuffer )
-      {
-      glDeleteBuffers( 1, &m_VerTexBuffer );
-      m_VerTexBuffer = 0;
-      }
-
-   if( m_UVBuffer )
-      {
-      glDeleteBuffers( 1, &m_UVBuffer );
-      m_UVBuffer = 0;
-      }
-
-   if( m_IndexBuffer )
-      {
-      glDeleteBuffers( 1, &m_IndexBuffer );
-      m_IndexBuffer = 0;
-      }
-
-   if( m_TextureUni )
-      {
-      glDeleteTextures( 1, &m_TextureUni );
-      m_Texture = 0;
-      }
-
-   if( m_Program )
-      {
-      glDeleteProgram( m_Program );
-      m_Program = 0;
-      }
+   ReleaseResource();
+   glGenVertexArrays( 1, &m_VertexArray );
+   glBindVertexArray( m_VertexArray );
 
    m_VertexShader.OnRestore( pScene );
    m_FragmentShader.OnRestore( pScene );
@@ -118,7 +81,7 @@ int SkySceneNode::VRender( Scene *pScene )
    {
 	// Use our shader
 	glUseProgram( m_Program );
-   
+   glBindVertexArray( m_VertexArray );
 
    // Get the projection & view matrix from the camera class
 	Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
@@ -180,4 +143,42 @@ int SkySceneNode::VRender( Scene *pScene )
 	glDisableVertexAttribArray( 1 );
 
    return S_OK;
+   }
+
+void SkySceneNode::ReleaseResource( void )
+   {
+   if( m_VertexArray )
+      {
+      glDeleteVertexArrays( 1, &m_VertexArray );
+      m_VertexArray = 0;
+      }
+   if( m_VerTexBuffer )
+      {
+      glDeleteBuffers( 1, &m_VerTexBuffer );
+      m_VerTexBuffer = 0;
+      }
+
+   if( m_UVBuffer )
+      {
+      glDeleteBuffers( 1, &m_UVBuffer );
+      m_UVBuffer = 0;
+      }
+
+   if( m_IndexBuffer )
+      {
+      glDeleteBuffers( 1, &m_IndexBuffer );
+      m_IndexBuffer = 0;
+      }
+
+   if( m_TextureUni )
+      {
+      glDeleteTextures( 1, &m_Texture );
+      m_Texture = 0;
+      }
+
+   if( m_Program )
+      {
+      glDeleteProgram( m_Program );
+      m_Program = 0;
+      }
    }

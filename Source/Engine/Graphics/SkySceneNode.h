@@ -46,7 +46,7 @@ class SkySceneNode : public SceneNode
       virtual bool VIsVisible( Scene *pScene ) const override { return m_IsActive; };
 
    protected:
-      
+      void ReleaseResource( void );
 
    protected:
       bool					   m_IsActive;

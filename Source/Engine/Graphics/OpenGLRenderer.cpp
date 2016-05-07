@@ -101,8 +101,6 @@ void OpenGLRenderer::LoadMesh( GLuint* vertexBuffer, float* radius, GLuint* uvBu
    // So we have to translate them
    aiVector2t<float> *uvVertices = NULL;
 
-
-
    if( uvBuffer )
       {
       uvVertices = ENG_NEW aiVector2t<float>[pMesh->mNumVertices];
@@ -305,6 +303,7 @@ void OpenGLRenderer::SetRenderAlpha( bool isAlpha )
       {
       glDisable( GL_BLEND );
       glEnable( GL_CULL_FACE );
+      glBlendFunc(GL_ONE, GL_ZERO);
       }
    
    }

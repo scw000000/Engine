@@ -42,7 +42,7 @@ class MeshSceneNode : public SceneNode
       GLuint GetProgram( void ) { return m_Program; };
 
    protected:
-      
+      void ReleaseResource( void );
 
    protected:
 	   GLuint            m_Program;

@@ -31,6 +31,10 @@
       #pragma comment( lib, "glew32d.lib" )
       #pragma comment( lib, "CEGUIBase-0_d.lib" )
       #pragma comment( lib, "CEGUIOpenGLRenderer-0_d.lib" )
+      #pragma comment( lib, "BulletCollision_Debug.lib" )
+      #pragma comment( lib, "BulletDynamics_Debug.lib" )
+      #pragma comment( lib, "LinearMath_Debug.lib" )
+
 	#else
 
 	#endif

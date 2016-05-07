@@ -40,6 +40,9 @@
     <Filter Include="LuaScripting">
       <UniqueIdentifier>{638e9750-26f8-4e30-b58f-8e5ccd63c7f3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Physics">
+      <UniqueIdentifier>{e8800d8b-a1e3-4915-9d94-154edb33e562}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
@@ -130,9 +133,6 @@
     <ClCompile Include="..\LuaScripting\ScriptProcess.cpp">
       <Filter>LuaScripting</Filter>
     </ClCompile>
-    <ClCompile Include="..\LuaScripting\ScriptEvent.cpp">
-      <Filter>LuaScripting</Filter>
-    </ClCompile>
     <ClCompile Include="..\Graphics\Material.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -168,6 +168,21 @@
     </ClCompile>
     <ClCompile Include="..\Actors\SkyRenderComponent.cpp">
       <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Physics\Physics.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Physics\PhysicsDebugDrawer.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Physics\PhysicsEventListener.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Event\PhysicsEvents.cpp">
+      <Filter>Event</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Event\ScriptEvent.cpp">
+      <Filter>Event</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -269,9 +284,6 @@
     <ClInclude Include="..\LuaScripting\ScriptProcess.h">
       <Filter>LuaScripting</Filter>
     </ClInclude>
-    <ClInclude Include="..\LuaScripting\ScriptEvent.h">
-      <Filter>LuaScripting</Filter>
-    </ClInclude>
     <ClInclude Include="..\Graphics\Material.h">
       <Filter>Graphics</Filter>
     </ClInclude>
@@ -307,6 +319,21 @@
     </ClInclude>
     <ClInclude Include="..\Actors\SkyRenderComponent.h">
       <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\Physics.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\PhysicsDebugDrawer.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\PhysicsEventListener.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Event\PhysicsEvents.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Event\ScriptEvent.h">
+      <Filter>Event</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

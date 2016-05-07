@@ -3,7 +3,7 @@
 // Filename: ScriptExports.h
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "ScriptEvent.h"
+#include "..\Event\ScriptEvent.h"
 #include "FastDelegate.h"
 #include "LuaStateManager.h"
 #include "..\Event\Events.h"

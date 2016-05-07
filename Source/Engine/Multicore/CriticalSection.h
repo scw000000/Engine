@@ -1,14 +1,22 @@
-
 #pragma once
-//========================================================================
-// CriticalSection.h : Defines helper classes for multiprogramming
-//
-//========================================================================
+/*!
+ * \file CriticalSection.h
+ * \date 2016/05/07 11:32
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
  
 #include <windows.h>
  //#include "EngineStd.h"
 
-class CriticalSection : public ENG_noncopyable
+class CriticalSection : public ENG_Noncopyable
 {
 public:
 	CriticalSection()
@@ -79,7 +87,7 @@ protected:
  
  
 */
-class ScopedCriticalSection : public ENG_noncopyable
+class ScopedCriticalSection : public ENG_Noncopyable
 {
 public:
 	ScopedCriticalSection( CriticalSection & csResource)

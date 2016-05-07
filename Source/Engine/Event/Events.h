@@ -1,7 +1,18 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Events.h
-////////////////////////////////////////////////////////////////////////////////
+
+/*!
+ * \file Events.h
+ * \date 2016/05/07 14:02
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include <strstream>
 #include "FastDelegate.h"
 
@@ -34,13 +45,16 @@ template <typename T>class BaseEventData : public IEventData
       
       virtual ~BaseEventData( void ) { }
 
-      virtual const EventType& VGetEventType( void ) const override { return sk_EventType; };
+      virtual const EventType& VGetEventType( void ) const override { return s_EventType; };
 
-      virtual float VGetTimeStamp( void ) const { return m_TimeStamp; }
+      virtual float VGetTimeStamp( void ) const override { return m_TimeStamp; }
    
+      virtual const char* GetName( void ) const override { return s_pName; }
+
    public:
        // GUID of this event
-      const static EventType sk_EventType;
+      const static EventType  s_EventType;
+      const static char*      s_pName;
 
    protected:
       
@@ -56,12 +70,56 @@ class EvtData_Destroy_Actor : public BaseEventData<EvtData_Destroy_Actor>
       explicit EvtData_Destroy_Actor( ActorId id ) : m_Id( id ) {  }
       virtual IEventDataPtr VCopy( void ) const { return IEventDataPtr( ENG_NEW EvtData_Destroy_Actor( m_Id ) ); }
       //virtual void VSerialize( std::ostre )
-      virtual const char* GetName( void ) const { return "EvtDat_Destyot_Actor"; } 
+     // virtual const char* GetName( void ) const { return "EvtDat_Destyot_Actor"; } 
 
    private:
       ActorId m_Id;
    };
 
+class EvtData_Move_Actor : public BaseEventData<EvtData_Move_Actor>
+   {
+
+
+public:
+
+   EvtData_Move_Actor( void ) { m_Id = INVALID_ACTOR_ID; }
+
+   EvtData_Move_Actor( ActorId id, const Mat4x4& matrix ) : m_Id( id ), m_Matrix( matrix ){ }
+
+   //virtual void VSerialize( std::ostrstream &out ) const
+   //   {
+   //   out << m_Id << " ";
+   //   for( int i = 0; i < 4; ++i )
+   //      {
+   //      for( int j = 0; j < 4; ++j )
+   //         {
+   //         out << m_Matrix.m[i][j] << " ";
+   //         }
+   //      }
+   //   }
+
+   /*virtual void VDeserialize( std::istrstream& in )
+      {
+      in >> m_Id;
+      for( int i = 0; i < 4; ++i )
+         {
+         for( int j = 0; j < 4; ++j )
+            {
+            in >> m_Matrix.m[i][j];
+            }
+         }
+      }*/
+
+   virtual IEventDataPtr VCopy( ) const override{ return IEventDataPtr( ENG_NEW EvtData_Move_Actor( m_Id, m_Matrix ) ); }
+
+   ActorId GetId( void ) const { m_Id; }
+
+   const Mat4x4& GetMatrix( void ) const { return m_Matrix; }
+
+   private:
+      ActorId m_Id;
+      Mat4x4 m_Matrix;
+   };
 
 class EvtData_New_Render_Component : public BaseEventData<EvtData_New_Render_Component>
    {
@@ -73,7 +131,7 @@ class EvtData_New_Render_Component : public BaseEventData<EvtData_New_Render_Com
 
       virtual IEventDataPtr VCopy(void) const override { return IEventDataPtr( ENG_NEW EvtData_New_Render_Component( m_ActorId, m_pSceneNode ) ); }
 
-      virtual const char* GetName(void) const override { return "EvtData_New_Render_Component"; }
+    //  virtual const char* GetName(void) const override { return "EvtData_New_Render_Component"; }
 
       const ActorId GetActorId(void) const { return m_ActorId; }
 

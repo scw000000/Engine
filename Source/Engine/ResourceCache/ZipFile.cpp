@@ -470,7 +470,7 @@ void main(int argc, const char *argv[])
 
           printf("File \"%s\" (%d bytes): ", fname, len);
 
-          char *pData = GCC_NEW char[len];
+          char *pData = ENG_NEW char[len];
           if (!pData)
             printf("OUT OF MEMORY\n");
           else if (true == zip.ReadFile(i, pData))

@@ -14,7 +14,7 @@ IEventManager* IEventManager::GetSingleton(void)
 
 IEventManager::IEventManager(const char* pName, bool setAsGlobal)
    {
-	if (setAsGlobal)
+	if ( setAsGlobal )
       {
       if ( g_pEventMgr )
          {

@@ -44,13 +44,14 @@ class OpenGLRenderer : public IRenderer
 	   
       //virtual shared_ptr<IRenderState> VPrepareAlphaPass( void )=0;
 	   //virtual shared_ptr<IRenderState> VPrepareSkyBoxPass( void )=0;
-	   //virtual void VDrawLine( const Vec3& from,const Vec3& to,const Color& color )=0;
       
       static GLuint GenerateShader( Resource* shaderRes, GLuint shaderType );
 
       static GLuint GenerateProgram( GLuint vertexShader, GLuint fragmentShader );
 
       static void SetRenderAlpha( bool isAlpha );
+
+      virtual void VDrawLine( const Vec3& from,const Vec3& to,const Color& color ) const override;
 
    private:
       static GLuint CompileShader( const GLchar* const* pSrcData, const GLuint shaderID );

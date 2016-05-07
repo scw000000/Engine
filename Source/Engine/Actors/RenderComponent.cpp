@@ -51,7 +51,7 @@ TiXmlElement* BaseRenderComponent::VGenerateXml(void)
     TiXmlElement* pBaseElement = VCreateBaseElement();
 
      color
-    TiXmlElement* pColor = GCC_NEW TiXmlElement("Color");
+    TiXmlElement* pColor = ENG_NEW TiXmlElement("Color");
     pColor->SetAttribute("r", ToStr(m_color.r).c_str());
     pColor->SetAttribute("g", ToStr(m_color.g).c_str());
     pColor->SetAttribute("b", ToStr(m_color.b).c_str());

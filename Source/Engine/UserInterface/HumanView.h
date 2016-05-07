@@ -45,6 +45,8 @@ class HumanView : public IGameView
       Uint32 GetModalEventType( void ) { return m_pGUIManager->GetModalEventType(); }
 	   //HumanView(shared_ptr<IRenderer> renderer);
 
+      shared_ptr<Scene> GetScene( void ) { return m_pScene; }
+
    public:
       ScreenElementList m_ScreenElements;
 

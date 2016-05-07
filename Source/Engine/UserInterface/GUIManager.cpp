@@ -92,8 +92,7 @@ void GUIManager::OnUpdate( const unsigned long deltaMs )
 
 void GUIManager::OnRender( double fTime, float fElapsedTime )
    {
-   //CEGUI::System::getSingleton().renderAllGUIContexts();
-    CEGUI::System::getSingleton().renderAllGUIContexts();
+   CEGUI::System::getSingleton().renderAllGUIContexts();
    /* s_pRenderer->beginRendering( );
     m_pContext->draw( );
     s_pRenderer->endRendering( );*/

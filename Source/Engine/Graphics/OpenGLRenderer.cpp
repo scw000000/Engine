@@ -307,3 +307,14 @@ void OpenGLRenderer::SetRenderAlpha( bool isAlpha )
       }
    
    }
+
+void OpenGLRenderer::VDrawLine( const Vec3& from,const Vec3& to,const Color& color ) const 
+   {
+   glLineWidth( 2.5 );
+   glColor3f( color.m_Component.r, color.m_Component.g, color.m_Component.b );
+
+   glBegin( GL_LINES );
+   glVertex3f( from.x, from.y, from.z );
+   glVertex3f( to.x, to.y, to.z );
+   glEnd();   
+   }

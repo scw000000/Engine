@@ -43,7 +43,7 @@
     <OutDir>$(ProjectDir)..\..\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.5\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus\lua51\src;$(SolutionDir)..\3rdParty\SDL2_image-2.0.1;$(SolutionDir)..\3rdParty\assimp-3.2\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.5\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus\lua51\src;$(SolutionDir)..\3rdParty\SDL2_image-2.0.1;$(SolutionDir)..\3rdParty\assimp-3.2\include;$(SolutionDir)..\3rdParty\bullet3-2.83.7\src;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath);$(WindowsSDK_LibraryPath_x86);</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -102,6 +102,8 @@
     <ClCompile Include="..\Debugging\Logger.cpp" />
     <ClCompile Include="..\Event\EventManager.cpp" />
     <ClCompile Include="..\Event\Events.cpp" />
+    <ClCompile Include="..\Event\PhysicsEvents.cpp" />
+    <ClCompile Include="..\Event\ScriptEvent.cpp" />
     <ClCompile Include="..\Graphics\Geometry.cpp" />
     <ClCompile Include="..\Graphics\Light.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
@@ -113,7 +115,6 @@
     <ClCompile Include="..\Graphics\SceneNodes.cpp" />
     <ClCompile Include="..\Graphics\Shaders.cpp" />
     <ClCompile Include="..\LuaScripting\LuaStateManager.cpp" />
-    <ClCompile Include="..\LuaScripting\ScriptEvent.cpp" />
     <ClCompile Include="..\LuaScripting\ScriptExports.cpp" />
     <ClCompile Include="..\LuaScripting\ScriptProcess.cpp" />
     <ClCompile Include="..\MainLoop\Initialization.cpp" />
@@ -130,6 +131,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\Physics\Physics.cpp" />
+    <ClCompile Include="..\Physics\PhysicsDebugDrawer.cpp" />
+    <ClCompile Include="..\Physics\PhysicsEventListener.cpp" />
     <ClCompile Include="..\ResourceCache\MeshResource.cpp" />
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp" />
     <ClCompile Include="..\ResourceCache\TextureResource.cpp" />
@@ -160,6 +164,8 @@
     <ClInclude Include="..\Debugging\Logger.h" />
     <ClInclude Include="..\Event\EventManager.h" />
     <ClInclude Include="..\Event\Events.h" />
+    <ClInclude Include="..\Event\PhysicsEvents.h" />
+    <ClInclude Include="..\Event\ScriptEvent.h" />
     <ClInclude Include="..\Graphics\Geometry.h" />
     <ClInclude Include="..\Graphics\Light.h" />
     <ClInclude Include="..\Graphics\Material.h" />
@@ -171,7 +177,6 @@
     <ClInclude Include="..\Graphics\SceneNodes.h" />
     <ClInclude Include="..\Graphics\Shaders.h" />
     <ClInclude Include="..\LuaScripting\LuaStateManager.h" />
-    <ClInclude Include="..\LuaScripting\ScriptEvent.h" />
     <ClInclude Include="..\LuaScripting\ScriptExports.h" />
     <ClInclude Include="..\LuaScripting\ScriptProcess.h" />
     <ClInclude Include="..\MainLoop\Initialization.h" />
@@ -183,6 +188,9 @@
     <ClInclude Include="..\Main\Interfaces.h" />
     <ClInclude Include="..\Memory\MemoryPool.h" />
     <ClInclude Include="..\Multicore\CriticalSection.h" />
+    <ClInclude Include="..\Physics\Physics.h" />
+    <ClInclude Include="..\Physics\PhysicsDebugDrawer.h" />
+    <ClInclude Include="..\Physics\PhysicsEventListener.h" />
     <ClInclude Include="..\ResourceCache\MeshResource.h" />
     <ClInclude Include="..\ResourceCache\ResourceCache.h" />
     <ClInclude Include="..\ResourceCache\TextureResource.h" />

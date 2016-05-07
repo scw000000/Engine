@@ -45,7 +45,7 @@ Color::Color( const Color& color )
    Satuate();
    }
     
-Color::Color( float red, float green, float blue, float alpha ) // : r( red ), g( green ), b( blue ), a( alpha )
+Color::Color( const float red, const float green, const float blue, const float alpha ) // : r( red ), g( green ), b( blue ), a( alpha )
    {
    m_Component.r = red;
    m_Component.g = green;

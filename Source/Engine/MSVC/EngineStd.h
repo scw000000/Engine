@@ -38,16 +38,19 @@ using std::tr1::dynamic_pointer_cast;
 
 /*
 this interface make the copy constructor and assignment operator to be private
-inorder to prevent copy
+in order to prevent copy by =
 */
-class ENG_noncopyable 
-{  
-     private:  
-      ENG_noncopyable(const ENG_noncopyable& x);  
-      ENG_noncopyable& operator=(const ENG_noncopyable& x);  
-     public:  
-      ENG_noncopyable() {}; // Default constructor  
-};  
+class ENG_Noncopyable 
+   {  
+   public:
+      ENG_Noncopyable( )
+         {
+         }; // Default constructor 
+
+   private:  
+      ENG_Noncopyable( const ENG_Noncopyable& x );  
+      ENG_Noncopyable& operator=( const ENG_Noncopyable& x );  
+   };  
 
 //
 // Game Code Complete - Chapter 12, page 446-447

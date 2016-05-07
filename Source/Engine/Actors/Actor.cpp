@@ -65,7 +65,7 @@ std::string Actor::ToXML()
     TiXmlDocument outDoc;
 
     // Actor element
-    TiXmlElement* pActorElement = GCC_NEW TiXmlElement("Actor");
+    TiXmlElement* pActorElement = ENG_NEW TiXmlElement("Actor");
     pActorElement->SetAttribute("type", m_Type.c_str());
 	pActorElement->SetAttribute("resource", m_Resource.c_str());
 

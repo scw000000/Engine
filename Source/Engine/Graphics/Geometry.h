@@ -1,11 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Geometry.h
-////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////
-//3rd party INCLUDES //
-///////////////////////
+/*!
+ * \file Geometry.h
+ * \date 2016/05/07 14:29
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtx/euler_angles.hpp>
@@ -29,18 +35,11 @@ typedef shared_ptr<Transform> TransformPtr;
 #define RADIANS_TO_DEGREES(x) ((x) * ENG_DEGREES_OVER_RADIANS )
 #define DEGREES_TO_RADIANS(x) ((x) * ENG_RADIANS_OVER_DEGREES )
 
-inline float NormalizeRad( float val )
-   {
-   if( val > ENG_2PI )
-      {
-      return val - ENG_2PI;
-      }
-   if( val < -ENG_2PI )
-      {
-      return val + ENG_2PI;
-      }
-   return val;
-   }
+class Vec3;
+class Vec4;
+
+typedef std::list<Vec3> Vec3List;
+typedef std::list<Vec4> Vec4List;
 
 class Vec3 : public glm::vec3
    {
@@ -361,7 +360,7 @@ typedef struct Color
     Color();
     Color( const Color& color );
     Color( const float * );
-    Color( float red, float green, float blue, float alpha );
+    Color( const float red, const float green, const float blue, const float alpha = 1.0 );
 
     float GetAlpha( void ) const { return m_Component.a; }
     void SetAlpha( float alpha ) { m_Component.a = alpha; }

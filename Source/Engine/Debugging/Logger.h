@@ -2,8 +2,8 @@
 //---------------------------------------------------------------------------------------------------------------------
 // TYPICAL USAGE:
 // 
-// 1) Call the GCC_ASSERT() macro just like you would for _ASSERTE()
-//		Example -> GCC_ASSERT(ptr != NULL);
+// 1) Call the ENG_ASSERT() macro just like you would for _ASSERTE()
+//		Example -> ENG_ASSERT(ptr != NULL);
 // 2) Call the GCC_ERROR() macro to send out an error message
 //		Example -> GCC_ERROR("Something Blew Up!");
 //---------------------------------------------------------------------------------------------------------------------

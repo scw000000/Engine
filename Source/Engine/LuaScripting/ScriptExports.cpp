@@ -86,7 +86,7 @@ void InternalScriptExports::RemoveEventListener( unsigned long listenerId )
 
 bool InternalScriptExports::QueueEvent( EventType eventType, LuaPlus::LuaObject eventData )
    {
-   shared_ptr<ScriptEventImp> pEvent( BuildEvent( eventType, eventData ) );
+   shared_ptr<IScriptEvent> pEvent( BuildEvent( eventType, eventData ) );
    if( pEvent )
       {
       IEventManager::GetSingleton()->VQueueEvent( pEvent );
@@ -100,7 +100,7 @@ bool InternalScriptExports::QueueEvent( EventType eventType, LuaPlus::LuaObject 
 //---------------------------------------------------------------------------------------------------------------------
 bool InternalScriptExports::TriggerEvent( EventType eventType, LuaPlus::LuaObject eventData )
    {
-	shared_ptr<ScriptEventImp> pEvent( BuildEvent( eventType, eventData ) );
+	shared_ptr<IScriptEvent> pEvent( BuildEvent( eventType, eventData ) );
     if ( pEvent )
        {
 	    return IEventManager::GetSingleton()->VTriggerEvent( pEvent );
@@ -111,18 +111,18 @@ bool InternalScriptExports::TriggerEvent( EventType eventType, LuaPlus::LuaObjec
 //---------------------------------------------------------------------------------------------------------------------
 // Builds the event to be sent or queued
 //---------------------------------------------------------------------------------------------------------------------
-shared_ptr<ScriptEventImp> InternalScriptExports::BuildEvent( EventType eventType, LuaPlus::LuaObject& eventData )
+shared_ptr<IScriptEvent> InternalScriptExports::BuildEvent( EventType eventType, LuaPlus::LuaObject& eventData )
    {
 	// create the event from the event type
-	shared_ptr<ScriptEventImp> pEvent( ScriptEventFactory::CreateEventFromScript( eventType ) );
+	shared_ptr<IScriptEvent> pEvent( ScriptEventFactory::CreateEventFromScript( eventType ) );
 	if ( !pEvent )
       {
-      return shared_ptr<ScriptEventImp>();
+      return shared_ptr<IScriptEvent>();
       }
 	// set the event data that was passed in
 	if ( !pEvent->SetEventData( eventData ) )
 	   {
-		return shared_ptr<ScriptEventImp>();
+		return shared_ptr<IScriptEvent>();
 	   }
 	
 	return pEvent;
@@ -144,7 +144,7 @@ ScriptEventListener::~ScriptEventListener( void )
 
 void ScriptEventListener::ScriptEventDelegate( IEventPtr pEvent )
    {
-   shared_ptr<ScriptEventImp> pScriptEvent = static_pointer_cast<ScriptEventImp>( pEvent );
+   shared_ptr<IScriptEvent> pScriptEvent = dynamic_pointer_cast<IScriptEvent>( pEvent );
    LuaPlus::LuaFunction< void* > callback = m_ScriptCallbackFunction;
    callback( pScriptEvent->GetLuaEventData() );
    }

@@ -14,7 +14,7 @@
 #include "ScriptEvent.h"
 
 
-typedef ScriptEventImp* ( *CreateEventForScriptFunctionType )( void );  // function ptr typedef to create a script event
+typedef IScriptEvent* ( *CreateEventForScriptFunctionType )( void );  // function ptr typedef to create a script event
 
 #define REGISTER_SCRIPT_EVENT( eventClass ) \
 	ScriptEventFactory::RegisterEventTypeWithScript( #eventClass, eventClass::s_EventType ); \
@@ -30,8 +30,8 @@ class ScriptEventFactory
       template <typename T> static void RegisterCreationFunction( EventType type ) { ENG_ASSERT( s_ScriptEventFactory.Register<T>( type ) ); }
       // This function is called by InternalScriptExports::BuildEvent( EventType eventType, LuaPlus::LuaObject& eventData )
       // ( when lua queue want to trigger an event, we have to make a C++ script event )
-      static ScriptEventImp* CreateEventFromScript( EventType type );
+      static IScriptEvent* CreateEventFromScript( EventType type );
 
    private:
-      static GenericObjectFactory< ScriptEventImp, EventType> s_ScriptEventFactory;
+      static GenericObjectFactory< IScriptEvent, EventType> s_ScriptEventFactory;
    };

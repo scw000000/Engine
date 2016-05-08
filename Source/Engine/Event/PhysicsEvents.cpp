@@ -22,8 +22,8 @@ const char* BaseEvent<EvtData_PhysTrigger_Enter>::s_pName( "EvtData_PhysTrigger_
 const EventType BaseEvent<EvtData_PhysTrigger_Leave>::s_EventType( 0x9be8c9a5 );
 const char* BaseEvent<EvtData_PhysTrigger_Leave>::s_pName( "EvtData_PhysTrigger_Leave" );
 
-const EventType BaseScriptEvent<EvtData_PhysCollision>::s_EventType( 0x1d26a043 );
-const char* BaseScriptEvent<EvtData_PhysCollision>::s_pName( "EvtData_PhysCollision" );
+const EventType BaseEvent<EvtData_PhysCollision>::s_EventType( 0x1d26a043 );
+const char* BaseEvent<EvtData_PhysCollision>::s_pName( "EvtData_PhysCollision" );
 
 const EventType BaseEvent<EvtData_PhysSeparation>::s_EventType( 0x94ab2d35 );
 const char* BaseEvent<EvtData_PhysSeparation>::s_pName( "EvtData_PhysSeparation" );

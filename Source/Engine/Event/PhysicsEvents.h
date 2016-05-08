@@ -68,6 +68,8 @@ class EvtData_PhysTrigger_Leave : public BaseEvent<EvtData_PhysTrigger_Leave>
       int m_TriggerID;
       ActorId m_Other;
    };
+#pragma warning( push )
+#pragma warning( disable : 4250 )
 
 class EvtData_PhysCollision : public BaseScriptEvent<EvtData_PhysCollision>
    {
@@ -106,8 +108,6 @@ class EvtData_PhysCollision : public BaseScriptEvent<EvtData_PhysCollision>
       const Vec3List& GetCollisionPoints( void ) const { return m_CollisionPoints; }
 
       virtual void VBuildScriptEventData( void ) override; 
-
-//      EXPORT_FOR_SCRIPT_EVENT( EvtData_PhysCollision );
    
    private:
       ActorId m_ActorA;
@@ -117,6 +117,7 @@ class EvtData_PhysCollision : public BaseScriptEvent<EvtData_PhysCollision>
       Vec3List m_CollisionPoints;
    };
 
+#pragma warning( pop )
 
 class EvtData_PhysSeparation : public BaseEvent<EvtData_PhysSeparation> 
    {

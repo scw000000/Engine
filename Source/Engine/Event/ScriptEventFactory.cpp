@@ -17,7 +17,7 @@
 #include "..\LuaScripting\LuaStateManager.h"
 #include "PhysicsEvents.h"
 
-GenericObjectFactory< ScriptEventImp, EventType> ScriptEventFactory::s_ScriptEventFactory;
+GenericObjectFactory< IScriptEvent, EventType> ScriptEventFactory::s_ScriptEventFactory;
 
 void ScriptEventFactory::RegisterEventTypeWithScript( const char* key, EventType type )
    {
@@ -43,7 +43,7 @@ void ScriptEventFactory::RegisterEventTypeWithScript( const char* key, EventType
 //   //s_CreationFunctions.insert( std::make_pair( type, pCreationFunctionPtr ) );
 //   }
 
-ScriptEventImp* ScriptEventFactory::CreateEventFromScript( EventType type )
+IScriptEvent* ScriptEventFactory::CreateEventFromScript( EventType type )
    {
    return s_ScriptEventFactory.Create( type );
    /*CreationFunctions::iterator findIt = s_CreationFunctions.find( type );

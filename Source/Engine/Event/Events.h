@@ -38,7 +38,7 @@ class IEvent
    };
 
 // Using Curiously recurring template pattern (CRTP) to prevent declaring GUID mulit times
-template <typename T>class BaseEvent : public IEvent
+template <typename T>class BaseEvent : virtual public IEvent
    {
    public:
       explicit BaseEvent( const float timeStamp = 0.0f ) : m_TimeStamp( timeStamp ) {  };

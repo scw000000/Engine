@@ -140,7 +140,7 @@ void Scene::RenderAlphaPass()
 
 void Scene::NewRenderComponentDelegate( IEventPtr pEventData )
    {
-   shared_ptr<EvtData_New_Render_Component> pCastEventData = static_pointer_cast<EvtData_New_Render_Component>( pEventData );
+   shared_ptr<EvtData_New_Render_Component> pCastEventData = dynamic_pointer_cast<EvtData_New_Render_Component>( pEventData );
 
     ActorId actorId = pCastEventData->GetActorId();
     shared_ptr<SceneNode> pSceneNode( pCastEventData->GetSceneNode() );

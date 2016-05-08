@@ -216,7 +216,7 @@ class ISceneNode
 	   virtual int VOnRestore( Scene *pScene ) = 0;
 
 	   virtual int VPreRender( Scene *pScene ) = 0;
-	   virtual bool VIsVisible( Scene *pScene ) const = 0;
+	   virtual bool VIsVisible( Scene *pScene ) = 0;
 	   virtual int VRender( Scene *pScene ) = 0;
 	   virtual int VRenderChildren( Scene *pScene )=0;
 	   virtual int VPostRender( Scene *pScene ) = 0;

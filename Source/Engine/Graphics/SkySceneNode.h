@@ -43,7 +43,7 @@ class SkySceneNode : public SceneNode
 	   //virtual int VPick(Scene *pScene, RayCast *pRayCast);
       GLuint GetProgram( void ) { return m_Program; };
 
-      virtual bool VIsVisible( Scene *pScene ) const override { return m_IsActive; };
+      virtual bool VIsVisible( Scene *pScene ) override { return m_IsActive; };
 
    protected:
       void ReleaseResource( void );

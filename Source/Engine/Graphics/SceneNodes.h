@@ -50,6 +50,7 @@ class SceneNodeProperties
        * @return const Transform&
        */
       const Transform& GetTransform( void ) const;
+      Transform GetTransform( void );
 
       const char* Name( void ) const { return m_Name.c_str(); }
 
@@ -104,7 +105,7 @@ class SceneNode : public ISceneNode
 	   virtual int VOnUpdate( Scene *, const unsigned long elapsedMs ) override;
 
 	   virtual int VPreRender( Scene *pScene ) override;
-	   virtual bool VIsVisible( Scene *pScene ) const override;
+	   virtual bool VIsVisible( Scene *pScene ) override;
 	   virtual int VRender( Scene *pScene ) { return S_OK; } 
 	   virtual int VRenderChildren( Scene *pScene ) override;
 	   virtual int VPostRender( Scene *pScene ) override;

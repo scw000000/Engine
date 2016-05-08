@@ -27,6 +27,11 @@ const Transform& SceneNodeProperties::GetTransform( void ) const
    return *m_pTransform;
    }
 
+Transform SceneNodeProperties::GetTransform( void )
+   {
+   return *m_pTransform;
+   }
+
 void SceneNodeProperties::SetAlpha( const float alpha )
    {
    if( m_pMaterial )
@@ -97,13 +102,12 @@ int SceneNode::VPreRender( Scene *pScene )
    return S_OK;
    }
 
-bool SceneNode::VIsVisible( Scene *pScene ) const
+bool SceneNode::VIsVisible( Scene *pScene )
    {
-   Mat4x4 fromWorld;
-   const Transform& pCamTransform = pScene->GetCamera()->VGetProperties().GetTransform();
+   auto camTransform = pScene->GetCamera()->VGetProperties().GetTransform();
    Vec3 nodeInCamWorldPos = GetWorldPosition();
    // transform to camera's local space
-   nodeInCamWorldPos = pCamTransform.GetFromWorld().Xform( nodeInCamWorldPos );
+   nodeInCamWorldPos = camTransform.GetFromWorld().Xform( nodeInCamWorldPos );;
    const Frustum &frustum = pScene->GetCamera()->GetFrustum();
    //return true;
    return frustum.Inside( nodeInCamWorldPos, VGetProperties().GetRadius() );

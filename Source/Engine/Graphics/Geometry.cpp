@@ -237,28 +237,34 @@ void Frustum::Init( const float fov, const float aspect, const float nearClipDis
 	m_Planes[Bottom].Init( origin, m_FarPlaneVerts[2], m_FarPlaneVerts[3] );
    }
 
+Transform::Transform( const Mat4x4& toWorld )
+   {
+   m_ToWorld = toWorld;
+   m_FromWorld = toWorld.Inverse();
+   m_IsFromWorldDirty = false;
+   } 
+
+Transform::Transform( const Vec3& position, const Vec3& scale,const Quaternion& rotation )
+   {
+   m_ToWorld = rotation.GetRotMatrix( );// m = R
+   m_ToWorld.MultScale( scale );// m = R S
+   m_ToWorld.SetToWorldPosition( position );// m = T R S
+   m_FromWorld = m_ToWorld.Inverse( );
+   m_IsFromWorldDirty = false;
+   }
+
 //Transform::Transform( const Mat4x4& toWorld )
 //   {
-//   m_ToWorld = toWorld;
+//   Mat4x4 temp( toWorld );
+//   m_Scale = toWorld.GetScale();
+//   temp.MultScale( 1.0f / m_Scale );
+//   m_Quat = temp.GetQuaternion();
+//   m_Quat.Normalize();
+//
+//   m_Pos = toWorld.GetToWorldPosition();
 //   } 
 //
 //Transform::Transform( const Vec3& position, const Vec3& scale,const Quaternion& rotation ) : m_Pos( position ), m_Scale( scale ), m_Quat( rotation )
 //   {
 //   
 //   }
-
-Transform::Transform( const Mat4x4& toWorld )
-   {
-   Mat4x4 temp( toWorld );
-   m_Scale = toWorld.GetScale();
-   temp.MultScale( 1.0f / m_Scale );
-   m_Quat = temp.GetQuaternion();
-   m_Quat.Normalize();
-
-   m_Pos = toWorld.GetToWorldPosition();
-   } 
-
-Transform::Transform( const Vec3& position, const Vec3& scale,const Quaternion& rotation ) : m_Pos( position ), m_Scale( scale ), m_Quat( rotation )
-   {
-   
-   }

@@ -158,7 +158,6 @@ void MovementController::OnUpdate( const unsigned long deltaMilliseconds )
    m_pTransform->AddFromWorldPitchYawRollRad( rotVal.x, 0.0f, rotVal.z );
    m_pTransform->AddToWorldPitchYawRollRad( 0.0f, rotVal.y, 0.0f );
 
-   // m_pTransform->AddToWorldPitchYawRollRad( 0.0f, rotVal.y, 0.0f );
    m_TargetRotShift *= m_Smoothness;
 
    if ( bTranslating )

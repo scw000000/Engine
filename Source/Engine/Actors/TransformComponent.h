@@ -23,7 +23,9 @@ class TransformComponent : public ActorComponent
 
    // transform functions
       TransformPtr GetTransform(void) const { return m_pTransform; }
-      void SetTransform( const TransformPtr pNewTransform ) { m_pTransform = pNewTransform; }
+      void SetTransformPtr( const TransformPtr pNewTransform ) { m_pTransform = pNewTransform; }
+      void SetTransform( const Transform& newTransform ) { *m_pTransform = newTransform; }
+      
       Vec3 GetToWorldPosition(void) const { return m_pTransform->GetPosition(); }
       void SetToWorldPosition(const Vec3& pos) { m_pTransform->SetPosition( pos ); }
       Vec3 GetForward(void) const { return m_pTransform->GetForward(); }

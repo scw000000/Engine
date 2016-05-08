@@ -6,7 +6,7 @@
 #include "Events.h"
 
 const EventType BaseEventData<EvtData_Destroy_Actor>::s_EventType( 0x220b94dd );
-const char* BaseEventData<EvtData_Destroy_Actor>::s_pName( "EvtDat_Destyot_Actor" );
+const char* BaseEventData<EvtData_Destroy_Actor>::s_pName( "EvtData_Destroy_Actor" );
 
 const EventType BaseEventData<EvtData_Move_Actor>::s_EventType( 0xddf0765c );
 const char* BaseEventData<EvtData_Move_Actor>::s_pName( "EvtData_Move_Actor" );

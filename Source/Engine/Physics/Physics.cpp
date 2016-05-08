@@ -14,12 +14,14 @@
 //
 #include "EngineStd.h"
 #include "Physics.h"
+
 #include "btBulletDynamicsCommon.h"
 #include "PhysicsDebugDrawer.h"
-#include "..\Event\PhysicsEvents.h"
+
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Actors\TransformComponent.h"
 #include "..\Event\Events.h"
+#include "..\Event\PhysicsEvents.h"
 #include "..\Event\EventManager.h"
 //
 //
@@ -237,7 +239,7 @@
 //         shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pGameActor->GetComponent<TransformComponent>( TransformComponent::g_Name ) );
 //         if( pTransformComponent )
 //            {
-//            if( pTransformComponent->GetTransform( ) != actorMotionState->m_worldToPositionTransform )
+//            if( pTransformComponent->GetTransform( )->GetToWorld() != actorMotionState->m_worldToPositionTransform )
 //               {
 //               // Bullet has moved the actor's physics object.  Sync the transform and inform the game an actor has moved
 //               pTransformComponent->SetTransform( actorMotionState->m_worldToPositionTransform );
@@ -273,7 +275,7 @@
 //   ENG_ASSERT( pTransformComponent );
 //   if( pTransformComponent )
 //      {
-//      transform = pTransformComponent->GetTransform( );
+//      transform = pTransformComponent->GetTransform( )->GetToWorld();
 //      }
 //   else
 //      {

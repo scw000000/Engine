@@ -14,8 +14,8 @@ class IEventManager
       virtual ~IEventManager( void );
       virtual bool VAddListener( const EventListenerDelegate& eventDelegate, const EventType& type ) = 0;
       virtual bool VRemoveListener(  const EventListenerDelegate& eventDelegate, const EventType& type  ) = 0;
-      virtual bool VTriggerEvent( const IEventDataPtr& pEvent ) const = 0 ;
-      virtual bool VQueueEvent( const IEventDataPtr& pEvent ) = 0;
+      virtual bool VTriggerEvent( const IEventPtr& pEvent ) const = 0 ;
+      virtual bool VQueueEvent( const IEventPtr& pEvent ) = 0;
       virtual bool VAbortEvent( const EventType&type, bool allOFType = false ) = 0;
       virtual bool VUpdate( unsigned long maxMs = kINFINITE ) = 0;
       
@@ -33,8 +33,8 @@ class EventManager : public IEventManager
       virtual ~EventManager( void );
       virtual bool VAddListener( const EventListenerDelegate& eventDelegate, const EventType& type );
       virtual bool VRemoveListener(  const EventListenerDelegate& eventDelegate, const EventType& type  );
-      virtual bool VTriggerEvent( const IEventDataPtr& pEvent ) const;
-      virtual bool VQueueEvent( const IEventDataPtr& pEvent );
+      virtual bool VTriggerEvent( const IEventPtr& pEvent ) const;
+      virtual bool VQueueEvent( const IEventPtr& pEvent );
       virtual bool VAbortEvent( const EventType&type, bool allOfType = false );
       // This function is called in EngineApp::OnUpdateGame
       virtual bool VUpdate( unsigned long maxMs = kINFINITE );
@@ -46,7 +46,7 @@ class EventManager : public IEventManager
    private:
       typedef std::list<EventListenerDelegate> EventListenerList;
       typedef std::map<EventType, EventListenerList> EventListenerMap;
-      typedef std::list<IEventDataPtr> EventQueue;
+      typedef std::list<IEventPtr> EventQueue;
 
       EventListenerMap m_EventListeners;
       //  Two queues, one for current processing events, the other is for next around

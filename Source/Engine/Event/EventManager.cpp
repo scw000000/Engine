@@ -6,13 +6,13 @@
 
 static IEventManager* g_pEventMgr = NULL;
 
-IEventManager* IEventManager::GetSingleton(void)
+IEventManager* IEventManager::GetSingleton( void )
    {
    ENG_ASSERT( g_pEventMgr );
 	return g_pEventMgr;
    }
 
-IEventManager::IEventManager(const char* pName, bool setAsGlobal)
+IEventManager::IEventManager( const char* pName, bool setAsGlobal )
    {
 	if ( setAsGlobal )
       {
@@ -79,7 +79,7 @@ bool EventManager::VRemoveListener( const EventListenerDelegate& eventDelegate, 
    }
 
 // Make all listeners process the event right now instead of add the event into queue
-bool EventManager::VTriggerEvent( const IEventDataPtr& pEvent ) const
+bool EventManager::VTriggerEvent( const IEventPtr& pEvent ) const
    {
    auto mapIt = m_EventListeners.find( pEvent->VGetEventType() );
    // corresponding listing list is not exist
@@ -100,7 +100,7 @@ bool EventManager::VTriggerEvent( const IEventDataPtr& pEvent ) const
    }
 
 //  Push event into active queue
-bool EventManager::VQueueEvent( const IEventDataPtr& pEvent )
+bool EventManager::VQueueEvent( const IEventPtr& pEvent )
    {
    ENG_ASSERT( m_ActiveQueue >= 0 );
    ENG_ASSERT( m_ActiveQueue < EVENTMANAGER_NUM_QUEUES );
@@ -166,7 +166,7 @@ bool EventManager::VUpdate( unsigned long maxMs )
 	while ( !m_EventQueues[queueToProcess].empty() )
 	   {
       // pop the front of the queue
-		IEventDataPtr pEvent = m_EventQueues[queueToProcess].front();
+		IEventPtr pEvent = m_EventQueues[queueToProcess].front();
       m_EventQueues[queueToProcess].pop_front();
       ENG_LOG( "EventLoop", "\t\tProcessing Event " + std::string( pEvent->GetName() ) );
 
@@ -204,7 +204,7 @@ bool EventManager::VUpdate( unsigned long maxMs )
 	   {
 		while (!m_EventQueues[queueToProcess].empty())
 		   {
-			IEventDataPtr pEvent = m_EventQueues[queueToProcess].back();
+			IEventPtr pEvent = m_EventQueues[queueToProcess].back();
 			m_EventQueues[queueToProcess].pop_back();
 			m_EventQueues[m_ActiveQueue].push_front(pEvent);
 		   }

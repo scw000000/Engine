@@ -5,22 +5,20 @@
 #include "..\Event\Events.h"
 #include "LuaPlus.h"
 
-class ScriptEvent;
+class IScripiEvent : public IEvent
+   {
+   public:
+      virtual LuaPlus::LuaObject GetLuaEventData( void ) = 0;
+      
+      virtual bool SetEventData( LuaPlus::LuaObject eventData ) = 0;
 
-typedef ScriptEvent* (*CreateEventForScriptFunctionType)(void);  // function ptr typedef to create a script event
+   protected:
+      virtual void VBuildScriptEventData( void ) = 0;
+      
+      virtual bool VBuildEventFromScript( void ) = 0;
+   
+   };
 
-#define REGISTER_SCRIPT_EVENT( eventClass, eventType ) \
-	ScriptEvent::RegisterEventTypeWithScript( #eventClass, eventType ); \
-	ScriptEvent::AddCreationFunction( eventType, &eventClass::CreateEventForScript )
-
-// this MACRO should be called within Scriptclass definition
-// 
-#define EXPORT_FOR_SCRIPT_EVENT( eventClass ) \
-	public: \
-		static ScriptEvent* CreateEventForScript( void ) \
-		{ \
-			return ENG_NEW eventClass; \
-		}
 
 //---------------------------------------------------------------------------------------------------------------------
 // Script event base class.  This class is meant to be subclassed by any event that can be sent or received by the
@@ -28,40 +26,59 @@ typedef ScriptEvent* (*CreateEventForScriptFunctionType)(void);  // function ptr
 // Furthermore, since the Script data isn't built unless being received by a script listener, there's no worry about 
 // performance.
 //---------------------------------------------------------------------------------------------------------------------
-class ScriptEvent : public BaseEventData<ScriptEvent>
+class ScriptEventImp : public IScripiEvent
    {
    public:
-      ScriptEvent( void ) { m_IsEventDataValid = false; }
+      ScriptEventImp( void ) { m_IsEventDataValid = false; }
       // set m_LuaEventData and copy C++ menber variable to lua event data
-      // This function is called by ScriptEventListener::ScriptEventDelegate(IEventDataPtr pEvent)  
+      // This function is called by ScriptEventImpListener::ScriptEventImpDelegate(IEventPtr pEvent)  
       // ( when we want to call a lua callback function )
-      LuaPlus::LuaObject GetLuaEventData( void );
+      virtual LuaPlus::LuaObject GetLuaEventData( void ) override;
       // set m_LuaEventData from eventData and copy it to C++ menber
       // This function is called by InternalScriptExports::BuildEvent(EventType eventType, LuaPlus::LuaObject& eventData) 
       // ( when lua queue or trigger an event, we have to make a C++ script event )
-      bool SetEventData( LuaPlus::LuaObject eventData );
-      // find or create event matching table in lua and insert a key-value pair ( event name, event id )
-      // So the event class and type pair information is stored in lua, this function is called by MACRO REGISTER_SCRIPT_EVENT
-      static void RegisterEventTypeWithScript( const char* key, EventType type );
-      // add eventType - creationfunction ptr pair to map
-      static void AddCreationFunction( EventType type, CreateEventForScriptFunctionType pCreationFunctionPtr );
-      // This function is called by InternalScriptExports::BuildEvent( EventType eventType, LuaPlus::LuaObject& eventData )
-      // ( when lua queue want to trigger an event, we have to make a C++ script event )
-      static ScriptEvent* CreateEventFromScript( EventType type );
+      virtual bool SetEventData( LuaPlus::LuaObject eventData ) override;
 
    protected:
       // This function is for the event being sent from C++ to lua. Called by GetEventData
       // What this function should do is copy specific C++ event data, such as damage value from C++ menber variable to lua
-      virtual bool VBuildLuaEventData( void );
+      virtual void VBuildScriptEventData( void ) override;
       // This function is for the event being sent from lua to C++. Called by SetEventData
       // What this function should do is copy specific lua event data, such as damage value from lua to C++ menber variable
-      virtual bool VBuildEventFromScript( void ) { return true; }
+      virtual bool VBuildEventFromScript( void ) override { return true; }
 
    protected:
       LuaPlus::LuaObject m_LuaEventData; // the counterpart lua event data
 
    private:
-      typedef std::map< EventType, CreateEventForScriptFunctionType > CreationFunctions;
-      static CreationFunctions s_CreationFunctions;
       bool m_IsEventDataValid;
+   };
+
+// Using Curiously recurring template pattern (CRTP) to prevent declaring GUID mulit times
+template <typename T>class BaseScriptEvent : public ScriptEventImp 
+   {
+   public:
+   explicit BaseScriptEvent( const float timeStamp = 0.0f ) : m_TimeStamp( timeStamp )
+      {
+      };
+
+   virtual ~BaseScriptEvent( void ) { }
+
+   virtual const EventType& VGetEventType( void ) const override { return s_EventType;};
+
+   virtual float VGetTimeStamp( void ) const override { return m_TimeStamp; }
+
+   virtual const char* GetName( void ) const override { return s_pName; }
+
+public:
+   // GUID of this event
+   const static EventType  s_EventType;
+   const static char*      s_pName;
+
+protected:
+
+
+private:
+
+   const float m_TimeStamp;
    };

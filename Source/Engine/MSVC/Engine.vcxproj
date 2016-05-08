@@ -104,6 +104,7 @@
     <ClCompile Include="..\Event\Events.cpp" />
     <ClCompile Include="..\Event\PhysicsEvents.cpp" />
     <ClCompile Include="..\Event\ScriptEvent.cpp" />
+    <ClCompile Include="..\Event\ScriptEventFactory.cpp" />
     <ClCompile Include="..\Graphics\Geometry.cpp" />
     <ClCompile Include="..\Graphics\Light.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="..\Event\Events.h" />
     <ClInclude Include="..\Event\PhysicsEvents.h" />
     <ClInclude Include="..\Event\ScriptEvent.h" />
+    <ClInclude Include="..\Event\ScriptEventFactory.h" />
     <ClInclude Include="..\Graphics\Geometry.h" />
     <ClInclude Include="..\Graphics\Light.h" />
     <ClInclude Include="..\Graphics\Material.h" />

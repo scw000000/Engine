@@ -1,7 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: ScriptExports.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file ScriptExports.h
+ * \date 2016/05/08 15:08
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "..\Event\ScriptEvent.h"
 #include "FastDelegate.h"
@@ -17,6 +27,7 @@ namespace ScriptExports
    }
 
 class ScriptEventListenerMgr;
+class ScriptEventFactory;
 
 // This class contains some static functions for lua to call
 class InternalScriptExports
@@ -30,13 +41,13 @@ class InternalScriptExports
       // this function enables lua to remove listener by calling listenerId, which is actually a pointer
       // because lua does not know what is pointer
       static void RemoveEventListener( unsigned long listenerId );
-      // Generate a corresponding C++ event ( ScriptEvent )from Lua Event and queue it
+      // Generate a corresponding C++ event ( ScriptEventImp )from Lua Event and queue it
       static bool QueueEvent( EventType eventType, LuaPlus::LuaObject eventData );
-      // Generate a corresponding C++ event ( ScriptEvent )from Lua Event and triggert it
+      // Generate a corresponding C++ event ( ScriptEventImp )from Lua Event and trigger it
 	   static bool TriggerEvent( EventType eventType, LuaPlus::LuaObject eventData );
 
    private:
-	   static shared_ptr<ScriptEvent> BuildEvent(EventType eventType, LuaPlus::LuaObject& eventData);
+	   static shared_ptr<ScriptEventImp> BuildEvent(EventType eventType, LuaPlus::LuaObject& eventData);
       static ScriptEventListenerMgr* s_pScriptEventListenerMgr;
    };
 
@@ -61,8 +72,8 @@ class ScriptEventListener
          {
          return fastdelegate::MakeDelegate( this, &ScriptEventListener::ScriptEventDelegate );
          }
-      // A Callback function, it is registered in EventManager by ScriptEventListenerMgr
-      void ScriptEventDelegate( IEventDataPtr pEvent );
+      // A Callback function, it is registered in EventManager by ScriptEventImpListenerMgr
+      void ScriptEventDelegate( IEventPtr pEvent );
 
    private:
       EventType m_EventType;
@@ -71,8 +82,8 @@ class ScriptEventListener
 
 //---------------------------------------------------------------------------------------------------------------------
 // This class manages the C++ ScriptListener objects needed for script event listeners.
-// The ScriptEventDelegate function will be registered in EventManager, and the action of registration is made by this class
-// In other words, ScriptEventListenerMgr class takes care of ScriptEventListener registration / unregistration in EventManager
+// The ScriptEventImpDelegate function will be registered in EventManager, and the action of registration is made by this class
+// In other words, ScriptEventImpListenerMgr class takes care of ScriptEventImpListener registration / unregistration in EventManager
 // This class is manipulated by class InternalScriptExports though a static menber variable
 //---------------------------------------------------------------------------------------------------------------------
 class ScriptEventListenerMgr

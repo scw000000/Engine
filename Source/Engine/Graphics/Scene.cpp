@@ -138,7 +138,7 @@ void Scene::RenderAlphaPass()
    OpenGLRenderer::SetRenderAlpha( false );
    }
 
-void Scene::NewRenderComponentDelegate( IEventDataPtr pEventData )
+void Scene::NewRenderComponentDelegate( IEventPtr pEventData )
    {
    shared_ptr<EvtData_New_Render_Component> pCastEventData = static_pointer_cast<EvtData_New_Render_Component>( pEventData );
 

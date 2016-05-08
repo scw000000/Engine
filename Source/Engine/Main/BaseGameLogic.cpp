@@ -291,7 +291,7 @@ bool BaseGameLogic::VLoadGame( const char* levelResource )
 
     // register script events from the engine
 	//   [mrmike] this was moved to the constructor post-press, since this function can be called when new levels are loaded by the game or editor
-    // RegisterEngineScriptEvents();
+    // RegisterEngineScriptEventImps();
 
     // load the post-load script if there is one
    if ( postLoadScript )

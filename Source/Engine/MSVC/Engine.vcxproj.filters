@@ -184,6 +184,9 @@
     <ClCompile Include="..\Event\ScriptEvent.cpp">
       <Filter>Event</Filter>
     </ClCompile>
+    <ClCompile Include="..\Event\ScriptEventFactory.cpp">
+      <Filter>Event</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -333,6 +336,9 @@
       <Filter>Event</Filter>
     </ClInclude>
     <ClInclude Include="..\Event\ScriptEvent.h">
+      <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Event\ScriptEventFactory.h">
       <Filter>Event</Filter>
     </ClInclude>
   </ItemGroup>

@@ -266,7 +266,7 @@ class IGamePhysics
       virtual void VTranslate( ActorId actorId, const Vec3& vec ) = 0;
 
       virtual void VSetTransform( const ActorId id, const Mat4x4& mat ) = 0;
-      virtual Mat4x4 VGetTransform( const ActorId id ) = 0;
+      virtual Transform VGetTransform( const ActorId id ) = 0;
 
       virtual ~IGamePhysics( )
       {

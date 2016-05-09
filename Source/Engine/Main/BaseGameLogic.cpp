@@ -186,7 +186,7 @@ void BaseGameLogic::VOnUpdate( float time, float elapsedTime )
     // update game actors
     for (ActorMap::const_iterator it = m_actors.begin(); it != m_actors.end(); ++it)
       {
-      it->second->Update(deltaMilliseconds);
+      it->second->Update( deltaMilliseconds );
       }
 
    }

@@ -237,5 +237,10 @@ class GenericObjectFactory
          }
       return NULL;
       }
+
+   bool IsRegistered( IdType id )
+      {
+      return ( m_creationFunctions.find(id) != m_creationFunctions.end() );
+      }
    };
 

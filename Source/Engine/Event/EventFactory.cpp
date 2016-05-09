@@ -13,11 +13,17 @@
  */
 
 #include "EngineStd.h"
-#include "ScriptEventFactory.h"
+#include "EventFactory.h"
 #include "..\LuaScripting\LuaStateManager.h"
 #include "PhysicsEvents.h"
 
-GenericObjectFactory< IScriptEvent, EventType> ScriptEventFactory::s_ScriptEventFactory;
+
+ScriptEventFactory& ScriptEventFactory::GetSingleton( void )
+   {
+   static ScriptEventFactory instance;
+   return instance;   
+   }
+
 
 void ScriptEventFactory::RegisterEventTypeWithScript( const char* key, EventType type )
    {
@@ -43,9 +49,9 @@ void ScriptEventFactory::RegisterEventTypeWithScript( const char* key, EventType
 //   //s_CreationFunctions.insert( std::make_pair( type, pCreationFunctionPtr ) );
 //   }
 
-IScriptEvent* ScriptEventFactory::CreateEventFromScript( EventType type )
+IScriptEvent* ScriptEventFactory::CreateScriptEvent( EventType type )
    {
-   return s_ScriptEventFactory.Create( type );
+   return  GetSingleton().m_ScriptEventFactory.Create( type );
    /*CreationFunctions::iterator findIt = s_CreationFunctions.find( type );
    if( findIt != s_CreationFunctions.end( ) )
    {
@@ -57,4 +63,18 @@ IScriptEvent* ScriptEventFactory::CreateEventFromScript( EventType type )
    ENG_ERROR( "Couldn't find event type" );
    return NULL;
    }*/
+   }
+
+IEvent* ScriptEventFactory::CreateEvent( EventType type )
+   {
+   if( GetSingleton().m_EventFactory.IsRegistered( type ) )
+      {
+      return GetSingleton().m_EventFactory.Create( type );
+      }
+   return GetSingleton().m_ScriptEventFactory.Create( type );
+   }
+
+ScriptEventFactory::ScriptEventFactory( void )
+   {
+   
    }

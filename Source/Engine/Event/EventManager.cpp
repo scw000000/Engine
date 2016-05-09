@@ -1,6 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: EventManager.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file EventManager.cpp
+ * \date 2016/05/09 22:15
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "EngineStd.h"
 #include "EventManager.h"
 

@@ -27,9 +27,9 @@ extern btVector3 Vec3_to_btVector3( Vec3 const & vec3 );
 
 extern Vec3 btVector3_to_Vec3( btVector3 const & btvec );
 
-extern btTransform Mat4x4_to_btTransform( Mat4x4 const & mat );
+extern btTransform Transform_to_btTransform( Transform const & trans );
 
-extern Mat4x4 btTransform_to_Mat4x4( btTransform const & trans );
+extern Transform btTransform_to_Transform( btTransform const & trans );
 
 struct MaterialData 
    {
@@ -51,22 +51,22 @@ struct MaterialData
 
 struct ActorMotionState : public btMotionState 
    {
-   Mat4x4 m_worldToPositionTransform;
+   Transform m_Transform;
 
-   ActorMotionState( Mat4x4 const & startingTransform )
-      : m_worldToPositionTransform( startingTransform )
+   ActorMotionState( Transform const & transform )
+      : m_Transform( transform )
       {
       }
 
    // btMotionState interface:  Bullet calls these
    virtual void getWorldTransform( btTransform& worldTrans ) const
       {
-      worldTrans = Mat4x4_to_btTransform( m_worldToPositionTransform );
+      worldTrans = Transform_to_btTransform( m_Transform );
       }
 
    virtual void setWorldTransform( const btTransform& worldTrans )
       {
-      m_worldToPositionTransform = btTransform_to_Mat4x4( worldTrans );
+      m_Transform = btTransform_to_Transform( worldTrans );
       }
    };
 
@@ -108,7 +108,7 @@ class BulletPhysics : public IGamePhysics, ENG_Noncopyable
 
       virtual void VSetTransform( const ActorId id, const Mat4x4& mat );
 
-      virtual Mat4x4 VGetTransform( const ActorId id );
+      virtual Transform VGetTransform( const ActorId id );
 
    private:
       void LoadXml( );

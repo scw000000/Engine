@@ -17,6 +17,7 @@
 #include "FastDelegate.h"
 
 class IEvent;
+class SceneNode;
 
 typedef unsigned long EventType;
 typedef shared_ptr<IEvent> IEventPtr;
@@ -127,7 +128,7 @@ class EvtData_New_Render_Component : public BaseEvent<EvtData_New_Render_Compone
    public:
       EvtData_New_Render_Component( void ) { m_ActorId = INVALID_ACTOR_ID; }
 
-      explicit EvtData_New_Render_Component(ActorId actorId, shared_ptr<SceneNode> pSceneNode) : m_ActorId(actorId), m_pSceneNode(pSceneNode) { }
+      explicit EvtData_New_Render_Component( ActorId actorId, shared_ptr<SceneNode> pSceneNode ) : m_ActorId(actorId), m_pSceneNode(pSceneNode) { }
 
       virtual IEventPtr VCopy(void) const override { return IEventPtr( ENG_NEW EvtData_New_Render_Component( m_ActorId, m_pSceneNode ) ); }
 

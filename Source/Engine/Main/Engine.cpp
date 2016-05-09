@@ -11,6 +11,7 @@
 #include "..\ResourceCache\XmlResource.h"
 #include "..\ResourceCache\MeshResource.h"
 #include "..\Event\EventManager.h"
+#include "..\Event\Events.h"
 #include "..\Graphics\OpenGLRenderer.h"
 #include "SDL_image.h"
 
@@ -156,6 +157,8 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 		ENG_ERROR( "Failed to create EventManager." );
 		return false;
 	   }
+
+   REGISTER_EVENT( EvtData_New_Render_Component );
    //--------------------------------- 
    //  Initialize EventManager
    //--------------------------------- 

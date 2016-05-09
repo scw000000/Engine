@@ -37,51 +37,65 @@ static Vec3 btVector3_to_Vec3( btVector3 const & btvec )
    return Vec3( btvec.x( ), btvec.y( ), btvec.z( ) );
    }
 
-static btTransform Mat4x4_to_btTransform( Mat4x4 const & mat )
+static btTransform Transform_to_btTransform( Transform const & trans )
    {
    // convert from Mat4x4 (GameCode) to btTransform (Bullet)
    btMatrix3x3 bulletRotation;
-   btVector3 bulletPosition;
 
-   // copy rotation matrix
+   Mat4x4 rot = trans.GetRotationMatrix();
+
    for( int row = 0; row < 3; ++row )
-      for( int column = 0; column < 3; ++column )
-         bulletRotation[row][column] = mat[column][row]; // note the reversed indexing (row/column vs. column/row)
-   //  this is because Mat4x4s are row-major matrices and
-   //  btMatrix3x3 are column-major.  This reversed indexing
-   //  implicitly transposes (flips along the diagonal) 
-   //  the matrix when it is copied.
+      {
+  //    Vec3 vec = rot.GetRow( row );
+      memcpy( &bulletRotation[row][0], &rot[row][0], sizeof( Vec3 ) );
+      }
 
-   // copy position
-   for( int column = 0; column < 3; ++column )
-      bulletPosition[column] = mat[3][column];
+   //// copy rotation matrix
+   //for( int row = 0; row < 3; ++row )
+   //   for( int column = 0; column < 3; ++column )
+   //      bulletRotation[row][column] = mat[column][row]; // note the reversed indexing (row/column vs. column/row)
+   ////  this is because Mat4x4s are row-major matrices and
+   ////  btMatrix3x3 are column-major.  This reversed indexing
+   ////  implicitly transposes (flips along the diagonal) 
+   ////  the matrix when it is copied.
 
-   return btTransform( bulletRotation, bulletPosition );
+   //// copy position
+   //for( int column = 0; column < 3; ++column )
+   //   bulletPosition[column] = mat[3][column];
+
+   return btTransform( bulletRotation, Vec3_to_btVector3(  rot.GetRow( 3 ) ) );
    }
 
-static Mat4x4 btTransform_to_Mat4x4( btTransform const & trans )
+static Transform btTransform_to_Transform( btTransform const & trans )
    {
-   Mat4x4 returnValue = Mat4x4::g_Identity;
+   Mat4x4 ret = Mat4x4::g_Identity;
 
    // convert from btTransform (Bullet) to Mat4x4 (GameCode)
    btMatrix3x3 const & bulletRotation = trans.getBasis( );
    btVector3 const & bulletPosition = trans.getOrigin( );
 
-   // copy rotation matrix
    for( int row = 0; row < 3; ++row )
-      for( int column = 0; column < 3; ++column )
-         returnValue[row][column] = bulletRotation[column][row];
-   // note the reversed indexing (row/column vs. column/row)
-   //  this is because Mat4x4s are row-major matrices and
-   //  btMatrix3x3 are column-major.  This reversed indexing
-   //  implicitly transposes (flips along the diagonal) 
-   //  the matrix when it is copied.
+      {
+      //    Vec3 vec = rot.GetRow( row );
+      memcpy( &ret[row][0], &bulletRotation[row][0], sizeof( Vec3 ) );
+      }
 
-   // copy position
-   for( int column = 0; column < 3; ++column )
-      returnValue[3][column] = bulletPosition[column];
+   ret.SetToWorldPosition( btVector3_to_Vec3( bulletPosition ) );
+   //// copy rotation matrix
+   //for( int row = 0; row < 3; ++row )
+   //   for( int column = 0; column < 3; ++column )
+   //      ret[row][column] = bulletRotation[column][row];
+   //// note the reversed indexing (row/column vs. column/row)
+   ////  this is because Mat4x4s are row-major matrices and
+   ////  btMatrix3x3 are column-major.  This reversed indexing
+   ////  implicitly transposes (flips along the diagonal) 
+   ////  the matrix when it is copied.
 
-   return returnValue;
+   //// copy position
+   //for( int column = 0; column < 3; ++column )
+   //   ret[3][column] = bulletPosition[column];
+
+   return ret;
    }
 
 BulletPhysics::BulletPhysics( )
@@ -239,11 +253,11 @@ void BulletPhysics::VSyncVisibleScene( )
          shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pGameActor->GetComponent<TransformComponent>( TransformComponent::g_Name ) );
          if( pTransformComponent )
             {
-            if( pTransformComponent->GetTransform( )->GetToWorld() != actorMotionState->m_worldToPositionTransform )
+            if( pTransformComponent->GetTransform( )->GetToWorld() != actorMotionState->m_Transform.GetToWorld() )
                {
                // Bullet has moved the actor's physics object.  Sync the transform and inform the game an actor has moved
-               pTransformComponent->SetTransform( actorMotionState->m_worldToPositionTransform );
-               shared_ptr<EvtData_Move_Actor> pEvent( ENG_NEW EvtData_Move_Actor( id, actorMotionState->m_worldToPositionTransform ) );
+               pTransformComponent->SetTransform( actorMotionState->m_Transform );
+               shared_ptr<EvtData_Move_Actor> pEvent( ENG_NEW EvtData_Move_Actor( id, actorMotionState->m_Transform.GetToWorld() ) );
                IEventManager::GetSingleton()->VQueueEvent( pEvent );
                }
             }
@@ -545,7 +559,7 @@ bool BulletPhysics::VKinematicMove( const Mat4x4 &mat, ActorId aid )
       body->setActivationState( DISABLE_DEACTIVATION );
 
       // warp the body to the new position
-      body->setWorldTransform( Mat4x4_to_btTransform( mat ) );
+      body->setWorldTransform( Transform_to_btTransform( mat ) );
       return true;
       }
 
@@ -557,13 +571,13 @@ bool BulletPhysics::VKinematicMove( const Mat4x4 &mat, ActorId aid )
 //
 //   Returns the current transform of the phyics object
 //
-Mat4x4 BulletPhysics::VGetTransform( const ActorId id )
+Transform BulletPhysics::VGetTransform( const ActorId id )
    {
    btRigidBody * pRigidBody = FindBulletRigidBody( id );
    ENG_ASSERT( pRigidBody );
 
    const btTransform& actorTransform = pRigidBody->getCenterOfMassTransform( );
-   return btTransform_to_Mat4x4( actorTransform );
+   return btTransform_to_Transform( actorTransform );
    }
 
 /////////////////////////////////////////////////////////////////////////////

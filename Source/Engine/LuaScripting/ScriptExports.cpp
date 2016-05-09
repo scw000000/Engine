@@ -13,7 +13,7 @@
  */
 #include "EngineStd.h"
 #include "ScriptExports.h"
-#include "..\Event\ScriptEventFactory.h"
+#include "..\Event\EventFactory.h"
 
 
 ScriptEventListenerMgr* InternalScriptExports::s_pScriptEventListenerMgr = NULL;
@@ -114,7 +114,7 @@ bool InternalScriptExports::TriggerEvent( EventType eventType, LuaPlus::LuaObjec
 shared_ptr<IScriptEvent> InternalScriptExports::BuildEvent( EventType eventType, LuaPlus::LuaObject& eventData )
    {
 	// create the event from the event type
-	shared_ptr<IScriptEvent> pEvent( ScriptEventFactory::CreateEventFromScript( eventType ) );
+	shared_ptr<IScriptEvent> pEvent( ScriptEventFactory::CreateScriptEvent( eventType ) );
 	if ( !pEvent )
       {
       return shared_ptr<IScriptEvent>();

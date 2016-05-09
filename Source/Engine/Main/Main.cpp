@@ -83,7 +83,7 @@ int main( int argc, char *argv[] )
    //Vec3 s1 = Vec3( 41.0f, 21.0f, 51.0f );
    //Quaternion r1 = Quaternion( Vec3( 155.f, 45.f ,32.f ) );
    //Transform transform( t1, s1, r1 );
-   //Mat4x4 m1 = Mat4x4::GetTranslateMatrix( t1 ) * Mat4x4::GetRotMatrix( r1 ) * Mat4x4::GetScaleMatrix( s1 );
+   //Mat4x4 m1 = Mat4x4::GetTranslateMatrix( t1 ) * Mat4x4::GetRotationMatrix( r1 ) * Mat4x4::GetScaleMatrix( s1 );
    //Transform mt( m1 );
    //auto ddd = r1 * mt.GetQuaternion().Inverse();
 

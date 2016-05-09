@@ -1,14 +1,18 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: EngineStd.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file EngineStd.h
+ * \date 2016/05/09 22:12
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
-#ifndef _ENGINESTD_H_
-#define _ENGINESTD_H_
-
-//////////////
-// INCLUDES //
-//////////////
 
 #define NOMINMAX
 #include <windows.h>
@@ -36,20 +40,21 @@ using std::tr1::weak_ptr;
 using std::tr1::static_pointer_cast;
 using std::tr1::dynamic_pointer_cast;
 
-/*
-this interface make the copy constructor and assignment operator to be private
-in order to prevent copy by =
-*/
-class ENG_Noncopyable 
+/*!
+ * \class ENG_Noncopyable
+ *
+ * \brief Modified version of non copyable class
+ *  reference https://msdn.microsoft.com/zh-tw/library/dn457344.aspx
+ * \author SCW
+ * \date 05 2016
+ */
+class ENG_Noncopyable
    {  
    public:
-      ENG_Noncopyable( )
-         {
-         }; // Default constructor 
+      ENG_Noncopyable( void ) { }; // Default constructor 
 
-   private:  
-      ENG_Noncopyable( const ENG_Noncopyable& x );  
-      ENG_Noncopyable& operator=( const ENG_Noncopyable& x );  
+      ENG_Noncopyable( const ENG_Noncopyable& x ) = delete;  
+      ENG_Noncopyable& operator=( const ENG_Noncopyable& x ) = delete;  
    };  
 
 //
@@ -82,7 +87,7 @@ class ENG_Noncopyable
 #include "..\Utilities\String.h"
 #include "..\Main\Interfaces.h"
 #include "..\MainLoop\Timer.h"
-
+#include "..\Event\EventFactory.h"
 
 extern Color g_White;
 extern Color g_Black;
@@ -144,7 +149,5 @@ extern const int SCREEN_HEIGHT;
 #define __STR1__(x) __STR2__(x)
 #define __LOC__ __FILE__ "("__STR1__(__LINE__)") : Warning Msg: "  
 
-
-#endif // !ENGINESTD
 
 #include "..\Main\Engine.h"

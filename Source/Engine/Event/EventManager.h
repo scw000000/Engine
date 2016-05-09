@@ -1,7 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: EventManager.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file EventManager.h
+ * \date 2016/05/09 22:15
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "Events.h"
 
 
@@ -53,6 +63,7 @@ class EventManager : public IEventManager
       EventQueue m_EventQueues[EVENTMANAGER_NUM_QUEUES];
       // Index of current processing queue
       int m_ActiveQueue;
+
    };
 
 

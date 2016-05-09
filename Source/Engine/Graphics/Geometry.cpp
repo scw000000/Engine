@@ -246,7 +246,7 @@ Transform::Transform( const Mat4x4& toWorld )
 
 Transform::Transform( const Vec3& position, const Vec3& scale,const Quaternion& rotation )
    {
-   m_ToWorld = rotation.GetRotMatrix( );// m = R
+   m_ToWorld = rotation.GetRotationMatrix( );// m = R
    m_ToWorld.MultScale( scale );// m = R S
    m_ToWorld.SetToWorldPosition( position );// m = T R S
    m_FromWorld = m_ToWorld.Inverse( );

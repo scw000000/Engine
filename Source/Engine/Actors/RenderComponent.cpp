@@ -101,11 +101,11 @@ shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
 
 bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
    {
-   TiXmlElement* pMeshFileElement = pData->FirstChildElement( "Mesh" );
+   TiXmlElement* pMeshElement = pData->FirstChildElement( "Mesh" );
    // Set mesh file path
-   if( pMeshFileElement )
+   if( pMeshElement )
       {
-      const char *pMeshFilePath = pMeshFileElement->Attribute( "path" );
+      const char *pMeshFilePath = pMeshElement->Attribute( "path" );
       if( !pMeshFilePath )
          {
          return false;

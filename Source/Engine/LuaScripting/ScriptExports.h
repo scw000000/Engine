@@ -37,7 +37,7 @@ class InternalScriptExports
       static bool Init( void );
       static void Destroy( void );
       static bool LoadAndExecuteScriptResource( const char *scriptRes );
-      // new a eventListener and bind lua function 
+      // new a eventListener and bind lua function, also create a delegate for EventManager
       static unsigned long RegisterEventListener( EventType eventType, LuaPlus::LuaObject callbackFunction );
       // this function enables lua to remove listener by calling listenerId, which is actually a pointer
       // because lua does not know what is pointer
@@ -48,7 +48,6 @@ class InternalScriptExports
 	   static bool TriggerEvent( EventType eventType, LuaPlus::LuaObject eventData );
 
    private:
-	   static shared_ptr<IScriptEvent> BuildEvent(EventType eventType, LuaPlus::LuaObject& eventData);
       static ScriptEventListenerMgr* s_pScriptEventListenerMgr;
    };
 

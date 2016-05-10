@@ -83,19 +83,38 @@ class BulletPhysics : public IGamePhysics, ENG_Noncopyable
       virtual void VOnUpdate( const float deltaSeconds ) override;
 
       // Initialization of Physics Objects
-      virtual void VAddSphere( float radius, WeakActorPtr pGameActor, const std::string& densityStr, const std::string& physicsMaterial ) override;
-      virtual void VAddBox( const Vec3& dimensions, WeakActorPtr pGameActor, const std::string& densityStr, const std::string& physicsMaterial ) override;
-      virtual void VAddPointCloud( Vec3 *verts, int numPoints, WeakActorPtr pGameActor, const std::string& densityStr, const std::string& physicsMaterial ) override;
+      virtual void VAddSphere( float radius, WeakActorPtr pActor, const std::string& densityStr, const std::string& physicsMaterial ) override;
+      virtual void VAddBox( const Vec3& dimensions, WeakActorPtr pActor, const std::string& densityStr, const std::string& physicsMaterial ) override;
+
+      /**
+       * @brief declare a group of vertice as a rigid body
+       *
+       * @param  verts Vec3 * verts
+       * @param  numPoints int numPoints
+       * @param  pActor WeakActorPtr pActor
+       * @param  densityStr const std::string & densityStr
+       * @param  physicsMaterial const std::string & physicsMaterial
+       * @return void
+       */
+       virtual void VAddPointCloud( Vec3 *verts, int numPoints, WeakActorPtr pActor, const std::string& densityStr, const std::string& physicsMaterial ) override;
       virtual void VRemoveActor( ActorId id ) override;
 
       // Debugging
-      virtual void VRenderDiagnostics( ) override;
+      virtual void VRenderDiagnostics( void ) override;
 
       // Physics world modifiers
-      virtual void VCreateTrigger( WeakActorPtr pGameActor, const Vec3 &pos, const float dim ) override;
+      /**
+       * @brief 
+       * TODO: check if it work correctly, becuase it doesn't set any Userpointer in this method
+       * @param  pActor WeakActorPtr pActor
+       * @param  pos const Vec3 & pos
+       * @param  dim const float dim
+       * @return void
+       */
+       virtual void VCreateTrigger( WeakActorPtr pActor, const Vec3 &pos, const float dim ) override;
       virtual void VApplyForce( const Vec3 &dir, float newtons, ActorId aid ) override;
       virtual void VApplyTorque( const Vec3 &dir, float newtons, ActorId aid ) override;
-      virtual bool VKinematicMove( const Mat4x4 &mat, ActorId aid ) override;
+      virtual bool VKinematicMove( const Transform &trans, ActorId aid ) override;
 
       virtual void VRotateY( ActorId actorId, float angleRadians, float time );
       virtual float VGetOrientationY( ActorId actorId );
@@ -106,7 +125,7 @@ class BulletPhysics : public IGamePhysics, ENG_Noncopyable
       virtual void VSetAngularVelocity( ActorId actorId, const Vec3& vel );
       virtual void VTranslate( ActorId actorId, const Vec3& vec );
 
-      virtual void VSetTransform( const ActorId id, const Mat4x4& mat );
+      virtual void VSetTransform( const ActorId id, const Transform &trans );
 
       virtual Transform VGetTransform( const ActorId id );
 
@@ -125,7 +144,7 @@ class BulletPhysics : public IGamePhysics, ENG_Noncopyable
       void SendCollisionPairRemoveEvent( btRigidBody const * body0, btRigidBody const * body1 );
 
       // common functionality used by VAddSphere, VAddBox, etc
-      void AddShape( StrongActorPtr pGameActor, btCollisionShape* shape, float mass, const std::string& physicsMaterial );
+      void AddShape( StrongActorPtr pActor, btCollisionShape* shape, float mass, const std::string& physicsMaterial );
 
       // helper for cleaning up objects
       void RemoveCollisionObject( btCollisionObject * removeMe );

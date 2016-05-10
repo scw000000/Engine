@@ -18,14 +18,14 @@
 #include "PhysicsEvents.h"
 
 
-ScriptEventFactory& ScriptEventFactory::GetSingleton( void )
+EventFactory& EventFactory::GetSingleton( void )
    {
-   static ScriptEventFactory instance;
+   static EventFactory instance;
    return instance;   
    }
 
 
-void ScriptEventFactory::RegisterEventTypeWithScript( const char* key, EventType type )
+void EventFactory::RegisterEventTypeWithScript( const char* key, EventType type )
    {
    // load existing eventType table in lua or create it if its not exist
    LuaPlus::LuaObject eventTypeTable = LuaStateManager::GetSingleton( )->GetGlobalVars( ).GetByName( "EventType" );
@@ -38,8 +38,24 @@ void ScriptEventFactory::RegisterEventTypeWithScript( const char* key, EventType
    ENG_ASSERT( eventTypeTable[key].IsNil( ) );
    eventTypeTable.SetNumber( key, ( double ) type );
    }
+
+shared_ptr<IScriptEvent> EventFactory::BuildEvent( EventType eventType, LuaPlus::LuaObject& eventData )
+   {
+   // create the event from the event type
+   shared_ptr<IScriptEvent> pEvent( EventFactory::CreateScriptEvent( eventType ) );
+   if( !pEvent )
+      {
+      return shared_ptr<IScriptEvent>( );
+      }
+   // set the event data that was passed in
+   if( !pEvent->SetEventData( eventData ) )
+      {
+      return shared_ptr<IScriptEvent>( );
+      }
+   return pEvent;
+   }
 //
-//template <typename T> void ScriptEventFactory::RegisterCreationFunction( EventType type )
+//template <typename T> void EventFactory::RegisterCreationFunction( EventType type )
 //   {
 //   ENG_ASSERT( s_ScriptEventFactory.Register<T>( type ) );
 //
@@ -49,9 +65,9 @@ void ScriptEventFactory::RegisterEventTypeWithScript( const char* key, EventType
 //   //s_CreationFunctions.insert( std::make_pair( type, pCreationFunctionPtr ) );
 //   }
 
-IScriptEvent* ScriptEventFactory::CreateScriptEvent( EventType type )
+shared_ptr<IScriptEvent> EventFactory::CreateScriptEvent( EventType type )
    {
-   return  GetSingleton().m_ScriptEventFactory.Create( type );
+   return  shared_ptr<IScriptEvent>( GetSingleton().m_ScriptEventFactory.Create( type ) );
    /*CreationFunctions::iterator findIt = s_CreationFunctions.find( type );
    if( findIt != s_CreationFunctions.end( ) )
    {
@@ -65,16 +81,16 @@ IScriptEvent* ScriptEventFactory::CreateScriptEvent( EventType type )
    }*/
    }
 
-IEvent* ScriptEventFactory::CreateEvent( EventType type )
+shared_ptr<IEvent> EventFactory::CreateEvent( EventType type )
    {
    if( GetSingleton().m_EventFactory.IsRegistered( type ) )
       {
-      return GetSingleton().m_EventFactory.Create( type );
+      return shared_ptr<IEvent>( GetSingleton().m_EventFactory.Create( type ) );
       }
-   return GetSingleton().m_ScriptEventFactory.Create( type );
+   return shared_ptr<IEvent>( GetSingleton().m_ScriptEventFactory.Create( type ) );
    }
 
-ScriptEventFactory::ScriptEventFactory( void )
+EventFactory::EventFactory( void )
    {
    
    }

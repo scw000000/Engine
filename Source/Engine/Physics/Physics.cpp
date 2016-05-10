@@ -101,10 +101,10 @@ static Transform btTransform_to_Transform( btTransform const & trans )
 BulletPhysics::BulletPhysics( )
    {
    // [mrmike] This was changed post-press to add event registration!
-   /*REGISTER_EVENT( EvtData_PhysTrigger_Enter );
+   REGISTER_EVENT( EvtData_PhysTrigger_Enter );
    REGISTER_EVENT( EvtData_PhysTrigger_Leave );
-   REGISTER_EVENT( EvtData_PhysCollision );
-   REGISTER_EVENT( EvtData_PhysSeparation );*/
+   REGISTER_SCRIPT_EVENT( EvtData_PhysCollision );
+   REGISTER_EVENT( EvtData_PhysSeparation );
    }
 
 
@@ -162,6 +162,7 @@ void BulletPhysics::LoadXml( )
    ENG_ASSERT( pParentNode );
    for( TiXmlElement* pNode = pParentNode->FirstChildElement( ); pNode; pNode = pNode->NextSiblingElement( ) )
       {
+      // Insert ( substance name, substance density )
       m_densityTable.insert( std::make_pair( pNode->Value( ), ( float ) atof( pNode->FirstChild( )->Value( ) ) ) );
       }
    }
@@ -247,10 +248,10 @@ void BulletPhysics::VSyncVisibleScene( )
       ActorMotionState const * const actorMotionState = static_cast< ActorMotionState* >( it->second->getMotionState( ) );
       ENG_ASSERT( actorMotionState );
 
-      StrongActorPtr pGameActor = MakeStrongPtr( g_pApp->m_pGame->VGetActor( id ) );
-      if( pGameActor && actorMotionState )
+      StrongActorPtr pActor = MakeStrongPtr( g_pApp->m_pGame->VGetActor( id ) );
+      if( pActor && actorMotionState )
          {
-         shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pGameActor->GetComponent<TransformComponent>( TransformComponent::g_Name ) );
+         shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::g_Name ) );
          if( pTransformComponent )
             {
             if( pTransformComponent->GetTransform( )->GetToWorld() != actorMotionState->m_Transform.GetToWorld() )
@@ -268,11 +269,11 @@ void BulletPhysics::VSyncVisibleScene( )
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::AddShape						- Chapter 17, page 600
 //
-void BulletPhysics::AddShape( StrongActorPtr pGameActor, btCollisionShape* shape, float mass, const std::string& physicsMaterial )
+void BulletPhysics::AddShape( StrongActorPtr pActor, btCollisionShape* shape, float mass, const std::string& physicsMaterial )
    {
-   ENG_ASSERT( pGameActor );
+   ENG_ASSERT( pActor );
 
-   ActorId actorID = pGameActor->GetId( );
+   ActorId actorID = pActor->GetId( );
    ENG_ASSERT( m_ActorIdToRigidBody.find( actorID ) == m_ActorIdToRigidBody.end( ) && "Actor with more than one physics body?" );
 
    // lookup the material
@@ -284,12 +285,12 @@ void BulletPhysics::AddShape( StrongActorPtr pGameActor, btCollisionShape* shape
       shape->calculateLocalInertia( mass, localInertia );
 
 
-   Mat4x4 transform = Mat4x4::g_Identity;
-   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pGameActor->GetComponent<TransformComponent>( TransformComponent::g_Name ) );
+   Transform transform = Transform::g_Identity;
+   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::g_Name ) );
    ENG_ASSERT( pTransformComponent );
    if( pTransformComponent )
       {
-      transform = pTransformComponent->GetTransform( )->GetToWorld();
+      transform = *pTransformComponent->GetTransform( );
       }
    else
       {
@@ -329,7 +330,7 @@ void BulletPhysics::RemoveCollisionObject( btCollisionObject * const removeMe )
    for( CollisionPairs::iterator it = m_PrevTickCollisionPairs.begin( );
         it != m_PrevTickCollisionPairs.end( ); )
       {
-      CollisionPairs::iterator next = it;
+      CollisionPairs::iterator next = it; // jump to next pair in case iterator is erased
       ++next;
 
       if( it->first == removeMe || it->second == removeMe )
@@ -347,7 +348,6 @@ void BulletPhysics::RemoveCollisionObject( btCollisionObject * const removeMe )
       // delete the components of the object
       delete body->getMotionState( );
       delete body->getCollisionShape( );
-      delete body->getUserPointer( );
       delete body->getUserPointer( );
 
       for( int ii = body->getNumConstraintRefs( ) - 1; ii >= 0; --ii )
@@ -390,9 +390,9 @@ ActorId BulletPhysics::FindActorID( btRigidBody const * const body ) const
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VAddSphere					- Chapter 17, page 599
 //
-void BulletPhysics::VAddSphere( float const radius, WeakActorPtr pGameActor, const std::string& densityStr, const std::string& physicsMaterial )
+void BulletPhysics::VAddSphere( float const radius, WeakActorPtr pActor, const std::string& densityStr, const std::string& physicsMaterial )
    {
-   StrongActorPtr pStrongActor = MakeStrongPtr( pGameActor );
+   StrongActorPtr pStrongActor = MakeStrongPtr( pActor );
    if( !pStrongActor )
       return;  // FUTURE WORK - Add a call to the error log here
 
@@ -410,9 +410,9 @@ void BulletPhysics::VAddSphere( float const radius, WeakActorPtr pGameActor, con
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VAddBox
 //
-void BulletPhysics::VAddBox( const Vec3& dimensions, WeakActorPtr pGameActor, const std::string& densityStr, const std::string& physicsMaterial )
+void BulletPhysics::VAddBox( const Vec3& dimensions, WeakActorPtr pActor, const std::string& densityStr, const std::string& physicsMaterial )
    {
-   StrongActorPtr pStrongActor = MakeStrongPtr( pGameActor );
+   StrongActorPtr pStrongActor = MakeStrongPtr( pActor );
    if( !pStrongActor )
       return;  // FUTURE WORK: Add a call to the error log here
 
@@ -430,9 +430,9 @@ void BulletPhysics::VAddBox( const Vec3& dimensions, WeakActorPtr pGameActor, co
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VAddPointCloud				- Chapter 17, page 601
 //
-void BulletPhysics::VAddPointCloud( Vec3 *verts, int numPoints, WeakActorPtr pGameActor, /*const Mat4x4& initialTransform,*/ const std::string& densityStr, const std::string& physicsMaterial )
+void BulletPhysics::VAddPointCloud( Vec3 *verts, int numPoints, WeakActorPtr pActor, /*const Mat4x4& initialTransform,*/ const std::string& densityStr, const std::string& physicsMaterial )
    {
-   StrongActorPtr pStrongActor = MakeStrongPtr( pGameActor );
+   StrongActorPtr pStrongActor = MakeStrongPtr( pActor );
    if( !pStrongActor )
       return;  // FUTURE WORK: Add a call to the error log here
 
@@ -449,7 +449,7 @@ void BulletPhysics::VAddPointCloud( Vec3 *verts, int numPoints, WeakActorPtr pGa
    btVector3 const aabbExtents = aabbMax - aabbMin;
 
    float specificGravity = LookupSpecificGravity( densityStr );
-   float const volume = aabbExtents.x( ) * aabbExtents.y( ) * aabbExtents.z( );
+   float const volume = aabbExtents.x( ) * aabbExtents.y( ) * aabbExtents.z( ); // approximate the volume as bounding box
    btScalar const mass = volume * specificGravity;
 
    AddShape( pStrongActor, shape, mass, physicsMaterial );
@@ -474,31 +474,27 @@ void BulletPhysics::VRemoveActor( ActorId id )
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VRenderDiagnostics			- Chapter 17, page 604
 //
-void BulletPhysics::VRenderDiagnostics( )
+void BulletPhysics::VRenderDiagnostics( void )
    {
    m_DynamicsWorld->debugDrawWorld( );
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VCreateTrigger				- Chapter 17, page 602
-//
-// FUTURE WORK: Mike create a trigger actor archetype that can be instantiated in the editor!!!!!
-//
-void BulletPhysics::VCreateTrigger( WeakActorPtr pGameActor, const Vec3 &pos, const float dim )
+
+void BulletPhysics::VCreateTrigger( WeakActorPtr pActor, const Vec3 &pos, const float dim )
    {
-   StrongActorPtr pStrongActor = MakeStrongPtr( pGameActor );
+   StrongActorPtr pStrongActor = MakeStrongPtr( pActor );
    if( !pStrongActor )
       return;  // FUTURE WORK: Add a call to the error log here
 
    // create the collision body, which specifies the shape of the object
    btBoxShape * const boxShape = new btBoxShape( Vec3_to_btVector3( Vec3( dim, dim, dim ) ) );
 
-   // triggers are immoveable.  0 mass signals this to Bullet.
+   // triggers are immovable.  0 mass signals this to Bullet.
    btScalar const mass = 0;
 
    // set the initial position of the body from the actor
-   Mat4x4 triggerTrans = Mat4x4::g_Identity;
-   triggerTrans.SetToWorldPosition( pos );
+   Transform triggerTrans = Transform::g_Identity;
+   triggerTrans.SetPosition( pos );
    ActorMotionState * const myMotionState = ENG_NEW ActorMotionState( triggerTrans );
 
    btRigidBody::btRigidBodyConstructionInfo rbInfo( mass, myMotionState, boxShape, btVector3( 0, 0, 0 ) );
@@ -552,14 +548,14 @@ void BulletPhysics::VApplyTorque( const Vec3 &dir, float magnitude, ActorId aid 
 //
 //    Forces a phyics object to a new location/orientation
 //
-bool BulletPhysics::VKinematicMove( const Mat4x4 &mat, ActorId aid )
+bool BulletPhysics::VKinematicMove( const Transform &trans, ActorId aid )
    {
    if( btRigidBody * const body = FindBulletRigidBody( aid ) )
       {
       body->setActivationState( DISABLE_DEACTIVATION );
 
       // warp the body to the new position
-      body->setWorldTransform( Transform_to_btTransform( mat ) );
+      body->setWorldTransform( Transform_to_btTransform( trans ) );
       return true;
       }
 
@@ -569,7 +565,7 @@ bool BulletPhysics::VKinematicMove( const Mat4x4 &mat, ActorId aid )
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VGetTransform					- not described in the book
 //
-//   Returns the current transform of the phyics object
+//   Returns the current transform of the physics object
 //
 Transform BulletPhysics::VGetTransform( const ActorId id )
    {
@@ -583,11 +579,11 @@ Transform BulletPhysics::VGetTransform( const ActorId id )
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VSetTransform					- not described in the book
 //
-//   Sets the current transform of the phyics object
+//   Sets the current transform of the physics object
 //
-void BulletPhysics::VSetTransform( ActorId actorId, const Mat4x4& mat )
+void BulletPhysics::VSetTransform( ActorId actorId, const Transform& trans )
    {
-   VKinematicMove( mat, actorId );
+   VKinematicMove( trans, actorId );
    }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -627,7 +623,7 @@ float BulletPhysics::VGetOrientationY( ActorId actorId )
    btVector3 startingVec( 0, 0, 1 );
    btVector3 endingVec = actorRotationMat * startingVec; // transform the vector
 
-   endingVec.setY( 0 );  // we only care about rotation on the XZ plane
+   endingVec.setY( 0 );  // project it onto XZ plane, cause we only care about rotation on the XZ plane
 
    float const endingVecLength = endingVec.length( );
    if( endingVecLength < 0.001 )
@@ -741,7 +737,7 @@ void BulletPhysics::BulletInternalTickCallback( btDynamicsWorld * const world, b
       btRigidBody const * const body0 = static_cast< btRigidBody const * >( manifold->getBody0( ) );
       btRigidBody const * const body1 = static_cast< btRigidBody const * >( manifold->getBody1( ) );
 
-      // always create the pair in a predictable order
+      // always create the pair in a predictable order to prevent duplicated pair
       bool const swapped = body0 > body1;
 
       btRigidBody const * const sortedBodyA = swapped ? body1 : body0;

@@ -94,114 +94,109 @@ protected:
 
 template <class T>
 class optional : public optional_base<sizeof(T)>
-{
-public:
-    // Default - invalid.
+   {
+   public:
+      // Default - invalid.
 
-    optional()	 {    }
-    optional(T const & t)  { construct(t); m_bValid = (true);  }
-	optional(optional_empty const &) {	}
+      optional()	 {    }
+      optional(T const & t)  { construct(t); m_bValid = (true);  }
+	   optional(optional_empty const &) {	}
 
-    optional & operator = (T const & t)
-    {
-        if (m_bValid)
-        {
+      optional & operator= ( T const & t )
+         {
+         if (m_bValid)
+            {
             * GetT() = t;
-        }
-        else
-        {
-            construct(t);
-			m_bValid = true;	// order important for exception safety.
-        }
-
+            }
+         else
+            {
+            construct( t );
+			   m_bValid = true;	// order important for exception safety.
+            }
         return * this;
-    }
+         }
 
-	//Copy constructor
-    optional(optional const & other)
-    {
-		if (other.m_bValid)
-		{
-			construct(* other);
+	   //Copy constructor
+      optional(optional const & other)
+         {
+		   if (other.m_bValid)
+		      {
+			   construct(* other);
             m_bValid = true;	// order important for exception safety.
-		}
-    }
+		      }
+         }
 
-    optional & operator = (optional const & other)
-    {
-		ENG_ASSERT(! (this == & other));	// don't copy over self!
-		if (m_bValid)
-		{						// first, have to destroy our original.
-			m_bValid = false;	// for exception safety if destroy() throws.
+      optional & operator = (optional const & other)
+         {
+		   ENG_ASSERT( ! ( this == & other ) );	// don't copy over self!
+		   if ( m_bValid )
+		      {						// first, have to destroy our original.
+			   m_bValid = false;	// for exception safety if destroy() throws.
 								// (big trouble if destroy() throws, though)
-			destroy();
-		}
+			   destroy();
+		      }
 
-		if (other.m_bValid)
-		{
-			construct(* other);
-			m_bValid = true;	// order vital.
+		   if( other.m_bValid )
+		      {
+			   construct(* other);
+			   m_bValid = true;	// order vital.
+      		}
+		   return * this;
+         }
+	   bool const operator == (optional const & other) const
+	      {
+		   if ( ( ! valid() ) && ( ! other.valid() ) ) { return true; }
+		   if ( valid() ^ other.valid() ) { return false; }
+		   return ( (* * this) == (* other) );
+	      }
+      // compare data if both variable are valid
+      // else the NULL one is smaller
+	   bool const operator < (optional const & other) const
+	      {
+		   // equally invalid - not smaller.
+		   if ( ( ! valid() ) && ( ! other.valid() ) )   { return false; }
 
-		}
-		return * this;
-    }
+		   // I'm not valid, other must be, smaller.
+		   if ( ! valid() )	{ return true; }
 
+		   // I'm valid, other is not valid, I'm larger
+		   if ( ! other.valid() ) { return false; }
 
-	bool const operator == (optional const & other) const
-	{
-		if ((! valid()) && (! other.valid())) { return true; }
-		if (valid() ^ other.valid()) { return false; }
-		return ((* * this) == (* other));
-	}
-   // compare data if both variable are valid
-   // else the NULL one is smaller
-	bool const operator < (optional const & other) const
-	{
-		// equally invalid - not smaller.
-		if ((! valid()) && (! other.valid()))   { return false; }
+		   return ( ( * * this ) < ( * other ) );
+	      }
 
-		// I'm not valid, other must be, smaller.
-		if (! valid())	{ return true; }
+      ~optional() { if (m_bValid) destroy(); }
 
-		// I'm valid, other is not valid, I'm larger
-		if (! other.valid()) { return false; }
+	   // Accessors.
+	   const T& operator * () const			{ ENG_ASSERT( m_bValid ); return * GetT(); }
+	   T& operator * ()						   { ENG_ASSERT( m_bValid ); return * GetT(); }
+	   const T* const operator -> () const	{ ENG_ASSERT( m_bValid ); return GetT(); }
+	   T		* const operator -> ()			{ ENG_ASSERT( m_bValid ); return GetT(); }
 
-		return ((* * this) < (* other));
-	}
+	   //This clears the value of this optional variable and makes it invalid once again.
+	   void clear()
+	      {
+		   if (m_bValid)
+		      {
+			   m_bValid = false;
+			   destroy();
+		      }
+	      }
 
-    ~optional() { if (m_bValid) destroy(); }
+	   //utility functions
+	   bool const valid() const		{ return m_bValid; }
+	   bool const invalid() const		{ return !m_bValid; }
 
-	// Accessors.
+   private:
 
-	T const & operator * () const			{ ENG_ASSERT(m_bValid); return * GetT(); }
-	T & operator * ()						{ ENG_ASSERT(m_bValid); return * GetT(); }
-	T const * const operator -> () const	{ ENG_ASSERT(m_bValid); return GetT(); }
-	T		* const operator -> ()			{ ENG_ASSERT(m_bValid); return GetT(); }
-
-	//This clears the value of this optional variable and makes it invalid once again.
-	void clear()
-	{
-		if (m_bValid)
-		{
-			m_bValid = false;
-			destroy();
-		}
-	}
-
-	//utility functions
-	bool const valid() const		{ return m_bValid; }
-	bool const invalid() const		{ return !m_bValid; }
-
-private:
-
-    // return pointer to m_data ( const version )
-    T const * const GetT() const { return reinterpret_cast<T const * const>(m_data); }
-    // return pointer to m_data
-    T * const GetT()			 { return reinterpret_cast<T * const>(m_data);}
-    // new existing memory space with t as initial value
-	void construct(T const & t)  { new (GetT()) T(t); }
-    void destroy() { GetT()->~T(); }
-};
+      // return pointer to m_data ( const version )
+      T const * const GetT() const { return reinterpret_cast<T const * const>(m_data); }
+      // return pointer to m_data
+      T * const GetT()			 { return reinterpret_cast<T * const>(m_data);}
+      // new existing memory space with t as initial value
+	   void construct(T const & t)  { new ( GetT() ) T(t); }
+      void destroy() { GetT()->~T(); }
+   };
 
 
 template <class BaseType, class SubType>
@@ -218,8 +213,7 @@ class GenericObjectFactory
       template <class SubClass>
       bool Register(IdType id)
          {
-         auto findIt = m_creationFunctions.find(id);
-         if (findIt == m_creationFunctions.end())
+         if ( !IsRegistered( id ) )
             {
             m_creationFunctions[id] = &GenericObjectCreationFunction<BaseClass, SubClass>;  // insert() is giving me compiler errors
             return true;
@@ -229,8 +223,8 @@ class GenericObjectFactory
     // Find the relation mapping and create the subClass based on given id
    BaseClass* Create(IdType id)
       {
-      auto findIt = m_creationFunctions.find(id);
-      if (findIt != m_creationFunctions.end())
+      auto findIt = m_creationFunctions.find( id );
+      if ( findIt != m_creationFunctions.end() )
          {
          ObjectCreationFunction pFunc = findIt->second;
          return pFunc();

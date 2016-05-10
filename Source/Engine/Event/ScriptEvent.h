@@ -39,17 +39,13 @@ class IScriptEvent : virtual public IEvent
 // performance.
 //---------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------
-// http://stackoverflow.com/questions/8696473/multiple-inheritance-and-pure-virtual-functions
-// The reason why inherit implementation BaseEvent<T> privately is because it should be hided
-// from client code, on the other hand, Interface IScriptEvent is public inherited so the entire interface ( IEvent,
-// IScriptEvent ) can be shown to client code
-// http://stackoverflow.com/questions/3747066/c-cannot-convert-from-base-a-to-derived-type-b-via-virtual-base-a
+// // http://stackoverflow.com/questions/3747066/c-cannot-convert-from-base-a-to-derived-type-b-via-virtual-base-a
 // However, virtual inheritance has a disadvantage, which is dynamic_pointer_cast is needed to downcast
 //---------------------------------------------------------------------------------------------------------------------
 #pragma warning( push )
 #pragma warning( disable : 4250 )
 
-template <typename T>class BaseScriptEvent : private BaseEvent<T>, virtual public IScriptEvent
+template <typename T>class BaseScriptEvent : public BaseEvent<T>, public IScriptEvent
    {
    public:
       BaseScriptEvent( void ) { m_IsEventDataValid = false; }

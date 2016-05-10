@@ -253,7 +253,7 @@ class IGamePhysics
       virtual void VCreateTrigger( WeakActorPtr pGameActor, const Vec3 &pos, const float dim ) = 0;
       virtual void VApplyForce( const Vec3 &dir, float newtons, ActorId aid ) = 0;
       virtual void VApplyTorque( const Vec3 &dir, float newtons, ActorId aid ) = 0;
-      virtual bool VKinematicMove( const Mat4x4 &mat, ActorId aid ) = 0;
+      virtual bool VKinematicMove( const Transform &trans, ActorId aid ) = 0;
 
       // Physics actor states
       virtual void VRotateY( ActorId actorId, float angleRadians, float time ) = 0;
@@ -265,7 +265,7 @@ class IGamePhysics
       virtual void VSetAngularVelocity( ActorId actorId, const Vec3& vel ) = 0;
       virtual void VTranslate( ActorId actorId, const Vec3& vec ) = 0;
 
-      virtual void VSetTransform( const ActorId id, const Mat4x4& mat ) = 0;
+      virtual void VSetTransform( const ActorId id, const Transform& trans ) = 0;
       virtual Transform VGetTransform( const ActorId id ) = 0;
 
       virtual ~IGamePhysics( )

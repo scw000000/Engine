@@ -1,14 +1,19 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Engine.h
-////////////////////////////////////////////////////////////////////////////////
-
-
-///////////////////////
-// MY CLASS INCLUDES //
-///////////////////////
+/*!
+ * \file Engine.h
+ * \date 2016/05/14 21:58
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "../Mainloop/Initialization.h"
-#include "../Main/BaseGameLogic.h"
+#include "../Main/BaseEngineLogic.h"
 #include "../ResourceCache/ResourceCache.h"
 #include "../UserInterface/UserInterface.h"
 
@@ -23,7 +28,7 @@ class EngineApp
       
       static Renderer GetRendererImpl();
 
-      virtual bool VLoadGame( void );
+      virtual bool VLoadLevel( void );
       virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
 
       void MainLoop( void );
@@ -44,8 +49,8 @@ class EngineApp
 
       Point GetScreenSize( void ) const { return m_screenSize; }
 
-      BaseGameLogic* GetGameLogic(void) const { return m_pGame; }
-      BaseGameLogic* VCreateGameAndView();
+      BaseEngineLogic* GetGameLogic(void) const { return m_pGame; }
+      BaseEngineLogic* VCreateLogic();
       
       HWND GetHwnd( void );      
 
@@ -54,7 +59,7 @@ class EngineApp
    public:
       struct EngineOptions m_EngineOptions;
       TCHAR m_saveGameDirectory[MAX_PATH];
-      BaseGameLogic *m_pGame;
+      BaseEngineLogic *m_pGame;
       ResCache *m_pResCache;
       shared_ptr<IRenderer> m_pRenderer;
       EventManager *m_pEventManager;

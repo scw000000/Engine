@@ -39,6 +39,9 @@ HumanView::HumanView( shared_ptr<IRenderer> p_renderer )
 
    m_pGUIManager = ENG_NEW GUIManager;
    m_pGUIManager->Init( "GUI/" );
+
+   VPushElement( m_pScene );
+   m_pController.reset( ENG_NEW MovementController( m_pCamera, 0, 0, false ) );
    }
 
 
@@ -194,8 +197,7 @@ int HumanView::Ask( MessageBox_Questions question )
 // TODO: refactor this method ( unnecessary param )
 bool HumanView::LoadGame( TiXmlElement* pLevelData )
    {
-   VPushElement( m_pScene );  
-   m_pController.reset( ENG_NEW MovementController( m_pCamera, 0, 0, false ) );
+   
    //m_pScene->VOnRestore();
    return true;
    }

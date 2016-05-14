@@ -22,11 +22,7 @@ class HumanView : public IGameView
 	   virtual GameViewType VGetType() { return GameView_Human; }
 	   virtual GameViewId VGetId( void ) const { return m_ViewId; }
 
-	   virtual void VOnAttach( GameViewId vid, ActorId aid )
-         {
-   		m_ViewId = vid; 
-	   	m_ActorId = aid;
-	      }
+	   virtual void VOnAttach( GameViewId vid ) { m_ViewId = vid; }
       virtual int VOnRestore( void );
       virtual int VOnLostDevice( void );
       virtual int VOnMsgProc( SDL_Event event ); // process the OS event
@@ -52,7 +48,6 @@ class HumanView : public IGameView
 
    protected:
 	   GameViewId m_ViewId;
-	   ActorId m_ActorId;
       Uint64 m_currTick; 
       Uint64 m_lastDraw; // last time the game rended
       bool m_runFullSpeed; // if the view should ignore max rendering frequency setting

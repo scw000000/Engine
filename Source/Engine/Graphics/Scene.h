@@ -44,7 +44,8 @@ class Scene
       Transform GetTopTransform( void ) const{ return m_TransformStack.GetTopTransForm(); };
 
 	   void AddAlphaSceneNode( AlphaSceneNode *asn ) { m_AlphaSceneNodes.push_back( asn ); }
-      void NewRenderComponentDelegate( IEventPtr pEventData );
+      void NewRenderComponentDelegate( IEventPtr pEvent );
+      void DestroyActorDelegate( IEventPtr pEvent );
       shared_ptr<IRenderer> GetRenderer( void ) { return m_pRenderer; }
       shared_ptr<CameraNode> GetCamera( void ) { return m_Camera; }
       shared_ptr<LightManager> GetLightManagerPtr( void ){ return m_pLightManager; }

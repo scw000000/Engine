@@ -1,10 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Engine.cpp
-////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////
-// MY CLASS INCLUDES //  
-///////////////////////
+/*!
+ * \file Engine.cpp
+ * \date 2016/05/14 21:58
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "EngineStd.h"
 #include "..\UserInterface\HumanView.h"
 #include "..\UserInterface/GUIManager.h"
@@ -266,7 +272,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
    // Create game & view
    //--------------------------------- 
-   m_pGame = VCreateGameAndView();
+   m_pGame = VCreateLogic();
    if (!m_pGame)
       {
       return false;
@@ -279,7 +285,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    return true;
    }
 
-bool EngineApp::VLoadGame(void)
+bool EngineApp::VLoadLevel(void)
    {
    // Read the game options and see what the current game
    // needs to be - all of the game graphics are initialized by now, too...
@@ -366,7 +372,7 @@ void EngineApp::MsgProc( void )
          case SDL_CONTROLLERDEVICEREMOVED:
          case SDL_CONTROLLERDEVICEREMAPPED:
          // send event to all of game views
-         for( auto i = m_pGame->m_gameViews.rbegin(); i != m_pGame->m_gameViews.rend(); ++i) 
+         for( auto i = m_pGame->m_ViewList.rbegin(); i != m_pGame->m_ViewList.rend(); ++i) 
 		      {
 			   if ( (*i)->VOnMsgProc( event ) )
 				   {
@@ -377,9 +383,9 @@ void EngineApp::MsgProc( void )
       }// If poll event exist
    }// Function MsgProc
 
-BaseGameLogic *EngineApp::VCreateGameAndView( void )
+BaseEngineLogic *EngineApp::VCreateLogic( void )
    {
-   m_pGame = ENG_NEW BaseGameLogic();
+   m_pGame = ENG_NEW BaseEngineLogic();
    m_pGame->Init();
 
    // shared_ptr<IGameView> menuView;
@@ -416,7 +422,7 @@ int EngineApp::Modal( shared_ptr<Dialog> pModalScreen, int defaultAnswer )
 
 HumanView* EngineApp::GetHumanView( void )
    {
-   for( auto it = m_pGame->m_gameViews.begin(); it != m_pGame->m_gameViews.end(); ++it )
+   for( auto it = m_pGame->m_ViewList.begin(); it != m_pGame->m_ViewList.end(); ++it )
       {
       if( (*it)->VGetType() == GameViewType::GameView_Human )
          {
@@ -510,7 +516,7 @@ int EngineApp::PumpUntilMessage( Uint32& eventEnd, Sint32& code )
             double fAbsoluteTime = 0.0;
             float  fElapasedTime = 0.0f;
             GetGlobalTimer()->GetTimeValues( &fAppTime, &fAbsoluteTime, &fElapasedTime );
-				for( auto i = m_pGame->m_gameViews.begin(); i!=m_pGame->m_gameViews.end(); ++i )
+				for( auto i = m_pGame->m_ViewList.begin(); i!=m_pGame->m_ViewList.end(); ++i )
 				   {
 					(*i)->VOnUpdate( ( unsigned long ) ( fElapasedTime * 1000.f ) );
 				   }
@@ -553,19 +559,19 @@ void EngineApp::OnUpdateGame( double fTime, float fElapsedTime )
       ENG_ASSERT( PushUserEvent( m_ShutDownEventType, 0 ) );
       }
 
-	   if (m_pGame)
+	if ( m_pGame )
 	   {
-      IEventManager::GetSingleton()->VUpdate(20); // allow event queue to process for up to 20 ms
+      IEventManager::GetSingleton()->VUpdate( 20 ); // allow event queue to process for up to 20 ms
 		g_pApp->m_pGame->VOnUpdate( ( float ) fTime, fElapsedTime );
 	   }
    }
 
 void EngineApp::OnFrameRender( double fTime, float fElapsedTime )
    {
-   BaseGameLogic *pGame = g_pApp->m_pGame;
+   BaseEngineLogic *pGame = g_pApp->m_pGame;
 
    g_pApp->m_pRenderer->VPreRender();
-	for(GameViewList::iterator i=pGame->m_gameViews.begin(), end=pGame->m_gameViews.end(); i!=end; ++i)
+	for( ViewList::iterator i=pGame->m_ViewList.begin(), end=pGame->m_ViewList.end(); i!=end; ++i )
 	   {
 		(*i)->VOnRender( fTime, fElapsedTime );
 	   }

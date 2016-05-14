@@ -58,9 +58,6 @@
     <ClCompile Include="..\UserInterface\HumanView.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
-    <ClCompile Include="..\Main\BaseGameLogic.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\Utilities\Random.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -187,6 +184,15 @@
     <ClCompile Include="..\Event\EventFactory.cpp">
       <Filter>Event</Filter>
     </ClCompile>
+    <ClCompile Include="..\Main\EngineState.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Main\EditorViewState.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Main\BaseEngineLogic.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -201,9 +207,6 @@
     </ClInclude>
     <ClInclude Include="..\UserInterface\HumanView.h">
       <Filter>UserInterface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Main\BaseGameLogic.h">
-      <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="..\Utilities\Math.h">
       <Filter>Utilities</Filter>
@@ -340,6 +343,15 @@
     </ClInclude>
     <ClInclude Include="..\Event\EventFactory.h">
       <Filter>Event</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Main\EngineState.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Main\EditorViewState.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Main\BaseEngineLogic.h">
+      <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

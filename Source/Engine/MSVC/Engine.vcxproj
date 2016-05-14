@@ -122,10 +122,12 @@
     <ClCompile Include="..\MainLoop\Process.cpp" />
     <ClCompile Include="..\MainLoop\ProcessManager.cpp" />
     <ClCompile Include="..\MainLoop\Timer.cpp" />
-    <ClCompile Include="..\Main\BaseGameLogic.cpp" />
+    <ClCompile Include="..\Main\BaseEngineLogic.cpp" />
+    <ClCompile Include="..\Main\EditorViewState.cpp" />
     <ClCompile Include="..\Main\Engine.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EngineStd.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="..\Main\EngineState.cpp" />
     <ClCompile Include="..\Main\main.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EngineStd.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EngineStd.h</PrecompiledHeaderFile>
@@ -185,8 +187,10 @@
     <ClInclude Include="..\MainLoop\Process.h" />
     <ClInclude Include="..\MainLoop\ProcessManager.h" />
     <ClInclude Include="..\MainLoop\Timer.h" />
-    <ClInclude Include="..\Main\BaseGameLogic.h" />
+    <ClInclude Include="..\Main\BaseEngineLogic.h" />
+    <ClInclude Include="..\Main\EditorViewState.h" />
     <ClInclude Include="..\Main\Engine.h" />
+    <ClInclude Include="..\Main\EngineState.h" />
     <ClInclude Include="..\Main\Interfaces.h" />
     <ClInclude Include="..\Memory\MemoryPool.h" />
     <ClInclude Include="..\Multicore\CriticalSection.h" />

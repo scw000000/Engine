@@ -13,7 +13,7 @@ Scene::Scene( shared_ptr<IRenderer> renderer ) : m_Root( ENG_NEW RootNode ), m_p
 	
    IEventManager* pEventMgr = IEventManager::GetSingleton();
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::NewRenderComponentDelegate ), EvtData_New_Render_Component::s_EventType );
-   //pEventMgr->VAddListener(fastdelegate::MakeDelegate(this, &Scene::DestroyActorDelegate), EvtData_Destroy_Actor::sk_EventType);
+   pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::DestroyActorDelegate ), EvtData_Destroy_Actor::s_EventType);
    //pEventMgr->VAddListener(fastdelegate::MakeDelegate(this, &Scene::MoveActorDelegate), EvtData_Move_Actor::sk_EventType);
    //pEventMgr->VAddListener(fastdelegate::MakeDelegate(this, &Scene::ModifiedRenderComponentDelegate), EvtData_Modified_Render_Component::sk_EventType);
    }
@@ -23,7 +23,7 @@ Scene::~Scene()
    
    }
 
-// TODO: move the post render to humanview, because it has GUIManager
+
 int Scene::OnRender()
    {
    if ( m_Root && m_Camera )
@@ -138,12 +138,12 @@ void Scene::RenderAlphaPass()
    OpenGLRenderer::SetRenderAlpha( false );
    }
 
-void Scene::NewRenderComponentDelegate( IEventPtr pEventData )
+void Scene::NewRenderComponentDelegate( IEventPtr pEvent )
    {
-   shared_ptr<EvtData_New_Render_Component> pCastEventData = dynamic_pointer_cast<EvtData_New_Render_Component>( pEventData );
+   shared_ptr<EvtData_New_Render_Component> pDerivedEvent = dynamic_pointer_cast<EvtData_New_Render_Component>( pEvent );
 
-    ActorId actorId = pCastEventData->GetActorId();
-    shared_ptr<SceneNode> pSceneNode( pCastEventData->GetSceneNode() );
+    ActorId actorId = pDerivedEvent->GetActorId();
+    shared_ptr<SceneNode> pSceneNode( pDerivedEvent->GetSceneNode() );
 
     // TODO: implement and call VOnInit instead of VOnRestore
     // because it will be called again in HumanView
@@ -155,4 +155,11 @@ void Scene::NewRenderComponentDelegate( IEventPtr pEventData )
       }
 
    AddChild( actorId, pSceneNode );
+   }
+
+void Scene::DestroyActorDelegate( IEventPtr pEvent )
+   {
+   shared_ptr<EvtData_Destroy_Actor> pDerivedEvent = dynamic_pointer_cast<EvtData_Destroy_Actor>( pEvent );
+
+   RemoveChild( pDerivedEvent->GetId() );
    }

@@ -72,6 +72,7 @@ class EvtData_Destroy_Actor : public BaseEvent<EvtData_Destroy_Actor>
       virtual IEventPtr VCopy( void ) const { return IEventPtr( ENG_NEW EvtData_Destroy_Actor( m_Id ) ); }
       //virtual void VSerialize( std::ostre )
      // virtual const char* GetName( void ) const { return "EvtDat_Destyot_Actor"; } 
+      ActorId GetId( void ) const { return m_Id; }
 
    private:
       ActorId m_Id;

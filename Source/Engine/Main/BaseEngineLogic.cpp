@@ -1,12 +1,18 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: BaseGameLogic.cpp
-////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////
-// MY CLASS INCLUDES //
-///////////////////////
+/*!
+ * \file BaseEngineLogic.cpp
+ * \date 2016/05/14 21:30
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "EngineStd.h"
-#include "BaseGameLogic.h"
+#include "BaseEngineLogic.h"
 #include "..\Mainloop\Initialization.h"			// only for GameOptions
 #include "..\MainLoop\Process.h"
 #include "..\Actors\Actor.h"
@@ -14,53 +20,48 @@
 #include "..\Utilities\String.h"
 #include "..\UserInterface\HumanView.h"
 #include "..\ResourceCache\XmlResource.h"
+#include "..\Event\EventManager.h"
 
-BaseGameLogic::BaseGameLogic()
+BaseEngineLogic::BaseEngineLogic()
    {
    m_Lifetime = 0.f;
    m_LastActorId = 0;
 	m_pProcessManager = ENG_NEW ProcessManager;
 	m_State = BGS_Initializing;
-	m_ExpectedPlayers = 0;
-	m_ExpectedRemotePlayers = 0;
-	m_ExpectedAI = 0;
-	m_HumanPlayersAttached = 0;
-	m_AIPlayersAttached = 0;
-	m_HumanGamesLoaded = 0;
    m_pActorFactory = NULL;
    }
 
-BaseGameLogic::~BaseGameLogic()
+BaseEngineLogic::~BaseEngineLogic()
    {
-   while (!m_gameViews.empty())
-		m_gameViews.pop_front();
+   while (!m_ViewList.empty())
+		m_ViewList.pop_front();
 
 	SAFE_DELETE(m_pProcessManager);
     SAFE_DELETE(m_pActorFactory);
 
     // destroy all actors
-    for (auto it = m_actors.begin(); it != m_actors.end(); ++it)
+    for ( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
         it->second->Destroy();
-    m_actors.clear();
+    m_Actors.clear();
 
    }
 
-bool BaseGameLogic::Init()
+bool BaseEngineLogic::Init()
    {
    m_pActorFactory = VCreateActorFactory();
    return true;
    }
 
-void BaseGameLogic::VAddView( shared_ptr<IGameView> pView, ActorId actorId )
+void BaseEngineLogic::VAddView( shared_ptr<IGameView> pView )
    {
    // This makes sure that all views have a non-zero view id.
-	int viewId = static_cast<int>( m_gameViews.size() );
-	m_gameViews.push_back(pView);
-	pView->VOnAttach(viewId, actorId);
-	pView->VOnRestore();
+	int viewId = static_cast<int>( m_ViewList.size() );
+	m_ViewList.push_back( pView );
+	pView->VOnAttach( viewId );
+	pView->VOnRestore(); 
    }
 
-StrongActorPtr BaseGameLogic::VCreateActor(const std::string &actorResource, TiXmlElement *overrides, const Mat4x4* initialTransform, const ActorId serversActorId )
+StrongActorPtr BaseEngineLogic::VCreateActor(const std::string &actorResource, TiXmlElement *overrides, const Mat4x4* initialTransform, const ActorId serversActorId )
    {
    ENG_ASSERT( m_pActorFactory );
 
@@ -68,7 +69,7 @@ StrongActorPtr BaseGameLogic::VCreateActor(const std::string &actorResource, TiX
    if (pActor)
       {
       // Insert into actor map
-      m_actors.insert( std::make_pair(pActor->GetId(), pActor) );
+      m_Actors.insert( std::make_pair(pActor->GetId(), pActor) );
       return pActor;
       }
    else
@@ -78,43 +79,44 @@ StrongActorPtr BaseGameLogic::VCreateActor(const std::string &actorResource, TiX
       }
    }
 
-void BaseGameLogic::VDestroyActor( const ActorId actorId )
+void BaseEngineLogic::VDestroyActor( const ActorId actorId )
    {
    // We need to trigger a synchronous event to ensure that any systems responding to this event can still access a 
    // valid actor if need be.  The actor will be destroyed after this.
-
-   auto findIt = m_actors.find(actorId);
-   if (findIt != m_actors.end())
+   shared_ptr<EvtData_Destroy_Actor> pEvent( ENG_NEW EvtData_Destroy_Actor( actorId ) );
+   IEventManager::GetSingleton()->VTriggerEvent( pEvent );
+   auto findIt = m_Actors.find(actorId);
+   if (findIt != m_Actors.end())
       {
       findIt->second->Destroy();
-      m_actors.erase(findIt);
+      m_Actors.erase(findIt);
       }
    }
 
-WeakActorPtr BaseGameLogic::VGetActor( const ActorId actorId )
+WeakActorPtr BaseEngineLogic::VGetActor( const ActorId actorId )
    {
-   ActorMap::iterator findIt = m_actors.find(actorId);
-    if (findIt != m_actors.end())
+   ActorMap::iterator findIt = m_Actors.find(actorId);
+    if (findIt != m_Actors.end())
        {
        return findIt->second;
        }
    return WeakActorPtr();
    }
 
-void BaseGameLogic::VModifyActor( const ActorId actorId, TiXmlElement *overrides )
+void BaseEngineLogic::VModifyActor( const ActorId actorId, TiXmlElement *overrides )
    {
-   ENG_ASSERT(m_pActorFactory);
+   ENG_ASSERT( m_pActorFactory );
 	// if (!m_pActorFactory)
 	//	return;
 
-	auto findIt = m_actors.find(actorId);
-   if (findIt != m_actors.end())
+	auto findIt = m_Actors.find(actorId);
+   if (findIt != m_Actors.end())
       {
 		m_pActorFactory->ModifyActor( findIt->second, overrides );
       }
    }
 
-void BaseGameLogic::VOnUpdate( float time, float elapsedTime )
+void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
    {
    unsigned long deltaMilliseconds = unsigned long( elapsedTime * 1000.0f );
 	m_Lifetime += elapsedTime;
@@ -134,23 +136,11 @@ void BaseGameLogic::VOnUpdate( float time, float elapsedTime )
 			break;
 
 		case BGS_LoadingGameEnvironment:
-/***
-			// [mrmike] This was modified a little from what you see in the book - VLoadGame() is now called from 
-			//          BaseGameLogic::VChangeState()
-			//
-			if (!g_pApp->VLoadGame())
-			{
-				GCC_ERROR("The game failed to load.");
-				g_pApp->AbortGame();
-			}
-***/
+
 			break;
 
 		case BGS_WaitingForPlayersToLoadEnvironment:
-			if ( m_ExpectedPlayers + m_ExpectedRemotePlayers <= m_HumanGamesLoaded )
-			   {
 				VChangeState( BGS_SpawningPlayersActors );
-			   }
 			break;
 
 		case BGS_SpawningPlayersActors:
@@ -158,15 +148,12 @@ void BaseGameLogic::VOnUpdate( float time, float elapsedTime )
 			break;
 
 		case BGS_WaitingForPlayers:
-			if (m_ExpectedPlayers + m_ExpectedRemotePlayers == m_HumanPlayersAttached ) 
-			   {
 				// The server sends us the level name as a part of the login message. 
 				// We have to wait until it arrives before loading the level
 				if ( !g_pApp->m_EngineOptions.m_Level.empty() )
 				   {
 					VChangeState(BGS_LoadingGameEnvironment);
 				   }
-			   }
 			break;
 
 		case BGS_Running:
@@ -178,29 +165,27 @@ void BaseGameLogic::VOnUpdate( float time, float elapsedTime )
 	   }
 
     // update all game views
-    for ( GameViewList::iterator it = m_gameViews.begin(); it != m_gameViews.end(); ++it )
+    for ( ViewList::iterator it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
 	   {
 		(*it)->VOnUpdate( deltaMilliseconds );
 	   }
 
     // update game actors
-    for (ActorMap::const_iterator it = m_actors.begin(); it != m_actors.end(); ++it)
+    for ( ActorMap::const_iterator it = m_Actors.begin(); it != m_Actors.end(); ++it )
       {
       it->second->Update( deltaMilliseconds );
       }
 
    }
 
-void BaseGameLogic::VChangeState( BaseGameState newState )
+void BaseEngineLogic::VChangeState( BaseGameState newState )
    {
    if ( newState == BGS_WaitingForPlayers )
 	   {
 		// Get rid of the Main Menu...
-		m_gameViews.pop_front();
+		m_ViewList.pop_front();
 
 		// Note: Split screen support would require this to change!
-		m_ExpectedPlayers = 1;
-      m_ExpectedAI = g_pApp->m_EngineOptions.m_numAIs;
 
       /* online gaming, skipped
 		if ( !g_pApp->m_Options.m_gameHost.empty() )
@@ -213,7 +198,7 @@ void BaseGameLogic::VChangeState( BaseGameState newState )
 	else if ( newState == BGS_LoadingGameEnvironment )
 	{
 		m_State = newState;
-		if ( !g_pApp->VLoadGame() )
+		if ( !g_pApp->VLoadLevel() )
 		   {
 			ENG_ERROR("The game failed to load.");
 			g_pApp->AbortGame();
@@ -230,7 +215,7 @@ void BaseGameLogic::VChangeState( BaseGameState newState )
 
 // this function is called by EngineApp::VLoadGame
 // LATER: finish implementation
-bool BaseGameLogic::VLoadGame( const char* levelResource )
+bool BaseEngineLogic::VLoadGame( const char* levelResource )
    {
    
     // Grab the root XML node
@@ -279,7 +264,7 @@ bool BaseGameLogic::VLoadGame( const char* levelResource )
       }
 
     // initialize all human views
-   for ( auto it = m_gameViews.begin(); it != m_gameViews.end(); ++it )
+   for ( auto it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
       {
       shared_ptr<IGameView> pView = *it;
       if ( pView->VGetType() == GameView_Human )
@@ -304,7 +289,7 @@ bool BaseGameLogic::VLoadGame( const char* levelResource )
    }
 
 
-ActorFactory* BaseGameLogic::VCreateActorFactory( void )
+ActorFactory* BaseEngineLogic::VCreateActorFactory( void )
    {
    return ENG_NEW ActorFactory;
    }

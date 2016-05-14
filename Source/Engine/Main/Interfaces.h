@@ -82,11 +82,11 @@ public:
 	virtual GameViewType VGetType( void ) = 0;
 	virtual GameViewId VGetId() const = 0;
 	virtual void VOnUpdate( const unsigned long deltaMs ) = 0;
-   virtual void VOnAttach( GameViewId vid, ActorId aid ) = 0;
+   virtual void VOnAttach( GameViewId vid ) = 0;
 	virtual ~IGameView( void ) { };
 };
 
-typedef std::list<shared_ptr<IGameView> > GameViewList;
+typedef std::list<shared_ptr<IGameView> > ViewList;
 
 class IKeyboardHandler
    {

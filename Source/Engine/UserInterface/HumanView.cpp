@@ -11,7 +11,7 @@ const unsigned int SCREEN_MAX_FRAME_RATE = 60;
 const Uint64 SCREEN_MIN_RENDER_INTERVAL = ( SDL_GetPerformanceFrequency() / SCREEN_MAX_FRAME_RATE );
 const ViewId gc_InvalidGameViewId = 0xffffffff;
 
-HumanView::HumanView( void )
+HumanView::HumanView( void ) : m_GUILayout( "MainMenu.layout" )
    {
 	m_pProcessManager = ENG_NEW ProcessManager;
 
@@ -21,7 +21,7 @@ HumanView::HumanView( void )
 	   {
       m_pWorld = g_pApp->m_pEngineLogic->m_pWrold;
 		Frustum frustum;
-		frustum.Init( ENG_PI/4.0f, 4.0f / 3.0f, 0.1f, 2000.0f );
+		frustum.Init( ENG_PI/4.0f, g_pApp->m_EngineOptions.m_ScreenSize.x / g_pApp->m_EngineOptions.m_ScreenSize.y, 0.1f, 2000.0f );
       
       m_pCamera.reset( ENG_NEW CameraNode( Vec3(0.0f, 0.0f, 0.0f), // position in World Space
 								Vec3( 0.0f, 0.0f, 1.0f), // look target
@@ -33,7 +33,7 @@ HumanView::HumanView( void )
 
    m_pGUIManager = ENG_NEW GUIManager;
    m_pGUIManager->Init( "GUI/" );
-
+   m_pGUIManager->LoadLayout( m_GUILayout );
    m_pController.reset( ENG_NEW MovementController( m_pCamera, 0, 0, false ) );
    }
 

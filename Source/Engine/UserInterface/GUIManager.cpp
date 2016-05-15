@@ -24,13 +24,13 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
       {
       s_pRenderer = &CEGUI::OpenGL3Renderer::bootstrapSystem();
       s_pResProvider = static_cast< CEGUI::DefaultResourceProvider* >( CEGUI::System::getSingleton().getResourceProvider() );
-      std::string resourceDir( resourceDirectory );
-      s_pResProvider->setResourceGroupDirectory( "imagesets", resourceDir + "imagesets/" );
-      s_pResProvider->setResourceGroupDirectory( "schemes", resourceDir + "schemes/" );
-      s_pResProvider->setResourceGroupDirectory( "fonts", resourceDir + "fonts/" );
-      s_pResProvider->setResourceGroupDirectory( "layouts", resourceDir + "layouts/" );
-      s_pResProvider->setResourceGroupDirectory( "looknfeel", resourceDir + "looknfeel/" );
-      s_pResProvider->setResourceGroupDirectory( "lua_scripts", resourceDir + "lua_scripts/" );
+      m_ResourceDir = resourceDirectory;
+      s_pResProvider->setResourceGroupDirectory( "imagesets", m_ResourceDir + "imagesets/" );
+      s_pResProvider->setResourceGroupDirectory( "schemes", m_ResourceDir + "schemes/" );
+      s_pResProvider->setResourceGroupDirectory( "fonts", m_ResourceDir + "fonts/" );
+      s_pResProvider->setResourceGroupDirectory( "layouts", m_ResourceDir + "layouts/" );
+      s_pResProvider->setResourceGroupDirectory( "looknfeel", m_ResourceDir + "looknfeel/" );
+      s_pResProvider->setResourceGroupDirectory( "lua_scripts", m_ResourceDir + "lua_scripts/" );
 
       CEGUI::ImageManager::setImagesetDefaultResourceGroup( "imagesets" );
       CEGUI::Scheme::setDefaultResourceGroup( "schemes" );
@@ -42,7 +42,7 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
    
 
    m_pContext = &CEGUI::System::getSingleton().createGUIContext( s_pRenderer->getDefaultRenderTarget() );
-   LoadScheme( "WindowsLook.scheme" );
+   LoadScheme( "GlossySerpentFHD.scheme" );
    SetFont( "UTF8.ttf" );
 
    m_pRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "root" );
@@ -152,6 +152,17 @@ int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
    return 0;
    }
 
+void GUIManager::LoadLayout( const Resource& layout )
+   {
+  // LoadScheme( "GlossySerpentFHD.scheme" );
+
+  // CEGUI::Window *pWindow = CEGUI::WindowManager::getSingleton().loadLayoutFromFile( m_ResourceDir + "layouts/" + "MainMenu.layout","main_" ); 
+   CEGUI::Window *pWindow = CEGUI::WindowManager::getSingleton( ).loadLayoutFromFile( m_ResourceDir + "layouts/" + "Test.layout", "main_" );
+   std::cout << pWindow->getChildCount();
+   CEGUI::WindowManager::getSingleton( ).saveLayoutToFile( *pWindow, "debug.txt" );
+   CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow( pWindow );
+   //  m_pUIRoot->addChild( pWindow );
+   }
 
 int GUIManager::Ask( MessageBox_Questions question )
    {

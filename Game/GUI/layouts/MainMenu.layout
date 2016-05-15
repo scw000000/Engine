@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<GUILayout version="4" >
+    <Window type="GlossySerpentFHD/SimplePanel" name="SimplePanel" >
+        <Property name="Area" value="{{0,0},{0,0},{1,0},{1,0}}" />
+        <Property name="MaxSize" value="{{1,0},{1,0}}" />
+        <Window type="GlossySerpentFHD/ItemListbox" name="ItemListbox" >
+            <Property name="Area" value="{{0,-15},{0,2},{0.2,0},{0.4,-1}}" />
+            <Property name="VerticalAlignment" value="Centre" />
+            <Property name="HorizontalAlignment" value="Centre" />
+            <AutoWindow namePath="__auto_content_pane__" >
+                <Property name="MouseInputPropagationEnabled" value="true" />
+            </AutoWindow>
+            <AutoWindow namePath="__auto_vscrollbar__" >
+                <Property name="NonClient" value="true" />
+                <Property name="AlwaysOnTop" value="true" />
+                <Property name="VerticalScrollbar" value="true" />
+            </AutoWindow>
+            <AutoWindow namePath="__auto_hscrollbar__" >
+                <Property name="NonClient" value="true" />
+                <Property name="AlwaysOnTop" value="true" />
+            </AutoWindow>
+            <Window type="GlossySerpentFHD/VerticalScrollbar" name="VerticalScrollbar" >
+                <Property name="Area" value="{{0,0},{0,0},{0.13,0},{1,0}}" />
+                <Property name="VerticalScrollbar" value="true" />
+                <Property name="HorizontalAlignment" value="Right" />
+            </Window>
+            <Window type="GlossySerpentFHD/ListHeaderSegment" name="ListHeaderSegment2" >
+                <Property name="Area" value="{{0,54},{0,-1},{0,104},{0,49}}" />
+                <Property name="MouseInputPropagationEnabled" value="true" />
+            </Window>
+            <Window type="GlossySerpentFHD/ListHeaderSegment" name="ListHeaderSegment" >
+                <Property name="Area" value="{{0,0},{0,0},{0,50},{0,50}}" />
+                <Property name="MouseInputPropagationEnabled" value="true" />
+            </Window>
+        </Window>
+        <Window type="GlossySerpentFHD/Button" name="Button" >
+            <Property name="Area" value="{{0,0},{0,214},{0.1,1},{0.05,214}}" />
+            <Property name="Text" value="Start" />
+            <Property name="VerticalAlignment" value="Centre" />
+            <Property name="HorizontalAlignment" value="Centre" />
+        </Window>
+        <Window type="GlossySerpentFHD/Button32_4C" name="Button32_4C" >
+            <Property name="Area" value="{{0,213},{0,541},{0,295},{0,615}}" />
+        </Window>
+    </Window>
+</GUILayout>

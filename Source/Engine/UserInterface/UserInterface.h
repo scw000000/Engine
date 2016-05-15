@@ -1,7 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: UserInterface.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file UserInterface.h
+ * \date 2016/05/15 19:15
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 
 #include "..\Main\Interfaces.h"

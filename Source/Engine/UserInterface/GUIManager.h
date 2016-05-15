@@ -30,12 +30,11 @@ class GUIManager
       int Ask( MessageBox_Questions question );
       bool HasModalDialog( void ){ return m_HasModalDialog != 0; }
       Uint32 GetModalEventType( void ){ return m_ModalEventType; }
+      void LoadLayout( const Resource& layout );
 
    protected:
       static CEGUI::Key::Scan SDLKeyToCEGUIKey( SDL_Keycode key );
       static CEGUI::MouseButton SDLButtonTOCEGUIButton( Uint8 button );
-
-   protected:
       static  CEGUI::OpenGL3Renderer* s_pRenderer;
       static  CEGUI::DefaultResourceProvider* s_pResProvider;
       CEGUI::GUIContext* m_pContext;
@@ -44,4 +43,5 @@ class GUIManager
       CEGUI::Window* m_pUIRoot;
       Uint32 m_ModalEventType;
       int m_HasModalDialog;
+      std::string m_ResourceDir;
    };

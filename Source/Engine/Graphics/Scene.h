@@ -10,7 +10,7 @@
 
 typedef std::map< ActorId, shared_ptr< ISceneNode > > ActorSceneMap;
 
-// TODO: complete implementation
+
 class Scene
    {
    public:

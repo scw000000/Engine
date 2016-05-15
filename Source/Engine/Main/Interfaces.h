@@ -47,46 +47,48 @@ class IScreenElement
 	   virtual bool const operator <(IScreenElement const &other) { return VGetZOrder() < other.VGetZOrder(); }
    };
 
+typedef unsigned int ViewId;
+extern const ViewId gc_InvalidGameViewId;
 
-class IGameLogic
+enum ViewType 
+   {
+   View_Human,
+   View_Remote,
+   View_AI,
+   View_Recorder,
+   View_Other
+   };
+
+
+class IView 
    {
    public:
-   	virtual WeakActorPtr VGetActor( const ActorId id )=0;
-      virtual StrongActorPtr VCreateActor( const std::string &actorResource, TiXmlElement *overrides, const Mat4x4 *initialTransform=NULL, const ActorId serversActorId=INVALID_ACTOR_ID)=0;
-      virtual void VDestroyActor( const ActorId actorId )=0;
-	   virtual bool VLoadGame( const char* levelResource )=0;
-	   //virtual void VSetProxy()=0;				
-	   virtual void VOnUpdate( float time, float elapsedTime )=0;
-	   virtual void VChangeState( enum BaseGameState newState )=0;
-	   virtual void VMoveActor( const ActorId id, Mat4x4 const &mat )=0;
+      virtual int VOnRestore( void ) = 0;
+      virtual void VOnRender( double fTime, float fElapsedTime ) = 0;
+      virtual int VOnMsgProc( SDL_Event event ) = 0;
+      virtual ViewType VGetType( void ) = 0;
+      virtual ViewId VGetId( ) const = 0;
+      virtual void VOnUpdate( const unsigned long deltaMs ) = 0;
+      virtual void VOnAttach( ViewId vid ) = 0;
    };
 
-enum GameViewType
+class IEngineLogic
    {
-	GameView_Human,
-	GameView_Remote,
-	GameView_AI,
-	GameView_Recorder,
-	GameView_Other
+   public:
+   	virtual WeakActorPtr VGetActor( const ActorId id ) = 0;
+      virtual StrongActorPtr VCreateActor( const std::string &actorResource, TiXmlElement *overrides, const Mat4x4 *initialTransform=NULL, const ActorId serversActorId=INVALID_ACTOR_ID) = 0;
+      virtual void VDestroyActor( const ActorId actorId ) = 0;
+	   virtual bool VLoadGame( const char* levelResource ) = 0;
+	   //virtual void VSetProxy()=0;				
+      virtual int VOnRestore( void ) = 0;
+	   virtual void VOnUpdate( float time, float elapsedTime ) = 0;
+      virtual void VOnRender( double fTime, float fElapsedTime ) = 0;
+	   virtual void VMoveActor( const ActorId id, Mat4x4 const &mat ) = 0;
+      virtual void VAddView( shared_ptr<IView> pView ) = 0;
+      virtual void VModifyActor( const ActorId actorId, TiXmlElement *overrides ) = 0;
    };
 
-typedef unsigned int GameViewId;
-extern const GameViewId gc_InvalidGameViewId;
-
-class IGameView 
-{
-public:
-   virtual int VOnRestore( void ) = 0;
-	virtual void VOnRender( double fTime, float fElapsedTime )=0;
-   virtual int VOnMsgProc( SDL_Event event ) = 0;
-	virtual GameViewType VGetType( void ) = 0;
-	virtual GameViewId VGetId() const = 0;
-	virtual void VOnUpdate( const unsigned long deltaMs ) = 0;
-   virtual void VOnAttach( GameViewId vid ) = 0;
-	virtual ~IGameView( void ) { };
-};
-
-typedef std::list<shared_ptr<IGameView> > ViewList;
+typedef std::list<shared_ptr<IView> > ViewList;
 
 class IKeyboardHandler
    {

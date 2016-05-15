@@ -22,13 +22,18 @@
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Event\EventManager.h"
 
-BaseEngineLogic::BaseEngineLogic()
+BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer )
    {
    m_Lifetime = 0.f;
    m_LastActorId = 0;
 	m_pProcessManager = ENG_NEW ProcessManager;
+   if( pRenderer )
+      {
+      m_pWrold.reset( ENG_NEW Scene( pRenderer ) );
+      m_pRenderer = pRenderer;
+      }
 	m_State = BGS_Initializing;
-   m_pActorFactory = NULL;
+   m_pActorFactory = ENG_NEW ActorFactory;;
    }
 
 BaseEngineLogic::~BaseEngineLogic()
@@ -37,7 +42,7 @@ BaseEngineLogic::~BaseEngineLogic()
 		m_ViewList.pop_front();
 
 	SAFE_DELETE(m_pProcessManager);
-    SAFE_DELETE(m_pActorFactory);
+   SAFE_DELETE(m_pActorFactory);
 
     // destroy all actors
     for ( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
@@ -48,11 +53,20 @@ BaseEngineLogic::~BaseEngineLogic()
 
 bool BaseEngineLogic::Init()
    {
-   m_pActorFactory = VCreateActorFactory();
+   if( !VLoadGame( g_pApp->m_EngineOptions.m_Level.c_str() ))
+      {
+      ENG_ERROR( "The game failed to load." );
+      g_pApp->AbortGame( );
+      return false;
+      }
+   m_pWrold->OnRestore();
+   
+   shared_ptr<IView> pView( ENG_NEW HumanView( ) );
+   VAddView( pView );
    return true;
    }
 
-void BaseEngineLogic::VAddView( shared_ptr<IGameView> pView )
+void BaseEngineLogic::VAddView( shared_ptr<IView> pView )
    {
    // This makes sure that all views have a non-zero view id.
 	int viewId = static_cast<int>( m_ViewList.size() );
@@ -116,101 +130,45 @@ void BaseEngineLogic::VModifyActor( const ActorId actorId, TiXmlElement *overrid
       }
    }
 
+int BaseEngineLogic::VOnRestore( void )
+   {
+   m_pWrold->OnRestore();
+   for( auto pView : m_ViewList )
+      {
+      pView->VOnRestore();
+      }
+   return S_OK;
+   }
+
 void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
    {
-   unsigned long deltaMilliseconds = unsigned long( elapsedTime * 1000.0f );
+   unsigned long deltaMs = unsigned long( elapsedTime * 1000.0f );
 	m_Lifetime += elapsedTime;
 
-	switch(m_State)
-	{
-		case BGS_Initializing:
-			// If we get to here we're ready to attach players
-			VChangeState( BGS_MainMenu );
-			break;
+   m_pWrold->OnUpdate( deltaMs );
 
-		case BGS_MainMenu:
-      if ( !g_pApp->m_EngineOptions.m_Level.empty() )
-				   {
-					VChangeState(BGS_LoadingGameEnvironment);
-				   }
-			break;
-
-		case BGS_LoadingGameEnvironment:
-
-			break;
-
-		case BGS_WaitingForPlayersToLoadEnvironment:
-				VChangeState( BGS_SpawningPlayersActors );
-			break;
-
-		case BGS_SpawningPlayersActors:
-			VChangeState( BGS_Running );
-			break;
-
-		case BGS_WaitingForPlayers:
-				// The server sends us the level name as a part of the login message. 
-				// We have to wait until it arrives before loading the level
-				if ( !g_pApp->m_EngineOptions.m_Level.empty() )
-				   {
-					VChangeState(BGS_LoadingGameEnvironment);
-				   }
-			break;
-
-		case BGS_Running:
-			m_pProcessManager->UpdateProcesses( deltaMilliseconds );
-			break;
-
-		default:
-			ENG_ERROR("Unrecognized state.");
-	   }
-
-    // update all game views
-    for ( ViewList::iterator it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
+   // update all game views
+   for ( ViewList::iterator it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
 	   {
-		(*it)->VOnUpdate( deltaMilliseconds );
+		(*it)->VOnUpdate( deltaMs );
 	   }
 
-    // update game actors
-    for ( ActorMap::const_iterator it = m_Actors.begin(); it != m_Actors.end(); ++it )
+   // update game actors
+   for ( ActorMap::const_iterator it = m_Actors.begin(); it != m_Actors.end(); ++it )
       {
-      it->second->Update( deltaMilliseconds );
+      it->second->Update( deltaMs );
       }
 
    }
 
-void BaseEngineLogic::VChangeState( BaseGameState newState )
+void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )
    {
-   if ( newState == BGS_WaitingForPlayers )
-	   {
-		// Get rid of the Main Menu...
-		m_ViewList.pop_front();
-
-		// Note: Split screen support would require this to change!
-
-      /* online gaming, skipped
-		if ( !g_pApp->m_Options.m_gameHost.empty() )
-		   {
-		   }
-		else if (m_ExpectedRemotePlayers > 0)
-		   {
-		   }*/
-	}
-	else if ( newState == BGS_LoadingGameEnvironment )
-	{
-		m_State = newState;
-		if ( !g_pApp->VLoadLevel() )
-		   {
-			ENG_ERROR("The game failed to load.");
-			g_pApp->AbortGame();
-		   }
-		else
-		   {
-			VChangeState( BGS_WaitingForPlayersToLoadEnvironment );			// we must wait for all human player to report their environments are loaded.
-			return;
-		   }
-	}
-
-	m_State = newState;
+   m_pRenderer->VPreRender( );
+   for( auto pView : m_ViewList )
+      {
+      pView->VOnRender( fTime, fElapsedTime );
+      }
+   m_pRenderer->VPostRender( );
    }
 
 // this function is called by EngineApp::VLoadGame
@@ -266,10 +224,10 @@ bool BaseEngineLogic::VLoadGame( const char* levelResource )
     // initialize all human views
    for ( auto it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
       {
-      shared_ptr<IGameView> pView = *it;
-      if ( pView->VGetType() == GameView_Human )
+      shared_ptr<IView> pView = *it;
+      if ( pView->VGetType() == View_Human )
          {
-         shared_ptr<HumanView> pHumanView = static_pointer_cast<HumanView, IGameView>(pView);
+         shared_ptr<HumanView> pHumanView = static_pointer_cast<HumanView, IView>(pView);
          pHumanView->LoadGame( pRoot );
          }
       }
@@ -286,10 +244,4 @@ bool BaseEngineLogic::VLoadGame( const char* levelResource )
       }
    
    return true;
-   }
-
-
-ActorFactory* BaseEngineLogic::VCreateActorFactory( void )
-   {
-   return ENG_NEW ActorFactory;
    }

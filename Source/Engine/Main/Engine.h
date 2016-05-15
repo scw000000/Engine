@@ -28,7 +28,7 @@ class EngineApp
       
       static Renderer GetRendererImpl();
 
-      virtual bool VLoadLevel( void );
+      //virtual bool VLoadLevel( void );
       virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
 
       void MainLoop( void );
@@ -37,7 +37,6 @@ class EngineApp
       bool IsRunning() { return m_bIsRunning; }
       bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );
       bool LoadStrings( std::string language );
-      bool LoadGame( void );
 
       int Modal( shared_ptr<Dialog> pModalScreen, int defaultAnswer );
 
@@ -49,7 +48,7 @@ class EngineApp
 
       Point GetScreenSize( void ) const { return m_screenSize; }
 
-      BaseEngineLogic* GetGameLogic(void) const { return m_pGame; }
+      BaseEngineLogic* GetGameLogic(void) const { return m_pEngineLogic; }
       BaseEngineLogic* VCreateLogic();
       
       HWND GetHwnd( void );      
@@ -59,7 +58,7 @@ class EngineApp
    public:
       struct EngineOptions m_EngineOptions;
       TCHAR m_saveGameDirectory[MAX_PATH];
-      BaseEngineLogic *m_pGame;
+      BaseEngineLogic *m_pEngineLogic;
       ResCache *m_pResCache;
       shared_ptr<IRenderer> m_pRenderer;
       EventManager *m_pEventManager;

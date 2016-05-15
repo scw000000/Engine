@@ -248,7 +248,7 @@ void BulletPhysics::VSyncVisibleScene( )
       ActorMotionState const * const actorMotionState = static_cast< ActorMotionState* >( it->second->getMotionState( ) );
       ENG_ASSERT( actorMotionState );
 
-      StrongActorPtr pActor = MakeStrongPtr( g_pApp->m_pGame->VGetActor( id ) );
+      StrongActorPtr pActor = MakeStrongPtr( g_pApp->m_pEngineLogic->VGetActor( id ) );
       if( pActor && actorMotionState )
          {
          shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::g_Name ) );

@@ -11,26 +11,26 @@ class GUIManager;
 
 typedef std::list< shared_ptr< IScreenElement > > ScreenElementList;
 
-class HumanView : public IGameView
+class HumanView : public IView
    {
 	friend class EngineApp;
 
    public:
-      HumanView( shared_ptr<IRenderer> p_renderer );
+      HumanView( void );
       virtual ~HumanView( void );
       virtual void VOnRender( double fTime, float fElapsedTime );
-	   virtual GameViewType VGetType() { return GameView_Human; }
-	   virtual GameViewId VGetId( void ) const { return m_ViewId; }
+	   virtual ViewType VGetType() { return View_Human; }
+	   virtual ViewId VGetId( void ) const { return m_ViewId; }
 
-	   virtual void VOnAttach( GameViewId vid ) { m_ViewId = vid; }
+	   virtual void VOnAttach( ViewId vid ) { m_ViewId = vid; }
       virtual int VOnRestore( void );
       virtual int VOnLostDevice( void );
       virtual int VOnMsgProc( SDL_Event event ); // process the OS event
 	   virtual void VOnUpdate( const unsigned long deltaMs );
    
-	   // Virtual methods to control the layering of interface elements
-	   virtual void VPushElement( shared_ptr<IScreenElement> pElement );
-	   virtual void VRemoveElement( shared_ptr<IScreenElement> pElement );
+	   //// Virtual methods to control the layering of interface elements
+	   //virtual void VPushElement( shared_ptr<IScreenElement> pElement );
+	   //virtual void VRemoveElement( shared_ptr<IScreenElement> pElement );
 
       ProcessManager* GetProcessManager( void ) { return m_pProcessManager; }
 	   //void TogglePause(bool active);
@@ -41,20 +41,16 @@ class HumanView : public IGameView
       Uint32 GetModalEventType( void ) { return m_pGUIManager->GetModalEventType(); }
 	   //HumanView(shared_ptr<IRenderer> renderer);
 
-      shared_ptr<Scene> GetScene( void ) { return m_pScene; }
-
    public:
-      ScreenElementList m_ScreenElements;
 
    protected:
-	   GameViewId m_ViewId;
+	   ViewId m_ViewId;
       Uint64 m_currTick; 
       Uint64 m_lastDraw; // last time the game rended
-      bool m_runFullSpeed; // if the view should ignore max rendering frequency setting
+      bool m_RunFullSpeed; // if the view should ignore max rendering frequency setting
       ProcessManager *m_pProcessManager; // this Processmanager is for things like button animations
-      BaseGameState m_BaseGameState;					// Added post-press - what is the current game state
       GUIManager* m_pGUIManager;
-      shared_ptr<ScreenElementScene> m_pScene; // this scene will be pushed into screen element list by LoadGame( xml level)
+      shared_ptr<Scene> m_pWorld; // this scene will be pushed into screen element list by LoadGame( xml level)
       shared_ptr<CameraNode> m_pCamera;
       shared_ptr<MovementController> m_pController; 
 

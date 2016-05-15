@@ -9,21 +9,17 @@
 
 const unsigned int SCREEN_MAX_FRAME_RATE = 60;
 const Uint64 SCREEN_MIN_RENDER_INTERVAL = ( SDL_GetPerformanceFrequency() / SCREEN_MAX_FRAME_RATE );
-const GameViewId gc_InvalidGameViewId = 0xffffffff;
+const ViewId gc_InvalidGameViewId = 0xffffffff;
 
-HumanView::HumanView( shared_ptr<IRenderer> p_renderer )
+HumanView::HumanView( void )
    {
 	m_pProcessManager = ENG_NEW ProcessManager;
 
 	m_ViewId = gc_InvalidGameViewId;
-
-	m_BaseGameState = BGS_Initializing;		// what is the current game state
    
-   if ( p_renderer )
+   if ( g_pApp->m_pEngineLogic->m_pWrold )
 	   {
-		// Moved to the HumanView class post press
-		m_pScene.reset( ENG_NEW ScreenElementScene( p_renderer ) );
-
+      m_pWorld = g_pApp->m_pEngineLogic->m_pWrold;
 		Frustum frustum;
 		frustum.Init( ENG_PI/4.0f, 4.0f / 3.0f, 0.1f, 2000.0f );
       
@@ -31,26 +27,19 @@ HumanView::HumanView( shared_ptr<IRenderer> p_renderer )
 								Vec3( 0.0f, 0.0f, 1.0f), // look target
 								Vec3( 0.0f, 1.0f, 0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
                         , frustum ) );
-		ENG_ASSERT( m_pScene && m_pCamera && _T("Out of memory") );     
-		m_pScene->VAddChild( INVALID_ACTOR_ID, m_pCamera );
-		m_pScene->SetCamera( m_pCamera );
-	   m_pCamera->VOnRestore( &*m_pScene );
+		ENG_ASSERT( m_pWorld && m_pCamera && _T("Out of memory") );     
+		m_pWorld->AddChild( INVALID_ACTOR_ID, m_pCamera );
       }
 
    m_pGUIManager = ENG_NEW GUIManager;
    m_pGUIManager->Init( "GUI/" );
 
-   VPushElement( m_pScene );
    m_pController.reset( ENG_NEW MovementController( m_pCamera, 0, 0, false ) );
    }
 
 
 HumanView::~HumanView()
    {
-	while (!m_ScreenElements.empty())
-	   {
-		m_ScreenElements.pop_front();		
-	   }
 	SAFE_DELETE( m_pProcessManager );
    m_pGUIManager->Destory();
    SAFE_DELETE( m_pGUIManager );
@@ -58,6 +47,7 @@ HumanView::~HumanView()
 
 void HumanView::VOnRender( double fTime, float fElapsedTime )
    {
+
    m_currTick = SDL_GetPerformanceCounter();
    
    if( m_currTick == m_lastDraw ) // already draw in this tick, leave now
@@ -65,20 +55,11 @@ void HumanView::VOnRender( double fTime, float fElapsedTime )
       return;
       }
 
-   if( m_runFullSpeed || ( ( m_currTick - m_lastDraw ) > SCREEN_MIN_RENDER_INTERVAL ) )
+   if( m_RunFullSpeed || ( ( m_currTick - m_lastDraw ) > SCREEN_MIN_RENDER_INTERVAL ) )
       {
-      
-      if( true )
-         {
-         for( auto it = m_ScreenElements.begin(); it != m_ScreenElements.end(); ++it )
-            {
-            if( (*it)->VIsVisible() )
-               {
-               (*it)->VOnRender( fTime, fElapsedTime );
-               }
-            }
-         m_lastDraw = m_currTick;
-         }
+      m_pWorld->SetCamera( m_pCamera );
+      m_pWorld->OnRender();
+      m_lastDraw = m_currTick;
       }
 
    // Render GUI last, because its on top of the screen
@@ -87,22 +68,13 @@ void HumanView::VOnRender( double fTime, float fElapsedTime )
 
 int HumanView::VOnRestore()
    {
-	int hr = 0;
-	for(ScreenElementList::iterator i=m_ScreenElements.begin(); i!=m_ScreenElements.end(); ++i)
-	   {
-	   ( (*i)->VOnRestore() );
-	   }
-	return hr;
+   m_pCamera->VOnRestore( &*m_pWorld );
+	return S_OK;
    }
 
 int HumanView::VOnLostDevice()
    {
-   int hr = 0;
-	for(ScreenElementList::iterator i=m_ScreenElements.begin(); i!=m_ScreenElements.end(); ++i)
-	   {
-	   ( (*i)->VOnLostDevice() );
-	   }
-	return hr; 
+	return S_OK; 
    }
 
 // let the controller handle the input event
@@ -120,17 +92,6 @@ int HumanView::VOnMsgProc( SDL_Event event )
       {
       return true;
       }
-
-	for( ScreenElementList::reverse_iterator i=m_ScreenElements.rbegin(); i != m_ScreenElements.rend(); ++i )
-	   {
-		if ( (*i)->VIsVisible() )
-		   {
-			if ( (*i)->VOnMsgProc( event ) )
-			   {
-				return 1;
-			   }
-		   }
-	   }
 
 	// Inject userInput into controller here
    switch ( event.type ) 
@@ -173,20 +134,6 @@ void HumanView::VOnUpdate( const unsigned long deltaMs )
       }
    m_pGUIManager->OnUpdate( deltaMs );
    m_pProcessManager->UpdateProcesses( deltaMs );
-   for(ScreenElementList::iterator i=m_ScreenElements.begin(); i!=m_ScreenElements.end(); ++i)
-	   {
-	   ( (*i)->VOnUpdate( deltaMs ) );
-	   }
-   }
-
-void HumanView::VPushElement( shared_ptr<IScreenElement> pElement )
-   {
-   m_ScreenElements.push_front(pElement);
-   }
-
-void HumanView::VRemoveElement( shared_ptr<IScreenElement> pElement )
-   {
-   m_ScreenElements.remove(pElement);
    }
 
 int HumanView::Ask( MessageBox_Questions question )

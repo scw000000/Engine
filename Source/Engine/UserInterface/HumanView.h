@@ -53,7 +53,6 @@ class HumanView : public IView
       shared_ptr<Scene> m_pWorld; // this scene will be pushed into screen element list by LoadGame( xml level)
       shared_ptr<CameraNode> m_pCamera;
       shared_ptr<MovementController> m_pController; 
-      Resource m_GUILayout;
 
    private:
 

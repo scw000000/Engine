@@ -22,15 +22,13 @@ bool CheckForJoystick(std::string hWnd)
 EngineOptions::EngineOptions()
    {
    // set all the options to decent default valu
-	m_Renderer = "OpenGL";
-   m_Level = "World\\default.xml";
+	m_Renderer = "OpenGL";   
 	m_runFullSpeed = false;
 	m_ScreenSize = Point(1024,768);
-   m_numAIs = 0;
 	m_pDoc = NULL;
    }
 
-void EngineOptions::Init(const char* xmlFileName)
+void EngineOptions::Init( const char* xmlFileName )
    {
 	// read the XML file
 	// if needed, override the XML file with options passed in on the command line.
@@ -47,11 +45,11 @@ void EngineOptions::Init(const char* xmlFileName)
       // Loop through each child element and load the component
       TiXmlElement* pNode = NULL;
 		pNode = pRoot->FirstChildElement("Graphics"); 
-		if (pNode)
+		if ( pNode )
 		   {
 			std::string attribute;
 			attribute = pNode->Attribute("renderer");
-			if (attribute != "Direct3D 9" && attribute != "Direct3D 11")
+			if ( attribute != "OpenGL" )
 			   {
 				ENG_ASSERT(0 && "Bad Renderer setting in Graphics options.");
 			   }
@@ -60,7 +58,7 @@ void EngineOptions::Init(const char* xmlFileName)
 				m_Renderer = attribute;
 			   }
 
-		   if (pNode->Attribute("width"))
+		   if ( pNode->Attribute("width") )
 			   {
 			   m_ScreenSize.x = atoi(pNode->Attribute("width"));
 			   if (m_ScreenSize.x < 800)
@@ -83,12 +81,18 @@ void EngineOptions::Init(const char* xmlFileName)
 
 		   }
 
-      pNode = pRoot->FirstChildElement("Multiplayer"); 
-		if (pNode)
-		   {
-			m_numAIs = atoi(pNode->Attribute("numAIs"));
-			m_maxAIs = atoi(pNode->Attribute("maxAIs"));
-		   }
+      pNode = pRoot->FirstChildElement("User"); 
+      if( pNode )
+         {
+         if( pNode->Attribute( "level" ) )
+            {
+            m_Level = pNode->Attribute( "level" );
+            }
+         if( pNode->Attribute( "layout" ) )
+            {
+            m_Layout = pNode->Attribute( "layout" );
+            }
+         }
 
 	   }
    }

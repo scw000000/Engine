@@ -32,8 +32,9 @@ Dialog::Dialog( CEGUI::Window* pRoot, Uint32 eventType, const std::wstring& msg,
    ENG_ASSERT( pRoot );
    // Be aware! creating CEGUI window must specify unique name, or it will throw exception
    CEGUI::Window* p_Window = CreateCEGUIWindow( "GlossySerpentFHD/FrameWindow", ws2s( msg ) );
-   m_pWindow = static_cast<CEGUI::FrameWindow*>( p_Window );
+   m_pWindow = static_cast<CEGUI::FrameWindow*>( p_Window );  
    pRoot->addChild( m_pWindow );
+   m_pWindow->setAlwaysOnTop( true );
 
    ENG_ASSERT( eventType != ((Uint32)-1) );
    m_EventType = eventType;

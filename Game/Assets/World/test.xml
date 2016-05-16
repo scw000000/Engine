@@ -1,0 +1,14 @@
+<World>
+  
+    <!-- A list of static actors to load.  Static actors have no game view attached.  This is for stuff like 
+    level geometry.-->
+
+    <StaticActors>
+		<Actor resource="actors\cube2.xml" />
+		<Actor resource="actors\cube.xml" />
+		<Actor resource="actors\cube3.xml" />
+		<Actor resource="actors\cube4.xml" />
+		<Actor resource="actors\sky.xml" />
+    </StaticActors>
+
+</World>

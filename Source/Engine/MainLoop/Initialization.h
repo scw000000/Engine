@@ -27,17 +27,15 @@ struct EngineOptions
 
       // Level option
 	   std::string m_Level;
+      // Rendering options
+      std::string m_Renderer;
+      std::string m_Layout;
 
       // TiXmlElement - look at this to find other options added by the developer
 	   TiXmlDocument *m_pDoc;
 
-
-	   // Rendering options
-	   std::string m_Renderer;
 	   bool m_runFullSpeed;
 	   Point m_ScreenSize;
-      int m_numAIs;
-	   int m_maxAIs;
 	
       void Init(const char* xmlFileName);
    };

@@ -76,7 +76,7 @@ int main( int argc, char *argv[] )
 
    Logger::Init( "logging.xml" );
 
-   g_pApp->m_EngineOptions.Init( "PlayerOptions.xml" );
+   g_pApp->m_EngineOptions.Init( "EngineOptions.xml" );
 
    g_pApp->InitInstance( 0, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
    //Vec3 t1 = Vec3( 1.0f, 1.0f, 1.0f );

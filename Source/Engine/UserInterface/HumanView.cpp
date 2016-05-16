@@ -11,7 +11,7 @@ const unsigned int SCREEN_MAX_FRAME_RATE = 60;
 const Uint64 SCREEN_MIN_RENDER_INTERVAL = ( SDL_GetPerformanceFrequency() / SCREEN_MAX_FRAME_RATE );
 const ViewId gc_InvalidGameViewId = 0xffffffff;
 
-HumanView::HumanView( void ) : m_GUILayout( "MainMenu.layout" )
+HumanView::HumanView( void )
    {
 	m_pProcessManager = ENG_NEW ProcessManager;
 
@@ -33,7 +33,7 @@ HumanView::HumanView( void ) : m_GUILayout( "MainMenu.layout" )
 
    m_pGUIManager = ENG_NEW GUIManager;
    m_pGUIManager->Init( "GUI/" );
-   m_pGUIManager->LoadLayout( m_GUILayout );
+ //  m_pGUIManager->LoadLayout( g_pApp->m_EngineOptions.m_Layout );
    m_pController.reset( ENG_NEW MovementController( m_pCamera, 0, 0, false ) );
    }
 

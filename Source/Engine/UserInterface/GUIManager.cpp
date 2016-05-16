@@ -43,20 +43,46 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
 
    m_pContext = &CEGUI::System::getSingleton().createGUIContext( s_pRenderer->getDefaultRenderTarget() );
    LoadScheme( "GlossySerpentFHD.scheme" );
+   CEGUI::ImageManager::getSingleton( ).loadImageset( "GlossySerpentFHDCursors.imageset" );
+   CEGUI::ImageManager::getSingleton( ).loadImageset( "WindowsLook.imageset" );
+   /*CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setImage( "WindowsLook/MouseArrow" );
+   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setVisible(true);*/
+   
+   m_pContext->getMouseCursor().setDefaultImage( "WindowsLook/MouseArrow"  );
+   m_pContext->getMouseCursor().setVisible( true );
+    m_pContext->getMouseCursor().show();
+    
+   //std::cout << CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().getImage();
+   std::cout << m_pContext->getMouseCursor().getImage() << " ";
+   std::cout << m_pContext->getMouseCursor().isVisible();
+   //CEGUI::MouseCursor::setImage( CEGUI::ImageManager::getSingleton().load );
+  // CEGUI::MouseCursor::setM WindowsLook.imageset
    SetFont( "UTF8.ttf" );
 
-   m_pRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "root" );
+   /*m_pRoot = CEGUI::WindowManager::getSingleton( ).createWindow( "DefaultWindow", "root" );
    m_pContext->setRootWindow( m_pRoot );
    m_pRoot->setMousePassThroughEnabled( true );
+*/
+   m_pUIRoot = CEGUI::WindowManager::getSingleton( ).loadLayoutFromFile( g_pApp->m_EngineOptions.m_Layout, "ui_" );
+  // m_pRoot->addChild( m_pUIRoot );
+   m_pContext->setRootWindow( m_pUIRoot );
+  //SDL_ShowCursor( SDL_ENABLE );
 
-   m_pPromptRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "prompt_root" );
-   m_pPromptRoot->setMousePassThroughEnabled( true );
-   m_pRoot->addChild( m_pPromptRoot );
-  
+   /*m_pRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "root" );
+   m_pContext->setRootWindow( m_pRoot );
+   m_pRoot->setMousePassThroughEnabled( true );*/
 
-   m_pUIRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "ui_root" );
-   m_pUIRoot->setMousePassThroughEnabled( true );
-   m_pRoot->addChild( m_pUIRoot );
+   //m_pUIRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "ui_root" );
+   //m_pUIRoot->setMousePassThroughEnabled( true );
+   //
+
+   //m_pPromptRoot = CEGUI::WindowManager::getSingleton( ).createWindow( "DefaultWindow", "prompt_root" );
+   //m_pPromptRoot->setMousePassThroughEnabled( true );
+   //m_pPromptRoot->setAlwaysOnTop( true );
+
+   ////m_pRoot->addChild( m_pPromptRoot );
+   //m_pRoot->addChild( m_pUIRoot );
+   //m_pUIRoot->addChild( m_pPromptRoot );
 
    m_ModalEventType = SDL_RegisterEvents( 1 );
    ENG_ASSERT( m_ModalEventType != ((Uint32)-1) );
@@ -93,9 +119,9 @@ void GUIManager::OnUpdate( const unsigned long deltaMs )
 void GUIManager::OnRender( double fTime, float fElapsedTime )
    {
    CEGUI::System::getSingleton().renderAllGUIContexts();
-   /* s_pRenderer->beginRendering( );
-    m_pContext->draw( );
-    s_pRenderer->endRendering( );*/
+   ///* s_pRenderer->beginRendering( );
+   // m_pContext->draw( );
+   // s_pRenderer->endRendering( );*/
    }
 
 int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
@@ -154,14 +180,10 @@ int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
 
 void GUIManager::LoadLayout( const Resource& layout )
    {
-  // LoadScheme( "GlossySerpentFHD.scheme" );
-
-  // CEGUI::Window *pWindow = CEGUI::WindowManager::getSingleton().loadLayoutFromFile( m_ResourceDir + "layouts/" + "MainMenu.layout","main_" ); 
-   CEGUI::Window *pWindow = CEGUI::WindowManager::getSingleton( ).loadLayoutFromFile( m_ResourceDir + "layouts/" + "Test.layout", "main_" );
-   std::cout << pWindow->getChildCount();
-   CEGUI::WindowManager::getSingleton( ).saveLayoutToFile( *pWindow, "debug.txt" );
-   CEGUI::System::getSingleton().getDefaultGUIContext().setRootWindow( pWindow );
-   //  m_pUIRoot->addChild( pWindow );
+   CEGUI::Window *pWindow = CEGUI::WindowManager::getSingleton().loadLayoutFromFile( m_ResourceDir + "layouts/" + "MainMenu.layout","main_" ); 
+   CEGUI::WindowManager::getSingleton( ).destroyWindow( m_pRoot );
+   m_pRoot = pWindow;
+   m_pContext->setRootWindow( m_pRoot );
    }
 
 int GUIManager::Ask( MessageBox_Questions question )
@@ -204,15 +226,15 @@ int GUIManager::Ask( MessageBox_Questions question )
       m_HasModalDialog <<= 1;
 	   m_HasModalDialog |= 1;
 
-      SDL_ShowCursor( SDL_ENABLE );
-		shared_ptr<Dialog> pDialog( ENG_NEW Dialog( m_pPromptRoot, m_ModalEventType, msg, title, buttonFlags ) );
+     // SDL_ShowCursor( SDL_ENABLE );
+		shared_ptr<Dialog> pDialog( ENG_NEW Dialog( m_pUIRoot, m_ModalEventType, msg, title, buttonFlags ) );
       pDialog->m_pWindow->setModalState( true );
       int result = g_pApp->Modal( pDialog, defaultAnswer );
 
       m_HasModalDialog >>= 1;
       if( !m_HasModalDialog )
          {
-         SDL_ShowCursor( SDL_DISABLE );
+       //  SDL_ShowCursor( SDL_DISABLE );
          }
 		return result;
 	   }

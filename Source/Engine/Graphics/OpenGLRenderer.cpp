@@ -226,7 +226,7 @@ GLuint OpenGLRenderer::GenerateShader( Resource* shaderRes, GLuint shaderType )
       ENG_ERROR( "Invalid shader file path" );
       }
    // Compile Vertex Shader
-   ENG_LOG( "Renderer", "Compiling vertex shader: " + shaderRes->m_name );
+   ENG_LOG( "Renderer", "Compiling vertex shader: " + shaderRes->m_Name );
 
    GLchar* p_VSSourcePointer = ( GLchar* ) pResourceHandle->GetBuffer( );
    CompileShader( &p_VSSourcePointer, shader );

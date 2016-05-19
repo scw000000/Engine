@@ -40,6 +40,7 @@ TiXmlElement* XmlResourceLoader::LoadAndReturnRootXmlElement( const char* resour
    {
    Resource resource( resourceString );
    shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( &resource );  // this actually loads the XML file from the zip file
+   ENG_ASSERT( pResourceHandle );
    shared_ptr<XmlResourceExtraData> pExtraData = static_pointer_cast< XmlResourceExtraData >( pResourceHandle->GetExtraData() );
    return pExtraData->GetRoot();
    }

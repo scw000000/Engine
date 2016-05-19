@@ -1,6 +1,16 @@
-﻿////////////////////////////////////////////////////////////////////////////////
-// Filename: GUIManager.cpp
-////////////////////////////////////////////////////////////////////////////////
+﻿/*!
+ * \file GUIManager.cpp
+ * \date 2016/05/19 15:43
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "EngineStd.h"
 #include "GUIManager.h"
@@ -14,7 +24,7 @@ GUIManager::GUIManager( void )
    m_pRoot = NULL;
    m_pPromptRoot = NULL;
    m_pUIRoot = NULL;
-   m_ModalEventType = 0;
+   /*m_ModalEventType = 0;*/
    m_HasModalDialog = 0;
    }
 
@@ -23,6 +33,7 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
    if( !s_pRenderer || !s_pResProvider )
       {
       s_pRenderer = &CEGUI::OpenGL3Renderer::bootstrapSystem();
+      s_pRenderer->enableExtraStateSettings( true );
       s_pResProvider = static_cast< CEGUI::DefaultResourceProvider* >( CEGUI::System::getSingleton().getResourceProvider() );
       m_ResourceDir = resourceDirectory;
       s_pResProvider->setResourceGroupDirectory( "imagesets", m_ResourceDir + "imagesets/" );
@@ -43,49 +54,29 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
 
    m_pContext = &CEGUI::System::getSingleton().createGUIContext( s_pRenderer->getDefaultRenderTarget() );
    LoadScheme( "GlossySerpentFHD.scheme" );
+   LoadScheme( "WindowsLook.scheme" );
    CEGUI::ImageManager::getSingleton( ).loadImageset( "GlossySerpentFHDCursors.imageset" );
    CEGUI::ImageManager::getSingleton( ).loadImageset( "WindowsLook.imageset" );
-   /*CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setImage( "WindowsLook/MouseArrow" );
-   CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().setVisible(true);*/
-   
-   m_pContext->getMouseCursor().setDefaultImage( "WindowsLook/MouseArrow"  );
-   m_pContext->getMouseCursor().setVisible( true );
-    m_pContext->getMouseCursor().show();
-    
-   //std::cout << CEGUI::System::getSingleton().getDefaultGUIContext().getMouseCursor().getImage();
-   std::cout << m_pContext->getMouseCursor().getImage() << " ";
-   std::cout << m_pContext->getMouseCursor().isVisible();
-   //CEGUI::MouseCursor::setImage( CEGUI::ImageManager::getSingleton().load );
-  // CEGUI::MouseCursor::setM WindowsLook.imageset
+
    SetFont( "UTF8.ttf" );
 
-   /*m_pRoot = CEGUI::WindowManager::getSingleton( ).createWindow( "DefaultWindow", "root" );
+   m_pRoot = CEGUI::WindowManager::getSingleton( ).createWindow( "DefaultWindow", "root" );
    m_pContext->setRootWindow( m_pRoot );
    m_pRoot->setMousePassThroughEnabled( true );
-*/
-   m_pUIRoot = CEGUI::WindowManager::getSingleton( ).loadLayoutFromFile( g_pApp->m_EngineOptions.m_Layout, "ui_" );
-  // m_pRoot->addChild( m_pUIRoot );
-   m_pContext->setRootWindow( m_pUIRoot );
-  //SDL_ShowCursor( SDL_ENABLE );
 
-   /*m_pRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "root" );
-   m_pContext->setRootWindow( m_pRoot );
-   m_pRoot->setMousePassThroughEnabled( true );*/
+  /* m_pUIRoot = CEGUI::WindowManager::getSingleton( ).loadLayoutFromFile( g_pApp->m_EngineOptions.m_Layout, "ui_" );
+   m_pRoot->addChild( m_pUIRoot );
 
-   //m_pUIRoot = CEGUI::WindowManager::getSingleton().createWindow( "DefaultWindow", "ui_root" );
-   //m_pUIRoot->setMousePassThroughEnabled( true );
-   //
+   m_pPromptRoot = CEGUI::WindowManager::getSingleton( ).createWindow( "DefaultWindow", "prompt_root" );
+   m_pPromptRoot->setMousePassThroughEnabled( true );
+   m_pPromptRoot->setAlwaysOnTop( true );
 
-   //m_pPromptRoot = CEGUI::WindowManager::getSingleton( ).createWindow( "DefaultWindow", "prompt_root" );
-   //m_pPromptRoot->setMousePassThroughEnabled( true );
-   //m_pPromptRoot->setAlwaysOnTop( true );
-
-   ////m_pRoot->addChild( m_pPromptRoot );
+   m_pRoot->addChild( m_pPromptRoot );*/
    //m_pRoot->addChild( m_pUIRoot );
    //m_pUIRoot->addChild( m_pPromptRoot );
 
-   m_ModalEventType = SDL_RegisterEvents( 1 );
-   ENG_ASSERT( m_ModalEventType != ((Uint32)-1) );
+   //m_ModalEventType = SDL_RegisterEvents( 1 );
+   //ENG_ASSERT( m_ModalEventType != ((Uint32)-1) );
    }
 
 void GUIManager::Destory( void )
@@ -119,9 +110,9 @@ void GUIManager::OnUpdate( const unsigned long deltaMs )
 void GUIManager::OnRender( double fTime, float fElapsedTime )
    {
    CEGUI::System::getSingleton().renderAllGUIContexts();
-   ///* s_pRenderer->beginRendering( );
-   // m_pContext->draw( );
-   // s_pRenderer->endRendering( );*/
+   /*s_pRenderer->beginRendering( );
+   m_pContext->draw( );
+   s_pRenderer->endRendering( );*/
    }
 
 int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
@@ -178,70 +169,78 @@ int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
    return 0;
    }
 
-void GUIManager::LoadLayout( const Resource& layout )
+void GUIManager::AttachLayout( CEGUI::Window* pWindow )
    {
-   CEGUI::Window *pWindow = CEGUI::WindowManager::getSingleton().loadLayoutFromFile( m_ResourceDir + "layouts/" + "MainMenu.layout","main_" ); 
-   CEGUI::WindowManager::getSingleton( ).destroyWindow( m_pRoot );
-   m_pRoot = pWindow;
-   m_pContext->setRootWindow( m_pRoot );
+   m_pRoot->addChild( pWindow );
    }
 
-int GUIManager::Ask( MessageBox_Questions question )
+// CEGUI::UDim( scale, pos ) : scale : relative point on the screen between (0,1)
+//                             pos   : additional absolute shift in pixels
+// UDim( 0.5, 100 ) -> middle point + shift 100
+CEGUI::Window* GUIManager::CreateCEGUIWindow( const std::string &type, const std::string& name, const Vec4& position, const Vec4& size )
    {
-   std::wstring msg;
-	std::wstring title;
-	int buttonFlags;
-	int defaultAnswer = IDOK;
-
-	switch(question)
-	   {
-		case QUESTION_WHERES_THE_CD:
-		   {
-			msg = (_T("IDS_QUESTION_WHERES_THE_CD"));
-			title = (_T("IDS_ALERT"));
-			buttonFlags = MB_RETRYCANCEL;
-			defaultAnswer = IDCANCEL;
-			break;
-		   }
-		case QUESTION_QUIT_GAME:
-		   {
-			msg = (_T("IDS_QUESTION_QUIT_GAME"));
-			title = (_T("IDS_QUESTION"));
-			buttonFlags = MB_YESNO;
-			defaultAnswer = IDNO;
-			break;
-		   }
-		default:
-			ENG_ASSERT(0 && _T("Undefined question in GUIManager::Ask"));
-			return IDCANCEL;
-	   }
-
-	if ( m_pContext )
-	   {
-      if ( m_HasModalDialog & 0x10000000 )
-	      {
-		   ENG_ASSERT( 0 && "Too Many nested dialogs!" );
-		   return defaultAnswer;
-	      }
-      m_HasModalDialog <<= 1;
-	   m_HasModalDialog |= 1;
-
-     // SDL_ShowCursor( SDL_ENABLE );
-		shared_ptr<Dialog> pDialog( ENG_NEW Dialog( m_pUIRoot, m_ModalEventType, msg, title, buttonFlags ) );
-      pDialog->m_pWindow->setModalState( true );
-      int result = g_pApp->Modal( pDialog, defaultAnswer );
-
-      m_HasModalDialog >>= 1;
-      if( !m_HasModalDialog )
-         {
-       //  SDL_ShowCursor( SDL_DISABLE );
-         }
-		return result;
-	   }
-	// If the engine is not exist, still pop a message box
-	return 0;
-   //return ::MessageBox(g_pApp ? g_pApp->GetHwnd() : NULL, msg.c_str(), title.c_str(), buttonFlags);
+   CEGUI::Window* pWindow = CEGUI::WindowManager::getSingleton( ).createWindow( type, name );
+   pWindow->setPosition( CEGUI::UVector2( CEGUI::UDim( position.x, position.y ), CEGUI::UDim( position.z, position.w ) ) );
+   pWindow->setSize( CEGUI::USize( CEGUI::UDim( size.x, size.y ), CEGUI::UDim( size.z, size.w ) ) );
+   return pWindow;
    }
+
+//int GUIManager::Ask( MessageBox_Questions question )
+//   {
+//   std::wstring msg;
+//	std::wstring title;
+//	int buttonFlags;
+//	int defaultAnswer = IDOK;
+//
+//	switch(question)
+//	   {
+//		case QUESTION_WHERES_THE_CD:
+//		   {
+//			msg = (_T("IDS_QUESTION_WHERES_THE_CD"));
+//			title = (_T("IDS_ALERT"));
+//			buttonFlags = MB_RETRYCANCEL;
+//			defaultAnswer = IDCANCEL;
+//			break;
+//		   }
+//		case QUESTION_QUIT_GAME:
+//		   {
+//			msg = (_T("IDS_QUESTION_QUIT_GAME"));
+//			title = (_T("IDS_QUESTION"));
+//			buttonFlags = MB_YESNO;
+//			defaultAnswer = IDNO;
+//			break;
+//		   }
+//		default:
+//			ENG_ASSERT(0 && _T("Undefined question in GUIManager::Ask"));
+//			return IDCANCEL;
+//	   }
+//
+//	if ( m_pContext )
+//	   {
+//      if ( m_HasModalDialog & 0x10000000 )
+//	      {
+//		   ENG_ASSERT( 0 && "Too Many nested dialogs!" );
+//		   return defaultAnswer;
+//	      }
+//      m_HasModalDialog <<= 1;
+//	   m_HasModalDialog |= 1;
+//
+//     // SDL_ShowCursor( SDL_ENABLE );
+//      shared_ptr<PromptBox> pDialog( ENG_NEW PromptBox( m_pPromptRoot, m_ModalEventType, msg, title, buttonFlags ) ); */
+//         pDialog->m_pWindow->setModalState( true );
+//      int result = g_pApp->Modal( pDialog, defaultAnswer );
+//
+//      m_HasModalDialog >>= 1;
+//      if( !m_HasModalDialog )
+//         {
+//       //  SDL_ShowCursor( SDL_DISABLE );
+//         }
+//		return result;
+//	   }
+//	// If the engine is not exist, still pop a message box
+//	return 0;
+//   //return ::MessageBox(g_pApp ? g_pApp->GetHwnd() : NULL, msg.c_str(), title.c_str(), buttonFlags);
+//   }
 
 CEGUI::Key::Scan GUIManager::SDLKeyToCEGUIKey( SDL_Keycode key )
    {

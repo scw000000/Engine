@@ -19,10 +19,11 @@
 #include "..\Actors\ActorFactory.h"
 #include "..\Utilities\String.h"
 #include "..\UserInterface\HumanView.h"
+#include "..\UserInterface\GUIManager.h"
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Event\EventManager.h"
 
-BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer )
+BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer ) : m_pGUIManager( ENG_NEW GUIManager )
    {
    m_Lifetime = 0.f;
    m_LastActorId = 0;
@@ -33,7 +34,7 @@ BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer )
       m_pRenderer = pRenderer;
       }
 	m_State = BGS_Initializing;
-   m_pActorFactory = ENG_NEW ActorFactory;;
+   m_pActorFactory = ENG_NEW ActorFactory;
    }
 
 BaseEngineLogic::~BaseEngineLogic()
@@ -41,9 +42,9 @@ BaseEngineLogic::~BaseEngineLogic()
    while (!m_ViewList.empty())
 		m_ViewList.pop_front();
 
-	SAFE_DELETE(m_pProcessManager);
-   SAFE_DELETE(m_pActorFactory);
-
+	SAFE_DELETE( m_pProcessManager );
+   SAFE_DELETE( m_pActorFactory );
+   m_pGUIManager->Destory();
     // destroy all actors
     for ( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
         it->second->Destroy();
@@ -53,14 +54,15 @@ BaseEngineLogic::~BaseEngineLogic()
 
 bool BaseEngineLogic::Init()
    {
-   if( !VLoadGame( g_pApp->m_EngineOptions.m_Level.c_str() ))
+   if( !VLoadLevel( g_pApp->m_EngineOptions.m_Level.c_str() ))
       {
       ENG_ERROR( "The game failed to load." );
       g_pApp->AbortGame( );
       return false;
       }
    m_pWrold->OnRestore();
-   
+   m_pGUIManager->Init( g_pApp->m_EngineOptions.m_GUIDirectory );
+
    shared_ptr<IView> pView( ENG_NEW HumanView( ) );
    VAddView( pView );
    return true;
@@ -140,13 +142,29 @@ int BaseEngineLogic::VOnRestore( void )
    return S_OK;
    }
 
+void BaseEngineLogic::VOnMsgProc( SDL_Event event )
+   {
+   if( m_pGUIManager->OnMsgProc( event ) )
+      {
+      return;
+      }
+   // send event to all of game views
+   for( auto i = m_ViewList.rbegin( ); i != m_ViewList.rend( ); ++i )
+      {
+      if( ( *i )->VOnMsgProc( event ) )
+         {
+         return;
+         }
+      }
+   }
+
 void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
    {
    unsigned long deltaMs = unsigned long( elapsedTime * 1000.0f );
 	m_Lifetime += elapsedTime;
 
    m_pWrold->OnUpdate( deltaMs );
-
+   m_pGUIManager->OnUpdate( deltaMs );
    // update all game views
    for ( ViewList::iterator it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
 	   {
@@ -168,12 +186,14 @@ void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )
       {
       pView->VOnRender( fTime, fElapsedTime );
       }
+   //Render GUI last
+   m_pGUIManager->OnRender( fTime, fElapsedTime );
    m_pRenderer->VPostRender( );
    }
 
 // this function is called by EngineApp::VLoadGame
 // LATER: finish implementation
-bool BaseEngineLogic::VLoadGame( const char* levelResource )
+bool BaseEngineLogic::VLoadLevel( const char* levelResource )
    {
    
     // Grab the root XML node
@@ -228,7 +248,7 @@ bool BaseEngineLogic::VLoadGame( const char* levelResource )
       if ( pView->VGetType() == View_Human )
          {
          shared_ptr<HumanView> pHumanView = static_pointer_cast<HumanView, IView>(pView);
-         pHumanView->LoadGame( pRoot );
+         pHumanView->LoadLevel( pRoot );
          }
       }
 

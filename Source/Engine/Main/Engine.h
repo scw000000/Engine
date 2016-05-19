@@ -15,10 +15,12 @@
 #include "../Mainloop/Initialization.h"
 #include "../Main/BaseEngineLogic.h"
 #include "../ResourceCache/ResourceCache.h"
-#include "../UserInterface/UserInterface.h"
+#include "../UserInterface/PromptBox.h"
 
 class EventManager;
 class HumanView;
+
+const Uint32 g_QuitNoPrompt = -1;
 
 class EngineApp
    {
@@ -38,9 +40,10 @@ class EngineApp
       bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );
       bool LoadStrings( std::string language );
 
-      int Modal( shared_ptr<Dialog> pModalScreen, int defaultAnswer );
+      int Modal( shared_ptr<PromptBox> pModalScreen, int defaultAnswer );
 
       Uint32  GetWindowState( void );
+      static Uint32 RegisterEvent( int eventNum );
 
       std::wstring GetString( std::wstring sID );
 

@@ -81,6 +81,15 @@ void EngineOptions::Init( const char* xmlFileName )
 
 		   }
 
+      pNode = pRoot->FirstChildElement( "ResCache" );
+      if( pNode )
+         {
+         if( pNode->Attribute( "GUIDirectory" ) )
+            {
+            m_GUIDirectory = pNode->Attribute( "GUIDirectory" );
+            }
+         }
+
       pNode = pRoot->FirstChildElement("User"); 
       if( pNode )
          {

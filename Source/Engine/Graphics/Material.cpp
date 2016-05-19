@@ -1,7 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Material.cpp  
-////////////////////////////////////////////////////////////////////////////////
-
+/*!
+ * \file Material.cpp
+ * \date 2016/05/19 19:49
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "EngineStd.h"
 #include "Material.h"
 

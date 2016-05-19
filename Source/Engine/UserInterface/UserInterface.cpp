@@ -1,6 +1,6 @@
-﻿/*!
+/*!
  * \file UserInterface.cpp
- * \date 2016/05/15 19:15
+ * \date 2016/05/19 16:23
  *
  * \author SCW
  * Contact: scw000000@gmail.com
@@ -14,209 +14,125 @@
 
 #include "EngineStd.h"
 #include "UserInterface.h"
-#include "GUIManager.h"
-#include <iostream> 
-#include <fstream> 
 
-Dialog::~Dialog( void )
+UserInterface::UserInterface( const Resource& layoutRes ) : m_LayoutResource( layoutRes ), m_pGUIManager( g_pApp->m_pEngineLogic->m_pGUIManager )
    {
-   if( m_pWindow )
+   m_IsMouseCursorEnable = false;
+   m_ModalEventType = 0;
+   m_pRoot = 0;
+   m_pUIRoot = 0;
+   m_pPromptRoot = 0;
+   m_pMouseArrowImg = 0;
+   }
+
+UserInterface::~UserInterface( void )
+   {
+   if( m_pRoot )
       {
-      CEGUI::WindowManager::getSingleton().destroyWindow( m_pWindow );
-      m_pWindow = NULL;
+      CEGUI::WindowManager::getSingleton( ).destroyWindow( m_pRoot );
+      }
+   if( m_pUIRoot )
+      {
+      CEGUI::WindowManager::getSingleton( ).destroyWindow( m_pUIRoot );
+      }
+   if( m_pPromptRoot )
+      {
+      CEGUI::WindowManager::getSingleton( ).destroyWindow( m_pPromptRoot );
       }
    }
 
-Dialog::Dialog( CEGUI::Window* pRoot, Uint32 eventType, const std::wstring& msg, const std::wstring& title, int buttonFlags )
+void UserInterface::VInit( void )
    {
-   ENG_ASSERT( pRoot );
-   // Be aware! creating CEGUI window must specify unique name, or it will throw exception
-   CEGUI::Window* p_Window = CreateCEGUIWindow( "GlossySerpentFHD/FrameWindow", ws2s( msg ) );
-   m_pWindow = static_cast<CEGUI::FrameWindow*>( p_Window );  
-   pRoot->addChild( m_pWindow );
-   m_pWindow->setAlwaysOnTop( true );
+   m_pRoot = CEGUI::WindowManager::getSingleton( ).createWindow( "DefaultWindow", "human_root" );
+   m_pRoot->setMousePassThroughEnabled( true );
 
-   ENG_ASSERT( eventType != ((Uint32)-1) );
-   m_EventType = eventType;
+   m_pUIRoot = CEGUI::WindowManager::getSingleton( ).loadLayoutFromFile( m_LayoutResource.m_Name );
+   m_pRoot->addChild( m_pUIRoot );
 
-   buttonFlags &= 0xF;
-   int numButtons = 2;
-	if ( (buttonFlags == MB_ABORTRETRYIGNORE) || (buttonFlags == MB_CANCELTRYCONTINUE) || (buttonFlags == MB_CANCELTRYCONTINUE) )
-	   {
-		numButtons = 3;
-	   }
-	else if (buttonFlags == MB_OK)
-	   {
-		numButtons = 1;
-	   }
-   float btnWidth = ( m_pWindow->getRootContainerSize().d_width * 0.075f);
-   float btnHeight = (m_pWindow->getRootContainerSize().d_height * 0.037f);
-   float borderWidth = ( m_pWindow->getRootContainerSize().d_width * 0.02f);
-   float borderHeight =  ( m_pWindow->getRootContainerSize().d_height * 0.008f);
-   m_pWindow->setWidth( CEGUI::UDim( 0.0f, (float)numButtons * ( borderWidth + btnWidth ) + borderWidth ) );
+   m_pPromptRoot = CEGUI::WindowManager::getSingleton( ).createWindow( "DefaultWindow", "prompt_root" );
+   m_pPromptRoot->setMousePassThroughEnabled( true );
+   m_pPromptRoot->setAlwaysOnTop( true );
+   m_pRoot->addChild( m_pPromptRoot );
 
-   m_pWindow->setText(  ws2UTF8s( g_pApp->GetString( title ) ) );
-   CEGUI::MultiLineEditbox* textBox = static_cast<CEGUI::MultiLineEditbox*> ( CreateCEGUIWindow( "GlossySerpentFHD/MultiLineEditbox", "textbox", Vec4( 0.0f, 0.0f, 0.0f, 0.0f ), Vec4( 1.0f, 0.0f, 1.0f, 0.f ) ) );
-   // We need to attach it before get corret line number
-   CEGUI::NamedArea namearea( textBox->getName() );
-   namearea.setArea( CEGUI::ComponentArea() );
-   m_pWindow->addChild( textBox ); 
-   textBox->setText(  ws2UTF8s( g_pApp->GetString( msg ) ) );
-   textBox->setReadOnly( true ); 
-   float textBoxHeight = ( textBox->getFont()->getLineSpacing() + 5.0f ) * static_cast<float> ( textBox->getFormattedLines(  ).size() );
-   
-   textBox->setHeight(  CEGUI::UDim( 0.0f, textBoxHeight ) );
-   float btnBaseHeight = textBox->getPixelSize().d_height;
-   m_pWindow->setHeight( CEGUI::UDim( 0.0f, m_pWindow->getTitlebar()->getPixelSize().d_height + btnBaseHeight + btnHeight + 2 * borderHeight ) );
-   
-   //m_pWindow->setPosition( CEGUI::UVector2( CEGUI::UDim( 0.f, ( m_pWindow->getRootContainerSize().d_width - m_pWindow->getPixelSize().d_width ) / 2.0f ), 
-   //   CEGUI::UDim( 0.f, ( m_pWindow->getRootContainerSize().d_height - m_pWindow->getPixelSize().d_height  ) / 2.0f ) ) );
-   m_pWindow->setVerticalAlignment( CEGUI::VA_CENTRE );
-   m_pWindow->setHorizontalAlignment( CEGUI::HA_CENTRE );
-   m_pWindow->setSizingEnabled( false );
+   m_pGUIManager->AttachLayout( m_pRoot );
 
-   m_pWindow->setCloseButtonEnabled( false );
-   //m_pWindow->getCloseButton()->setID( 0 );
-   //m_pWindow->getCloseButton()->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      
-
-	if ( (buttonFlags == MB_ABORTRETRYIGNORE) || (buttonFlags == MB_CANCELTRYCONTINUE) )
-	   {
-		// The message box contains three push buttons: Cancel, Try Again, Continue. 
-		// This is the new standard over Abort,Retry,Ignore
-      std::string windowName = m_pWindow->getName().c_str();
-
-      CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_CONTINUE", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button0->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_CONTINUE" ) ) ) );
-      button0->setID( IDCONTINUE );
-      button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button0 );
-
-      CEGUI::PushButton* button1 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_TRYAGAIN", Vec4( 0.0f, borderWidth * 2.0f + btnWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button1->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_TRYAGAIN" ) ) ) );
-      button1->setID( IDTRYAGAIN );
-      button1->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button1 );
-
-      CEGUI::PushButton* button2 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_CANCEL", Vec4( 0.0f, borderWidth * 3.0f + btnWidth * 2.0f, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button2->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_CANCEL" ) ) )  );
-      button2->setID( IDCANCEL );
-      button2->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button2 );
-	   }
-	else if (buttonFlags == MB_OKCANCEL)
-	   {
-		//The message box contains two push buttons: OK and Cancel.
-      std::string windowName = m_pWindow->getName().c_str();
-
-      CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_OK", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button0->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_OK" ) ) ) );
-      button0->setID( IDOK );
-      button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button0 );
-
-      CEGUI::PushButton* button1 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_CANCEL", Vec4( 0.0f, borderWidth * 2.0f + btnWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button1->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_CANCEL" ) ) )  );
-      button1->setID( IDCANCEL );
-      button1->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button1 );
-	   }
-	else if (buttonFlags == MB_RETRYCANCEL)
-	   {
-		//The message box contains two push buttons: Retry and Cancel.
-      std::string windowName = m_pWindow->getName().c_str();
-
-      CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_RETRY", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button0->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_RETRY" ) ) )  );
-      button0->setID( IDRETRY );
-      button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button0 );
-
-      CEGUI::PushButton* button1 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_CANCEL", Vec4( 0.0f, borderWidth * 2.0f + btnWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button1->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_CANCEL" ) ) )  );
-      button1->setID( IDCANCEL );
-      button1->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button1 );
-	   }
-	else if (buttonFlags == MB_YESNO)
-	   {
-		//The message box contains two push buttons: Yes and No.
-      std::string windowName = m_pWindow->getName().c_str();
-
-      CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_YES", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button0->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_YES" ) ) )  );
-      button0->setID( IDYES );
-      button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button0 );
-
-      CEGUI::PushButton* button1 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_NO", Vec4( 0.0f, borderWidth * 2.0f + btnWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button1->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_NO" ) ) )  );
-      button1->setID( IDNO );
-      button1->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button1 );
-	   }
-	else if (buttonFlags == MB_YESNOCANCEL)
-	   {
-		//The message box contains three push buttons: Yes, No, and Cancel.
-      std::string windowName = m_pWindow->getName().c_str();
-
-      CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_YES", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button0->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_YES" ) ) )  );
-      button0->setID( IDYES );
-      button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button0 );
-
-      CEGUI::PushButton* button1 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_NO", Vec4( 0.0f, borderWidth * 2.0f + btnWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button1->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_NO" ) ) )  );
-      button1->setID( IDNO );
-      button1->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button1 );
-
-      CEGUI::PushButton* button2 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_CANCEL", Vec4( 0.0f, borderWidth * 3.0f + btnWidth * 2.0f, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button2->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_CANCEL" ) ) )  );
-      button2->setID( IDCANCEL );
-      button2->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button2 );
-	   }
-	else //if (buttonFlags & MB_OK)
-	   {
-        // The message box contains one push button: OK. This is the default.
-		std::string windowName = m_pWindow->getName().c_str();
-
-      CEGUI::PushButton* button0 = static_cast<CEGUI::PushButton*> ( CreateCEGUIWindow( "GlossySerpentFHD/Button", windowName + " IDS_OK", Vec4( 0.0f, borderWidth, 0.0f, btnBaseHeight + borderHeight ), Vec4( 0.0f, btnWidth, 0.0f, btnHeight ) ) );
-      button0->setText( ws2UTF8s( g_pApp->GetString( _T( "IDS_OK" ) ) )  );
-      button0->setID( IDOK );
-      button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &Dialog::OnButtonClicked, this ) );
-      m_pWindow->addChild( button0 );
-	   }
-   std::ofstream fout("temp.xml");
-
-      
-   CEGUI::XMLSerializer xml( fout );
-   m_pWindow->writeXMLToStream( xml );
-
-      fout.close( );
+   m_ModalEventType = g_pApp->RegisterEvent( 1 );
    }
 
-// CEGUI::UDim( scale, pos ) : scale : relative point on the screen between (0,1)
-//                             pos   : additional absolute shift in pixels
-// UDim( 0.5, 100 ) -> middle point + shift 100
-CEGUI::Window* Dialog::CreateCEGUIWindow( const std::string &type, const std::string& name, const Vec4& position, const Vec4& size )
+void UserInterface::VSetDisplayMouseCursor( bool isDisplay )
    {
-   CEGUI::Window* pWindow =  CEGUI::WindowManager::getSingleton().createWindow( type, name );
-   pWindow->setPosition( CEGUI::UVector2( CEGUI::UDim( position.x, position.y ), CEGUI::UDim( position.z, position.w ) ) );
-   pWindow->setSize( CEGUI::USize( CEGUI::UDim( size.x, size.y ), CEGUI::UDim( size.z, size.w ) ) );
-   return pWindow;
+   SetMouseCursor( m_pRoot, isDisplay? m_pMouseArrowImg: NULL );
    }
 
-bool Dialog::OnButtonClicked( const CEGUI::EventArgs& arg )
+void UserInterface::SetMouseCursor( CEGUI::Window* pWindow, const CEGUI::Image* pImage )
    {
-   const CEGUI::MouseEventArgs& mouseArgs = static_cast<const CEGUI::MouseEventArgs&>( arg );
-   int id = mouseArgs.window->getID();
-   SDL_Event event;
-   SDL_zero(event); /* or SDL_zero(event) */
-   event.type = m_EventType;
-   event.user.code = id;
-   ENG_ASSERT( SDL_PushEvent( &event ) >= 0 );
-   return true;
+   pWindow->setMouseCursor( pImage );
+   size_t childNum = pWindow->getChildCount( );
+   for( size_t i = 0; i < childNum; ++i )
+      {
+      SetMouseCursor( pWindow->getChildAtIdx( i ), pImage );
+      }
+   }
+
+int UserInterface::VAsk( MessageBox_Questions question )
+   {
+   std::wstring msg;
+   std::wstring title;
+   int buttonFlags;
+   int defaultAnswer = IDOK;
+
+   switch( question )
+      {
+         case QUESTION_WHERES_THE_CD:
+            {
+            msg = ( _T( "IDS_QUESTION_WHERES_THE_CD" ) );
+            title = ( _T( "IDS_ALERT" ) );
+            buttonFlags = MB_RETRYCANCEL;
+            defaultAnswer = IDCANCEL;
+            break;
+            }
+         case QUESTION_QUIT_GAME:
+            {
+            msg = ( _T( "IDS_QUESTION_QUIT_GAME" ) );
+            title = ( _T( "IDS_QUESTION" ) );
+            buttonFlags = MB_YESNO;
+            defaultAnswer = IDNO;
+            break;
+            }
+         default:
+         ENG_ASSERT( 0 && _T( "Undefined question in GUIManager::Ask" ) );
+         return IDCANCEL;
+      }
+
+   if( m_pGUIManager )
+      {
+      if( m_pPromptRoot->getChildCount() > 10 )
+         {
+         ENG_ASSERT( 0 && "Too Many nested dialogs!" );
+         return defaultAnswer;
+         }
+      VSetDisplayMouseCursor( true );
+      shared_ptr<PromptBox> pPromptBox( ENG_NEW PromptBox( m_pPromptRoot, m_ModalEventType, msg, title, buttonFlags ) );
+      pPromptBox->m_pWindow->setModalState( true );
+      int result = g_pApp->Modal( pPromptBox, defaultAnswer );
+
+      if( !m_pPromptRoot->getChildCount() )
+         {
+         VSetDisplayMouseCursor( m_IsMouseCursorEnable );
+         }
+      return result;
+      }
+   // If the engine is not exist, still pop a message box
+   return 0;
+   //return ::MessageBox(g_pApp ? g_pApp->GetHwnd() : NULL, msg.c_str(), title.c_str(), buttonFlags);
+   }
+
+bool UserInterface::VHasModalWindow( void ) 
+   {
+   return m_pPromptRoot->getChildCount() > 0;
+   }
+
+Uint32 UserInterface::GetModalEventType( void )
+   {
+   return m_ModalEventType;
    }

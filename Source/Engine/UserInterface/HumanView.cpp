@@ -1,10 +1,21 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: HumanView.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file HumanView.cpp
+ * \date 2016/05/19 21:10
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "EngineStd.h"
 #include "HumanView.h"
-#include "GUIManager.h"
+#include "UserInterface.h"
+#include "..\Graphics\Scene.h"
 #include "..\Controller\Controller.h"
 
 const unsigned int SCREEN_MAX_FRAME_RATE = 60;
@@ -14,7 +25,8 @@ const ViewId gc_InvalidGameViewId = 0xffffffff;
 HumanView::HumanView( void )
    {
 	m_pProcessManager = ENG_NEW ProcessManager;
-
+   m_pUserInterface = ENG_NEW UserInterface( Resource( g_pApp->m_EngineOptions.m_Layout, true ) );
+   m_pUserInterface->VInit();
 	m_ViewId = gc_InvalidGameViewId;
    
    if ( g_pApp->m_pEngineLogic->m_pWrold )
@@ -30,10 +42,6 @@ HumanView::HumanView( void )
 		ENG_ASSERT( m_pWorld && m_pCamera && _T("Out of memory") );     
 		m_pWorld->AddChild( INVALID_ACTOR_ID, m_pCamera );
       }
-
-   m_pGUIManager = ENG_NEW GUIManager;
-   m_pGUIManager->Init( "GUI/" );
- //  m_pGUIManager->LoadLayout( g_pApp->m_EngineOptions.m_Layout );
    m_pController.reset( ENG_NEW MovementController( m_pCamera, 0, 0, false ) );
    }
 
@@ -41,8 +49,7 @@ HumanView::HumanView( void )
 HumanView::~HumanView()
    {
 	SAFE_DELETE( m_pProcessManager );
-   m_pGUIManager->Destory();
-   SAFE_DELETE( m_pGUIManager );
+   SAFE_DELETE( m_pUserInterface );
 	}
 
 void HumanView::VOnRender( double fTime, float fElapsedTime )
@@ -61,9 +68,6 @@ void HumanView::VOnRender( double fTime, float fElapsedTime )
       m_pWorld->OnRender();
       m_lastDraw = m_currTick;
       }
-
-   // Render GUI last, because its on top of the screen
-   m_pGUIManager->OnRender( fTime, fElapsedTime );
    }
 
 int HumanView::VOnRestore()
@@ -83,10 +87,6 @@ int HumanView::VOnMsgProc( SDL_Event event )
    // Iterate through the screen layers first
 	// In reverse order since we'll send input messages to the 
 	// screen on top
-   if( m_pGUIManager->OnMsgProc( event ) )
-      {
-      return 1;
-      }
 
    if( m_pController && m_pController->VOnMsgProc( event ) )
       {
@@ -132,20 +132,27 @@ void HumanView::VOnUpdate( const unsigned long deltaMs )
       {
       m_pController->OnUpdate( deltaMs );
       }
-   m_pGUIManager->OnUpdate( deltaMs );
    m_pProcessManager->UpdateProcesses( deltaMs );
+   }
+
+bool HumanView::HasModalWindow( void )
+   {
+   return m_pUserInterface->VHasModalWindow();
+   }
+
+ Uint32 HumanView::GetModalEventType( void )
+   {
+   return m_pUserInterface->GetModalEventType();
    }
 
 int HumanView::Ask( MessageBox_Questions question )
    {
-   return m_pGUIManager->Ask( question );
+   return m_pUserInterface->VAsk( question );
    }
 
 // TODO: refactor this method ( unnecessary param )
-bool HumanView::LoadGame( TiXmlElement* pLevelData )
+bool HumanView::LoadLevel( TiXmlElement* pLevelData )
    {
-   
-   //m_pScene->VOnRestore();
    return true;
    }
 

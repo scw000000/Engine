@@ -220,8 +220,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    // set two buffer for rendering
    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
-   m_ShutDownEventType = SDL_RegisterEvents( 1 );
-   ENG_ASSERT( m_ShutDownEventType != ((Uint32)-1) );
+   m_ShutDownEventType = RegisterEvent( 1 );
    //--------------------------------- 
    // Initiate window & SDL, glew
    //--------------------------------- 
@@ -290,6 +289,13 @@ Uint32 EngineApp::GetWindowState( void )
    return SDL_GetWindowFlags( m_pWindow );
    }
 
+Uint32 EngineApp::RegisterEvent( int eventNum )
+   {
+   Uint32 eventID = SDL_RegisterEvents( eventNum );
+   ENG_ASSERT( eventID != ( ( Uint32 ) -1 ) );
+   return eventID;
+   }
+
 void EngineApp::MsgProc( void )
    {
 
@@ -300,7 +306,7 @@ void EngineApp::MsgProc( void )
       if( event.type == m_ShutDownEventType )
          {
          pHumanView = GetHumanView();
-         if( pHumanView && pHumanView->HasModalDialog() )
+         if( pHumanView && pHumanView->HasModalWindow() )
             {
             // force the dialog to exit
             ENG_ASSERT( PushUserEvent( pHumanView->GetModalEventType(), g_QuitNoPrompt ) >= 0 );
@@ -364,15 +370,9 @@ void EngineApp::MsgProc( void )
          case SDL_CONTROLLERDEVICEADDED:
          case SDL_CONTROLLERDEVICEREMOVED:
          case SDL_CONTROLLERDEVICEREMAPPED:
-         // send event to all of game views
-         for( auto i = m_pEngineLogic->m_ViewList.rbegin(); i != m_pEngineLogic->m_ViewList.rend(); ++i) 
-		      {
-			   if ( (*i)->VOnMsgProc( event ) )
-				   {
-				   return;
-			      }
-			   }
-         }// Switch
+         m_pEngineLogic->VOnMsgProc( event );
+         }
+      
       }// If poll event exist
    }// Function MsgProc
 
@@ -384,7 +384,7 @@ BaseEngineLogic *EngineApp::VCreateLogic( void )
 	return m_pEngineLogic;
    }
 
-int EngineApp::Modal( shared_ptr<Dialog> pModalScreen, int defaultAnswer )
+int EngineApp::Modal( shared_ptr<PromptBox> pModalScreen, int defaultAnswer )
    {
    ENG_ASSERT( GetWindow() != NULL && _T("Main Window is NULL!") );
    // if the dialog poped out while the window is minimized, flash it to notify
@@ -458,7 +458,7 @@ std::wstring EngineApp::GetString( std::wstring sID )
 	auto localizedString = m_textResource.find( sID );
 	if(localizedString == m_textResource.end() )
 	   {
-		ENG_ASSERT(0 && "String not found!");
+		//ENG_ASSERT(0 && "String not found!");
 		return L"";
 	   }
 	return localizedString->second;

@@ -1,19 +1,27 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: GUIManager.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file GUIManager.h
+ * \date 2016/05/19 15:43
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "CEGUI/CEGUI.h"
 #include "CEGUI/RendererModules/OpenGL/GL3Renderer.h"
+#include "PromptBox.h"
 #include "UserInterface.h"
-
-typedef shared_ptr<IScreenElement> StrongScreenElementPtr;
-
 
 
 class GUIManager
    {
-   friend class Dialog;
+   friend class PromptBox;
    public:
       GUIManager( void );
       void Init( const std::string& resourceDirectory );
@@ -27,10 +35,14 @@ class GUIManager
       void OnRender( double fTime, float fElapsedTime );
       int  OnMsgProc( SDL_Event event ); // process the OS event
 
+      CEGUI::GUIContext* GetContext( void ) { return m_pContext; }
+
       int Ask( MessageBox_Questions question );
       bool HasModalDialog( void ){ return m_HasModalDialog != 0; }
-      Uint32 GetModalEventType( void ){ return m_ModalEventType; }
-      void LoadLayout( const Resource& layout );
+      //Uint32 GetModalEventType( void ){ return m_ModalEventType; }
+      void AttachLayout( CEGUI::Window* pWindow );
+
+      static CEGUI::Window* CreateCEGUIWindow( const std::string &type, const std::string& name, const Vec4& position = Vec4(), const Vec4& size = Vec4() );
 
    protected:
       static CEGUI::Key::Scan SDLKeyToCEGUIKey( SDL_Keycode key );
@@ -41,7 +53,6 @@ class GUIManager
       CEGUI::Window* m_pRoot;
       CEGUI::Window* m_pPromptRoot;
       CEGUI::Window* m_pUIRoot;
-      Uint32 m_ModalEventType;
       int m_HasModalDialog;
       std::string m_ResourceDir;
    };

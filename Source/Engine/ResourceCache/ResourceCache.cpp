@@ -1,10 +1,17 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: ResourceCache.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file ResourceCache.cpp
+ * \date 2016/05/19 19:01
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
-///////////////////////
-// MY CLASS INCLUDES //
-///////////////////////
 #include "EngineStd.h"
 #include "ResourceCache.h"
 
@@ -14,10 +21,13 @@
 
 
 // before restore the file name, trans from the alphabets to lowercase to prevent case-sensitive situation
-Resource::Resource( const std::string &name )
+Resource::Resource( const std::string &name, bool caseSensitive )
    {
-   m_name = name;
-   std::transform( m_name.begin(), m_name.end(), m_name.begin(), ( int(*)(int) )std::tolower );
+   m_Name = name;
+   if( !caseSensitive )
+      {
+      std::transform( m_Name.begin(), m_Name.end(), m_Name.begin(), ( int(*)(int) )std::tolower );
+      }
    }
 
 
@@ -119,7 +129,7 @@ int ResCache::Preload( const std::string pattern, void (*progressCallback)( int,
       // try to get every file name in the zip file
       Resource resource( m_file->VGetResourceName( i ) );
       // load the file if pattern is matched
-      if( WildcardMatch( pattern.c_str(), resource.m_name.c_str() ) )
+      if( WildcardMatch( pattern.c_str(), resource.m_Name.c_str() ) )
          {
          shared_ptr< ResHandle > handle = g_pApp->m_pResCache->GetHandle( &resource ); // use resource cache to load resource
          ++loaded;
@@ -151,7 +161,7 @@ void ResCache::Flush( void )
 
 shared_ptr< ResHandle > ResCache::Find( Resource *resource )
    {
-   ResHandleMap::iterator i = m_Resources.find( resource->m_name );
+   ResHandleMap::iterator i = m_Resources.find( resource->m_Name );
 	if ( i == m_Resources.end() )
 		return shared_ptr<ResHandle>();
 
@@ -174,7 +184,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
    for( auto it = m_ResourceLoaders.begin(); it != m_ResourceLoaders.end(); ++it )
       {
       // find correspond matching loader based on resource name
-      if( (*it)->VIsPatternMatch( resource->m_name.c_str() ) )
+      if( (*it)->VIsPatternMatch( resource->m_Name.c_str() ) )
          {
          loader = (*it);
          break;
@@ -261,7 +271,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
    if( handle )
       {
       m_lruResHandleList.push_front( handle ); // this resource is newly loaded, put it in the start of list
-      m_Resources[ resource->m_name ] = handle; // add resource name & handle mapping
+      m_Resources[ resource->m_Name ] = handle; // add resource name & handle mapping
       }
 
    return handle;
@@ -271,7 +281,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
 void ResCache::Free( shared_ptr< ResHandle > gonner )
    {
    m_lruResHandleList.remove( gonner ); // This calls the destructor of shared_ptr
-	m_Resources.erase( gonner->m_Resource.m_name );
+	m_Resources.erase( gonner->m_Resource.m_Name );
    // Note - the resource might still be in use by something,
 	// so the cache can't actually count the memory freed until the
 	// ResHandle pointing to it is destroyed. ( destructor of ResHandle has been called ) 
@@ -383,7 +393,7 @@ bool ResourceZipFile::VOpen()
 
 int ResourceZipFile::VGetRawResourceSize(const Resource &r)
    {
-	int resourceNum = m_pZipFile->Find( r.m_name.c_str() );
+	int resourceNum = m_pZipFile->Find( r.m_Name.c_str() );
 	if (resourceNum == -1)
 		return -1;
 
@@ -393,7 +403,7 @@ int ResourceZipFile::VGetRawResourceSize(const Resource &r)
 int ResourceZipFile::VGetRawResource( const Resource &r, char *buffer )
    {
 	int size = 0;
-	optional<int> resourceNum = m_pZipFile->Find( r.m_name.c_str() );
+	optional<int> resourceNum = m_pZipFile->Find( r.m_Name.c_str() );
 	if (resourceNum.valid())
 	   {
 		size = m_pZipFile->GetFileLen( *resourceNum );

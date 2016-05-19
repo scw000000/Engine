@@ -58,7 +58,6 @@ class ENG_Noncopyable
    };  
 
 //
-// Game Code Complete - Chapter 12, page 446-447
 //This macro must placed before all of the self-defined headers
 //
 #if defined(_DEBUG)
@@ -66,49 +65,6 @@ class ENG_Noncopyable
 #else
 #	define ENG_NEW new
 #endif
-
-///////////////////////
-//3rd party INCLUDES //
-///////////////////////
-#include "SDL.h"
-#include "SDL_syswm.h"
-#include "GL\glew.h"
-#include <tinyxml.h>
-
-
-
-///////////////////////
-// MY CLASS INCLUDES //
-///////////////////////
-#include "..\Debugging\Logger.h"  // this should be the first of the gcc includes since it defines ENG_ASSERT()
-#include "..\Utilities\types.h"
-#include "..\Utilities\templates.h"
-#include "..\Graphics\Geometry.h"
-#include "..\Utilities\String.h"
-#include "..\Main\Interfaces.h"
-#include "..\MainLoop\Timer.h"
-#include "..\Event\EventFactory.h"
-
-extern Color g_White;
-extern Color g_Black;
-extern Color g_Cyan;
-extern Color g_Red;
-extern Color g_Green;
-extern Color g_Blue;
-extern Color g_Yellow;
-extern Color g_Gray40;
-extern Color g_Gray25;
-extern Color g_Gray65;
-extern Color g_Transparent;
-
-extern Vec3 g_Up;
-extern Vec3 g_Right;
-extern Vec3 g_Forward;
-
-extern Vec4 g_Up4;
-extern Vec4 g_Right4;
-extern Vec4 g_Forward4;
-
 
 // Useful #defines
 
@@ -148,6 +104,51 @@ extern const int SCREEN_HEIGHT;
 #define __STR2__(x) #x
 #define __STR1__(x) __STR2__(x)
 #define __LOC__ __FILE__ "("__STR1__(__LINE__)") : Warning Msg: "  
+
+///////////////////////
+//3rd party INCLUDES //
+///////////////////////
+#include "SDL.h"
+#include "SDL_syswm.h"
+#include "GL\glew.h"
+#include <tinyxml.h>
+
+
+
+///////////////////////
+// MY CLASS INCLUDES //
+///////////////////////
+#include "..\Debugging\Logger.h"  // this should be the first of the gcc includes since it defines ENG_ASSERT()
+#include "..\Utilities\types.h"
+#include "..\Utilities\templates.h"
+#include "..\Graphics\Geometry.h"
+#include "..\Utilities\String.h"
+#include "..\Main\Interfaces.h"
+#include "..\ResourceCache\ResourceCache.h"
+#include "..\MainLoop\Timer.h"
+#include "..\Event\EventFactory.h"
+#include "..\Graphics\Scene.h"
+
+extern Color g_White;
+extern Color g_Black;
+extern Color g_Cyan;
+extern Color g_Red;
+extern Color g_Green;
+extern Color g_Blue;
+extern Color g_Yellow;
+extern Color g_Gray40;
+extern Color g_Gray25;
+extern Color g_Gray65;
+extern Color g_Transparent;
+
+extern Vec3 g_Up;
+extern Vec3 g_Right;
+extern Vec3 g_Forward;
+
+extern Vec4 g_Up4;
+extern Vec4 g_Right4;
+extern Vec4 g_Forward4;
+
 
 
 #include "..\Main\Engine.h"

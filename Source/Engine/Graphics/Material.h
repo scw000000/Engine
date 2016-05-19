@@ -14,6 +14,7 @@
  */
 #include "SceneNodes.h"
 
+
 enum AlphaType;
 
 class Material

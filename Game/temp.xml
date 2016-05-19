@@ -5,7 +5,6 @@
     <Property name="Text" value="Question" />
     <Property name="AlwaysOnTop" value="true" />
     <Property name="SizingEnabled" value="false" />
-    <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
     <Property name="VerticalAlignment" value="Centre" />
     <Property name="CloseButtonEnabled" value="false" />
     <Property name="HorizontalAlignment" value="Centre" />
@@ -13,12 +12,10 @@
     <AutoWindow namePath="__auto_titlebar__" >
         <Property name="NonClient" value="true" />
         <Property name="AlwaysOnTop" value="false" />
-        <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
     </AutoWindow>
     <AutoWindow namePath="__auto_closebutton__" >
         <Property name="NonClient" value="true" />
         <Property name="AlwaysOnTop" value="true" />
-        <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
     </AutoWindow>
     <Window type="GlossySerpentFHD/MultiLineEditbox" name="textbox" >
         <Property name="Area" value="{{0,0},{0,0},{1,0},{0,60.6072}}" />
@@ -27,42 +24,18 @@
  the game?
 </Property>
         <Property name="ReadOnly" value="true" />
-        <AutoWindow namePath="__auto_hscrollbar__" >
-            <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
-            <AutoWindow namePath="__auto_incbtn__" >
-                <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
-            </AutoWindow>
-            <AutoWindow namePath="__auto_decbtn__" >
-                <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
-            </AutoWindow>
-            <AutoWindow namePath="__auto_thumb__" >
-                <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
-            </AutoWindow>
-        </AutoWindow>
         <AutoWindow namePath="__auto_vscrollbar__" >
-            <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
             <Property name="VerticalScrollbar" value="true" />
-            <AutoWindow namePath="__auto_incbtn__" >
-                <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
-            </AutoWindow>
-            <AutoWindow namePath="__auto_decbtn__" >
-                <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
-            </AutoWindow>
-            <AutoWindow namePath="__auto_thumb__" >
-                <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
-            </AutoWindow>
         </AutoWindow>
     </Window>
     <Window type="GlossySerpentFHD/Button" name="IDS_QUESTION_QUIT_GAME IDS_YES" >
         <Property name="ID" value="6" />
         <Property name="Area" value="{{0,25.6},{0,66.76},{0,121.6},{0,93.4}}" />
         <Property name="Text" value="Yes" />
-        <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
     </Window>
     <Window type="GlossySerpentFHD/Button" name="IDS_QUESTION_QUIT_GAME IDS_NO" >
         <Property name="ID" value="7" />
         <Property name="Area" value="{{0,147.2},{0,66.76},{0,243.2},{0,93.4}}" />
         <Property name="Text" value="No" />
-        <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
     </Window>
 </Window>

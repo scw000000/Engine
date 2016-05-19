@@ -14,6 +14,7 @@
  */
 
 #include "../Mainloop/ProcessManager.h"
+#include "../UserInterface/GUIManager.h"
 #include "../Actors/Actor.h"
 
 class ActorFactory;
@@ -52,7 +53,9 @@ class BaseEngineLogic : public IEngineLogic
       virtual WeakActorPtr VGetActor(const ActorId actorId) override;
 	   virtual void VModifyActor(const ActorId actorId, TiXmlElement *overrides) override ;
 	   virtual void VMoveActor(const ActorId id, Mat4x4 const &mat) override {}
+      virtual bool VLoadLevel( const char* levelResource ) override;  
       virtual int VOnRestore( void ) override;
+      virtual void VOnMsgProc( SDL_Event event ) override;
       /**
        * @brief this function is called by EngineApp::OnUpdateGame after EventManger is updated
        *     state order->BGS_Initializing (constructor)->BGS_MainMenu (VOnUpdate)->BGS_WaitingForPlayers (RequestStartGameDelegate by GUI event)
@@ -67,12 +70,11 @@ class BaseEngineLogic : public IEngineLogic
 
 	   const BaseGameState GetState() const { return m_State; }
 
-      virtual bool VLoadGame( const char* levelResource ) override;  
-
       void AttachProcess(StrongProcessPtr pProcess) { if (m_pProcessManager) {m_pProcessManager->AttachProcess(pProcess);} }
-
+      
    public:
       shared_ptr<Scene> m_pWrold;
+      shared_ptr<GUIManager> m_pGUIManager;
 
    protected: 
 	   
@@ -81,7 +83,8 @@ class BaseEngineLogic : public IEngineLogic
       BaseGameState m_State;	// game state: loading, running, etc.
       shared_ptr<IRenderer> m_pRenderer;
       ProcessManager* m_pProcessManager;				// a game logic entity
-	   //GCCRandom m_random;								// our RNG
+	   
+      //GCCRandom m_random;								// our RNG
 	   ActorMap m_Actors;
 	   ActorId m_LastActorId;
       ActorFactory* m_pActorFactory;

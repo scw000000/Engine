@@ -2,12 +2,17 @@
 
 <GUILayout version="4" >
     <Window type="GlossySerpentFHD/FrameWindow" name="FrameWindow" >
-        <Property name="Area" value="{{0,0},{0,-40},{1,-818},{1.055,-296}}" />
+        <Property name="Area" value="{{0,0},{0,-40},{1,0},{1.055,-40}}" />
         <Property name="SizingEnabled" value="false" />
         <Property name="TitlebarEnabled" value="false" />
+        <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
         <Property name="DragMovingEnabled" value="false" />
         <Property name="CloseButtonEnabled" value="false" />
+        <Property name="EWSizingCursorImage" value="" />
+        <Property name="NSSizingCursorImage" value="" />
         <Property name="AutoRenderingSurface" value="true" />
+        <Property name="NESWSizingCursorImage" value="" />
+        <Property name="NWSESizingCursorImage" value="" />
         <AutoWindow namePath="__auto_titlebar__" >
             <Property name="NonClient" value="true" />
             <Property name="AlwaysOnTop" value="false" />
@@ -18,13 +23,14 @@
             <Property name="AlwaysOnTop" value="true" />
         </AutoWindow>
         <Window type="GlossySerpentFHD/Button" name="Button" >
-            <Property name="Area" value="{{0,1},{0,598},{0.2,1},{0,648}}" />
+            <Property name="Area" value="{{0,1},{0,598},{0.15,1},{0,648}}" />
+            <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
             <Property name="HorizontalAlignment" value="Centre" />
         </Window>
         <Window type="GlossySerpentFHD/ItemListbox" name="ItemListbox" >
             <Property name="Area" value="{{0,0},{0,0},{0.25,0},{0.5,0}}" />
+            <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
             <Property name="VerticalAlignment" value="Centre" />
-            <Property name="ForceVertScrollbar" value="true" />
             <Property name="HorizontalAlignment" value="Centre" />
             <AutoWindow namePath="__auto_content_pane__" >
                 <Property name="MouseInputPropagationEnabled" value="true" />

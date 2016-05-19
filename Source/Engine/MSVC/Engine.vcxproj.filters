@@ -100,9 +100,6 @@
     <ClCompile Include="..\UserInterface\GUIManager.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
-    <ClCompile Include="..\UserInterface\UserInterface.cpp">
-      <Filter>UserInterface</Filter>
-    </ClCompile>
     <ClCompile Include="..\ResourceCache\XmlResource.cpp">
       <Filter>ResourceCache</Filter>
     </ClCompile>
@@ -193,6 +190,12 @@
     <ClCompile Include="..\Main\BaseEngineLogic.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\UserInterface\PromptBox.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\UserInterface\UserInterface.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -256,9 +259,6 @@
     </ClInclude>
     <ClInclude Include="..\ResourceCache\ResourceCache.h">
       <Filter>ResourceCache</Filter>
-    </ClInclude>
-    <ClInclude Include="..\UserInterface\UserInterface.h">
-      <Filter>UserInterface</Filter>
     </ClInclude>
     <ClInclude Include="..\UserInterface\GUIManager.h">
       <Filter>UserInterface</Filter>
@@ -352,6 +352,12 @@
     </ClInclude>
     <ClInclude Include="..\Main\BaseEngineLogic.h">
       <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UserInterface\PromptBox.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UserInterface\UserInterface.h">
+      <Filter>UserInterface</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

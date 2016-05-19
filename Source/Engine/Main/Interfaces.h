@@ -1,7 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Interfaces.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file Interfaces.h
+ * \date 2016/05/19 19:43
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 enum Renderer
 	{
@@ -78,10 +88,11 @@ class IEngineLogic
    	virtual WeakActorPtr VGetActor( const ActorId id ) = 0;
       virtual StrongActorPtr VCreateActor( const std::string &actorResource, TiXmlElement *overrides, const Mat4x4 *initialTransform=NULL, const ActorId serversActorId=INVALID_ACTOR_ID) = 0;
       virtual void VDestroyActor( const ActorId actorId ) = 0;
-	   virtual bool VLoadGame( const char* levelResource ) = 0;
+	   virtual bool VLoadLevel( const char* levelResource ) = 0;
 	   //virtual void VSetProxy()=0;				
       virtual int VOnRestore( void ) = 0;
-	   virtual void VOnUpdate( float time, float elapsedTime ) = 0;
+	   virtual void VOnMsgProc( SDL_Event event ) = 0;
+      virtual void VOnUpdate( float time, float elapsedTime ) = 0;
       virtual void VOnRender( double fTime, float fElapsedTime ) = 0;
 	   virtual void VMoveActor( const ActorId id, Mat4x4 const &mat ) = 0;
       virtual void VAddView( shared_ptr<IView> pView ) = 0;

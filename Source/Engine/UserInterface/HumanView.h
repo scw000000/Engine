@@ -1,13 +1,22 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: HumanView.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file HumanView.h
+ * \date 2016/05/19 21:09
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
-#include "UserInterface.h"
-#include "GUIManager.h"
+#include "PromptBox.h"
 #include "..\Controller\Controller.h"
 
-class GUIManager;
+class UserInterface;
 
 typedef std::list< shared_ptr< IScreenElement > > ScreenElementList;
 
@@ -27,7 +36,9 @@ class HumanView : public IView
       virtual int VOnLostDevice( void );
       virtual int VOnMsgProc( SDL_Event event ); // process the OS event
 	   virtual void VOnUpdate( const unsigned long deltaMs );
-   
+      
+      bool HasModalWindow( void );
+      Uint32 GetModalEventType( void );
 	   //// Virtual methods to control the layering of interface elements
 	   //virtual void VPushElement( shared_ptr<IScreenElement> pElement );
 	   //virtual void VRemoveElement( shared_ptr<IScreenElement> pElement );
@@ -35,11 +46,7 @@ class HumanView : public IView
       ProcessManager* GetProcessManager( void ) { return m_pProcessManager; }
 	   //void TogglePause(bool active);
       int Ask( MessageBox_Questions question );
-      bool LoadGame( TiXmlElement* pLevelData );
-      bool HasModalDialog( void ) { return m_pGUIManager->HasModalDialog() != 0; }
-
-      Uint32 GetModalEventType( void ) { return m_pGUIManager->GetModalEventType(); }
-	   //HumanView(shared_ptr<IRenderer> renderer);
+      bool LoadLevel( TiXmlElement* pLevelData );
 
    public:
 
@@ -49,7 +56,7 @@ class HumanView : public IView
       Uint64 m_lastDraw; // last time the game rended
       bool m_RunFullSpeed; // if the view should ignore max rendering frequency setting
       ProcessManager *m_pProcessManager; // this Processmanager is for things like button animations
-      GUIManager* m_pGUIManager;
+      UserInterface *m_pUserInterface;
       shared_ptr<Scene> m_pWorld; // this scene will be pushed into screen element list by LoadGame( xml level)
       shared_ptr<CameraNode> m_pCamera;
       shared_ptr<MovementController> m_pController; 

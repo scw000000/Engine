@@ -1,16 +1,19 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: ResourceCache.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file ResourceCache.h
+ * \date 2016/05/19 19:00
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
-//////////////
-// INCLUDES //
-//////////////
 #include <zlib.h>
-
-///////////////////////
-// MY CLASS INCLUDES //
-///////////////////////
 #include "ZipFile.h"			// needed for ZipContentsMap
 
 // Basic definition of a single resource description, ex: a textrue, a music file, etc.
@@ -18,8 +21,8 @@
 class Resource
    {
    public:
-      std::string m_name;
-      Resource( const std::string &name );
+      std::string m_Name;
+      Resource( const std::string &name, bool caseSensitive = false );
    };
 
 class IResourceExtraData

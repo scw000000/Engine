@@ -14,12 +14,44 @@
  * \note
  */
 
-//////////////
-// INCLUDES //
-//////////////
 #include "../Utilities/String.h"
 
 class TiXmlElement;
+
+class IActorComponent
+   {
+   public:
+      virtual const ComponentId& VGetComponentID( void ) const = 0;
+      virtual const char *VGetName( ) const = 0;
+
+      virtual bool VInit( TiXmlElement* pData ) = 0;
+      virtual void VPostInit( void ) = 0;
+      virtual void VUpdate( const unsigned long deltaMs ) = 0;
+
+   };
+
+
+// Using Curiously recurring template pattern (CRTP) to prevent declaring GUID mulit times
+template <typename T>class BaseActorComponent : virtual public IActorComponent 
+   {
+   friend class ActorFactory;
+   public:
+
+      virtual const ComponentId& VGetComponentID( void ) const override { return s_ComponentID; };
+
+      virtual const char* GetName( void ) const override { return s_pName; }
+
+   public:
+      // GUID of this event
+      const static ComponentId  s_ComponentID;
+      const static char*      s_pName;
+
+   protected:
+      void SetOwner( StrongActorPtr pOwner ) { m_pOwner = pOwner; }
+   
+   protected:
+      StrongActorPtr m_pOwner;
+   };
 
 class ActorComponent
    {

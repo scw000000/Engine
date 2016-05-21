@@ -4,5 +4,8 @@
         <Item name="Menu" type="folder">
             <Item path="layouts/MainMenu.layout" type="file" />
         </Item>
+        <Item name="GamePlay" type="folder">
+            <Item path="layouts/Empty.layout" type="file" />
+        </Item>
     </Items>
 </Project>

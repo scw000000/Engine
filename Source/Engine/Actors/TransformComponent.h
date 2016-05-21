@@ -1,5 +1,17 @@
 #pragma once
-
+/*!
+ * \file TransformComponent.h
+ * \date 2016/05/21 21:52
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "ActorComponent.h"
 

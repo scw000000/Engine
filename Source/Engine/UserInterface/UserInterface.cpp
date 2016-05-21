@@ -14,35 +14,12 @@
 
 #include "EngineStd.h"
 #include "UserInterface.h"
+#include "HumanView.h"
+#include "..\Controller\Controller.h"
 
 UserInterface::UserInterface( const Resource& layoutRes ) : m_LayoutResource( layoutRes ), m_pGUIManager( g_pApp->m_pEngineLogic->m_pGUIManager )
    {
    m_IsMouseCursorEnable = false;
-   m_ModalEventType = 0;
-   m_pRoot = 0;
-   m_pUIRoot = 0;
-   m_pPromptRoot = 0;
-   m_pMouseArrowImg = 0;
-   }
-
-UserInterface::~UserInterface( void )
-   {
-   if( m_pRoot )
-      {
-      CEGUI::WindowManager::getSingleton( ).destroyWindow( m_pRoot );
-      }
-   if( m_pUIRoot )
-      {
-      CEGUI::WindowManager::getSingleton( ).destroyWindow( m_pUIRoot );
-      }
-   if( m_pPromptRoot )
-      {
-      CEGUI::WindowManager::getSingleton( ).destroyWindow( m_pPromptRoot );
-      }
-   }
-
-void UserInterface::VInit( void )
-   {
    m_pRoot = CEGUI::WindowManager::getSingleton( ).createWindow( "DefaultWindow", "human_root" );
    m_pRoot->setMousePassThroughEnabled( true );
 
@@ -54,24 +31,20 @@ void UserInterface::VInit( void )
    m_pPromptRoot->setAlwaysOnTop( true );
    m_pRoot->addChild( m_pPromptRoot );
 
-   m_pGUIManager->AttachLayout( m_pRoot );
-
    m_ModalEventType = g_pApp->RegisterEvent( 1 );
    }
 
-void UserInterface::VSetDisplayMouseCursor( bool isDisplay )
+UserInterface::~UserInterface( void )
    {
-   SetMouseCursor( m_pRoot, isDisplay? m_pMouseArrowImg: NULL );
    }
 
-void UserInterface::SetMouseCursor( CEGUI::Window* pWindow, const CEGUI::Image* pImage )
+void UserInterface::VInit( void )
    {
-   pWindow->setMouseCursor( pImage );
-   size_t childNum = pWindow->getChildCount( );
-   for( size_t i = 0; i < childNum; ++i )
-      {
-      SetMouseCursor( pWindow->getChildAtIdx( i ), pImage );
-      }
+   }
+
+void UserInterface::VSetIsMouseCursorEnable( bool isDisplay )
+   {
+   m_IsMouseCursorEnable = isDisplay;
    }
 
 int UserInterface::VAsk( MessageBox_Questions question )
@@ -111,14 +84,20 @@ int UserInterface::VAsk( MessageBox_Questions question )
          ENG_ASSERT( 0 && "Too Many nested dialogs!" );
          return defaultAnswer;
          }
-      VSetDisplayMouseCursor( true );
-      shared_ptr<PromptBox> pPromptBox( ENG_NEW PromptBox( m_pPromptRoot, m_ModalEventType, msg, title, buttonFlags ) );
-      pPromptBox->m_pWindow->setModalState( true );
-      int result = g_pApp->Modal( pPromptBox, defaultAnswer );
+      bool prevMouseDisplay = m_IsMouseCursorEnable;
+      bool prevMouseLock = g_pApp->GetHumanView()->m_pController->VIsPointerLocked();
+      m_pGUIManager->SetDisplayMouseCursor( true );
+      VSetIsMouseCursorEnable( true );
+      g_pApp->GetHumanView()->m_pController->VSetPointerLocked( false );
 
+      shared_ptr<PromptBox> pPromptBox( ENG_NEW PromptBox( m_pPromptRoot, m_ModalEventType, msg, title, buttonFlags ) );
+      pPromptBox->GetWindow()->setModalState( true );
+      int result = g_pApp->Modal( pPromptBox, defaultAnswer );
+      m_pPromptRoot->destroyChild( pPromptBox->GetWindow() );
       if( !m_pPromptRoot->getChildCount() )
          {
-         VSetDisplayMouseCursor( m_IsMouseCursorEnable );
+         VSetIsMouseCursorEnable( prevMouseDisplay );
+         g_pApp->GetHumanView()->m_pController->VSetPointerLocked( prevMouseLock );
          }
       return result;
       }
@@ -130,6 +109,11 @@ int UserInterface::VAsk( MessageBox_Questions question )
 bool UserInterface::VHasModalWindow( void ) 
    {
    return m_pPromptRoot->getChildCount() > 0;
+   }
+
+bool UserInterface::VIsMouseCursorEnable( void )
+   {
+   return m_IsMouseCursorEnable;
    }
 
 Uint32 UserInterface::GetModalEventType( void )

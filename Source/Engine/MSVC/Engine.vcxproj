@@ -123,11 +123,9 @@
     <ClCompile Include="..\MainLoop\ProcessManager.cpp" />
     <ClCompile Include="..\MainLoop\Timer.cpp" />
     <ClCompile Include="..\Main\BaseEngineLogic.cpp" />
-    <ClCompile Include="..\Main\EditorViewState.cpp" />
     <ClCompile Include="..\Main\Engine.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EngineStd.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="..\Main\EngineState.cpp" />
     <ClCompile Include="..\Main\main.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EngineStd.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">EngineStd.h</PrecompiledHeaderFile>
@@ -136,7 +134,6 @@
     </ClCompile>
     <ClCompile Include="..\Physics\Physics.cpp" />
     <ClCompile Include="..\Physics\PhysicsDebugDrawer.cpp" />
-    <ClCompile Include="..\Physics\PhysicsEventListener.cpp" />
     <ClCompile Include="..\ResourceCache\MeshResource.cpp" />
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp" />
     <ClCompile Include="..\ResourceCache\TextureResource.cpp" />
@@ -144,6 +141,7 @@
     <ClCompile Include="..\ResourceCache\ZipFile.cpp" />
     <ClCompile Include="..\UserInterface\GUIManager.cpp" />
     <ClCompile Include="..\UserInterface\HumanView.cpp" />
+    <ClCompile Include="..\UserInterface\MenuInterface.cpp" />
     <ClCompile Include="..\UserInterface\PromptBox.cpp" />
     <ClCompile Include="..\UserInterface\UserInterface.cpp" />
     <ClCompile Include="..\Utilities\Math.cpp" />
@@ -189,15 +187,12 @@
     <ClInclude Include="..\MainLoop\ProcessManager.h" />
     <ClInclude Include="..\MainLoop\Timer.h" />
     <ClInclude Include="..\Main\BaseEngineLogic.h" />
-    <ClInclude Include="..\Main\EditorViewState.h" />
     <ClInclude Include="..\Main\Engine.h" />
-    <ClInclude Include="..\Main\EngineState.h" />
     <ClInclude Include="..\Main\Interfaces.h" />
     <ClInclude Include="..\Memory\MemoryPool.h" />
     <ClInclude Include="..\Multicore\CriticalSection.h" />
     <ClInclude Include="..\Physics\Physics.h" />
     <ClInclude Include="..\Physics\PhysicsDebugDrawer.h" />
-    <ClInclude Include="..\Physics\PhysicsEventListener.h" />
     <ClInclude Include="..\ResourceCache\MeshResource.h" />
     <ClInclude Include="..\ResourceCache\ResourceCache.h" />
     <ClInclude Include="..\ResourceCache\TextureResource.h" />
@@ -205,6 +200,7 @@
     <ClInclude Include="..\ResourceCache\ZipFile.h" />
     <ClInclude Include="..\UserInterface\GUIManager.h" />
     <ClInclude Include="..\UserInterface\HumanView.h" />
+    <ClInclude Include="..\UserInterface\MenuInterface.h" />
     <ClInclude Include="..\UserInterface\PromptBox.h" />
     <ClInclude Include="..\UserInterface\UserInterface.h" />
     <ClInclude Include="..\Utilities\Math.h" />

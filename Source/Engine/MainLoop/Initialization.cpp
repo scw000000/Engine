@@ -48,7 +48,7 @@ void EngineOptions::Init( const char* xmlFileName )
 		if ( pNode )
 		   {
 			std::string attribute;
-			attribute = pNode->Attribute("renderer");
+			attribute = pNode->Attribute("Renderer");
 			if ( attribute != "OpenGL" )
 			   {
 				ENG_ASSERT(0 && "Bad Renderer setting in Graphics options.");
@@ -58,24 +58,24 @@ void EngineOptions::Init( const char* xmlFileName )
 				m_Renderer = attribute;
 			   }
 
-		   if ( pNode->Attribute("width") )
+		   if ( pNode->Attribute("Width") )
 			   {
-			   m_ScreenSize.x = atoi(pNode->Attribute("width"));
+			   m_ScreenSize.x = atoi(pNode->Attribute("Width"));
 			   if (m_ScreenSize.x < 800)
                {
                m_ScreenSize.x = 800;
                }
 			   }  
 
-			if (pNode->Attribute("height"))
+			if (pNode->Attribute("Height"))
 			   {
-				m_ScreenSize.y = atoi(pNode->Attribute("height"));
+				m_ScreenSize.y = atoi(pNode->Attribute("Height"));
 				   if (m_ScreenSize.y < 600) m_ScreenSize.y = 600;
 			   }
 
-			if (pNode->Attribute("runfullspeed"))
+			if (pNode->Attribute("RunFullSpeed"))
 			   {
-				attribute = pNode->Attribute("runfullspeed");
+				attribute = pNode->Attribute("RunFullSpeed");
 				m_runFullSpeed = (attribute == "yes") ? true : false;
 			   }
 
@@ -88,18 +88,22 @@ void EngineOptions::Init( const char* xmlFileName )
             {
             m_GUIDirectory = pNode->Attribute( "GUIDirectory" );
             }
+         if( pNode->Attribute( "LevelDirectory" ) )
+            {
+            m_LevelDirectory = pNode->Attribute( "LevelDirectory" );
+            }
          }
 
       pNode = pRoot->FirstChildElement("User"); 
       if( pNode )
          {
-         if( pNode->Attribute( "level" ) )
+         if( pNode->Attribute( "Level" ) )
             {
-            m_Level = pNode->Attribute( "level" );
+            m_Level = pNode->Attribute( "Level" );
             }
-         if( pNode->Attribute( "layout" ) )
+         if( pNode->Attribute( "Layout" ) )
             {
-            m_Layout = pNode->Attribute( "layout" );
+            m_Layout = pNode->Attribute( "Layout" );
             }
          }
 

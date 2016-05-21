@@ -1,7 +1,7 @@
 <PlayerOptions>
-  <Graphics renderer="OpenGL" width="1280" height="720" runfullspeed="no" />
-  <Sound sfxVolume="100" musicVolume="100"/>
-  <ResCache useDevelopmentDirectories="no" GUIDirectory="GUI/"/> 
-  <User level="World\default.xml" layout="MainMenu.layout"/>
+  <Graphics Renderer="OpenGL" Width="1280" Height="720" RunFullSpeed="no" />
+  <Sound SfxVolume="100" MusicVolume="100"/>
+  <ResCache UseDevelopmentDirectories="no" GUIDirectory="GUI/" LevelDirectory="world\"/> 
+  <User Level="default.xml" Layout="MainMenu.layout"/>
   <PhysicsDebug DrawWireFrame="yes" DrawContactPoints="yes" />
 </PlayerOptions>

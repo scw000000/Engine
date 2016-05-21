@@ -23,9 +23,10 @@ class GUIManager;
 class IUserInterface {
    public:
       virtual void VInit( void ) = 0;
-      virtual void VSetDisplayMouseCursor( bool isDisplay ) = 0;
-      virtual int  VAsk( MessageBox_Questions question ) = 0;
+      virtual void VSetIsMouseCursorEnable( bool isDisplay ) = 0;
       virtual bool VHasModalWindow( void ) = 0;
+      virtual int  VAsk( MessageBox_Questions question ) = 0;
+      virtual bool VIsMouseCursorEnable( void ) = 0;
 
    private:
    };
@@ -36,13 +37,15 @@ class UserInterface : public IUserInterface
       UserInterface( const Resource& layoutRes );
       ~UserInterface( void );
       virtual void VInit( void ) override;
-      virtual void VSetDisplayMouseCursor( bool isDisplay ) override;
-      void SetMouseCursor( CEGUI::Window* pWindow, const CEGUI::Image* pImage );
+      virtual void VSetIsMouseCursorEnable( bool isDisplay ) override;
+      virtual bool VIsMouseCursorEnable( void ) override;
       virtual int VAsk( MessageBox_Questions question ) override;
       virtual bool VHasModalWindow( void ) override;
+      
       Uint32 GetModalEventType( void );
+      CEGUI::Window* GetRootWindow( void ) { return m_pRoot; }
 
-   private:
+   protected:
       int m_HasModalDialog;
       bool m_IsMouseCursorEnable;
       Uint32 m_ModalEventType;
@@ -51,5 +54,4 @@ class UserInterface : public IUserInterface
       CEGUI::Window* m_pRoot;
       CEGUI::Window* m_pUIRoot;
       CEGUI::Window* m_pPromptRoot;
-      CEGUI::Image* m_pMouseArrowImg;
    };

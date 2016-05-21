@@ -27,7 +27,7 @@ MovementController::MovementController( shared_ptr<SceneNode> object,
 	m_CurrentSpeed = 0.0f;
    m_MsToMaxSpeed = 1500.f;
    m_Smoothness = std::max( 0.0f, std::min( 0.99f, smoothness ) );
-
+   m_isMouseLocked = false;
    memset( &m_KeyButton[0], 0x00, sizeof( bool ) * SDL_NUM_SCANCODES );
 
 	m_isMouseLButtonDown = false;
@@ -100,8 +100,11 @@ bool MovementController::VOnPointerMove( Point motion )
       m_TargetRotShift.x += 0.001f * ( motion.y - g_pApp->GetScreenSize().GetY() / 2 );
       m_TargetRotShift.y += 0.001f * ( g_pApp->GetScreenSize().GetX() / 2 - motion.x ) ;    
 	   }
-  // SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
-	return true;
+   if( m_isMouseLocked )
+      {
+      SDL_WarpMouseInWindow( g_pApp->GetWindow( ), g_pApp->GetScreenSize( ).GetX( ) / 2, g_pApp->GetScreenSize( ).GetY( ) / 2 );
+      }
+   return true;
    }
 
 //  class MovementController::OnUpdate			- Chapter 10, page 283

@@ -20,10 +20,10 @@ ActorFactory::ActorFactory( void )
    {
    m_lastActorId = INVALID_ACTOR_ID;
 
-   m_componentFactory.Register<TransformComponent>( ActorComponent::GetIdFromName( TransformComponent::g_Name) );
-   m_componentFactory.Register<MeshRenderComponent>( ActorComponent::GetIdFromName( MeshRenderComponent::g_Name) );
-   m_componentFactory.Register<LightRenderComponent>( ActorComponent::GetIdFromName( LightRenderComponent::g_Name) );
-   m_componentFactory.Register<SkyRenderComponent>( ActorComponent::GetIdFromName( SkyRenderComponent::g_Name) );
+   m_ComponentFactory.Register<TransformComponent>( ActorComponent::GetIdFromName( TransformComponent::g_Name) );
+   m_ComponentFactory.Register<MeshRenderComponent>( ActorComponent::GetIdFromName( MeshRenderComponent::g_Name) );
+   m_ComponentFactory.Register<LightRenderComponent>( ActorComponent::GetIdFromName( LightRenderComponent::g_Name) );
+   m_ComponentFactory.Register<SkyRenderComponent>( ActorComponent::GetIdFromName( SkyRenderComponent::g_Name) );
    }
 
 // This version of function is different than the source code
@@ -104,7 +104,7 @@ StrongActorComponentPtr ActorFactory::CreateComponent( TiXmlElement* pData )
    // std::map<IdType, ObjectCreationFunction> m_creationFunctions -> the table of creation functions 
    // ( of course these functions should be registered first )
    // Before that, the id is translated from name to id by using hash string ( GetIdFromName )
-   StrongActorComponentPtr pComponent( m_componentFactory.Create( ActorComponent::GetIdFromName( name.c_str() ) ) );
+   StrongActorComponentPtr pComponent( m_ComponentFactory.Create( ActorComponent::GetIdFromName( name.c_str() ) ) );
    if( !pComponent )
       {
       ENG_ERROR( "Cannot create componet due to lossing creation function: " + std::string( name ) );

@@ -97,6 +97,8 @@ class IEngineLogic
 	   virtual void VMoveActor( const ActorId id, Mat4x4 const &mat ) = 0;
       virtual void VAddView( shared_ptr<IView> pView ) = 0;
       virtual void VModifyActor( const ActorId actorId, TiXmlElement *overrides ) = 0;
+      virtual void VSetActorUpdate( bool isUpdatable ) = 0;
+      virtual void VSetWorldUpdate( bool isUpdatable ) = 0;
    };
 
 typedef std::list<shared_ptr<IView> > ViewList;
@@ -114,6 +116,8 @@ class IPointerHandler
 	   virtual bool VOnPointerMove( Point motion ) = 0;
 	   virtual bool VOnPointerButtonDown( Uint8 button ) = 0;
 	   virtual bool VOnPointerButtonUp( Uint8 button ) = 0;
+      virtual void VSetPointerLocked( bool isLocked ) = 0;
+      virtual bool VIsPointerLocked( void ) = 0;
    };
 
 class IController : public IKeyboardHandler, public IPointerHandler

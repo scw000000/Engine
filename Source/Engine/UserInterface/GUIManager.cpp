@@ -24,8 +24,6 @@ GUIManager::GUIManager( void )
    m_pRoot = NULL;
    m_pPromptRoot = NULL;
    m_pUIRoot = NULL;
-   /*m_ModalEventType = 0;*/
-   m_HasModalDialog = 0;
    }
 
 void GUIManager::Init(  const std::string& resourceDirectory  )
@@ -58,6 +56,9 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
    CEGUI::ImageManager::getSingleton( ).loadImageset( "GlossySerpentFHDCursors.imageset" );
    CEGUI::ImageManager::getSingleton( ).loadImageset( "WindowsLook.imageset" );
 
+   m_pContext->getMouseCursor().setDefaultImage( "WindowsLook/MouseArrow" );
+   m_pContext->getMouseCursor().hide();
+
    SetFont( "UTF8.ttf" );
 
    m_pRoot = CEGUI::WindowManager::getSingleton( ).createWindow( "DefaultWindow", "root" );
@@ -81,6 +82,7 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
 
 void GUIManager::Destory( void )
    {
+   m_Layouts.clear();
    CEGUI::System::destroy(); 
    CEGUI::OpenGL3Renderer::destroy( static_cast<CEGUI::OpenGL3Renderer&>( *s_pRenderer ) ); 
    }
@@ -115,38 +117,59 @@ void GUIManager::OnRender( double fTime, float fElapsedTime )
    s_pRenderer->endRendering( );*/
    }
 
+void GUIManager::AttachLayout( shared_ptr<UserInterface> pUI )
+   {
+   auto pRootWindow = pUI->GetRootWindow();
+   m_Layouts[ pRootWindow ] = pUI;
+   m_pRoot->addChild( pRootWindow );
+   pRootWindow->subscribeEvent( CEGUI::Window::EventMouseEntersArea, CEGUI::Event::Subscriber( &GUIManager::OnMouseEntersArea, this ) );
+   
+   }
+
+void GUIManager::DetachLayout( shared_ptr<UserInterface> pUI )
+   {
+   auto findResult = m_Layouts.find( pUI->GetRootWindow() );
+   if( findResult != m_Layouts.end() )
+      {
+      m_pRoot->destroyChild( findResult->first );
+      m_Layouts.erase( findResult );
+      } 
+   }
+
 int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
    {
+   bool hasModalWindow = m_pContext->getModalWindow() != NULL;
    switch( event.type )
       {
       case SDL_MOUSEBUTTONDOWN:
-         if( m_pContext->injectMouseButtonDown( SDLButtonTOCEGUIButton( event.button.button ) ) || m_HasModalDialog )
+         if( m_pContext->injectMouseButtonDown( SDLButtonTOCEGUIButton( event.button.button ) ) || hasModalWindow )
             {
             return 1;
             }
          
          break;
       case SDL_MOUSEBUTTONUP:
-         if( m_pContext->injectMouseButtonUp( SDLButtonTOCEGUIButton( event.button.button ) ) || m_HasModalDialog )
+         if( m_pContext->injectMouseButtonUp( SDLButtonTOCEGUIButton( event.button.button ) ) || hasModalWindow )
             {
             return 1;
             }
          break;
       case SDL_MOUSEMOTION:
-         if( m_pContext->injectMousePosition( (float)event.motion.x, (float)event.motion.y ) || m_HasModalDialog )
+         m_pContext->injectMousePosition( (float)event.motion.x, (float)event.motion.y );
+         if( hasModalWindow )
             {
             return 1;
             }
          break;
       case SDL_KEYDOWN:
-         if( m_pContext->injectKeyDown( SDLKeyToCEGUIKey( event.key.keysym.sym ) ) || m_HasModalDialog )
+         if( m_pContext->injectKeyDown( SDLKeyToCEGUIKey( event.key.keysym.sym ) ) || hasModalWindow )
             {
             
             return 1;
             }
          break;
       case SDL_KEYUP:
-         if( m_pContext->injectKeyUp( SDLKeyToCEGUIKey( event.key.keysym.sym ) ) || m_HasModalDialog )
+         if( m_pContext->injectKeyUp( SDLKeyToCEGUIKey( event.key.keysym.sym ) ) || hasModalWindow )
             {
             return 1;
             }
@@ -159,7 +182,7 @@ int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
             {
             codePoint |= event.text.text[i] << ( i * 8 );
             }
-         if( m_pContext->injectChar( codePoint ) || m_HasModalDialog )
+         if( m_pContext->injectChar( codePoint ) || hasModalWindow )
             {
             return 1;
             }
@@ -167,11 +190,6 @@ int GUIManager::OnMsgProc( SDL_Event event ) // process the OS event
                
       }
    return 0;
-   }
-
-void GUIManager::AttachLayout( CEGUI::Window* pWindow )
-   {
-   m_pRoot->addChild( pWindow );
    }
 
 // CEGUI::UDim( scale, pos ) : scale : relative point on the screen between (0,1)
@@ -184,63 +202,6 @@ CEGUI::Window* GUIManager::CreateCEGUIWindow( const std::string &type, const std
    pWindow->setSize( CEGUI::USize( CEGUI::UDim( size.x, size.y ), CEGUI::UDim( size.z, size.w ) ) );
    return pWindow;
    }
-
-//int GUIManager::Ask( MessageBox_Questions question )
-//   {
-//   std::wstring msg;
-//	std::wstring title;
-//	int buttonFlags;
-//	int defaultAnswer = IDOK;
-//
-//	switch(question)
-//	   {
-//		case QUESTION_WHERES_THE_CD:
-//		   {
-//			msg = (_T("IDS_QUESTION_WHERES_THE_CD"));
-//			title = (_T("IDS_ALERT"));
-//			buttonFlags = MB_RETRYCANCEL;
-//			defaultAnswer = IDCANCEL;
-//			break;
-//		   }
-//		case QUESTION_QUIT_GAME:
-//		   {
-//			msg = (_T("IDS_QUESTION_QUIT_GAME"));
-//			title = (_T("IDS_QUESTION"));
-//			buttonFlags = MB_YESNO;
-//			defaultAnswer = IDNO;
-//			break;
-//		   }
-//		default:
-//			ENG_ASSERT(0 && _T("Undefined question in GUIManager::Ask"));
-//			return IDCANCEL;
-//	   }
-//
-//	if ( m_pContext )
-//	   {
-//      if ( m_HasModalDialog & 0x10000000 )
-//	      {
-//		   ENG_ASSERT( 0 && "Too Many nested dialogs!" );
-//		   return defaultAnswer;
-//	      }
-//      m_HasModalDialog <<= 1;
-//	   m_HasModalDialog |= 1;
-//
-//     // SDL_ShowCursor( SDL_ENABLE );
-//      shared_ptr<PromptBox> pDialog( ENG_NEW PromptBox( m_pPromptRoot, m_ModalEventType, msg, title, buttonFlags ) ); */
-//         pDialog->m_pWindow->setModalState( true );
-//      int result = g_pApp->Modal( pDialog, defaultAnswer );
-//
-//      m_HasModalDialog >>= 1;
-//      if( !m_HasModalDialog )
-//         {
-//       //  SDL_ShowCursor( SDL_DISABLE );
-//         }
-//		return result;
-//	   }
-//	// If the engine is not exist, still pop a message box
-//	return 0;
-//   //return ::MessageBox(g_pApp ? g_pApp->GetHwnd() : NULL, msg.c_str(), title.c_str(), buttonFlags);
-//   }
 
 CEGUI::Key::Scan GUIManager::SDLKeyToCEGUIKey( SDL_Keycode key )
    {
@@ -373,4 +334,27 @@ CEGUI::MouseButton GUIManager::SDLButtonTOCEGUIButton( Uint8 button )
       default:                return MouseButton::NoButton;
       }
    return MouseButton::NoButton;
+   }
+
+void GUIManager::SetDisplayMouseCursor( bool isDisplay )
+   {
+   if( isDisplay )
+      {
+      m_pContext->getMouseCursor( ).show( );
+      }
+   else
+      {
+      m_pContext->getMouseCursor( ).hide( );
+      }
+   }
+
+bool GUIManager::OnMouseEntersArea( const CEGUI::EventArgs& arg )
+   {
+   const CEGUI::MouseEventArgs& mouseArgs = static_cast<const CEGUI::MouseEventArgs&>( arg );
+   auto findResult = m_Layouts.find( mouseArgs.window );
+   if( findResult != m_Layouts.end() )
+      {
+      SetDisplayMouseCursor( findResult->second->VIsMouseCursorEnable() );
+      }
+   return false;
    }

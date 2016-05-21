@@ -14,7 +14,7 @@
  */
 #include "EngineStd.h"
 #include "HumanView.h"
-#include "UserInterface.h"
+#include "MenuInterface.h"
 #include "..\Graphics\Scene.h"
 #include "..\Controller\Controller.h"
 
@@ -25,10 +25,9 @@ const ViewId gc_InvalidGameViewId = 0xffffffff;
 HumanView::HumanView( void )
    {
 	m_pProcessManager = ENG_NEW ProcessManager;
-   m_pUserInterface = ENG_NEW UserInterface( Resource( g_pApp->m_EngineOptions.m_Layout, true ) );
-   m_pUserInterface->VInit();
 	m_ViewId = gc_InvalidGameViewId;
-   
+   AttachLayout( shared_ptr<UserInterface> ( ENG_NEW MenuInterface( Resource( g_pApp->m_EngineOptions.m_Layout, true ) ) ) );
+
    if ( g_pApp->m_pEngineLogic->m_pWrold )
 	   {
       m_pWorld = g_pApp->m_pEngineLogic->m_pWrold;
@@ -43,13 +42,13 @@ HumanView::HumanView( void )
 		m_pWorld->AddChild( INVALID_ACTOR_ID, m_pCamera );
       }
    m_pController.reset( ENG_NEW MovementController( m_pCamera, 0, 0, false ) );
+   m_pController->VSetPointerLocked( false );
    }
-
 
 HumanView::~HumanView()
    {
+   DetachLayout();
 	SAFE_DELETE( m_pProcessManager );
-   SAFE_DELETE( m_pUserInterface );
 	}
 
 void HumanView::VOnRender( double fTime, float fElapsedTime )
@@ -133,6 +132,25 @@ void HumanView::VOnUpdate( const unsigned long deltaMs )
       m_pController->OnUpdate( deltaMs );
       }
    m_pProcessManager->UpdateProcesses( deltaMs );
+   }
+
+void HumanView::AttachLayout( shared_ptr<UserInterface> pUI )
+   {
+   if( m_pUserInterface )
+      {
+      DetachLayout();
+      }
+   m_pUserInterface = pUI;
+   m_pUserInterface->VInit();
+   g_pApp->m_pEngineLogic->m_pGUIManager->AttachLayout( m_pUserInterface );
+   }
+
+void HumanView::DetachLayout( void )
+   {
+   if( m_pUserInterface )
+      {
+      g_pApp->m_pEngineLogic->m_pGUIManager->DetachLayout( m_pUserInterface );
+      }
    }
 
 bool HumanView::HasModalWindow( void )

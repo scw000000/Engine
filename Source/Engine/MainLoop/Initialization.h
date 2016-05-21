@@ -31,6 +31,7 @@ struct EngineOptions
       std::string m_Renderer;
       std::string m_Layout;
       std::string m_GUIDirectory;
+      std::string m_LevelDirectory;
 
       // TiXmlElement - look at this to find other options added by the developer
 	   TiXmlDocument *m_pDoc;

@@ -20,10 +20,6 @@
 
 PromptBox::~PromptBox( void )
    {
-   if( m_pWindow )
-      {
-      CEGUI::WindowManager::getSingleton().destroyWindow( m_pWindow );
-      }
    }
 
 PromptBox::PromptBox( CEGUI::Window* pRoot, Uint32 eventType, const std::wstring& msg, const std::wstring& title, int buttonFlags )

@@ -5,7 +5,6 @@
         <Property name="Area" value="{{0,0},{0,-40},{1,0},{1.055,-40}}" />
         <Property name="SizingEnabled" value="false" />
         <Property name="TitlebarEnabled" value="false" />
-        <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
         <Property name="DragMovingEnabled" value="false" />
         <Property name="CloseButtonEnabled" value="false" />
         <Property name="EWSizingCursorImage" value="" />
@@ -22,27 +21,17 @@
             <Property name="NonClient" value="true" />
             <Property name="AlwaysOnTop" value="true" />
         </AutoWindow>
-        <Window type="GlossySerpentFHD/Button" name="Button" >
+        <Window type="GlossySerpentFHD/Button" name="StartButton" >
             <Property name="Area" value="{{0,1},{0,598},{0.15,1},{0,648}}" />
-            <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
+            <Property name="Text" value="Load Level" />
             <Property name="HorizontalAlignment" value="Centre" />
         </Window>
-        <Window type="GlossySerpentFHD/ItemListbox" name="ItemListbox" >
+        <Window type="GlossySerpentFHD/Listbox" name="LevelList" >
             <Property name="Area" value="{{0,0},{0,0},{0.25,0},{0.5,0}}" />
-            <Property name="MouseCursorImage" value="WindowsLook/MouseArrow" />
             <Property name="VerticalAlignment" value="Centre" />
             <Property name="HorizontalAlignment" value="Centre" />
-            <AutoWindow namePath="__auto_content_pane__" >
-                <Property name="MouseInputPropagationEnabled" value="true" />
-            </AutoWindow>
             <AutoWindow namePath="__auto_vscrollbar__" >
-                <Property name="NonClient" value="true" />
-                <Property name="AlwaysOnTop" value="true" />
                 <Property name="VerticalScrollbar" value="true" />
-            </AutoWindow>
-            <AutoWindow namePath="__auto_hscrollbar__" >
-                <Property name="NonClient" value="true" />
-                <Property name="AlwaysOnTop" value="true" />
             </AutoWindow>
         </Window>
     </Window>

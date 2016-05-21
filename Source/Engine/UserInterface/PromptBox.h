@@ -30,14 +30,14 @@ class CEGUI::FrameWindow;
 class PromptBox
    {
    friend class GUIManager;
-   friend class UserInterface;
    public:  
       PromptBox( CEGUI::Window* pRoot, Uint32 eventType,const std::wstring& msg, const std::wstring& title, int buttonFlags = MB_OK);
       ~PromptBox( void );
-      
+      CEGUI::FrameWindow* GetWindow( void ) { return m_pWindow; }
+
    protected:
       bool OnButtonClicked( const CEGUI::EventArgs& arg );
-
+      
    protected:
       CEGUI::FrameWindow* m_pWindow;
       Uint32 m_EventType;  

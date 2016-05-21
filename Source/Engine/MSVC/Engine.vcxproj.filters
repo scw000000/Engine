@@ -169,9 +169,6 @@
     <ClCompile Include="..\Physics\PhysicsDebugDrawer.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
-    <ClCompile Include="..\Physics\PhysicsEventListener.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Event\PhysicsEvents.cpp">
       <Filter>Event</Filter>
     </ClCompile>
@@ -181,12 +178,6 @@
     <ClCompile Include="..\Event\EventFactory.cpp">
       <Filter>Event</Filter>
     </ClCompile>
-    <ClCompile Include="..\Main\EngineState.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Main\EditorViewState.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\Main\BaseEngineLogic.cpp">
       <Filter>Main</Filter>
     </ClCompile>
@@ -194,6 +185,9 @@
       <Filter>UserInterface</Filter>
     </ClCompile>
     <ClCompile Include="..\UserInterface\UserInterface.cpp">
+      <Filter>UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\UserInterface\MenuInterface.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
   </ItemGroup>
@@ -332,9 +326,6 @@
     <ClInclude Include="..\Physics\PhysicsDebugDrawer.h">
       <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\Physics\PhysicsEventListener.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
     <ClInclude Include="..\Event\PhysicsEvents.h">
       <Filter>Event</Filter>
     </ClInclude>
@@ -344,12 +335,6 @@
     <ClInclude Include="..\Event\EventFactory.h">
       <Filter>Event</Filter>
     </ClInclude>
-    <ClInclude Include="..\Main\EngineState.h">
-      <Filter>Main</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Main\EditorViewState.h">
-      <Filter>Main</Filter>
-    </ClInclude>
     <ClInclude Include="..\Main\BaseEngineLogic.h">
       <Filter>Main</Filter>
     </ClInclude>
@@ -357,6 +342,9 @@
       <Filter>UserInterface</Filter>
     </ClInclude>
     <ClInclude Include="..\UserInterface\UserInterface.h">
+      <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\UserInterface\MenuInterface.h">
       <Filter>UserInterface</Filter>
     </ClInclude>
   </ItemGroup>

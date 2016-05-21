@@ -31,6 +31,21 @@ enum BaseGameState
 	BGS_Running
    };
 
+typedef std::string Level;
+
+class LevelManager 
+   {
+   public:
+      const std::vector<Level> &GetLevels( ) const { return m_Levels; }
+      Level GetCurrentLevel( ) const { return m_Levels[m_CurrentLevel]; }
+      void Init( const std::string& levelDir );
+
+   protected:
+      std::string m_LevelDirectory;
+      std::vector<Level> m_Levels;
+      int m_CurrentLevel;
+   };
+
 typedef std::map<ActorId, StrongActorPtr> ActorMap;
 
 class BaseEngineLogic : public IEngineLogic
@@ -56,6 +71,8 @@ class BaseEngineLogic : public IEngineLogic
       virtual bool VLoadLevel( const char* levelResource ) override;  
       virtual int VOnRestore( void ) override;
       virtual void VOnMsgProc( SDL_Event event ) override;
+      virtual void VSetActorUpdate( bool isUpdatable ) override;
+      virtual void VSetWorldUpdate( bool isUpdatable ) override;
       /**
        * @brief this function is called by EngineApp::OnUpdateGame after EventManger is updated
        *     state order->BGS_Initializing (constructor)->BGS_MainMenu (VOnUpdate)->BGS_WaitingForPlayers (RequestStartGameDelegate by GUI event)
@@ -75,11 +92,14 @@ class BaseEngineLogic : public IEngineLogic
    public:
       shared_ptr<Scene> m_pWrold;
       shared_ptr<GUIManager> m_pGUIManager;
+      LevelManager* m_pLevelManager;
 
    protected: 
 	   
    protected:
       float m_Lifetime;
+      bool m_EnableActorUpdate;
+      bool m_EnableWorldUpdate;
       BaseGameState m_State;	// game state: loading, running, etc.
       shared_ptr<IRenderer> m_pRenderer;
       ProcessManager* m_pProcessManager;				// a game logic entity
@@ -89,6 +109,7 @@ class BaseEngineLogic : public IEngineLogic
 	   ActorId m_LastActorId;
       ActorFactory* m_pActorFactory;
       
+
 	   ViewList m_ViewList;						// views that are attached to our game
      
 

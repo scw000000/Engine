@@ -20,7 +20,7 @@ class ActorFactory
 
    protected:
       // This factory is defined in Templates.h
-      GenericObjectFactory< ActorComponent, ComponentId > m_componentFactory;
+      GenericObjectFactory< ActorComponent, ComponentId > m_ComponentFactory;
 
    private:
       ActorId GetNextActorId( void ){ ++m_lastActorId; return m_lastActorId; }

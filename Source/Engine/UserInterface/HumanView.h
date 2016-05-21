@@ -27,16 +27,19 @@ class HumanView : public IView
    public:
       HumanView( void );
       virtual ~HumanView( void );
-      virtual void VOnRender( double fTime, float fElapsedTime );
-	   virtual ViewType VGetType() { return View_Human; }
-	   virtual ViewId VGetId( void ) const { return m_ViewId; }
+      virtual void VOnRender( double fTime, float fElapsedTime ) override;
+	   virtual ViewType VGetType() override { return View_Human; }
+	   virtual ViewId VGetId( void ) const override { return m_ViewId; }
 
-	   virtual void VOnAttach( ViewId vid ) { m_ViewId = vid; }
-      virtual int VOnRestore( void );
+	   virtual void VOnAttach( ViewId vid ) override { m_ViewId = vid; }
+      virtual int VOnRestore( void ) override;
       virtual int VOnLostDevice( void );
-      virtual int VOnMsgProc( SDL_Event event ); // process the OS event
-	   virtual void VOnUpdate( const unsigned long deltaMs );
+      virtual int VOnMsgProc( SDL_Event event ) override; // process the OS event
+	   virtual void VOnUpdate( const unsigned long deltaMs ) override;
       
+      void AttachLayout( shared_ptr<UserInterface> pUI );
+      void DetachLayout( void );
+
       bool HasModalWindow( void );
       Uint32 GetModalEventType( void );
 	   //// Virtual methods to control the layering of interface elements
@@ -46,9 +49,11 @@ class HumanView : public IView
       ProcessManager* GetProcessManager( void ) { return m_pProcessManager; }
 	   //void TogglePause(bool active);
       int Ask( MessageBox_Questions question );
+      
       bool LoadLevel( TiXmlElement* pLevelData );
 
    public:
+      shared_ptr<MovementController> m_pController; 
 
    protected:
 	   ViewId m_ViewId;
@@ -56,10 +61,10 @@ class HumanView : public IView
       Uint64 m_lastDraw; // last time the game rended
       bool m_RunFullSpeed; // if the view should ignore max rendering frequency setting
       ProcessManager *m_pProcessManager; // this Processmanager is for things like button animations
-      UserInterface *m_pUserInterface;
+      shared_ptr<UserInterface> m_pUserInterface;
       shared_ptr<Scene> m_pWorld; // this scene will be pushed into screen element list by LoadGame( xml level)
       shared_ptr<CameraNode> m_pCamera;
-      shared_ptr<MovementController> m_pController; 
+      
 
    private:
 

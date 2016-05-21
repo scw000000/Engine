@@ -23,6 +23,15 @@
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Event\EventManager.h"
 
+void LevelManager::Init( const std::string& levelDir )
+   {
+   m_LevelDirectory = levelDir;
+   m_Levels = g_pApp->m_pResCache->Match( m_LevelDirectory + "*.xml" );
+   auto levelIt = std::find( m_Levels.begin(), m_Levels.end(), m_LevelDirectory + g_pApp->m_EngineOptions.m_Level );
+   ENG_ASSERT( levelIt != m_Levels.end() );
+   m_CurrentLevel = levelIt - m_Levels.begin();
+   }
+
 BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer ) : m_pGUIManager( ENG_NEW GUIManager )
    {
    m_Lifetime = 0.f;
@@ -35,31 +44,40 @@ BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer ) : m_pGUIMana
       }
 	m_State = BGS_Initializing;
    m_pActorFactory = ENG_NEW ActorFactory;
+   m_pLevelManager = ENG_NEW LevelManager;
+   m_EnableActorUpdate = true;
+   m_EnableWorldUpdate = true;
    }
 
 BaseEngineLogic::~BaseEngineLogic()
    {
-   while (!m_ViewList.empty())
+   while ( !m_ViewList.empty() )
+      {
 		m_ViewList.pop_front();
+      }
 
 	SAFE_DELETE( m_pProcessManager );
+   SAFE_DELETE( m_pLevelManager );
    SAFE_DELETE( m_pActorFactory );
    m_pGUIManager->Destory();
     // destroy all actors
-    for ( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
-        it->second->Destroy();
-    m_Actors.clear();
+   for ( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
+      {
+      it->second->Destroy();
+      }
+   m_Actors.clear();
 
    }
 
 bool BaseEngineLogic::Init()
    {
-   if( !VLoadLevel( g_pApp->m_EngineOptions.m_Level.c_str() ))
+   if( !VLoadLevel( ( g_pApp->m_EngineOptions.m_LevelDirectory + g_pApp->m_EngineOptions.m_Level ).c_str() ))
       {
       ENG_ERROR( "The game failed to load." );
       g_pApp->AbortGame( );
       return false;
       }
+   m_pLevelManager->Init( g_pApp->m_EngineOptions.m_LevelDirectory );
    m_pWrold->OnRestore();
    m_pGUIManager->Init( g_pApp->m_EngineOptions.m_GUIDirectory );
 
@@ -158,12 +176,25 @@ void BaseEngineLogic::VOnMsgProc( SDL_Event event )
       }
    }
 
+void BaseEngineLogic::VSetActorUpdate( bool isUpdatable )
+   {
+   m_EnableActorUpdate = isUpdatable;
+   }
+
+void BaseEngineLogic::VSetWorldUpdate( bool isUpdatable )
+   {
+   m_EnableWorldUpdate = isUpdatable;
+   }
+
 void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
    {
    unsigned long deltaMs = unsigned long( elapsedTime * 1000.0f );
 	m_Lifetime += elapsedTime;
 
-   m_pWrold->OnUpdate( deltaMs );
+   if( m_EnableWorldUpdate )
+      {
+      m_pWrold->OnUpdate( deltaMs );
+      }
    m_pGUIManager->OnUpdate( deltaMs );
    // update all game views
    for ( ViewList::iterator it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
@@ -171,12 +202,14 @@ void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
 		(*it)->VOnUpdate( deltaMs );
 	   }
 
-   // update game actors
-   for ( ActorMap::const_iterator it = m_Actors.begin(); it != m_Actors.end(); ++it )
+   if( m_EnableActorUpdate )
       {
-      it->second->Update( deltaMs );
+      // update game actors
+      for( ActorMap::const_iterator it = m_Actors.begin( ); it != m_Actors.end( ); ++it )
+         {
+         it->second->Update( deltaMs );
+         }
       }
-
    }
 
 void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )

@@ -24,6 +24,8 @@ class MovementController : public IController
 	   virtual bool VOnPointerMove( Point motion ) override;
 	   virtual bool VOnPointerButtonDown( Uint8 button  ) override{ m_MouseButton[button] = true; return true; }
       virtual bool VOnPointerButtonUp( Uint8 button ) override{ m_MouseButton[button] = false; return true; }
+      virtual void VSetPointerLocked( bool isLocked ) override { m_isMouseLocked = isLocked; };
+      virtual bool VIsPointerLocked( void ) override { return m_isMouseLocked; };
 
 	   virtual bool VOnKeyDown( const SDL_Scancode& keyCode ) override { m_KeyButton[keyCode] = true; return true; }
 	   virtual bool VOnKeyUp( const SDL_Scancode& keyCode ) override { m_KeyButton[keyCode] = false; return true; }
@@ -40,6 +42,7 @@ class MovementController : public IController
 	   Point					m_LastMousePos;
 	   bool					m_KeyButton[ SDL_NUM_SCANCODES ];			// Which keys are up and down
       bool              m_MouseButton[ 256 ];
+      bool              m_isMouseLocked;
 	   // Orientation Controls
 	   float		m_MaxSpeed;
 	   float		m_CurrentSpeed;

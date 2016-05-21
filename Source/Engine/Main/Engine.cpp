@@ -398,7 +398,11 @@ int EngineApp::Modal( shared_ptr<PromptBox> pModalScreen, int defaultAnswer )
       {
       Uint32 eventEndType = pHumanView->GetModalEventType();
       Sint32 code = 0;
+      m_pEngineLogic->VSetActorUpdate( false );
+      m_pEngineLogic->VSetWorldUpdate( false );
       int result = PumpUntilMessage( eventEndType, code );
+      m_pEngineLogic->VSetActorUpdate( true );
+      m_pEngineLogic->VSetWorldUpdate( true );
       if( code == g_QuitNoPrompt )
          {
          return defaultAnswer;
@@ -500,10 +504,7 @@ int EngineApp::PumpUntilMessage( Uint32& eventEnd, Sint32& code )
             double fAbsoluteTime = 0.0;
             float  fElapasedTime = 0.0f;
             GetGlobalTimer()->GetTimeValues( &fAppTime, &fAbsoluteTime, &fElapasedTime );
-				for( auto i = m_pEngineLogic->m_ViewList.begin(); i!=m_pEngineLogic->m_ViewList.end(); ++i )
-				   {
-					(*i)->VOnUpdate( ( unsigned long ) ( fElapasedTime * 1000.f ) );
-				   }
+            m_pEngineLogic->VOnUpdate( fAppTime, fElapasedTime );
 				OnFrameRender( fAppTime, fElapasedTime );
 			   }
 		   }

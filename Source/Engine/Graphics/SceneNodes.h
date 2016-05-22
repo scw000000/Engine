@@ -12,14 +12,14 @@
  *
  * \note
  */
-////////////////////////////////////////////////////////////////////////////////
+
 
 #include "Material.h"
 
 
-class BaseRenderComponent;
+class IRenderComponent;
 
-typedef BaseRenderComponent* WeakBaseRenderComponentPtr;
+typedef IRenderComponent* WeakBaseRenderComponentPtr;
 
 
 //   This enum defines the different types of alpha blending

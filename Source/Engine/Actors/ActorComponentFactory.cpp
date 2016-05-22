@@ -43,6 +43,17 @@ StrongActorComponentPtr ActorComponentFactory::CreateComponent( const std::strin
    return GetSingleton().CreateComponent( findResult->second, pData );
    }
 
+ComponentId ActorComponentFactory::GetIdFromName( const std::string& name ) 
+   { 
+   auto& map = GetSingleton( ).m_NameToIdMap;
+   auto findResult = map.find( name );
+   if( findResult == map.end( ) )
+      {
+      return 0;
+      }
+   return findResult->second;
+   }
+
 ActorComponentFactory::ActorComponentFactory( void )
    {
 

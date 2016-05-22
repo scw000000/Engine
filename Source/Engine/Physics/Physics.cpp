@@ -251,7 +251,7 @@ void BulletPhysics::VSyncVisibleScene( )
       StrongActorPtr pActor = MakeStrongPtr( g_pApp->m_pEngineLogic->VGetActor( id ) );
       if( pActor && actorMotionState )
          {
-         shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::g_Name ) );
+         shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
          if( pTransformComponent )
             {
             if( pTransformComponent->GetTransform( )->GetToWorld() != actorMotionState->m_Transform.GetToWorld() )
@@ -286,7 +286,7 @@ void BulletPhysics::AddShape( StrongActorPtr pActor, btCollisionShape* shape, fl
 
 
    Transform transform = Transform::g_Identity;
-   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::g_Name ) );
+   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
    ENG_ASSERT( pTransformComponent );
    if( pTransformComponent )
       {

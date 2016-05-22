@@ -13,6 +13,7 @@
  */
 #include "EngineStd.h"
 #include "ActorFactory.h"
+#include "ActorComponentFactory.h"
 #include "Actor.h"
 #include "ActorComponent.h"
 #include "..\ResourceCache\XmlResource.h"
@@ -21,14 +22,20 @@
 #include "LightRenderComponent.h"
 #include "SkyRenderComponent.h"
 
+
 ActorFactory::ActorFactory( void )
    {
    m_lastActorId = INVALID_ACTOR_ID;
 
-   m_ComponentFactory.Register<TransformComponent>( ActorComponent::GetIdFromName( TransformComponent::g_Name) );
+   REGISTER_COMPONENT( TransformComponent );
+   REGISTER_COMPONENT( MeshRenderComponent );
+   REGISTER_COMPONENT( LightRenderComponent );
+   REGISTER_COMPONENT( SkyRenderComponent );
+
+   /*m_ComponentFactory.Register<TransformComponent>( ActorComponent::GetIdFromName( TransformComponent::g_Name) );
    m_ComponentFactory.Register<MeshRenderComponent>( ActorComponent::GetIdFromName( MeshRenderComponent::g_Name) );
    m_ComponentFactory.Register<LightRenderComponent>( ActorComponent::GetIdFromName( LightRenderComponent::g_Name) );
-   m_ComponentFactory.Register<SkyRenderComponent>( ActorComponent::GetIdFromName( SkyRenderComponent::g_Name) );
+   m_ComponentFactory.Register<SkyRenderComponent>( ActorComponent::GetIdFromName( SkyRenderComponent::g_Name) );*/
    }
 
 // This version of function is different than the source code
@@ -81,8 +88,8 @@ void ActorFactory::ModifyActor(StrongActorPtr pActor, TiXmlElement* overrides)
 	// Loop through each child element and load the component
 	for (TiXmlElement* pNode = overrides->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement())
 	   {
-		ComponentId componentId = ActorComponent::GetIdFromName( pNode->Value() );
-		StrongActorComponentPtr pComponent = MakeStrongPtr( pActor->GetComponent<ActorComponent>( componentId ) );
+		ComponentId componentId = ActorComponentFactory::GetIdFromName( pNode->Value() );
+		StrongActorComponentPtr pComponent = MakeStrongPtr( pActor->GetComponent<IActorComponent>( componentId ) );
 		if (pComponent)
 		   {
 			pComponent->VInit( pNode );
@@ -103,13 +110,17 @@ StrongActorComponentPtr ActorFactory::CreateComponent( TiXmlElement* pData )
    {
    std::string name( pData->Value() );
 
+   auto pComponent = ActorComponentFactory::CreateComponent( name, pData );
+
+   ENG_ASSERT( pComponent );
+
    // Create a component from componentFactory, the Create function take Id as argument
    // Which means it will search its creation function based on id --> id is mapping to creation function
    // typedef BaseClass* (*ObjectCreationFunction)(void); -> called creation function    
    // std::map<IdType, ObjectCreationFunction> m_creationFunctions -> the table of creation functions 
    // ( of course these functions should be registered first )
    // Before that, the id is translated from name to id by using hash string ( GetIdFromName )
-   StrongActorComponentPtr pComponent( m_ComponentFactory.Create( ActorComponent::GetIdFromName( name.c_str() ) ) );
+   /*StrongActorComponentPtr pComponent( m_ComponentFactory.Create( ActorComponent::GetIdFromName( name.c_str() ) ) );
    if( !pComponent )
       {
       ENG_ERROR( "Cannot create componet due to lossing creation function: " + std::string( name ) );
@@ -120,7 +131,7 @@ StrongActorComponentPtr ActorFactory::CreateComponent( TiXmlElement* pData )
       {
       ENG_ERROR( "Component failed to initialize: " + std::string( name ) );
       return StrongActorComponentPtr();
-      }
+      }*/
 
    return pComponent;
    }

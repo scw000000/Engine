@@ -22,20 +22,13 @@
 // the transform and doesn't register with the physics system at all.
 //---------------------------------------------------------------------------------------------------------------------
 
-class TransformComponent : public ActorComponent
+class TransformComponent : public BaseActorComponent<TransformComponent>
    {
-   
-   public:
-	   static const char* g_Name;
-
    public:
       virtual void Destory( void ) override;
-
-	   virtual const char* VGetName() const { return g_Name; }
       TransformComponent(void) : m_pTransform( ENG_NEW Transform( Transform::g_Identity ) ) { }
       virtual bool VInit(TiXmlElement* pData) override;
    //   virtual TiXmlElement* VGenerateXml(void) override;
-
    // transform functions
       TransformPtr GetTransform(void) const { return m_pTransform; }
       void SetTransformPtr( const TransformPtr pNewTransform ) { m_pTransform = pNewTransform; }

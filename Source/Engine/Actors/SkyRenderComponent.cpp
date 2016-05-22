@@ -17,7 +17,11 @@
 #include "TransformComponent.h"
 #include "..\Graphics\SkySceneNode.h"
 
-const char* SkyRenderComponent::g_Name = "SkyRenderComponent";
+//const char* SkyRenderComponent::g_Name = "SkyRenderComponent";
+
+const ComponentId BaseRenderComponent<SkyRenderComponent>::s_ComponentId = 0x249dbe49;
+const std::string BaseRenderComponent<SkyRenderComponent>::s_Name = "SkyRenderComponent";
+
 
 void SkyRenderComponent::Destory( void )
    {
@@ -72,7 +76,7 @@ bool SkyRenderComponent::VDelegateInit( TiXmlElement* pData )
 
 shared_ptr<SceneNode> SkyRenderComponent::VCreateSceneNode( void )
    {
-   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( TransformComponent::g_Name ) );
+   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
    if( pTransformComponent )
       {
       WeakBaseRenderComponentPtr weakThis( this );

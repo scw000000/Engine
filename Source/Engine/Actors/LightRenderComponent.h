@@ -16,12 +16,9 @@
 #include "..\Graphics\Light.h"
 
 
-class LightRenderComponent : public BaseRenderComponent
+class LightRenderComponent : public BaseRenderComponent<LightRenderComponent>
    {
-	
    public:
-	   static const char *g_Name;
-	   virtual const char *VGetName() const { return g_Name; }
       LightRenderComponent( void );
       virtual void Destory( void ) override;
       const LightProperties& GetLightProperties( void ) const{ return *m_pLightProps; };

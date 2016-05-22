@@ -14,11 +14,9 @@
 
 #include "RenderComponent.h"
 
-class SkyRenderComponent : public BaseRenderComponent 
+class SkyRenderComponent : public BaseRenderComponent<SkyRenderComponent>
    {
    public:
-      static const char *g_Name;
-      virtual const char *VGetName( ) const { return g_Name; }
       SkyRenderComponent( void );
       virtual void Destory( void ) override;
 

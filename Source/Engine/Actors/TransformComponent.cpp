@@ -17,7 +17,10 @@
 #include "TransformComponent.h"
 
 
-const char* TransformComponent::g_Name = "TransformComponent";
+//const char* TransformComponent::g_Name = "TransformComponent";
+
+const ComponentId BaseActorComponent<TransformComponent>::s_ComponentId = 0x78e9ef25;
+const std::string BaseActorComponent<TransformComponent>::s_Name = "TransformComponent";
 
 void TransformComponent::Destory( void )
    {

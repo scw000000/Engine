@@ -22,6 +22,7 @@ class ActorComponentFactory : public ENG_Noncopyable
       
       static StrongActorComponentPtr CreateComponent( ComponentId compId, TiXmlElement* pData );
       static StrongActorComponentPtr CreateComponent( const std::string& name, TiXmlElement* pData );
+      static ComponentId GetIdFromName( const std::string& name );
 
    private:
       ActorComponentFactory( void );
@@ -36,8 +37,11 @@ template <typename T> void ActorComponentFactory::RegisterComponentCreation( con
    {
    auto& map = GetSingleton().m_NameToIdMap;
    auto& factory = GetSingleton().m_CompFactory;
-   auto findResult = map.find( name );
-   ENG_ASSERT( findResult == map.end() && !factory.IsRegistered( compId ) && "The component has been registered before!" )
+   ENG_ASSERT(  map.find( name ) == map.end() && !factory.IsRegistered( compId ) && "The component has been registered before!" );
    map[name] = compId;
    factory.Register<T>( compId );
    }
+
+#define REGISTER_COMPONENT( componentClass ) ActorComponentFactory::RegisterComponentCreation<componentClass>( componentClass::s_Name, componentClass::s_ComponentId )
+
+#define CREATE_COMPONENT_FROM_NAME( name, pData ) ActorComponentFactory::CreateComponent( name, pData )

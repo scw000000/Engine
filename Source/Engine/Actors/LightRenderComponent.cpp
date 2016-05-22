@@ -1,13 +1,26 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: LightRenderComponent.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file LightRenderComponent.cpp
+ * \date 2016/05/22 16:32
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "EngineStd.h"
 #include "LightRenderComponent.h"
 #include "TransformComponent.h"
 #include "..\Graphics\Light.h"
 
-const char* LightRenderComponent::g_Name = "LightRenderComponent";
+//const char* LightRenderComponent::g_Name = "LightRenderComponent";
+
+const ComponentId BaseRenderComponent<LightRenderComponent>::s_ComponentId = 0xf501193f;
+const std::string BaseRenderComponent<LightRenderComponent>::s_Name = "LightRenderComponent";
 
 void LightRenderComponent::Destory( void )
    {
@@ -45,7 +58,7 @@ bool LightRenderComponent::VDelegateInit( TiXmlElement* pData )
 
 shared_ptr<SceneNode> LightRenderComponent::VCreateSceneNode(void)
    {
-   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( TransformComponent::g_Name ) );
+   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
    if (pTransformComponent)
       {
 		WeakBaseRenderComponentPtr weakThis(this);

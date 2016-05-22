@@ -14,7 +14,7 @@
 */
 #include "ActorComponent.h"
 
-class BaseRenderComponent : public ActorComponent
+class IRenderComponent : virtual public IActorComponent
    {
    public:
       virtual void Destory( void ) override;
@@ -28,10 +28,15 @@ class BaseRenderComponent : public ActorComponent
        */
       virtual bool VInit( TiXmlElement* pData ) override;
       virtual void VPostInit( void ) override;
+      virtual void VUpdate( const unsigned long deltaMs ) override { };
 	   //virtual void VOnChanged( void ) override;
       //virtual TiXmlElement* VGenerateXml(void) override;
 
    protected:
+      virtual void SetOwner( StrongActorPtr pOwner ) override
+         {
+         m_pOwner = pOwner;
+         }
       /**
        * @brief loads the SceneNode specific data ( represented in the <SceneNode> tag )
        *
@@ -45,10 +50,31 @@ class BaseRenderComponent : public ActorComponent
       static Color LoadColor( TiXmlElement* pData );
 
    protected:
+      StrongActorPtr m_pOwner;
       shared_ptr<SceneNode> m_pRootSceneNode;
-
+      
    private:
       virtual shared_ptr<SceneNode> VGetSceneNode(void);
+   };
+
+template <typename T>class BaseRenderComponent : public IRenderComponent 
+   {
+   public:
+
+      virtual ComponentId VGetId( void ) const override
+         {
+         return s_ComponentId;
+         };
+
+      virtual const std::string& VGetName( void ) const override
+         {
+         return s_Name;
+         }
+
+   public:
+      // GUID of this event
+      const static ComponentId  s_ComponentId;
+      const static std::string      s_Name;
    };
 
 //---------------------------------------------------------------------------------------------------------------------
@@ -56,14 +82,11 @@ class BaseRenderComponent : public ActorComponent
 // time towards the end of the project.  The other classes are important for testing since programming tends to move 
 // a lot faster than art in the early stages of development.
 //---------------------------------------------------------------------------------------------------------------------
-class MeshRenderComponent : public BaseRenderComponent
+class MeshRenderComponent : public BaseRenderComponent<MeshRenderComponent>
    {
    public:
       MeshRenderComponent( void );
-	   virtual const char *VGetName() const { return g_Name; }
       virtual void Destory( void ) override;
-   public:
-      static const char *g_Name;
 
    protected:     
       /**

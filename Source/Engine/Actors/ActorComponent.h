@@ -58,7 +58,7 @@ class ActorComponent : public IActorComponent
    friend class ActorFactory;
 
    public:
-      virtual ~ActorComponent( void ){  }
+    //  virtual ~ActorComponent( void ){  }
       virtual bool VInit( TiXmlElement* pData ) = 0;
       virtual void VPostInit( void ) override {}
       virtual void VUpdate( const unsigned long deltaMs ) override {}
@@ -70,7 +70,7 @@ class ActorComponent : public IActorComponent
          return reinterpret_cast<ComponentId> ( rawId );
          }
    protected:
-      WeakActorPtr m_pOwner;
+      StrongActorPtr m_pOwner;
 
    private:
 	   void SetOwner( StrongActorPtr pOwner) { m_pOwner = pOwner; }

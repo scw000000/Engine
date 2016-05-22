@@ -1,0 +1,8 @@
+<Actor type="Sky" resource="actors\sky.xml">
+
+    <SkyRenderComponent>
+        <Mesh path="art\sphere.obj" />
+		<Texture path="art\SkyDome-Cloud-Medium-MidMorning.png" />
+	</SkyRenderComponent>
+
+</Actor>

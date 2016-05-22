@@ -55,15 +55,16 @@ BaseEngineLogic::~BaseEngineLogic()
       {
 		m_ViewList.pop_front();
       }
-
 	SAFE_DELETE( m_pProcessManager );
    SAFE_DELETE( m_pLevelManager );
    SAFE_DELETE( m_pActorFactory );
    m_pGUIManager->Destory();
+   m_pWrold->Destory();
     // destroy all actors
    for ( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
       {
       it->second->Destroy();
+      std::cout << it->second.use_count() << std::endl;
       }
    m_Actors.clear();
 
@@ -100,7 +101,7 @@ StrongActorPtr BaseEngineLogic::VCreateActor(const std::string &actorResource, T
    ENG_ASSERT( m_pActorFactory );
 
    StrongActorPtr pActor = m_pActorFactory->CreateActor(actorResource.c_str() );
-   if (pActor)
+   if ( pActor )
       {
       // Insert into actor map
       m_Actors.insert( std::make_pair(pActor->GetId(), pActor) );

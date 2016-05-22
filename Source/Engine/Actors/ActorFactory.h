@@ -1,12 +1,20 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: ActorFactory.h
-////////////////////////////////////////////////////////////////////////////////
-
+/*!
+ * \file ActorFactory.h
+ * \date 2016/05/22 10:12
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 typedef unsigned long AcotrId;
 typedef shared_ptr<Actor> StrongActorPtr;
-typedef shared_ptr<ActorComponent> StrongActorComponentPtr;
 
 class ActorFactory
    {
@@ -20,7 +28,7 @@ class ActorFactory
 
    protected:
       // This factory is defined in Templates.h
-      GenericObjectFactory< ActorComponent, ComponentId > m_ComponentFactory;
+      GenericObjectFactory< IActorComponent, ComponentId > m_ComponentFactory;
 
    private:
       ActorId GetNextActorId( void ){ ++m_lastActorId; return m_lastActorId; }

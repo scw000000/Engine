@@ -17,6 +17,7 @@
 class BaseRenderComponent : public ActorComponent
    {
    public:
+      virtual void Destory( void ) override;
       /**
        * @brief set member variable from xml elements
        *
@@ -60,7 +61,7 @@ class MeshRenderComponent : public BaseRenderComponent
    public:
       MeshRenderComponent( void );
 	   virtual const char *VGetName() const { return g_Name; }
-
+      virtual void Destory( void ) override;
    public:
       static const char *g_Name;
 

@@ -19,6 +19,12 @@
 
 const char* SkyRenderComponent::g_Name = "SkyRenderComponent";
 
+void SkyRenderComponent::Destory( void )
+   {
+   BaseRenderComponent::Destory();
+   m_pTextureResource.reset();
+   m_pMeshResource.reset();
+   }
 
 SkyRenderComponent::SkyRenderComponent( void )
    {

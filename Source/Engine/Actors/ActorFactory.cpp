@@ -45,6 +45,7 @@ StrongActorPtr ActorFactory::CreateActor( const char* actorResource )
       }
 
    StrongActorPtr pActor( ENG_NEW Actor( nextActorId ) );
+   pActordd = pActor;
    if( !pActor->Init( pRoot ) )
       {
       ENG_ERROR( "Failed to initialize actor " + std::string( actorResource ) );

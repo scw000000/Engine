@@ -2,6 +2,6 @@
   <Graphics Renderer="OpenGL" Width="1280" Height="720" RunFullSpeed="no" />
   <Sound SfxVolume="100" MusicVolume="100"/>
   <ResCache UseDevelopmentDirectories="no" GUIDirectory="GUI/" LevelDirectory="world\"/> 
-  <User Level="default.xml" Layout="MainMenu.layout"/>
+  <User Level="test2.xml" Layout="MainMenu.layout"/>
   <PhysicsDebug DrawWireFrame="yes" DrawContactPoints="yes" />
 </PlayerOptions>

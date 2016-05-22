@@ -22,7 +22,7 @@ enum Renderer
 	};
 
 class Actor;
-class ActorComponent;
+class IActorComponent;
 
 typedef unsigned int ActorId;
 typedef unsigned int ComponentId;
@@ -32,8 +32,8 @@ const ComponentId INVALID_COMPONENT_ID = 0;
 
 typedef shared_ptr<Actor> StrongActorPtr;
 typedef weak_ptr<Actor> WeakActorPtr;
-typedef shared_ptr<ActorComponent> StrongActorComponentPtr;
-typedef weak_ptr<ActorComponent> WeakActorComponentPtr;
+typedef shared_ptr<IActorComponent> StrongActorComponentPtr;
+typedef weak_ptr<IActorComponent> WeakActorComponentPtr;
 
 //
 // class IScreenElement							- Chapter 10, page 285

@@ -1,10 +1,17 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Actor.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file Actor.cpp
+ * \date 2016/05/22 10:55
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
-///////////////////////
-// MY CLASS INCLUDES //  
-///////////////////////
 #include "EngineStd.h"
 #include "Actor.h"
 #include "ActorComponent.h"
@@ -47,6 +54,10 @@ void Actor::PostInit(void)
 void Actor::Destroy(void)
    {
    // Call map::clear
+   for( auto comp : m_Components )
+      {
+      comp.second->Destory();
+      }
    m_Components.clear();
    }
 

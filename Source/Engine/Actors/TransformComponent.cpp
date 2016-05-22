@@ -19,6 +19,11 @@
 
 const char* TransformComponent::g_Name = "TransformComponent";
 
+void TransformComponent::Destory( void )
+   {
+   m_pTransform.reset();
+   }
+
 bool TransformComponent::VInit(TiXmlElement* pData)
    {
    ENG_ASSERT(pData);

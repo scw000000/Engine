@@ -27,8 +27,11 @@ class TransformComponent : public ActorComponent
    
    public:
 	   static const char* g_Name;
-	   virtual const char* VGetName() const { return g_Name; }
 
+   public:
+      virtual void Destory( void ) override;
+
+	   virtual const char* VGetName() const { return g_Name; }
       TransformComponent(void) : m_pTransform( ENG_NEW Transform( Transform::g_Identity ) ) { }
       virtual bool VInit(TiXmlElement* pData) override;
    //   virtual TiXmlElement* VGenerateXml(void) override;
@@ -44,6 +47,5 @@ class TransformComponent : public ActorComponent
    
    private:
       TransformPtr m_pTransform;
-      /*Transform m_Transform;*/
    };
 

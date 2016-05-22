@@ -22,6 +22,11 @@
 
 const char* MeshRenderComponent::g_Name = "MeshRenderComponent";
 
+void BaseRenderComponent::Destory( void )
+   {
+   m_pRootSceneNode.reset();
+   }
+
 //---------------------------------------------------------------------------------------------------------------------
 // RenderComponent
 //---------------------------------------------------------------------------------------------------------------------
@@ -77,6 +82,14 @@ shared_ptr<SceneNode> BaseRenderComponent::VGetSceneNode( void )
 //---------------------------------------------------------------------------------------------------------------------
 // MeshRenderComponent
 //---------------------------------------------------------------------------------------------------------------------
+
+void MeshRenderComponent::Destory( void )
+   {
+   BaseRenderComponent::Destory();
+   m_pMaterial.reset();
+   m_pMeshResource.reset();
+   }
+
 MeshRenderComponent::MeshRenderComponent( void ) : m_pMeshResource( ENG_NEW Resource( "" ) ), m_pMaterial( ENG_NEW Material )
    {
    

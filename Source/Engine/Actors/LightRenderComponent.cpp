@@ -9,6 +9,12 @@
 
 const char* LightRenderComponent::g_Name = "LightRenderComponent";
 
+void LightRenderComponent::Destory( void )
+   {
+   BaseRenderComponent::Destory();
+   m_pLightProps.reset();
+   }
+
 //---------------------------------------------------------------------------------------------------------------------
 // LightRenderComponent
 //---------------------------------------------------------------------------------------------------------------------

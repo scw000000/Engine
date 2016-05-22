@@ -1,7 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Scene.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file Scene.h
+ * \date 2016/05/22 10:20
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "SceneNodes.h"
 #include "TransformStack.h"
 #include "SceneNodes.h"
@@ -15,6 +25,7 @@ class Scene
    {
    public:
       Scene( shared_ptr<IRenderer> renderer );
+      void Destory( void );
       virtual ~Scene( void );
       int OnRender( void );
       int OnRestore( void );

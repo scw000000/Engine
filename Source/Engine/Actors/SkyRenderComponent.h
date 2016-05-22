@@ -20,6 +20,7 @@ class SkyRenderComponent : public BaseRenderComponent
       static const char *g_Name;
       virtual const char *VGetName( ) const { return g_Name; }
       SkyRenderComponent( void );
+      virtual void Destory( void ) override;
 
    protected:
       virtual bool VDelegateInit( TiXmlElement* pData ) override;

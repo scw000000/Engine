@@ -190,6 +190,9 @@
     <ClCompile Include="..\UserInterface\MenuInterface.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
+    <ClCompile Include="..\Actors\ActorComponentFactory.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -346,6 +349,9 @@
     </ClInclude>
     <ClInclude Include="..\UserInterface\MenuInterface.h">
       <Filter>UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Actors\ActorComponentFactory.h">
+      <Filter>Actors</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

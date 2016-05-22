@@ -1,14 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: main.cpp
-////////////////////////////////////////////////////////////////////////////////
-
-//////////////
-// INCLUDES //
-//////////////
-
-///////////////////////
-// MY CLASS INCLUDES //  
-///////////////////////
+/*!
+ * \file main.cpp
+ * \date 2016/05/22 13:09
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "EngineStd.h"
 
 #include "Engine.h"
@@ -48,6 +50,7 @@
 	#error Preprocessor defines can't figure out which Bullet library to use.
 #endif
   
+
 
 EngineApp engineApp;
 
@@ -117,7 +120,6 @@ int main( int argc, char *argv[] )
    //std::cout << "t21m :  "<< std::endl << ToStr( t21m ) << std::endl<< std::endl;
    //std::cout << "t21m inv:  "<< std::endl << ToStr( t21m.Inverse() ) << std::endl<< std::endl;
    g_pApp->MainLoop();
-
 
    Logger::Destroy();
 

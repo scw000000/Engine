@@ -93,6 +93,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\Actors\Actor.cpp" />
+    <ClCompile Include="..\Actors\ActorComponentFactory.cpp" />
     <ClCompile Include="..\Actors\ActorFactory.cpp" />
     <ClCompile Include="..\Actors\LightRenderComponent.cpp" />
     <ClCompile Include="..\Actors\RenderComponent.cpp" />
@@ -157,6 +158,7 @@
   <ItemGroup>
     <ClInclude Include="..\Actors\Actor.h" />
     <ClInclude Include="..\Actors\ActorComponent.h" />
+    <ClInclude Include="..\Actors\ActorComponentFactory.h" />
     <ClInclude Include="..\Actors\ActorFactory.h" />
     <ClInclude Include="..\Actors\LightRenderComponent.h" />
     <ClInclude Include="..\Actors\RenderComponent.h" />

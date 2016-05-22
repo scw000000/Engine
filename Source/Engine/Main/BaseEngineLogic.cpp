@@ -59,7 +59,6 @@ BaseEngineLogic::~BaseEngineLogic()
    SAFE_DELETE( m_pLevelManager );
    SAFE_DELETE( m_pActorFactory );
    m_pGUIManager->Destory();
-   m_pWrold->Destory();
     // destroy all actors
    for ( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
       {

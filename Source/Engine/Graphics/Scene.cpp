@@ -28,19 +28,19 @@ Scene::Scene( shared_ptr<IRenderer> renderer ) : m_Root( ENG_NEW RootNode ), m_p
    //pEventMgr->VAddListener(fastdelegate::MakeDelegate(this, &Scene::ModifiedRenderComponentDelegate), EvtData_Modified_Render_Component::sk_EventType);
    }
 
-void Scene::Destory( void )
-   {
-   m_Root.reset( );
-   for( auto test : m_ActorMap )
-      {
-      test.second.reset();
-      }
-   m_ActorMap.clear( );
-   m_Camera.reset();
-   m_pRenderer.reset();
-   m_AlphaSceneNodes.clear();
-   m_pLightManager.reset();
-   }
+//void Scene::Destory( void )
+//   {
+//   m_Root.reset( );
+//   for( auto test : m_ActorMap )
+//      {
+//      test.second.reset();
+//      }
+//   m_ActorMap.clear( );
+//   m_Camera.reset();
+//   m_pRenderer.reset();
+//   m_AlphaSceneNodes.clear();
+//   m_pLightManager.reset();
+//   }
 
 Scene::~Scene()
    {

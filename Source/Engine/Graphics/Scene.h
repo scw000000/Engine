@@ -25,7 +25,6 @@ class Scene
    {
    public:
       Scene( shared_ptr<IRenderer> renderer );
-      void Destory( void );
       virtual ~Scene( void );
       int OnRender( void );
       int OnRestore( void );

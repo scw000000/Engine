@@ -21,6 +21,7 @@ class TiXmlElement;
 class IActorComponent
    {
    public:
+      virtual ~IActorComponent( void ){}
       virtual ComponentId VGetId( void ) const = 0;
       virtual const char *VGetName( ) const = 0;
 
@@ -58,7 +59,7 @@ class ActorComponent : public IActorComponent
    friend class ActorFactory;
 
    public:
-    //  virtual ~ActorComponent( void ){  }
+      ~ActorComponent( void ){ m_pOwner.reset(); } // make destructor virtual to prevent leak
       virtual bool VInit( TiXmlElement* pData ) = 0;
       virtual void VPostInit( void ) override {}
       virtual void VUpdate( const unsigned long deltaMs ) override {}
@@ -75,3 +76,39 @@ class ActorComponent : public IActorComponent
    private:
 	   void SetOwner( StrongActorPtr pOwner) { m_pOwner = pOwner; }
    };
+
+
+//class ActorComponent 
+//   {
+//   friend class ActorFactory;
+//
+//public:
+//   virtual ~ActorComponent( void ){ m_pOwner.reset(); }
+//   virtual void Destory( void ) = 0;
+//   virtual bool VInit( TiXmlElement* pData ) = 0;
+//   virtual const char *VGetName( ) const = 0;
+//   virtual void VPostInit( void ) 
+//      {
+//      }
+//   virtual void VUpdate( const unsigned long deltaMs ) 
+//      {
+//      }
+//
+//   virtual ComponentId VGetId( void ) const 
+//      {
+//      return GetIdFromName( VGetName( ) );
+//      }
+//   static ComponentId GetIdFromName( const char* componentName )
+//      {
+//      void* rawId = HashedString::hash_name( componentName );
+//      return reinterpret_cast< ComponentId > ( rawId );
+//      }
+//protected:
+//   StrongActorPtr m_pOwner;
+//
+//private:
+//   void SetOwner( StrongActorPtr pOwner )
+//      {
+//      m_pOwner = pOwner;
+//      }
+//   };

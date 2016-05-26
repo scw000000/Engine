@@ -1,3 +1,4 @@
+#pragma once
 /*!
  * \file EdtorStd.h
  * \date 2016/05/24 21:54
@@ -11,7 +12,7 @@
  *
  * \note
  */
-#pragma once
+
 
 #include "targetver.h"
 

@@ -1,8 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Initailzation.h
-////////////////////////////////////////////////////////////////////////////////
-
+/*!
+ * \file Initialization.h
+ * \date 2016/05/26 11:34
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 extern bool CheckStorage(const DWORDLONG diskSpaceNeeded);
 extern DWORD ReadCPUSpeed();

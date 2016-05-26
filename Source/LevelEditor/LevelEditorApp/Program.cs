@@ -18,7 +18,7 @@ namespace LevelEditorApp
          Application.EnableVisualStyles();
          Application.SetCompatibleTextRenderingDefault( false );
          Editor editor = new Editor();   
-      Application.Run( editor );
+         Application.Run( editor );
          }
       }
    }

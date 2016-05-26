@@ -1,13 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Initialization.cpp
-////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-///////////////////////
-// MY CLASS INCLUDES //  
-///////////////////////
+/*!
+ * \file Initialization.cpp
+ * \date 2016/05/26 11:34
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "EngineStd.h"
 #include "Initialization.h"
 
@@ -32,8 +35,7 @@ void EngineOptions::Init( const char* xmlFileName )
    {
 	// read the XML file
 	// if needed, override the XML file with options passed in on the command line.
-
-	m_pDoc = ENG_NEW TiXmlDocument( xmlFileName );
+   m_pDoc = ENG_NEW TiXmlDocument( xmlFileName );
 	if (m_pDoc && m_pDoc->LoadFile())
 	   {
       TiXmlElement *pRoot = m_pDoc->RootElement();

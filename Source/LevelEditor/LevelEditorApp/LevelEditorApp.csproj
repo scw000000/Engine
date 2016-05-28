@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="MessageHandler.cs" />
     <Compile Include="Editor.cs">
       <SubType>Form</SubType>
     </Compile>

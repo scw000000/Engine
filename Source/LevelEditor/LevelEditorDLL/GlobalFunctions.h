@@ -16,4 +16,4 @@
 #define DllExport _declspec(dllexport)
 
 extern "C" DllExport int EditorMain( int *pWindow, int screenWidth, int screenHeight );
-extern "C" DllExport int test( int *instancePtrAddress );
+extern "C" DllExport void SingleLoop( void );

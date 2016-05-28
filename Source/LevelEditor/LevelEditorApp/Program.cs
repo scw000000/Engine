@@ -17,8 +17,13 @@ namespace LevelEditorApp
          
          Application.EnableVisualStyles();
          Application.SetCompatibleTextRenderingDefault( false );
+         MessageHandler messageHandler = new MessageHandler();
+         Application.AddMessageFilter( messageHandler );
          Editor editor = new Editor();   
+         Application.Idle += new EventHandler( messageHandler.Application_Idle );
+         
          Application.Run( editor );
+
          }
       }
    }

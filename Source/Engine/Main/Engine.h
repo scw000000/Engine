@@ -34,6 +34,7 @@ class EngineApp
       virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
 
       void MainLoop( void );
+      void SingleLoop( void );
       void AbortGame( void ) { m_bQuitting = true; }
 
       bool IsRunning() { return m_bIsRunning; }

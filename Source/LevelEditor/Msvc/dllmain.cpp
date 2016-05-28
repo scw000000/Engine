@@ -1,7 +1,6 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "EditorStd.h"
 
-#pragma comment( lib, "Engine.lib" )
 #pragma comment( lib, "SDL2.lib" )
 #pragma comment( lib, "SDL2main.lib" )
 #pragma comment( lib, "SDL2_image.lib" )

@@ -45,8 +45,8 @@
 using std::string;
 
 /*
-This pragma is for folding specific region of code to make it better structered
-Constants, Statics, and Globals are for comment useage
+This pragma is for folding specific region of code to make it better structured
+Constants, Statics, and Globals are for comment usage
 */
 #pragma region Constants, Statics, and Globals
 //------------------------------------------------------------------------------------------------------------------------------------

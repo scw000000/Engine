@@ -250,7 +250,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       {
       ENG_ERROR( "Not supported renderer type" );
       }
-   m_pRenderer->VSetBackgroundColor( g_Black );
+   m_pRenderer->VSetBackgroundColor( g_Red );
    // Enable depth test
 	glEnable( GL_DEPTH_TEST );
 	// Accept fragment if it closer to the camera than the former one
@@ -535,6 +535,20 @@ void EngineApp::MainLoop( void )
       }
 
    OnClose();
+   }
+
+void EngineApp::SingleLoop( void )
+   {
+   static double fAppTime = 0.0;
+   static double fAbsoluteTime = 0.0;
+   static float  fElapasedTime = 0.0f;
+
+   MsgProc();
+   GetGlobalTimer()->GetTimeValues( &fAppTime, &fAbsoluteTime, &fElapasedTime );
+
+   OnUpdateGame( fAppTime, fElapasedTime );
+
+   OnFrameRender( fAppTime, fElapasedTime );
    }
 
 void EngineApp::OnUpdateGame( double fTime, float fElapsedTime )

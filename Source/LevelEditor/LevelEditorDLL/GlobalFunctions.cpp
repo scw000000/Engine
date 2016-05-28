@@ -47,25 +47,19 @@ int EditorMain( int *pWindow, int screenWidth, int screenHeight )
 
    g_pApp->InitInstance( ( SDL_Window* )pWindow, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
 
-//   g_pApp->MainLoop();
+  // g_pApp->MainLoop();
 
-   Logger::Destroy();
+  // Logger::Destroy();
 
-   return 0;
+   return true;
    }
 
-int test( int *instancePtrAddress )
+void SingleLoop( void )
    {
-   int tmpDbgFlag = _CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
-   tmpDbgFlag |= _CRTDBG_LEAK_CHECK_DF;
+   //g_pApp->m_pRenderer->VPreRender();
+   //g_pApp->m_pRenderer->VPreRender();
 
-   _CrtSetDbgFlag( tmpDbgFlag );
-
-   Logger::Init( "logging.xml" );
-   g_pApp->m_EngineOptions.Init( "EngineOptions.xml" );
-   g_pApp->InitInstance( 0, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
-   std::cout << "test!!!!!!!!!!!!!!!!!!!!" << std::endl;
-   return 0;
+   g_pApp->SingleLoop();
    }
 //
 //#include <windows.h>

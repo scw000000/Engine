@@ -7,9 +7,6 @@
     <Filter Include="Others">
       <UniqueIdentifier>{a0fc4f1a-d2f8-4b1d-a347-691c35924c98}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainLoop">
-      <UniqueIdentifier>{6c556e95-fcea-4a86-a54f-b96455f9673f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="UserInterface">
       <UniqueIdentifier>{aec0f142-6a48-4cef-9437-c295f14c06be}</UniqueIdentifier>
     </Filter>
@@ -43,6 +40,9 @@
     <Filter Include="Physics">
       <UniqueIdentifier>{e8800d8b-a1e3-4915-9d94-154edb33e562}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Main\MainLoop">
+      <UniqueIdentifier>{6c556e95-fcea-4a86-a54f-b96455f9673f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
@@ -53,7 +53,7 @@
       <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\MainLoop\Initialization.cpp">
-      <Filter>MainLoop</Filter>
+      <Filter>Main\MainLoop</Filter>
     </ClCompile>
     <ClCompile Include="..\UserInterface\HumanView.cpp">
       <Filter>UserInterface</Filter>
@@ -80,13 +80,13 @@
       <Filter>Actors</Filter>
     </ClCompile>
     <ClCompile Include="..\MainLoop\Process.cpp">
-      <Filter>MainLoop</Filter>
+      <Filter>Main\MainLoop</Filter>
     </ClCompile>
     <ClCompile Include="..\MainLoop\ProcessManager.cpp">
-      <Filter>MainLoop</Filter>
+      <Filter>Main\MainLoop</Filter>
     </ClCompile>
     <ClCompile Include="..\MainLoop\Timer.cpp">
-      <Filter>MainLoop</Filter>
+      <Filter>Main\MainLoop</Filter>
     </ClCompile>
     <ClCompile Include="..\ResourceCache\ZipFile.cpp">
       <Filter>ResourceCache</Filter>
@@ -200,7 +200,7 @@
       <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="..\MainLoop\Initialization.h">
-      <Filter>MainLoop</Filter>
+      <Filter>Main\MainLoop</Filter>
     </ClInclude>
     <ClInclude Include="..\Main\Interfaces.h">
       <Filter>Main</Filter>
@@ -243,13 +243,13 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\MainLoop\Process.h">
-      <Filter>MainLoop</Filter>
+      <Filter>Main\MainLoop</Filter>
     </ClInclude>
     <ClInclude Include="..\MainLoop\ProcessManager.h">
-      <Filter>MainLoop</Filter>
+      <Filter>Main\MainLoop</Filter>
     </ClInclude>
     <ClInclude Include="..\MainLoop\Timer.h">
-      <Filter>MainLoop</Filter>
+      <Filter>Main\MainLoop</Filter>
     </ClInclude>
     <ClInclude Include="..\ResourceCache\ZipFile.h">
       <Filter>ResourceCache</Filter>

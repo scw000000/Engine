@@ -64,6 +64,7 @@
       <PrecompiledHeaderFile>EngineStd.h</PrecompiledHeaderFile>
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

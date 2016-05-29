@@ -14,6 +14,7 @@
 #include "EngineStd.h"
 #include "..\UserInterface\HumanView.h"
 #include "..\UserInterface/GUIManager.h"
+#include "..\ResourceCache\DevResourceFile.h"
 #include "..\ResourceCache\XmlResource.h"
 #include "..\ResourceCache\MeshResource.h"
 #include "..\Event\EventManager.h"
@@ -116,11 +117,18 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
 
 	//--------------------------------- 
-   //  Initialize ResCache, all asseets are within a zip file
+   //  Initialize ResCache, all assets are within a zip file
    //--------------------------------- 
-	IResourceFile *zipFile = ENG_NEW ResourceZipFile( L"Assets.zip" );
-
-	m_pResCache = ENG_NEW ResCache( 50, zipFile );
+   IResourceFile *pFile = NULL;
+   if( m_EngineOptions.m_UseDevDir )
+      {
+      pFile = ENG_NEW DevResourceFile( DevResourceFile::Editor );
+      }
+   else
+      {
+      pFile = ENG_NEW ResourceZipFile( L"Assets.zip" );
+      }
+   m_pResCache = ENG_NEW ResCache( 50, pFile );
 
 	if ( !m_pResCache->Init() )
 	   {
@@ -250,7 +258,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       {
       ENG_ERROR( "Not supported renderer type" );
       }
-   m_pRenderer->VSetBackgroundColor( g_Red );
+   m_pRenderer->VSetBackgroundColor( g_Black );
    // Enable depth test
 	glEnable( GL_DEPTH_TEST );
 	// Accept fragment if it closer to the camera than the former one

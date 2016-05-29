@@ -1,9 +1,7 @@
 <EditorOptions>
-  <Graphics renderer="Direct3D 9" />
-  <Sound sfxVolume="100" musicVolume="100"/>
-  <WorldScriptAdditions>
-    <!-- The preLoad script is executed as the first operation when the level is loading.  The postLoad script 
-    if executed as the last step in the level loading process. -->
-    <Script preLoad="scripts\LevelInit.lua" postLoad="scripts\LevelPostInit.lua"/>
-  </WorldScriptAdditions>
+  <Graphics Renderer="OpenGL" RunFullSpeed="no" />
+  <Sound SfxVolume="100" MusicVolume="100"/>
+  <ResCache UseDevelopmentDirectories="yes" GUIDirectory="GUI/" LevelDirectory="world\"/> 
+  <User Level="test.xml" Layout="Empty.layout"/>
+  <PhysicsDebug DrawWireFrame="yes" DrawContactPoints="yes" />
 </EditorOptions>

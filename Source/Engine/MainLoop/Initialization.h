@@ -33,15 +33,16 @@ struct EngineOptions
    public:
       EngineOptions();
 	   ~EngineOptions() { SAFE_DELETE(m_pDoc); }
-
-      // Level option
-	   std::string m_Level;
+      
       // Rendering options
       std::string m_Renderer;
+
+      bool m_UseDevDir;
+      std::string m_Level;
+      std::string m_LevelDirectory;
       std::string m_Layout;
       std::string m_GUIDirectory;
-      std::string m_LevelDirectory;
-
+      
       // TiXmlElement - look at this to find other options added by the developer
 	   TiXmlDocument *m_pDoc;
 

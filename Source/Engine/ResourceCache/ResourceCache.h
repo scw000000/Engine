@@ -108,6 +108,7 @@ class ResCache
       shared_ptr< ResHandle > GetHandle( Resource *r );
       int Preload( const std::string pattern, void (*progressCallback)( int, bool & ) );
       void Flush( void );
+      bool IsUsingDevelopmentDirectories( void ) const { ENG_ASSERT( m_pResourceFile ); return m_pResourceFile->VIsUsingDevelopmentDirectories(); }
       std::vector<std::string> Match( const std::string pattern );
 
    protected:
@@ -127,26 +128,26 @@ class ResCache
       ResHandleMap m_Resources;
       ResourceLoaders m_ResourceLoaders;
       // this menber stores zip file 
-      IResourceFile *m_file;
+      IResourceFile *m_pResourceFile;
 
-      unsigned int m_cacheSize; // size in bytes
-      unsigned int m_allocated;
+      unsigned int m_CacheSize; // size in bytes
+      unsigned int m_AllocatedSize;
    };
 
 class ResourceZipFile : public IResourceFile
    {
    public:
-	   ResourceZipFile( const std::wstring resFileName ) { m_pZipFile = NULL; m_resFileName = resFileName; }
-	   virtual ~ResourceZipFile();
+	   ResourceZipFile( const std::wstring resFileName ) { m_pZipFile = NULL; m_ResFileName = resFileName; }
+	   ~ResourceZipFile();
 
-	   virtual bool VOpen();
-	   virtual int VGetRawResourceSize( const Resource &r );
-	   virtual int VGetRawResource( const Resource &r, char *buffer );
-	   virtual int VGetNumResources() const;
-	   virtual std::string VGetResourceName( int num ) const;
+	   virtual bool VOpen() override;
+      virtual int VGetRawResourceSize( const Resource &r ) override;
+      virtual int VGetRawResource( const Resource &r, char *buffer ) override;
+      virtual int VGetNumResources() const override;
+      virtual std::string VGetResourceName( int num ) const override;
       virtual bool VIsUsingDevelopmentDirectories( void ) const { return false; }
    
    private:
       ZipFile *m_pZipFile;
-	   std::wstring m_resFileName;
+	   std::wstring m_ResFileName;
    };

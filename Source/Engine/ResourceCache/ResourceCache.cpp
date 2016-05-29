@@ -65,9 +65,9 @@ DefaultResourceLoader::DefaultResourceLoader( void ) : ResourceLoader( std::vect
 
 ResCache::ResCache( const unsigned int sizeInMb, IResourceFile *resFile )
    {
-   m_cacheSize = sizeInMb * 1024 * 1024;
-   m_allocated = 0;
-   m_file = resFile;
+   m_CacheSize = sizeInMb * 1024 * 1024;
+   m_AllocatedSize = 0;
+   m_pResourceFile = resFile;
    }
 
 // delete all of the resources handle in the list
@@ -77,13 +77,13 @@ ResCache::~ResCache()
       {
       FreeOneResource();
       }
-      SAFE_DELETE( m_file );
+      SAFE_DELETE( m_pResourceFile );
    }
 
 bool ResCache::Init()
    {
    bool ret = false;
-   if( m_file->VOpen() )
+   if( m_pResourceFile->VOpen() )
       {
       RegisterLoader( shared_ptr< IResourceLoader > ( ENG_NEW DefaultResourceLoader() ) );
       ret = true;
@@ -116,18 +116,18 @@ shared_ptr< ResHandle > ResCache::GetHandle( Resource *resource )
 // preload specific type of resource
 int ResCache::Preload( const std::string pattern, void (*progressCallback)( int, bool & ) )
    {
-   if( !m_file )
+   if( !m_pResourceFile )
       {
       return 0;
       }
-   int numFiles = m_file->VGetNumResources();
+   int numFiles = m_pResourceFile->VGetNumResources();
    int loaded = 0;
    bool cancel = false;
    // for all of files in the zip file
    for( int i = 0; i < numFiles; ++i )
       {
       // try to get every file name in the zip file
-      Resource resource( m_file->VGetResourceName( i ) );
+      Resource resource( m_pResourceFile->VGetResourceName( i ) );
       // load the file if pattern is matched
       if( WildcardMatch( pattern.c_str(), resource.m_Name.c_str() ) )
          {
@@ -197,7 +197,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
       return handle;
       }
    // find correspond file in zip file and return its size
-   int rawSize = m_file->VGetRawResourceSize( *resource );
+   int rawSize = m_pResourceFile->VGetRawResourceSize( *resource );
 	if ( rawSize < 0 )
 	   { 
 		ENG_ASSERT( rawSize > 0 && "Resource size returned -1 - Resource not found" );
@@ -218,7 +218,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
       }
    memset( pRawBuffer, 0, allocSize );
    // allocate rawBuffer fail or cannot load raw file from zip fIle
-   if( !pRawBuffer || !m_file->VGetRawResource( *resource, pRawBuffer ) )
+   if( !pRawBuffer || !m_pResourceFile->VGetRawResource( *resource, pRawBuffer ) )
       {
       return shared_ptr< ResHandle >();
       }
@@ -289,12 +289,12 @@ void ResCache::Free( shared_ptr< ResHandle > gonner )
 
 bool ResCache::MakeRoom( unsigned int size )
    {
-   if( size > m_cacheSize ) // impossible, this resource is lager than the whole cache
+   if( size > m_CacheSize ) // impossible, this resource is lager than the whole cache
       {
       return false;
       }
 
-   while( size > ( m_cacheSize - m_allocated ) ) // while the size is larger than free cache size, keep remove resource out of cache 
+   while( size > ( m_CacheSize - m_AllocatedSize ) ) // while the size is larger than free cache size, keep remove resource out of cache 
       {
       if( m_lruResHandleList.empty() ) // the cache is already empty, but still the free space is smaller than resource size
          {
@@ -318,7 +318,7 @@ bool ResCache::Allocate( char** pAllocBuffer, unsigned int size, bool useRealAll
       *pAllocBuffer = ENG_NEW char[size];
       if( *pAllocBuffer )
          {
-         m_allocated += size; // update allocated size
+         m_AllocatedSize += size; // update allocated size
          }
       return true;
       }
@@ -343,7 +343,7 @@ void ResCache::FreeOneResource()
 // This function is called by destructor of ResHandle
 void ResCache::MemoryHasBeenFreed( unsigned int size )
    {
-   m_allocated -= size;
+   m_AllocatedSize -= size;
    }
 
 //
@@ -355,13 +355,13 @@ void ResCache::MemoryHasBeenFreed( unsigned int size )
 std::vector<std::string> ResCache::Match( const std::string pattern )
    {
 	std::vector<std::string> matchingNames;
-	if ( m_file == NULL )
+	if ( m_pResourceFile == NULL )
 		return matchingNames;
    // get total number of files in zip file
-	int numFiles = m_file->VGetNumResources();
+	int numFiles = m_pResourceFile->VGetNumResources();
 	for ( int i = 0; i < numFiles; ++i )
 	   {
-		std::string name = m_file->VGetResourceName( i );
+		std::string name = m_pResourceFile->VGetResourceName( i );
 		std::transform(name.begin(), name.end(), name.begin(), (int(*)(int)) std::tolower);
 		if ( WildcardMatch( pattern.c_str(), name.c_str() ) )
 		   {
@@ -386,7 +386,7 @@ bool ResourceZipFile::VOpen()
 	m_pZipFile = ENG_NEW ZipFile;
       if (m_pZipFile)
       {
-		return m_pZipFile->Init( m_resFileName.c_str() );
+		return m_pZipFile->Init( m_ResFileName.c_str() );
 	   }
 	return false;	
    }

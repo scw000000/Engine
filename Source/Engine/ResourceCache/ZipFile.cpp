@@ -1,10 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: ZipFile.cpp
-////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////
-// MY CLASS INCLUDES //  
-///////////////////////
+/*!
+ * \file ZipFile.cpp
+ * \date 2016/05/29 20:01
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "EngineStd.h"
 #include "ZipFile.h"
 
@@ -169,7 +175,7 @@ bool ZipFile::Init(const std::wstring &resFileName)
 	  fileName[fh.fnameLen]=0;
 	  _strlwr_s(fileName, _MAX_PATH);
 	  std::string spath = fileName;
-	  m_ZipContentsMap[spath] = i;
+	  m_FileContentsMap[spath] = i;
 
       // Skip name, extra and comment fields.
       pfh += fh.fnameLen + fh.xtraLen + fh.cmntLen;
@@ -191,8 +197,8 @@ int ZipFile::Find(const std::string &path) const
 {
 	std::string lowerCase = path;
 	std::transform(lowerCase.begin(), lowerCase.end(), lowerCase.begin(), (int(*)(int)) std::tolower);
-	ZipContentsMap::const_iterator i = m_ZipContentsMap.find(lowerCase);
-	if (i==m_ZipContentsMap.end())
+	FileContentsMap::const_iterator i = m_FileContentsMap.find(lowerCase);
+	if (i==m_FileContentsMap.end())
 		return -1;
 
 	return i->second;
@@ -207,7 +213,7 @@ int ZipFile::Find(const std::string &path) const
 // --------------------------------------------------------------------------
 void ZipFile::End()
 {
-    m_ZipContentsMap.clear();
+    m_FileContentsMap.clear();
     SAFE_DELETE_ARRAY(m_pDirData);
     m_nEntries = 0;
 }

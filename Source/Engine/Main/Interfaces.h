@@ -285,16 +285,14 @@ class IGamePhysics
       virtual void VSetTransform( const ActorId id, const Transform& trans ) = 0;
       virtual Transform VGetTransform( const ActorId id ) = 0;
 
-      virtual ~IGamePhysics( )
-      {
-      };
+      virtual ~IGamePhysics( void ){ };
    };
 
 
 class IScriptManager
    {
    public:
-      virtual ~IScriptManager( void ) {}
+      virtual ~IScriptManager( void ){ }
       virtual bool VInit( void ) = 0;
       virtual void VExecuteFile( const char* resource ) = 0;
       virtual void VExecuteString( const char* str ) = 0;

@@ -25,9 +25,10 @@ bool CheckForJoystick(std::string hWnd)
 EngineOptions::EngineOptions()
    {
    // set all the options to decent default valu
-	m_Renderer = "OpenGL";   
+   m_UseDevDir = false;
+   m_Renderer = "OpenGL";   
 	m_runFullSpeed = false;
-	m_ScreenSize = Point(1024,768);
+	m_ScreenSize = Point( 1024, 768 );
 	m_pDoc = NULL;
    }
 
@@ -69,16 +70,16 @@ void EngineOptions::Init( const char* xmlFileName )
                }
 			   }  
 
-			if (pNode->Attribute("Height"))
+			if ( pNode->Attribute( "Height" ) )
 			   {
-				m_ScreenSize.y = atoi(pNode->Attribute("Height"));
+				m_ScreenSize.y = atoi( pNode->Attribute( "Height" ) );
 				   if (m_ScreenSize.y < 600) m_ScreenSize.y = 600;
 			   }
 
-			if (pNode->Attribute("RunFullSpeed"))
+			if ( pNode->Attribute( "RunFullSpeed" ) )
 			   {
-				attribute = pNode->Attribute("RunFullSpeed");
-				m_runFullSpeed = (attribute == "yes") ? true : false;
+				attribute = pNode->Attribute( "RunFullSpeed" );
+				m_runFullSpeed = ( attribute == "yes" ) ? true : false;
 			   }
 
 		   }
@@ -86,6 +87,10 @@ void EngineOptions::Init( const char* xmlFileName )
       pNode = pRoot->FirstChildElement( "ResCache" );
       if( pNode )
          {
+         if( pNode->Attribute( "UseDevelopmentDirectories" ) )
+            {
+            m_UseDevDir = ( pNode->Attribute( "UseDevelopmentDirectories" ) == "yes" ) ? true : false;
+            }
          if( pNode->Attribute( "GUIDirectory" ) )
             {
             m_GUIDirectory = pNode->Attribute( "GUIDirectory" );

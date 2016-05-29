@@ -1,15 +1,22 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: ZipFile.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file ZipFile.h
+ * \date 2016/05/29 20:00
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include <stdio.h>
 
-///////////////////////
-// MY CLASS INCLUDES //  
-///////////////////////
 
-typedef std::map<std::string, int> ZipContentsMap;		// maps path to a zip content id
+typedef std::map<std::string, int> FileContentsMap;		// maps path to a zip content id
 
 class ZipFile
    {
@@ -28,7 +35,7 @@ class ZipFile
       bool ReadLargeFile( int i, void *pBuf, void ( *progressCallback )( int, bool & ) );
       int Find( const std::string &path ) const; 
 
-      ZipContentsMap m_ZipContentsMap;
+      FileContentsMap m_FileContentsMap;
 
    private:
       struct TZipDirHeader; // located in the very end of zip file

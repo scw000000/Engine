@@ -193,6 +193,9 @@
     <ClCompile Include="..\Actors\ActorComponentFactory.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
+    <ClCompile Include="..\ResourceCache\DevResourceFile.cpp">
+      <Filter>ResourceCache</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -352,6 +355,9 @@
     </ClInclude>
     <ClInclude Include="..\Actors\ActorComponentFactory.h">
       <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ResourceCache\DevResourceFile.h">
+      <Filter>ResourceCache</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

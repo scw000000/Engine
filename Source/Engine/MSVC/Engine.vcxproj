@@ -139,6 +139,7 @@
     </ClCompile>
     <ClCompile Include="..\Physics\Physics.cpp" />
     <ClCompile Include="..\Physics\PhysicsDebugDrawer.cpp" />
+    <ClCompile Include="..\ResourceCache\DevResourceFile.cpp" />
     <ClCompile Include="..\ResourceCache\MeshResource.cpp" />
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp" />
     <ClCompile Include="..\ResourceCache\TextureResource.cpp" />
@@ -199,6 +200,7 @@
     <ClInclude Include="..\Multicore\CriticalSection.h" />
     <ClInclude Include="..\Physics\Physics.h" />
     <ClInclude Include="..\Physics\PhysicsDebugDrawer.h" />
+    <ClInclude Include="..\ResourceCache\DevResourceFile.h" />
     <ClInclude Include="..\ResourceCache\MeshResource.h" />
     <ClInclude Include="..\ResourceCache\ResourceCache.h" />
     <ClInclude Include="..\ResourceCache\TextureResource.h" />

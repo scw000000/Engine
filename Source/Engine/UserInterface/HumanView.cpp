@@ -26,7 +26,7 @@ HumanView::HumanView( void )
    {
 	m_pProcessManager = ENG_NEW ProcessManager;
 	m_ViewId = gc_InvalidGameViewId;
-   AttachLayout( shared_ptr<UserInterface>( ENG_NEW MenuInterface( Resource( g_pApp->m_EngineOptions.m_Layout, true ) ) ) );
+   AttachLayout( shared_ptr<UserInterface>( ENG_NEW UserInterface( Resource( g_pApp->m_EngineOptions.m_Layout, true ) ) ) );
 
    if ( g_pApp->m_pEngineLogic->m_pWrold )
 	   {

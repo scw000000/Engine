@@ -21,7 +21,6 @@ namespace LevelEditorApp
          Application.AddMessageFilter( messageHandler );
          Editor editor = new Editor();   
          Application.Idle += new EventHandler( messageHandler.Application_Idle );
-         
          Application.Run( editor );
 
          }

@@ -74,6 +74,12 @@
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TabControlEX.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="TabPageEX.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="Editor.resx">
       <DependentUpon>Editor.cs</DependentUpon>
     </EmbeddedResource>

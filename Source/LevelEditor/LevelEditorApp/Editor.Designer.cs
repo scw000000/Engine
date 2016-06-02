@@ -28,28 +28,20 @@
         /// </summary>
         private void InitializeComponent()
         {
-         this.components = new System.ComponentModel.Container();
          this.menuStrip1 = new System.Windows.Forms.MenuStrip();
          this.fIleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          this.eDITToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          this.splitContainer1 = new System.Windows.Forms.SplitContainer();
          this.splitContainer2 = new System.Windows.Forms.SplitContainer();
          this.splitContainer_Left = new System.Windows.Forms.SplitContainer();
-         this.tabControlEX1 = new LevelEditorApp.TabControlEX();
-         
-         this.tabControl4 = new System.Windows.Forms.TabControl();
-         this.tabPage7 = new System.Windows.Forms.TabPage();
-         this.tabPage8 = new System.Windows.Forms.TabPage();
          this.splitContainer_Mid = new System.Windows.Forms.SplitContainer();
-         this.tabControl2 = new System.Windows.Forms.TabControl();
-         this.tabPage3 = new System.Windows.Forms.TabPage();
-         this.tabPage4 = new System.Windows.Forms.TabPage();
          this.splitContainer_Right = new System.Windows.Forms.SplitContainer();
-         this.tabControl1 = new System.Windows.Forms.TabControl();
-         this.tabPage1 = new System.Windows.Forms.TabPage();
-         this.TreeView_Assets = new System.Windows.Forms.TreeView();
-         this.tabPage2 = new System.Windows.Forms.TabPage();
-         this.treeView2 = new System.Windows.Forms.TreeView();
+         this.tabCtlEX_LeftUp = new LevelEditorApp.TabControlEX();
+         this.tabCtlEX_LeftDown = new LevelEditorApp.TabControlEX();
+         this.tabCtlEX_MidUp = new LevelEditorApp.TabControlEX();
+         this.tabCtlEX_MidDown = new LevelEditorApp.TabControlEX();
+         this.tabCtlEX_RightUp = new LevelEditorApp.TabControlEX();
+         this.tabCtlEX_RightDown = new LevelEditorApp.TabControlEX();
          this.menuStrip1.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
          this.splitContainer1.Panel1.SuspendLayout();
@@ -63,18 +55,14 @@
          this.splitContainer_Left.Panel1.SuspendLayout();
          this.splitContainer_Left.Panel2.SuspendLayout();
          this.splitContainer_Left.SuspendLayout();
-         this.tabControlEX1.SuspendLayout();
-         this.tabControl4.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Mid)).BeginInit();
+         this.splitContainer_Mid.Panel1.SuspendLayout();
          this.splitContainer_Mid.Panel2.SuspendLayout();
          this.splitContainer_Mid.SuspendLayout();
-         this.tabControl2.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Right)).BeginInit();
          this.splitContainer_Right.Panel1.SuspendLayout();
+         this.splitContainer_Right.Panel2.SuspendLayout();
          this.splitContainer_Right.SuspendLayout();
-         this.tabControl1.SuspendLayout();
-         this.tabPage1.SuspendLayout();
-         this.tabPage2.SuspendLayout();
          this.SuspendLayout();
          // 
          // menuStrip1
@@ -118,7 +106,7 @@
          this.splitContainer1.Panel2.Controls.Add(this.splitContainer_Right);
          this.splitContainer1.Size = new System.Drawing.Size(875, 570);
          this.splitContainer1.SplitterDistance = 683;
-         this.splitContainer1.SplitterWidth = 15;
+         this.splitContainer1.SplitterWidth = 10;
          this.splitContainer1.TabIndex = 1;
          // 
          // splitContainer2
@@ -136,7 +124,7 @@
          this.splitContainer2.Panel2.Controls.Add(this.splitContainer_Mid);
          this.splitContainer2.Size = new System.Drawing.Size(679, 566);
          this.splitContainer2.SplitterDistance = 197;
-         this.splitContainer2.SplitterWidth = 15;
+         this.splitContainer2.SplitterWidth = 10;
          this.splitContainer2.TabIndex = 0;
          // 
          // splitContainer_Left
@@ -149,62 +137,16 @@
          // 
          // splitContainer_Left.Panel1
          // 
-         this.splitContainer_Left.Panel1.Controls.Add(this.tabControlEX1);
+         this.splitContainer_Left.Panel1.Controls.Add(this.tabCtlEX_LeftUp);
          // 
          // splitContainer_Left.Panel2
          // 
-         this.splitContainer_Left.Panel2.Controls.Add(this.tabControl4);
+         this.splitContainer_Left.Panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+         this.splitContainer_Left.Panel2.Controls.Add(this.tabCtlEX_LeftDown);
          this.splitContainer_Left.Size = new System.Drawing.Size(197, 566);
          this.splitContainer_Left.SplitterDistance = 170;
-         this.splitContainer_Left.SplitterWidth = 15;
+         this.splitContainer_Left.SplitterWidth = 10;
          this.splitContainer_Left.TabIndex = 0;
-         // 
-         // tabControlEX1
-         // 
-         this.tabControlEX1.ConfirmOnClose = true;
-         
-         this.tabControlEX1.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.tabControlEX1.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
-         this.tabControlEX1.ItemSize = new System.Drawing.Size(50, 18);
-         this.tabControlEX1.Location = new System.Drawing.Point(0, 0);
-         this.tabControlEX1.Name = "tabControlEX1";
-         this.tabControlEX1.SelectedIndex = 0;
-         this.tabControlEX1.Size = new System.Drawing.Size(197, 170);
-         this.tabControlEX1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-         this.tabControlEX1.TabIndex = 0;
-         this.tabControlEX1.TabStop = false;
-         this.tabControlEX1.OnClose += new LevelEditorApp.TabControlEX.OnHeaderCloseDelegate(this.tabControlEX1_OnClose);
-         // 
-         // tabControl4
-         // 
-         this.tabControl4.Controls.Add(this.tabPage7);
-         this.tabControl4.Controls.Add(this.tabPage8);
-         this.tabControl4.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.tabControl4.Location = new System.Drawing.Point(0, 0);
-         this.tabControl4.Name = "tabControl4";
-         this.tabControl4.SelectedIndex = 0;
-         this.tabControl4.Size = new System.Drawing.Size(197, 381);
-         this.tabControl4.TabIndex = 0;
-         // 
-         // tabPage7
-         // 
-         this.tabPage7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-         this.tabPage7.Location = new System.Drawing.Point(4, 22);
-         this.tabPage7.Name = "tabPage7";
-         this.tabPage7.Padding = new System.Windows.Forms.Padding(3);
-         this.tabPage7.Size = new System.Drawing.Size(189, 355);
-         this.tabPage7.TabIndex = 0;
-         this.tabPage7.Text = "tabPage7";
-         // 
-         // tabPage8
-         // 
-         this.tabPage8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-         this.tabPage8.Location = new System.Drawing.Point(4, 22);
-         this.tabPage8.Name = "tabPage8";
-         this.tabPage8.Padding = new System.Windows.Forms.Padding(3);
-         this.tabPage8.Size = new System.Drawing.Size(189, 355);
-         this.tabPage8.TabIndex = 1;
-         this.tabPage8.Text = "tabPage8";
          // 
          // splitContainer_Mid
          // 
@@ -217,47 +159,16 @@
          // splitContainer_Mid.Panel1
          // 
          this.splitContainer_Mid.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+         this.splitContainer_Mid.Panel1.Controls.Add(this.tabCtlEX_MidUp);
          // 
          // splitContainer_Mid.Panel2
          // 
-         this.splitContainer_Mid.Panel2.Controls.Add(this.tabControl2);
-         this.splitContainer_Mid.Size = new System.Drawing.Size(467, 566);
+         this.splitContainer_Mid.Panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+         this.splitContainer_Mid.Panel2.Controls.Add(this.tabCtlEX_MidDown);
+         this.splitContainer_Mid.Size = new System.Drawing.Size(472, 566);
          this.splitContainer_Mid.SplitterDistance = 448;
-         this.splitContainer_Mid.SplitterWidth = 15;
+         this.splitContainer_Mid.SplitterWidth = 10;
          this.splitContainer_Mid.TabIndex = 0;
-         // 
-         // tabControl2
-         // 
-         this.tabControl2.Alignment = System.Windows.Forms.TabAlignment.Bottom;
-         this.tabControl2.Controls.Add(this.tabPage3);
-         this.tabControl2.Controls.Add(this.tabPage4);
-         this.tabControl2.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.tabControl2.Location = new System.Drawing.Point(0, 0);
-         this.tabControl2.Multiline = true;
-         this.tabControl2.Name = "tabControl2";
-         this.tabControl2.SelectedIndex = 0;
-         this.tabControl2.Size = new System.Drawing.Size(467, 103);
-         this.tabControl2.TabIndex = 2;
-         // 
-         // tabPage3
-         // 
-         this.tabPage3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-         this.tabPage3.Location = new System.Drawing.Point(4, 4);
-         this.tabPage3.Name = "tabPage3";
-         this.tabPage3.Padding = new System.Windows.Forms.Padding(3);
-         this.tabPage3.Size = new System.Drawing.Size(459, 77);
-         this.tabPage3.TabIndex = 0;
-         this.tabPage3.Text = "tabPage3";
-         // 
-         // tabPage4
-         // 
-         this.tabPage4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-         this.tabPage4.Location = new System.Drawing.Point(4, 4);
-         this.tabPage4.Name = "tabPage4";
-         this.tabPage4.Padding = new System.Windows.Forms.Padding(3);
-         this.tabPage4.Size = new System.Drawing.Size(459, 77);
-         this.tabPage4.TabIndex = 1;
-         this.tabPage4.Text = "tabPage4";
          // 
          // splitContainer_Right
          // 
@@ -269,72 +180,97 @@
          // 
          // splitContainer_Right.Panel1
          // 
-         this.splitContainer_Right.Panel1.Controls.Add(this.tabControl1);
+         this.splitContainer_Right.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+         this.splitContainer_Right.Panel1.Controls.Add(this.tabCtlEX_RightUp);
          // 
          // splitContainer_Right.Panel2
          // 
          this.splitContainer_Right.Panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-         this.splitContainer_Right.Size = new System.Drawing.Size(173, 566);
+         this.splitContainer_Right.Panel2.Controls.Add(this.tabCtlEX_RightDown);
+         this.splitContainer_Right.Size = new System.Drawing.Size(178, 566);
          this.splitContainer_Right.SplitterDistance = 182;
-         this.splitContainer_Right.SplitterWidth = 15;
+         this.splitContainer_Right.SplitterWidth = 10;
          this.splitContainer_Right.TabIndex = 1;
          // 
-         // tabControl1
+         // tabCtlEX_LeftUp
          // 
-         this.tabControl1.Controls.Add(this.tabPage1);
-         this.tabControl1.Controls.Add(this.tabPage2);
-         this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.tabControl1.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
-         this.tabControl1.ImeMode = System.Windows.Forms.ImeMode.NoControl;
-         this.tabControl1.ItemSize = new System.Drawing.Size(15, 18);
-         this.tabControl1.Location = new System.Drawing.Point(0, 0);
-         this.tabControl1.Name = "tabControl1";
-         this.tabControl1.SelectedIndex = 0;
-         this.tabControl1.Size = new System.Drawing.Size(173, 182);
-         this.tabControl1.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-         this.tabControl1.TabIndex = 1;
+         this.tabCtlEX_LeftUp.ConfirmOnClose = true;
+         this.tabCtlEX_LeftUp.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.tabCtlEX_LeftUp.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+         this.tabCtlEX_LeftUp.ItemSize = new System.Drawing.Size(50, 18);
+         this.tabCtlEX_LeftUp.Location = new System.Drawing.Point(0, 0);
+         this.tabCtlEX_LeftUp.Name = "tabCtlEX_LeftUp";
+         this.tabCtlEX_LeftUp.SelectedIndex = 0;
+         this.tabCtlEX_LeftUp.Size = new System.Drawing.Size(197, 170);
+         this.tabCtlEX_LeftUp.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+         this.tabCtlEX_LeftUp.TabIndex = 0;
+         this.tabCtlEX_LeftUp.TabStop = false;
+         this.tabCtlEX_LeftUp.OnClose += new LevelEditorApp.TabControlEX.OnHeaderCloseDelegate(this.tabControlEX1_OnClose);
          // 
-         // tabPage1
+         // tabCtlEX_LeftDown
          // 
-         this.tabPage1.Controls.Add(this.TreeView_Assets);
-         this.tabPage1.Location = new System.Drawing.Point(4, 22);
-         this.tabPage1.Name = "tabPage1";
-         this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-         this.tabPage1.Size = new System.Drawing.Size(165, 156);
-         this.tabPage1.TabIndex = 0;
-         this.tabPage1.Text = "tabPage1";
-         this.tabPage1.UseVisualStyleBackColor = true;
+         this.tabCtlEX_LeftDown.ConfirmOnClose = true;
+         this.tabCtlEX_LeftDown.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.tabCtlEX_LeftDown.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+         this.tabCtlEX_LeftDown.ItemSize = new System.Drawing.Size(50, 18);
+         this.tabCtlEX_LeftDown.Location = new System.Drawing.Point(0, 0);
+         this.tabCtlEX_LeftDown.Name = "tabCtlEX_LeftDown";
+         this.tabCtlEX_LeftDown.SelectedIndex = 0;
+         this.tabCtlEX_LeftDown.Size = new System.Drawing.Size(197, 386);
+         this.tabCtlEX_LeftDown.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+         this.tabCtlEX_LeftDown.TabIndex = 0;
+         this.tabCtlEX_LeftDown.TabStop = false;
+         this.tabCtlEX_LeftDown.OnClose += new LevelEditorApp.TabControlEX.OnHeaderCloseDelegate(this.tabControlEX1_OnClose);
          // 
-         // TreeView_Assets
+         // tabCtlEX_MidUp
          // 
-         this.TreeView_Assets.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-         this.TreeView_Assets.BorderStyle = System.Windows.Forms.BorderStyle.None;
-         this.TreeView_Assets.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.TreeView_Assets.Location = new System.Drawing.Point(3, 3);
-         this.TreeView_Assets.Name = "TreeView_Assets";
-         this.TreeView_Assets.Size = new System.Drawing.Size(159, 150);
-         this.TreeView_Assets.TabIndex = 0;
+         this.tabCtlEX_MidUp.ConfirmOnClose = true;
+         this.tabCtlEX_MidUp.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.tabCtlEX_MidUp.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+         this.tabCtlEX_MidUp.Location = new System.Drawing.Point(0, 0);
+         this.tabCtlEX_MidUp.Name = "tabCtlEX_MidUp";
+         this.tabCtlEX_MidUp.SelectedIndex = 0;
+         this.tabCtlEX_MidUp.Size = new System.Drawing.Size(472, 448);
+         this.tabCtlEX_MidUp.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+         this.tabCtlEX_MidUp.TabIndex = 0;
+         this.tabCtlEX_MidUp.TabStop = false;
          // 
-         // tabPage2
+         // tabCtlEX_MidDown
          // 
-         this.tabPage2.Controls.Add(this.treeView2);
-         this.tabPage2.Location = new System.Drawing.Point(4, 22);
-         this.tabPage2.Name = "tabPage2";
-         this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-         this.tabPage2.Size = new System.Drawing.Size(165, 156);
-         this.tabPage2.TabIndex = 1;
-         this.tabPage2.Text = "x";
-         this.tabPage2.UseVisualStyleBackColor = true;
+         this.tabCtlEX_MidDown.Alignment = System.Windows.Forms.TabAlignment.Bottom;
+         this.tabCtlEX_MidDown.ConfirmOnClose = true;
+         this.tabCtlEX_MidDown.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.tabCtlEX_MidDown.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+         this.tabCtlEX_MidDown.Location = new System.Drawing.Point(0, 0);
+         this.tabCtlEX_MidDown.Name = "tabCtlEX_MidDown";
+         this.tabCtlEX_MidDown.SelectedIndex = 0;
+         this.tabCtlEX_MidDown.Size = new System.Drawing.Size(472, 108);
+         this.tabCtlEX_MidDown.TabIndex = 0;
+         this.tabCtlEX_MidDown.TabStop = false;
          // 
-         // treeView2
+         // tabCtlEX_RightUp
          // 
-         this.treeView2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-         this.treeView2.BorderStyle = System.Windows.Forms.BorderStyle.None;
-         this.treeView2.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.treeView2.Location = new System.Drawing.Point(3, 3);
-         this.treeView2.Name = "treeView2";
-         this.treeView2.Size = new System.Drawing.Size(159, 150);
-         this.treeView2.TabIndex = 0;
+         this.tabCtlEX_RightUp.ConfirmOnClose = true;
+         this.tabCtlEX_RightUp.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.tabCtlEX_RightUp.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+         this.tabCtlEX_RightUp.Location = new System.Drawing.Point(0, 0);
+         this.tabCtlEX_RightUp.Name = "tabCtlEX_RightUp";
+         this.tabCtlEX_RightUp.SelectedIndex = 0;
+         this.tabCtlEX_RightUp.Size = new System.Drawing.Size(178, 182);
+         this.tabCtlEX_RightUp.TabIndex = 0;
+         this.tabCtlEX_RightUp.TabStop = false;
+         // 
+         // tabCtlEX_RightDown
+         // 
+         this.tabCtlEX_RightDown.ConfirmOnClose = true;
+         this.tabCtlEX_RightDown.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.tabCtlEX_RightDown.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+         this.tabCtlEX_RightDown.Location = new System.Drawing.Point(0, 0);
+         this.tabCtlEX_RightDown.Name = "tabCtlEX_RightDown";
+         this.tabCtlEX_RightDown.SelectedIndex = 0;
+         this.tabCtlEX_RightDown.Size = new System.Drawing.Size(178, 374);
+         this.tabCtlEX_RightDown.TabIndex = 0;
+         this.tabCtlEX_RightDown.TabStop = false;
          // 
          // Editor
          // 
@@ -360,18 +296,14 @@
          this.splitContainer_Left.Panel2.ResumeLayout(false);
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Left)).EndInit();
          this.splitContainer_Left.ResumeLayout(false);
-         this.tabControlEX1.ResumeLayout(false);
-         this.tabControl4.ResumeLayout(false);
+         this.splitContainer_Mid.Panel1.ResumeLayout(false);
          this.splitContainer_Mid.Panel2.ResumeLayout(false);
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Mid)).EndInit();
          this.splitContainer_Mid.ResumeLayout(false);
-         this.tabControl2.ResumeLayout(false);
          this.splitContainer_Right.Panel1.ResumeLayout(false);
+         this.splitContainer_Right.Panel2.ResumeLayout(false);
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Right)).EndInit();
          this.splitContainer_Right.ResumeLayout(false);
-         this.tabControl1.ResumeLayout(false);
-         this.tabPage1.ResumeLayout(false);
-         this.tabPage2.ResumeLayout(false);
          this.ResumeLayout(false);
          this.PerformLayout();
 
@@ -386,20 +318,13 @@
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.SplitContainer splitContainer_Left;
         private System.Windows.Forms.SplitContainer splitContainer_Mid;
-        private System.Windows.Forms.TabControl tabControl2;
-        private System.Windows.Forms.TabPage tabPage3;
-        private System.Windows.Forms.TabPage tabPage4;
         private System.Windows.Forms.SplitContainer splitContainer_Right;
-        private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TreeView TreeView_Assets;
-        private System.Windows.Forms.TabPage tabPage2;
-        private System.Windows.Forms.TreeView treeView2;
-        private System.Windows.Forms.TabControl tabControl4;
-        private System.Windows.Forms.TabPage tabPage7;
-        private System.Windows.Forms.TabPage tabPage8;
-        private LevelEditorApp.TabControlEX tabControlEX1;
-        
+        private LevelEditorApp.TabControlEX tabCtlEX_LeftUp;
+        private LevelEditorApp.TabControlEX tabCtlEX_LeftDown;
+        private LevelEditorApp.TabControlEX tabCtlEX_MidUp;
+        private LevelEditorApp.TabControlEX tabCtlEX_MidDown;
+        private LevelEditorApp.TabControlEX tabCtlEX_RightUp;
+        private LevelEditorApp.TabControlEX tabCtlEX_RightDown;
     }
 }
 

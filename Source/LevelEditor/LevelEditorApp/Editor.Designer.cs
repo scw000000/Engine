@@ -205,7 +205,7 @@
          this.tabCtlEX_LeftUp.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
          this.tabCtlEX_LeftUp.TabIndex = 0;
          this.tabCtlEX_LeftUp.TabStop = false;
-         this.tabCtlEX_LeftUp.OnClose += new LevelEditorApp.TabControlEX.OnHeaderCloseDelegate(this.tabControlEX1_OnClose);
+         this.tabCtlEX_LeftUp.OnClose += new LevelEditorApp.TabControlEX.OnHeaderCloseDelegate( this.tabCtlEX_MidUp_OnClose );
          // 
          // tabCtlEX_LeftDown
          // 
@@ -220,7 +220,6 @@
          this.tabCtlEX_LeftDown.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
          this.tabCtlEX_LeftDown.TabIndex = 0;
          this.tabCtlEX_LeftDown.TabStop = false;
-         this.tabCtlEX_LeftDown.OnClose += new LevelEditorApp.TabControlEX.OnHeaderCloseDelegate(this.tabControlEX1_OnClose);
          // 
          // tabCtlEX_MidUp
          // 
@@ -234,6 +233,7 @@
          this.tabCtlEX_MidUp.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
          this.tabCtlEX_MidUp.TabIndex = 0;
          this.tabCtlEX_MidUp.TabStop = false;
+         this.tabCtlEX_MidUp.OnClose += new LevelEditorApp.TabControlEX.OnHeaderCloseDelegate( this.tabCtlEX_MidUp_OnClose );
          // 
          // tabCtlEX_MidDown
          // 
@@ -325,6 +325,8 @@
         private LevelEditorApp.TabControlEX tabCtlEX_MidDown;
         private LevelEditorApp.TabControlEX tabCtlEX_RightUp;
         private LevelEditorApp.TabControlEX tabCtlEX_RightDown;
+        private LevelEditorApp.TabPageEX tabPageEX_Assets;
+        private LevelEditorApp.TabPageEX tabPageEX_World;
     }
 }
 

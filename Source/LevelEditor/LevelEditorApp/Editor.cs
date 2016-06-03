@@ -20,27 +20,28 @@ namespace LevelEditorApp
    {
    public partial class Editor : Form
       {
-      private const int INVALID_ACTOR_ID = 0;
-
-      private const int m_MinTabSize = 50;
-      private const int m_MaxTabSize = 100;
-
-      private string m_ProjectDirectory;
-      private string m_AssetsDirectory;
-      private string m_CurrentLevelFile;
-
+      //private ActorComponentEditor m_ActorComponentEditor;
+      private IntPtr m_pSDLWindow;
       private List<XmlNode> m_ActorsXmlNodes = new List<XmlNode>();
+      private MessageHandler m_messageFilter;
+      private System.Windows.Forms.TreeView treeView_Assets;
+
+      private const int INVALID_ACTOR_ID = 0;
+      private const int m_MaxTabSize = 100;
+      private const int m_MinTabSize = 50;
+
       private int m_SelectedActorId = INVALID_ACTOR_ID;
 
-      private MessageHandler m_messageFilter;
-      //private ActorComponentEditor m_ActorComponentEditor;
-      private LevelEditorApp.TabPageEX tabPageEX_World;
-      private LevelEditorApp.TabPageEX tabPageEX_Assets;
+      private string m_AssetsDirectory;
+      private string m_CurrentDirectory;
+      private string m_ProjectDirectory;
 
-      private System.Windows.Forms.TreeView treeView_Assets;
       public Editor()
          {
          InitializeComponent();
+         m_CurrentDirectory = Directory.GetCurrentDirectory();
+         m_AssetsDirectory = m_CurrentDirectory + "\\Assets";
+
          // Setting all of splitter width in all comtainers
          int splitterWidth = 10;
          this.splitContainer1.SplitterWidth = splitterWidth;
@@ -49,18 +50,15 @@ namespace LevelEditorApp
          this.splitContainer_Mid.SplitterWidth = splitterWidth;
          this.splitContainer_Right.SplitterWidth = splitterWidth;
 
-         this.tabPageEX_World = this.AddTabePage( "tabPageEX_World", this.tabCtlEX_MidUp.Controls, true );
-         this.tabPageEX_Assets = this.AddTabePage( "tabPageEX_Assets", this.tabCtlEX_RightUp.Controls, false );
+         this.tabPageEX_World = AddTabePage( "tabPageEX_World", this.tabCtlEX_MidUp.Controls, false );
+
+         this.tabPageEX_Assets = AddTabePage( "tabPageEX_Assets", this.tabCtlEX_RightUp.Controls, false );
          this.treeView_Assets = new System.Windows.Forms.TreeView();
          this.treeView_Assets.Dock = DockStyle.Fill;
          this.treeView_Assets.BackColor = Color.FromArgb( 255, 70, 70, 70 );
          this.treeView_Assets.LineColor = Color.WhiteSmoke;
          this.treeView_Assets.NodeMouseDoubleClick += new TreeNodeMouseClickEventHandler( this.treeView_Assets_NodeMouseClick );
          this.tabPageEX_Assets.Controls.Add( this.treeView_Assets );
-
-       //  tabControl1.ItemSize = new Size( Math.Min( m_MaxTabSize, Math.Max( m_MinTabSize, ( tabControl1.Width - 30 ) / tabControl1.TabCount ) ), 0 );
-         var currentDirectory = Directory.GetCurrentDirectory();
-         m_AssetsDirectory = currentDirectory + "\\Assets";
 
          try
             {
@@ -102,7 +100,7 @@ namespace LevelEditorApp
          var stack = new Stack<TreeNode>();
          var rootDirectory = new DirectoryInfo( m_AssetsDirectory );
          var node = new TreeNode( rootDirectory.Name ) { Tag = rootDirectory };
-         node.ForeColor = System.Drawing.Color.Silver;
+         node.ForeColor = Color.WhiteSmoke;
          stack.Push( node );
 
          while( stack.Count > 0 )
@@ -116,7 +114,7 @@ namespace LevelEditorApp
                   {
                   var childDirectoryNode = new TreeNode( directory.Name );
                   childDirectoryNode.Tag = directory;
-                  childDirectoryNode.ForeColor = System.Drawing.Color.Silver;
+                  childDirectoryNode.ForeColor = Color.WhiteSmoke;
                   currentNode.Nodes.Add( childDirectoryNode );
                   stack.Push( childDirectoryNode );
                   }
@@ -128,7 +126,7 @@ namespace LevelEditorApp
                   {
                   var childNode = new TreeNode( file.Name );
                   childNode.Tag = file.FullName;
-                  childNode.ForeColor = System.Drawing.Color.Silver;
+                  childNode.ForeColor = Color.WhiteSmoke;
                   currentNode.Nodes.Add( childNode );
                   }
                }
@@ -148,27 +146,46 @@ namespace LevelEditorApp
          return pageEx;
          }
 
-      private System.Windows.Forms.TextBox AddTextBox( string name, System.Windows.Forms.Control.ControlCollection controls, bool closeBtnEnabled )
+      private System.Windows.Forms.TextBox AddTextBox( string name, string fileName, System.Windows.Forms.Control.ControlCollection controls, bool closeBtnEnabled )
          {
          System.Windows.Forms.TextBox textBox = new System.Windows.Forms.TextBox();
          textBox.Dock = DockStyle.Fill;
          textBox.Name = name;
-         textBox.Text = "fucccccccccccccccccccccccccccccccccc";
+         textBox.BackColor = Color.FromArgb( 255, 49, 49, 49 );
+         textBox.ForeColor = Color.WhiteSmoke;
+         textBox.Multiline = true;
+         textBox.ScrollBars = ScrollBars.Vertical;
+         try
+            {
+            StreamReader objstream = new StreamReader( fileName );
+
+            textBox.Text = objstream.ReadToEnd ();
+            }
+         catch( Exception e )
+            {
+            MessageBox.Show( "Err: " + e.ToString() );
+            }
          controls.Add( textBox );
          return textBox;
          }
 
-      private void tabControlEX1_OnClose( object sender, CloseEventArgs e )
+      private void tabCtlEX_MidUp_OnClose( object sender, CloseEventArgs e )
          {
-         this.tabCtlEX_LeftUp.Controls.Remove( this.tabCtlEX_LeftUp.TabPages[ e.TabIndex ] );
+         this.tabCtlEX_MidUp.Controls.Remove( this.tabCtlEX_MidUp.TabPages[ e.TabIndex ] );
          }
-
-      private IntPtr m_pSDLWindow;
 
       void treeView_Assets_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
          {
          LevelEditorApp.TabPageEX textPage = AddTabePage( e.Node.Text, this.tabCtlEX_MidUp.Controls, true );
-         System.Windows.Forms.TextBox textBox = AddTextBox( e.Node.Text, textPage.Controls, false );
+         String filePath = "";
+         TreeNode tempNode = e.Node;
+         while( tempNode != null )
+            {
+            filePath = "\\" + tempNode.Text + filePath;
+            tempNode = tempNode.Parent;
+            }
+
+         System.Windows.Forms.TextBox textBox = AddTextBox( e.Node.Text, m_CurrentDirectory + "\\" + filePath, textPage.Controls, false );
          }
       }
    }

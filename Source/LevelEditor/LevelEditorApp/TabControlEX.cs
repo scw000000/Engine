@@ -22,6 +22,7 @@ namespace LevelEditorApp
       private const float m_InnerCrossDistance = 1.5f;
       private float m_MaxStringLength = -1.0f;
       private const int m_MinTabSize = 50;
+      private int m_MouseOnCloseBtnPageIndx = -1;
       /// <summary>
       /// Required designer variable.
       /// </summary>
@@ -174,9 +175,23 @@ namespace LevelEditorApp
 
                   if( CanDrawCloseButton( e.Index ) )
                      {
-                     _ColorBlend.Colors = new Color[]{  SystemColors.ActiveBorder, 
+                     if( m_MouseOnCloseBtnPageIndx == e.Index )
+                        {
+                        _ColorBlend.Colors = new Color[]
+                           {
+                              Color.FromArgb(255, 252, 193, 183),
+                              Color.FromArgb(255, 252, 193, 183), 
+                              Color.FromArgb(255, 210, 35, 2),
+                              Color.FromArgb(255, 210, 35, 2)
+                           };
+                        Console.Write( "detected!@!" );
+                        }
+                     else 
+                        {
+                        _ColorBlend.Colors = new Color[]{  SystemColors.ActiveBorder, 
                                                         SystemColors.ActiveBorder,SystemColors.ActiveBorder,
                                                         SystemColors.ActiveBorder};
+                        }
 
                      _Brush.InterpolationColors = _ColorBlend;
                      DrawCloseBox( e.Graphics, tabTextArea, _Brush );
@@ -222,12 +237,27 @@ namespace LevelEditorApp
                      }
                   if( CanDrawCloseButton( e.Index ) )
                      {
-
-                     //Drawing Close Button
-                     _ColorBlend.Colors = new Color[]{Color.FromArgb(255,231,164,152), 
+                     Console.Write( m_MouseOnCloseBtnPageIndx );
+                     if( m_MouseOnCloseBtnPageIndx == e.Index )
+                        {
+                        _ColorBlend.Colors = new Color[]
+                           {
+                              Color.FromArgb(255, 252, 193, 183),
+                              Color.FromArgb(255, 252, 193, 183), 
+                              Color.FromArgb(255, 210, 35, 2),
+                              Color.FromArgb(255, 210, 35, 2)
+                           };
+                        Console.Write( "detected!@!" );
+                        }
+                     else 
+                        {
+                        //Drawing Close Button
+                        _ColorBlend.Colors = new Color[]{Color.FromArgb(255,231,164,152), 
                                                          Color.FromArgb(255,231,164,152),
                                                          Color.FromArgb(255,197,98,79),
                                                          Color.FromArgb(255,197,98,79)};
+                        }
+                     
                      _Brush.InterpolationColors = _ColorBlend;
                      DrawCloseBox( e.Graphics, tabTextArea, _Brush );
                      }
@@ -274,6 +304,7 @@ namespace LevelEditorApp
          }
       protected override void OnMouseLeave( EventArgs e )
          {
+         m_MouseOnCloseBtnPageIndx = -1;
          Graphics g = CreateGraphics();
          g.SmoothingMode = SmoothingMode.AntiAlias;
          RectangleF tabTextArea = RectangleF.Empty;
@@ -384,7 +415,7 @@ namespace LevelEditorApp
 
       protected override void OnMouseMove( MouseEventArgs e )
          {
-
+         m_MouseOnCloseBtnPageIndx = -1;
          if( !DesignMode )
             {
             Graphics g = CreateGraphics();
@@ -398,7 +429,7 @@ namespace LevelEditorApp
                float outerCloseBtnX = tabTextArea.X + tabTextArea.Width - outerCloseBtnWidth - 2;
                float outerCloseBtnY = tabTextArea.Y + ( tabTextArea.Height - outerCloerBtnHeight ) / 2;
                Point pt = new Point( e.X, e.Y );
-               if( CanDrawMenuButton( nIndex ) )
+               if( CanDrawCloseButton( nIndex ) )
                   {
                   tabTextArea = new RectangleF( outerCloseBtnX, outerCloseBtnY, outerCloseBtnWidth,
                                      outerCloerBtnHeight );
@@ -406,6 +437,7 @@ namespace LevelEditorApp
 
                   if( tabTextArea.Contains( pt ) )
                      {
+                     m_MouseOnCloseBtnPageIndx = nIndex;
                      using(
                          LinearGradientBrush _Brush =
                              new LinearGradientBrush( tabTextArea, SystemColors.Control, SystemColors.ControlLight,
@@ -545,7 +577,7 @@ namespace LevelEditorApp
 
             tabTextArea = new RectangleF( outerCloseBtnX, outerCloseBtnY, outerCloseBtnWidth, outerCloerBtnHeight );
             Point pt = new Point( e.X, e.Y );
-            if( CanDrawMenuButton( SelectedIndex ) )
+            if( CanDrawCloseButton( SelectedIndex ) )
                {
                if( tabTextArea.Contains( pt ) )
                   {

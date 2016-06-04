@@ -169,11 +169,6 @@ namespace LevelEditorApp
          return textBox;
          }
 
-      private void tabCtlEX_MidUp_OnClose( object sender, CloseEventArgs e )
-         {
-         this.tabCtlEX_MidUp.Controls.Remove( this.tabCtlEX_MidUp.TabPages[ e.TabIndex ] );
-         }
-
       void treeView_Assets_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
          {
          LevelEditorApp.TabPageEX textPage = AddTabePage( e.Node.Text, this.tabCtlEX_MidUp.Controls, true );

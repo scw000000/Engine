@@ -34,7 +34,7 @@ namespace LevelEditorApp
          // This call is required by the Windows.Forms Form Designer.
          InitializeComponent();
          this.TabStop = false;
-
+         this.OnClose += new OnHeaderCloseDelegate( this.OnTabPageClose );
 
          // TODO: Add any initialization after the InitComponent call
 
@@ -186,7 +186,7 @@ namespace LevelEditorApp
                            };
                         Console.Write( "detected!@!" );
                         }
-                     else 
+                     else
                         {
                         _ColorBlend.Colors = new Color[]{  SystemColors.ActiveBorder, 
                                                         SystemColors.ActiveBorder,SystemColors.ActiveBorder,
@@ -249,7 +249,7 @@ namespace LevelEditorApp
                            };
                         Console.Write( "detected!@!" );
                         }
-                     else 
+                     else
                         {
                         //Drawing Close Button
                         _ColorBlend.Colors = new Color[]{Color.FromArgb(255,231,164,152), 
@@ -257,7 +257,7 @@ namespace LevelEditorApp
                                                          Color.FromArgb(255,197,98,79),
                                                          Color.FromArgb(255,197,98,79)};
                         }
-                     
+
                      _Brush.InterpolationColors = _ColorBlend;
                      DrawCloseBox( e.Graphics, tabTextArea, _Brush );
                      }
@@ -617,6 +617,12 @@ namespace LevelEditorApp
                   }
                }
             }
+         }
+
+      private void OnTabPageClose( object sender, CloseEventArgs e )
+         {
+
+         this.Controls.Remove( this.TabPages[ e.TabIndex ] );
          }
       }
 

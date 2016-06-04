@@ -80,6 +80,9 @@
     <Compile Include="TabPageEX.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="TextBoxEX.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="Editor.resx">
       <DependentUpon>Editor.cs</DependentUpon>
     </EmbeddedResource>

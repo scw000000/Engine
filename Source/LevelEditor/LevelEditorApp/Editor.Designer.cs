@@ -205,7 +205,6 @@
          this.tabCtlEX_LeftUp.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
          this.tabCtlEX_LeftUp.TabIndex = 0;
          this.tabCtlEX_LeftUp.TabStop = false;
-         this.tabCtlEX_LeftUp.OnClose += new LevelEditorApp.TabControlEX.OnHeaderCloseDelegate( this.tabCtlEX_MidUp_OnClose );
          // 
          // tabCtlEX_LeftDown
          // 
@@ -233,7 +232,6 @@
          this.tabCtlEX_MidUp.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
          this.tabCtlEX_MidUp.TabIndex = 0;
          this.tabCtlEX_MidUp.TabStop = false;
-         this.tabCtlEX_MidUp.OnClose += new LevelEditorApp.TabControlEX.OnHeaderCloseDelegate( this.tabCtlEX_MidUp_OnClose );
          // 
          // tabCtlEX_MidDown
          // 

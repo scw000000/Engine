@@ -15,7 +15,6 @@
 #include "EngineStd.h"
 #include "UserInterface.h"
 #include "HumanView.h"
-#include "..\Controller\Controller.h"
 
 UserInterface::UserInterface( const Resource& layoutRes ) : m_LayoutResource( layoutRes ), m_pGUIManager( g_pApp->m_pEngineLogic->m_pGUIManager )
    {

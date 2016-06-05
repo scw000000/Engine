@@ -123,7 +123,10 @@ class IPointerHandler
 class IController : public IKeyboardHandler, public IPointerHandler
    {
    public:
+      virtual ~IController( void ){}
       virtual bool VOnMsgProc( const SDL_Event& event ) = 0;
+      virtual void VOnTickUpdate( unsigned long deltaMilliseconds ) = 0;
+      virtual void VOnUpdate( unsigned long deltaMilliseconds ) = 0;
    };
 
 class IJoystickHandler

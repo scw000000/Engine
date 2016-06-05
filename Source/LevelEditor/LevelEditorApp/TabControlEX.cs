@@ -116,6 +116,14 @@ namespace LevelEditorApp
             }
          }
 
+      protected float MeasureTabWidth( int index ) 
+         {
+         TabPage curTab = this.TabPages[ index ];
+         Graphics g = Graphics.FromHwnd( curTab.Handle );
+         SizeF size = g.MeasureString( curTab.Text, curTab.Font, 300 );
+         return size.Width + this.GetTabRect( 0 ).Height + 11;
+         }
+
       protected override void OnControlAdded( ControlEventArgs e )
          {
          base.OnControlAdded( e );
@@ -128,6 +136,25 @@ namespace LevelEditorApp
             m_MaxStringLength = newTabMinWidth;
             this.ItemSize = new Size( Math.Max( m_MinTabSize, (int) m_MaxStringLength ), this.ItemSize.Height );
 
+            }
+
+         }
+
+      protected override void OnControlRemoved( ControlEventArgs e )
+         {
+         base.OnControlRemoved( e );
+         m_MaxStringLength = -1;
+         
+         for( int i = 0; i < this.TabCount; ++i )
+            {
+            if( !e.Control.Name.Equals( this.TabPages[ i ].Name ) && m_MaxStringLength < MeasureTabWidth( i ) )
+               {
+               m_MaxStringLength = MeasureTabWidth( i );
+               }
+            }
+         if( m_MaxStringLength > 0 )
+            {
+            this.ItemSize = new Size( Math.Max( m_MinTabSize, (int) m_MaxStringLength ), this.ItemSize.Height );
             }
 
          }
@@ -583,12 +610,25 @@ namespace LevelEditorApp
                   {
                   if( confirmOnClose )
                      {
-                     if(
-                         MessageBox.Show(
-                             "You are about to close " + this.TabPages[ SelectedIndex ].Text.TrimEnd() +
+                     EditorTextBox textBox = ( ( TabPageEX ) this.TabPages[ SelectedIndex ] ).TextBox;
+                     // if textBox exist, ask it instead of the tabPage
+                     if( textBox != null )
+                        {
+                        if( textBox.ConfirmClose() == false )
+                           {
+                           return;
+                           }
+                        }
+                     else 
+                        {
+                        if( MessageBox.Show(
+                             "You are about to close " + this.TabPages[ SelectedIndex ].Text +
                              " tab. Are you sure you want to continue?", "Confirm close", MessageBoxButtons.YesNo ) ==
-                         DialogResult.No )
-                        return;
+                         DialogResult.No ) 
+                           {
+                           return;
+                           }
+                        }
                      }
                   //Fire Event to Client
                   if( OnClose != null )
@@ -621,7 +661,6 @@ namespace LevelEditorApp
 
       private void OnTabPageClose( object sender, CloseEventArgs e )
          {
-
          this.Controls.Remove( this.TabPages[ e.TabIndex ] );
          }
       }

@@ -104,6 +104,8 @@
     <ClCompile Include="..\Actors\SkyRenderComponent.cpp" />
     <ClCompile Include="..\Actors\TransformComponent.cpp" />
     <ClCompile Include="..\Controller\Controller.cpp" />
+    <ClCompile Include="..\Controller\EditorController.cpp" />
+    <ClCompile Include="..\Controller\MovementController.cpp" />
     <ClCompile Include="..\Debugging\Logger.cpp" />
     <ClCompile Include="..\Event\EventManager.cpp" />
     <ClCompile Include="..\Event\Events.cpp" />
@@ -170,6 +172,8 @@
     <ClInclude Include="..\Actors\SkyRenderComponent.h" />
     <ClInclude Include="..\Actors\TransformComponent.h" />
     <ClInclude Include="..\Controller\Controller.h" />
+    <ClInclude Include="..\Controller\EditorController.h" />
+    <ClInclude Include="..\Controller\MovementController.h" />
     <ClInclude Include="..\Debugging\Logger.h" />
     <ClInclude Include="..\Event\EventManager.h" />
     <ClInclude Include="..\Event\Events.h" />

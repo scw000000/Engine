@@ -60,3 +60,9 @@ void SingleLoop( void )
    {
    g_pApp->SingleLoop();
    }
+
+void PushSDLEvent( int* event )
+   {
+  // SDL_PushEvent( ( SDL_Event* )event );
+   SDL_Event evt = *( SDL_Event* ) event;
+   }

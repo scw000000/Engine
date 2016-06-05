@@ -2,7 +2,7 @@
 // GameCode4.fx - the shader file for GameCode4 (D3D9 renderer)
 //
 // Part of the GameCode4 Application
-//
+//  
 // GameCode4 is the sample application that encapsulates much of the source code
 // discussed in "Game Coding Complete - 4th Edition" by Mike McShaffry and David
 // "Rez" Graham, published by Charles River Media. 

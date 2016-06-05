@@ -103,9 +103,6 @@
     <ClCompile Include="..\ResourceCache\XmlResource.cpp">
       <Filter>ResourceCache</Filter>
     </ClCompile>
-    <ClCompile Include="..\Controller\Controller.cpp">
-      <Filter>Controller</Filter>
-    </ClCompile>
     <ClCompile Include="..\Graphics\SceneNodes.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
@@ -196,6 +193,15 @@
     <ClCompile Include="..\ResourceCache\DevResourceFile.cpp">
       <Filter>ResourceCache</Filter>
     </ClCompile>
+    <ClCompile Include="..\Controller\MovementController.cpp">
+      <Filter>Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Controller\EditorController.cpp">
+      <Filter>Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Controller\Controller.cpp">
+      <Filter>Controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -265,9 +271,6 @@
     </ClInclude>
     <ClInclude Include="..\ResourceCache\XmlResource.h">
       <Filter>ResourceCache</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Controller\Controller.h">
-      <Filter>Controller</Filter>
     </ClInclude>
     <ClInclude Include="..\Graphics\SceneNodes.h">
       <Filter>Graphics</Filter>
@@ -358,6 +361,15 @@
     </ClInclude>
     <ClInclude Include="..\ResourceCache\DevResourceFile.h">
       <Filter>ResourceCache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Controller\MovementController.h">
+      <Filter>Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Controller\EditorController.h">
+      <Filter>Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Controller\Controller.h">
+      <Filter>Controller</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

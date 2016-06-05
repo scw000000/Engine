@@ -33,7 +33,7 @@ class GUIManager
       void LoadScheme( const std::string& schemeFile );
       void SetFont( const std::string& fontFile );
 
-      void OnUpdate( const unsigned long deltaMs );
+      void OnUpdate( unsigned long deltaMs );
       void OnRender( double fTime, float fElapsedTime );
       void AttachLayout( shared_ptr<UserInterface> pUI );
       void DetachLayout( shared_ptr<UserInterface> pUI );

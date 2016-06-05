@@ -17,9 +17,9 @@ namespace LevelEditorApp
          
          Application.EnableVisualStyles();
          Application.SetCompatibleTextRenderingDefault( false );
-         MessageHandler messageHandler = new MessageHandler();
+         Editor editor = new Editor();
+         MessageHandler messageHandler = new MessageHandler( ref editor.tabPageEX_World, ref editor );
          Application.AddMessageFilter( messageHandler );
-         Editor editor = new Editor();   
          Application.Idle += new EventHandler( messageHandler.Application_Idle );
          Application.Run( editor );
 

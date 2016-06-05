@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
-
-using System.IO;
-//using System.Collections;
-//using System.Runtime.InteropServices;
 using System.Xml;
+using System;
 
 using SDL2;
 
@@ -21,7 +18,7 @@ namespace LevelEditorApp
    public partial class Editor : Form
       {
       //private ActorComponentEditor m_ActorComponentEditor;
-      private IntPtr m_pSDLWindow;
+      public IntPtr m_pSDLWindow;
       private List<XmlNode> m_ActorsXmlNodes = new List<XmlNode>();
       private MessageHandler m_messageFilter;
       private System.Windows.Forms.TreeView treeView_Assets;
@@ -36,11 +33,18 @@ namespace LevelEditorApp
       private string m_CurrentDirectory;
       private string m_ProjectDirectory;
 
+      private List<String> m_SupportTextPattern;
+
       public Editor()
          {
          InitializeComponent();
          m_CurrentDirectory = Directory.GetCurrentDirectory();
          m_AssetsDirectory = m_CurrentDirectory + "\\Assets";
+
+         m_SupportTextPattern = new List<string>(){ "*.xml", 
+                                                "*.fragmentshader", 
+                                                "*.vertexshader",
+                                                "*.lua"};
 
          // Setting all of splitter width in all comtainers
          int splitterWidth = 10;
@@ -62,7 +66,7 @@ namespace LevelEditorApp
 
          try
             {
-            SDL.SDL_Init( SDL.SDL_INIT_VIDEO );
+            SDL.SDL_Init( SDL.SDL_INIT_EVERYTHING );
             //IntPtr pWindow = SDL2.SDL.SDL_CreateWindowFrom( this.splitContainer1.Panel1.Handle );
             m_pSDLWindow = SDL.SDL_CreateWindow( string.Empty, 
                SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED,
@@ -146,41 +150,42 @@ namespace LevelEditorApp
          return pageEx;
          }
 
-      private System.Windows.Forms.TextBox AddTextBox( string name, string fileName, System.Windows.Forms.Control.ControlCollection controls, bool closeBtnEnabled )
+      public void treeView_Assets_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
          {
-         System.Windows.Forms.TextBox textBox = new System.Windows.Forms.TextBox();
-         textBox.Dock = DockStyle.Fill;
-         textBox.Name = name;
-         textBox.BackColor = Color.FromArgb( 255, 49, 49, 49 );
-         textBox.ForeColor = Color.WhiteSmoke;
-         textBox.Multiline = true;
-         textBox.ScrollBars = ScrollBars.Vertical;
-         try
+         if( isTextBoxSupport( e.Node.Text ) )
             {
-            StreamReader objstream = new StreamReader( fileName );
-
-            textBox.Text = objstream.ReadToEnd ();
+            LevelEditorApp.TabPageEX textPage = AddTabePage( e.Node.Text, this.tabCtlEX_MidUp.Controls, true );
+            String filePath = "";
+            TreeNode tempNode = e.Node;
+            while( tempNode != null )
+               {
+               filePath = "\\" + tempNode.Text + filePath;
+               tempNode = tempNode.Parent;
+               }
+            textPage.TextBox = new EditorTextBox( e.Node.Text, m_CurrentDirectory + "\\" + filePath );
+            textPage.Controls.Add( textPage.TextBox );
             }
-         catch( Exception e )
+         else 
             {
-            MessageBox.Show( "Err: " + e.ToString() );
+            MessageBox.Show( "This file format is not supported yet.", "Error", MessageBoxButtons.OK );
             }
-         controls.Add( textBox );
-         return textBox;
          }
 
-      void treeView_Assets_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+      private bool isTextBoxSupport( string fileName ) 
          {
-         LevelEditorApp.TabPageEX textPage = AddTabePage( e.Node.Text, this.tabCtlEX_MidUp.Controls, true );
-         String filePath = "";
-         TreeNode tempNode = e.Node;
-         while( tempNode != null )
+         for( int i = 0; i < m_SupportTextPattern.Count; ++i )
             {
-            filePath = "\\" + tempNode.Text + filePath;
-            tempNode = tempNode.Parent;
+            if( Regex.IsMatch( fileName, WildCardToRegular( m_SupportTextPattern[ i ] ) ) )
+               {
+               return true;
+               }
             }
+         return false;
+         }
 
-         System.Windows.Forms.TextBox textBox = AddTextBox( e.Node.Text, m_CurrentDirectory + "\\" + filePath, textPage.Controls, false );
+      private static String WildCardToRegular( String value )
+         {
+         return "^" + Regex.Escape( value ).Replace( "\\?", "." ).Replace( "\\*", ".*" ) + "$";
          }
       }
    }

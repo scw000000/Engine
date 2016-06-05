@@ -16,7 +16,7 @@
 #include "HumanView.h"
 #include "MenuInterface.h"
 #include "..\Graphics\Scene.h"
-#include "..\Controller\Controller.h"
+#include "..\Controller\EditorController.h"
 
 const unsigned int SCREEN_MAX_FRAME_RATE = 60;
 const Uint64 SCREEN_MIN_RENDER_INTERVAL = ( SDL_GetPerformanceFrequency() / SCREEN_MAX_FRAME_RATE );
@@ -41,8 +41,7 @@ HumanView::HumanView( void )
 		ENG_ASSERT( m_pWorld && m_pCamera && _T("Out of memory") );     
 		m_pWorld->AddChild( INVALID_ACTOR_ID, m_pCamera );
       }
-   m_pController.reset( ENG_NEW MovementController( m_pCamera, 0, 0, false ) );
-   m_pController->VSetPointerLocked( false );
+   m_pController.reset( ENG_NEW EditorController( m_pCamera, 0, 0, true ) );
    }
 
 HumanView::~HumanView()
@@ -129,7 +128,7 @@ void HumanView::VOnUpdate( const unsigned long deltaMs )
    static bool test = true;
    if( m_pController )
       {
-      m_pController->OnUpdate( deltaMs );
+      m_pController->VOnTickUpdate( deltaMs );
       }
    m_pProcessManager->UpdateProcesses( deltaMs );
    }

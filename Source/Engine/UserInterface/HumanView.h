@@ -14,7 +14,7 @@
  */
 
 #include "PromptBox.h"
-#include "..\Controller\Controller.h"
+#include "..\Controller\MovementController.h"
 
 class UserInterface;
 
@@ -53,7 +53,7 @@ class HumanView : public IView
       bool LoadLevel( TiXmlElement* pLevelData );
 
    public:
-      shared_ptr<MovementController> m_pController; 
+      shared_ptr<IController> m_pController; 
 
    protected:
 	   ViewId m_ViewId;

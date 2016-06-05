@@ -13,7 +13,7 @@ using System.Windows.Forms;
 
 namespace LevelEditorApp
    {
-   class TabPageEX: System.Windows.Forms.TabPage
+   public class TabPageEX: System.Windows.Forms.TabPage
 	   {
 		/// <summary>
 		/// Required designer variable.
@@ -71,17 +71,20 @@ namespace LevelEditorApp
 		   {
 			components = new System.ComponentModel.Container();
 		   }
-      public override string Text
+
+      private LevelEditorApp.EditorTextBox m_EditorTextBox;
+      public LevelEditorApp.EditorTextBox TextBox
          {
          get
             {
-            return base.Text;
+            return m_EditorTextBox;
             }
          set
             {
-            base.Text = value;
+            m_EditorTextBox = value;
             }
          }
+
       private bool isCloseBtnEnabled = false;
       public bool CloseBtnEnabled
          {

@@ -324,7 +324,7 @@
         private LevelEditorApp.TabControlEX tabCtlEX_RightUp;
         private LevelEditorApp.TabControlEX tabCtlEX_RightDown;
         private LevelEditorApp.TabPageEX tabPageEX_Assets;
-        private LevelEditorApp.TabPageEX tabPageEX_World;
+        public LevelEditorApp.TabPageEX tabPageEX_World;
     }
 }
 

@@ -306,7 +306,6 @@ Uint32 EngineApp::RegisterEvent( int eventNum )
 
 void EngineApp::MsgProc( void )
    {
-
    SDL_Event event;
    HumanView*  pHumanView;
    if( SDL_PollEvent( &event ) )

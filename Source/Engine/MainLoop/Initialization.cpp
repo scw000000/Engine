@@ -30,6 +30,7 @@ EngineOptions::EngineOptions()
 	m_runFullSpeed = false;
 	m_ScreenSize = Point( 1024, 768 );
 	m_pDoc = NULL;
+   m_ShowMouseCursor = true;
    }
 
 void EngineOptions::Init( const char* xmlFileName )
@@ -89,7 +90,12 @@ void EngineOptions::Init( const char* xmlFileName )
          {
          if( pNode->Attribute( "UseDevelopmentDirectories" ) )
             {
-            m_UseDevDir = ( pNode->Attribute( "UseDevelopmentDirectories" ) == "yes" ) ? true : false;
+            std::string attribute = pNode->Attribute( "UseDevelopmentDirectories" );
+            m_UseDevDir = ( attribute == "yes" ) ? true : false;
+            }
+         if( pNode->Attribute( "AssetsDirectory" ) )
+            {
+            m_AssetsDirectory = pNode->Attribute( "AssetsDirectory" );
             }
          if( pNode->Attribute( "GUIDirectory" ) )
             {
@@ -113,6 +119,11 @@ void EngineOptions::Init( const char* xmlFileName )
             m_Layout = pNode->Attribute( "Layout" );
             }
          }
+         if( pNode->Attribute( "ShowMouseCursor" ) )
+            {
+            std::string attribute = pNode->Attribute( "ShowMouseCursor" );
+            m_ShowMouseCursor = ( attribute == "yes" ) ? true : false;
+            }
 
 	   }
    }

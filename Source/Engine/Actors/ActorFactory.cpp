@@ -42,7 +42,8 @@ ActorFactory::ActorFactory( void )
 // Including function arguments LATER: modify it and let it consistant
 StrongActorPtr ActorFactory::CreateActor( const char* actorResource )
    {
-   TiXmlElement *pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( actorResource );
+   Resource actorRes( actorResource, g_pApp->m_EngineOptions.m_UseDevDir );
+   TiXmlElement *pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( &actorRes );
 
    // Resource loading failed, return empty pointer
    if( !pRoot )

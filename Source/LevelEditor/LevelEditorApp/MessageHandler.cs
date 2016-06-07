@@ -56,20 +56,9 @@ namespace LevelEditorApp
             }
          }
 
-      unsafe public bool PreFilterMessage( ref Message m )
+       public bool PreFilterMessage( ref Message m )
          {
-         SDL.SDL_Event evt = new SDL.SDL_Event();
-         int i = 0;
-         //if( SDL.SDL_PeepEvents( out evt ) > 0 )
-         //   {
-         //   switch( evt.type )
-         //      {
-         //      case SDL.SDL_EventType.SDL_KEYDOWN:
-         //         i++;
-         //         break;
-         //      }
-         //   IntPtr ptr = new IntPtr( &evt );
-         //   NativeMethods.PushSDLEvent( ptr );
+         
          //   switch( evt.type )
          //      {
          //      case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
@@ -121,11 +110,34 @@ namespace LevelEditorApp
          return false;
          }
 
-      public void Application_Idle( object sender, EventArgs e )
+      unsafe public void Application_Idle( object sender, EventArgs e )
          {
          try
             {
-            
+            SDL.SDL_Event evt = new SDL.SDL_Event();
+            int i = 0;
+            //while( SDL.SDL_PollEvent( out evt ) > 0 )
+            //   {
+            //   switch( evt.type )
+            //      {
+            //      case SDL.SDL_EventType.SDL_KEYDOWN:
+            //         i++;
+            //         break;
+            //      }
+            //   IntPtr ptr = new IntPtr( &evt );
+            //   NativeMethods.PushSDLEvent( ptr );
+            //   }
+            if( SDL.SDL_PollEvent( out evt ) > 0 )
+               {
+               switch( evt.type )
+                  {
+                  case SDL.SDL_EventType.SDL_KEYDOWN:
+                     i++;
+                     break;
+                  }
+               IntPtr ptr = new IntPtr( &evt );
+               NativeMethods.PushSDLEvent( ptr );
+               }
             NativeMethods.SingleLoop();
             }
          catch( Exception ex )

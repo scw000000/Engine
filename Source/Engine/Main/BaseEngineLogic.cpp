@@ -228,9 +228,9 @@ void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )
 // LATER: finish implementation
 bool BaseEngineLogic::VLoadLevel( const char* levelResource )
    {
-   
+   Resource levelRes( levelResource, g_pApp->m_EngineOptions.m_UseDevDir );
     // Grab the root XML node
-   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( levelResource );
+   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( &levelRes );
    if (!pRoot)
       { 
       ENG_ERROR( "Failed to find level resource file: " + std::string( levelResource ) );

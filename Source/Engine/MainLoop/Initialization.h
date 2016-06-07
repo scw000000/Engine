@@ -38,11 +38,13 @@ struct EngineOptions
       std::string m_Renderer;
 
       bool m_UseDevDir;
+      std::string m_AssetsDirectory;
       std::string m_Level;
       std::string m_LevelDirectory;
       std::string m_Layout;
       std::string m_GUIDirectory;
-      
+      bool m_ShowMouseCursor;
+
       // TiXmlElement - look at this to find other options added by the developer
 	   TiXmlDocument *m_pDoc;
 

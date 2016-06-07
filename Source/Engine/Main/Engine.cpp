@@ -207,8 +207,15 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       }
 
 	m_screenSize = Point( screenWidth, screenHeight );
-
-   SDL_ShowCursor( SDL_DISABLE );
+   if( m_EngineOptions.m_ShowMouseCursor )
+      {
+      SDL_ShowCursor( SDL_ENABLE );
+      }
+   else
+      {
+      SDL_ShowCursor( SDL_DISABLE );
+      }
+   
    SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
    // setup opengl rendering context
    SDL_GLContext glContext = SDL_GL_CreateContext( m_pWindow );
@@ -310,6 +317,11 @@ void EngineApp::MsgProc( void )
    HumanView*  pHumanView;
    if( SDL_PollEvent( &event ) )
       {
+      if( event.type == SDL_KEYDOWN )
+         {
+         int i = 0;
+         ++i;
+         }
       if( event.type == m_ShutDownEventType )
          {
          pHumanView = GetHumanView();
@@ -438,8 +450,8 @@ bool EngineApp::LoadStrings( std::string language )
 	std::string languageFile = "Strings\\";
 	languageFile += language;
 	languageFile += ".xml";
-
-	TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( languageFile.c_str() );
+   Resource languageRes( languageFile, g_pApp->m_EngineOptions.m_UseDevDir );
+   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( &languageRes );
 	// load failed
    if ( !pRoot )
 	   {

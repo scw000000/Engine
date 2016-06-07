@@ -37,5 +37,5 @@ class XmlResourceLoader : public ResourceLoader
       virtual bool VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) override;
       virtual bool VUsePreAllocate( void ) override { return true; }
       // convenience function
-      static TiXmlElement* LoadAndReturnRootXmlElement( const char* resourceString );
+      static TiXmlElement* LoadAndReturnRootXmlElement( Resource* pResource );
    };

@@ -43,7 +43,15 @@ void UserInterface::VInit( void )
 
 void UserInterface::VSetIsMouseCursorEnable( bool isDisplay )
    {
-   m_IsMouseCursorEnable = isDisplay;
+   if( isDisplay )
+      {
+      SDL_ShowCursor( SDL_ENABLE );
+      }
+   else
+      {
+      SDL_ShowCursor( SDL_DISABLE );
+      }
+   
    }
 
 int UserInterface::VAsk( MessageBox_Questions question )

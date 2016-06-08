@@ -1,6 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: SceneNodes.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file SceneNodes.cpp
+ * \date 2016/06/08 15:09
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "EngineStd.h"
 #include "SceneNodes.h"

@@ -1,7 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: TransformStack.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file TransformStack.h
+ * \date 2016/06/08 15:10
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include <stack>
 #include <vector>

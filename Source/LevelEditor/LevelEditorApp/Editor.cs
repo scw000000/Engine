@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
@@ -63,39 +64,48 @@ namespace LevelEditorApp
          this.treeView_Assets.LineColor = Color.WhiteSmoke;
          this.treeView_Assets.NodeMouseDoubleClick += new TreeNodeMouseClickEventHandler( this.treeView_Assets_NodeMouseClick );
          this.tabPageEX_Assets.Controls.Add( this.treeView_Assets );
+         InitializeAssetTree();
 
-         try
-            {
-            SDL.SDL_Init( SDL.SDL_INIT_EVERYTHING );
-            //IntPtr pWindow = SDL2.SDL.SDL_CreateWindowFrom( this.splitContainer1.Panel1.Handle );
-            m_pSDLWindow = SDL.SDL_CreateWindow( string.Empty, 
-               SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED,
-               this.splitContainer_Mid.Panel1.Width,
-               this.splitContainer_Mid.Panel1.Height, 
-               SDL.SDL_WindowFlags.SDL_WINDOW_BORDERLESS | SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL );   
-            //IntPtr pContext = SDL2.SDL.SDL_GL_CreateContext( m_pSDLWindow );
-            SDL.SDL_SysWMinfo info = new SDL.SDL_SysWMinfo();
-            SDL.SDL_GetWindowWMInfo( m_pSDLWindow, ref info );
-            IntPtr winHandle = info.info.win.window;
-            NativeMethods.SetWindowPos(
-               winHandle,
-               Handle,
-               0,
-               0,
-               0,
-               0,
-               0x0401 // NOSIZE | SHOWWINDOW 
-               );
-            NativeMethods.SetParent( winHandle, this.tabPageEX_World.Handle );
-            NativeMethods.ShowWindow( winHandle, 1 ); // SHOWNORMAL
-            NativeMethods.EditorMain( m_pSDLWindow, this.splitContainer_Mid.Panel1.Width, this.splitContainer_Mid.Panel1.Height );
-         //   NativeMethods.test( pWindow );
-            InitializeAssetTree();
-            }
-         catch( Exception e )
-            {
-            MessageBox.Show( "Error: " + e.ToString() );
-            }
+         //try
+         //   {
+         //   SDL.SDL_Init( SDL.SDL_INIT_EVERYTHING );
+         //   //IntPtr pWindow = SDL2.SDL.SDL_CreateWindowFrom( this.splitContainer1.Panel1.Handle );
+         //   m_pSDLWindow = SDL.SDL_CreateWindow( string.Empty,
+         //      SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED,
+         //      this.splitContainer_Mid.Panel1.Width,
+         //      this.splitContainer_Mid.Panel1.Height,
+         //      SDL.SDL_WindowFlags.SDL_WINDOW_BORDERLESS | SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL );
+         //   //IntPtr pContext = SDL2.SDL.SDL_GL_CreateContext( m_pSDLWindow );
+         //   SDL.SDL_SysWMinfo info = new SDL.SDL_SysWMinfo();
+         //   SDL.SDL_GetWindowWMInfo( m_pSDLWindow, ref info );
+         //   IntPtr winHandle = info.info.win.window;
+         //   NativeMethods.SetWindowPos(
+         //      winHandle,
+         //      Handle,
+         //      0,
+         //      0,
+         //      0,
+         //      0,
+         //      0x0401 // NOSIZE | SHOWWINDOW 
+         //      );
+         //   NativeMethods.SetParent( winHandle, this.tabPageEX_World.Handle );
+         //   NativeMethods.ShowWindow( winHandle, 1 ); // SHOWNORMAL
+         //   NativeMethods.EditorMain( m_pSDLWindow, this.splitContainer_Mid.Panel1.Width, this.splitContainer_Mid.Panel1.Height );
+         //   //   NativeMethods.test( pWindow );
+
+         //   }
+         //catch( Exception e )
+         //   {
+         //   MessageBox.Show( "Error: " + e.ToString() );
+         //   }
+
+         SDLThread m_SDLThread = new SDLThread();
+         m_SDLThread.Init( Handle, this.tabPageEX_World.Handle, this.splitContainer_Mid.Panel1.Width, this.splitContainer_Mid.Panel1.Height );
+         //m_pSDLWindow = m_SDLThread.m_pSDLWindow;
+         //Thread workerThread = new Thread( m_SDLThread.Run );
+
+         //workerThread.Start();
+
          }
       private void InitializeAssetTree()
          {

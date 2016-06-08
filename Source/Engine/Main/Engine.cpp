@@ -226,6 +226,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    
    // Needed for core profile
    glewExperimental = true; 
+
    GLenum error = glewInit();
 
    if( error != GLEW_OK )

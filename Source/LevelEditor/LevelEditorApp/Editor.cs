@@ -20,8 +20,9 @@ namespace LevelEditorApp
       {
       //private ActorComponentEditor m_ActorComponentEditor;
       public IntPtr m_pSDLWindow;
+      public delegate void mydalegate();
+      public mydalegate m_UpdateSDLDelegate;
       private List<XmlNode> m_ActorsXmlNodes = new List<XmlNode>();
-      private MessageHandler m_messageFilter;
       private System.Windows.Forms.TreeView treeView_Assets;
 
       private const int INVALID_ACTOR_ID = 0;
@@ -39,6 +40,7 @@ namespace LevelEditorApp
       public Editor()
          {
          InitializeComponent();
+         this.WindowState = FormWindowState.Maximized;
          m_CurrentDirectory = Directory.GetCurrentDirectory();
          m_AssetsDirectory = m_CurrentDirectory + "\\Assets";
 
@@ -55,6 +57,14 @@ namespace LevelEditorApp
          this.splitContainer_Mid.SplitterWidth = splitterWidth;
          this.splitContainer_Right.SplitterWidth = splitterWidth;
 
+         int SDLWindowWidth = 1366;
+         int SDLWindowHeight = 768;
+
+         int lrPageWidth = ( this.splitContainer1.Width - SDLWindowWidth - 2 * splitterWidth - 8 ) / 2;
+         this.splitContainer1.SplitterDistance = this.splitContainer1.Width - lrPageWidth - splitterWidth - 4;
+         this.splitContainer2.SplitterDistance = this.splitContainer2.Width - SDLWindowWidth - splitterWidth;
+         this.splitContainer_Mid.SplitterDistance = SDLWindowHeight;
+
          this.tabPageEX_World = AddTabePage( "tabPageEX_World", this.tabCtlEX_MidUp.Controls, false );
 
          this.tabPageEX_Assets = AddTabePage( "tabPageEX_Assets", this.tabCtlEX_RightUp.Controls, false );
@@ -66,47 +76,74 @@ namespace LevelEditorApp
          this.tabPageEX_Assets.Controls.Add( this.treeView_Assets );
          InitializeAssetTree();
 
-         //try
-         //   {
-         //   SDL.SDL_Init( SDL.SDL_INIT_EVERYTHING );
-         //   //IntPtr pWindow = SDL2.SDL.SDL_CreateWindowFrom( this.splitContainer1.Panel1.Handle );
-         //   m_pSDLWindow = SDL.SDL_CreateWindow( string.Empty,
-         //      SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED,
-         //      this.splitContainer_Mid.Panel1.Width,
-         //      this.splitContainer_Mid.Panel1.Height,
-         //      SDL.SDL_WindowFlags.SDL_WINDOW_BORDERLESS | SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL );
-         //   //IntPtr pContext = SDL2.SDL.SDL_GL_CreateContext( m_pSDLWindow );
-         //   SDL.SDL_SysWMinfo info = new SDL.SDL_SysWMinfo();
-         //   SDL.SDL_GetWindowWMInfo( m_pSDLWindow, ref info );
-         //   IntPtr winHandle = info.info.win.window;
-         //   NativeMethods.SetWindowPos(
-         //      winHandle,
-         //      Handle,
-         //      0,
-         //      0,
-         //      0,
-         //      0,
-         //      0x0401 // NOSIZE | SHOWWINDOW 
-         //      );
-         //   NativeMethods.SetParent( winHandle, this.tabPageEX_World.Handle );
-         //   NativeMethods.ShowWindow( winHandle, 1 ); // SHOWNORMAL
-         //   NativeMethods.EditorMain( m_pSDLWindow, this.splitContainer_Mid.Panel1.Width, this.splitContainer_Mid.Panel1.Height );
-         //   //   NativeMethods.test( pWindow );
-
-         //   }
-         //catch( Exception e )
-         //   {
-         //   MessageBox.Show( "Error: " + e.ToString() );
-         //   }
-
-         SDLThread m_SDLThread = new SDLThread();
-         m_SDLThread.Init( Handle, this.tabPageEX_World.Handle, this.splitContainer_Mid.Panel1.Width, this.splitContainer_Mid.Panel1.Height );
-         //m_pSDLWindow = m_SDLThread.m_pSDLWindow;
-         //Thread workerThread = new Thread( m_SDLThread.Run );
-
-         //workerThread.Start();
+         m_UpdateSDLDelegate = new mydalegate( UpdateSDLWindow );
+         InitSDLWindow();
 
          }
+
+      public void treeView_Assets_NodeMouseClick( object sender, TreeNodeMouseClickEventArgs e )
+         {
+         if( isTextBoxSupport( e.Node.Text ) )
+            {
+            LevelEditorApp.TabPageEX textPage = AddTabePage( e.Node.Text, this.tabCtlEX_MidUp.Controls, true );
+            String filePath = "";
+            TreeNode tempNode = e.Node;
+            while( tempNode != null )
+               {
+               filePath = "\\" + tempNode.Text + filePath;
+               tempNode = tempNode.Parent;
+               }
+            textPage.TextBox = new EditorTextBox( e.Node.Text, m_CurrentDirectory + "\\" + filePath );
+            textPage.TextBox.Font = new Font( textPage.TextBox.Font.FontFamily, 20 );
+            textPage.Controls.Add( textPage.TextBox );
+            }
+         else
+            {
+            MessageBox.Show( "This file format is not supported yet.", "Error", MessageBoxButtons.OK );
+            }
+         }
+
+      public void InitSDLWindow()
+         {
+         try
+            {
+            SDL.SDL_Init( SDL.SDL_INIT_EVERYTHING );
+            //IntPtr pWindow = SDL2.SDL.SDL_CreateWindowFrom( this.splitContainer1.Panel1.Handle );
+            m_pSDLWindow = SDL.SDL_CreateWindow( string.Empty,
+               SDL.SDL_WINDOWPOS_CENTERED, SDL.SDL_WINDOWPOS_CENTERED,
+               this.splitContainer_Mid.Panel1.Width,
+               this.splitContainer_Mid.Panel1.Height,
+               SDL.SDL_WindowFlags.SDL_WINDOW_BORDERLESS | SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL );
+            //IntPtr pContext = SDL2.SDL.SDL_GL_CreateContext( m_pSDLWindow );
+            SDL.SDL_SysWMinfo info = new SDL.SDL_SysWMinfo();
+            SDL.SDL_GetWindowWMInfo( m_pSDLWindow, ref info );
+            IntPtr winHandle = info.info.win.window;
+            NativeMethods.SetWindowPos(
+               winHandle,
+               Handle,
+               0,
+               0,
+               0,
+               0,
+               0x0401 // NOSIZE | SHOWWINDOW 
+               );
+            NativeMethods.SetParent( winHandle, this.tabPageEX_World.Handle );
+            NativeMethods.ShowWindow( winHandle, 1 ); // SHOWNORMAL
+            NativeMethods.EditorMain( m_pSDLWindow, this.splitContainer_Mid.Panel1.Width, this.splitContainer_Mid.Panel1.Height );
+            //   NativeMethods.test( pWindow );
+
+            }
+         catch( Exception e )
+            {
+            MessageBox.Show( "Error: " + e.ToString() );
+            }
+         }
+
+      public void UpdateSDLWindow()
+         {
+         NativeMethods.SingleLoop();
+         }
+
       private void InitializeAssetTree()
          {
          treeView_Assets.Nodes.Clear();
@@ -158,27 +195,6 @@ namespace LevelEditorApp
          pageEx.Text = name;
          controls.Add( pageEx );
          return pageEx;
-         }
-
-      public void treeView_Assets_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
-         {
-         if( isTextBoxSupport( e.Node.Text ) )
-            {
-            LevelEditorApp.TabPageEX textPage = AddTabePage( e.Node.Text, this.tabCtlEX_MidUp.Controls, true );
-            String filePath = "";
-            TreeNode tempNode = e.Node;
-            while( tempNode != null )
-               {
-               filePath = "\\" + tempNode.Text + filePath;
-               tempNode = tempNode.Parent;
-               }
-            textPage.TextBox = new EditorTextBox( e.Node.Text, m_CurrentDirectory + "\\" + filePath );
-            textPage.Controls.Add( textPage.TextBox );
-            }
-         else 
-            {
-            MessageBox.Show( "This file format is not supported yet.", "Error", MessageBoxButtons.OK );
-            }
          }
 
       private bool isTextBoxSupport( string fileName ) 

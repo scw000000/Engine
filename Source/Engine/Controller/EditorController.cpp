@@ -14,7 +14,7 @@
 
 #include "EngineStd.h"
 #include "EditorController.h"
-
+#include "..\UserInterface\HumanView.h"
 
 
 EditorController::EditorController( shared_ptr<SceneNode> object,
@@ -39,12 +39,23 @@ EditorController::EditorController( shared_ptr<SceneNode> object,
 //  This function is updated in human view
 void EditorController::VOnUpdate( unsigned long deltaMilliseconds )
    {
-   if( !m_isRotateWhenLButtonDown || ( m_isRotateWhenLButtonDown && ( m_MouseButton[ SDL_BUTTON_LEFT ]  )) )
+   if( !m_isRotateWhenLButtonDown || ( m_isRotateWhenLButtonDown && ( m_MouseButton[ SDL_BUTTON_LEFT ] ) ) )
       {
       m_TargetRotShift.x += 0.001f * ( m_MouseShift.y );
       m_TargetRotShift.y += 0.001f * ( -m_MouseShift.x );
       SDL_WarpMouseInWindow( g_pApp->GetWindow(), m_LastMousePos.x, m_LastMousePos.y );
       m_CurMousePos = m_LastMousePos;
+      }
+   if( m_isRotateWhenLButtonDown )
+      {
+      if( m_MouseButton[ SDL_BUTTON_LEFT ] )
+         {
+         g_pApp->GetHumanView()->m_pUserInterface->VSetIsMouseCursorEnable( false );
+         }
+      else
+         {
+         g_pApp->GetHumanView()->m_pUserInterface->VSetIsMouseCursorEnable( true );
+         }
       }
 
    bool bTranslating = false;

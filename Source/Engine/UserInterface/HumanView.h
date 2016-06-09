@@ -54,6 +54,7 @@ class HumanView : public IView
 
    public:
       shared_ptr<IController> m_pController; 
+      shared_ptr<UserInterface> m_pUserInterface;
 
    protected:
 	   ViewId m_ViewId;
@@ -61,7 +62,6 @@ class HumanView : public IView
       Uint64 m_lastDraw; // last time the game rended
       bool m_RunFullSpeed; // if the view should ignore max rendering frequency setting
       ProcessManager *m_pProcessManager; // this Processmanager is for things like button animations
-      shared_ptr<UserInterface> m_pUserInterface;
       shared_ptr<Scene> m_pWorld; // this scene will be pushed into screen element list by LoadGame( xml level)
       shared_ptr<CameraNode> m_pCamera;
       

@@ -1,4 +1,6 @@
-﻿namespace LevelEditorApp
+﻿using System.Windows.Forms;
+
+namespace LevelEditorApp
 {
     partial class Editor
     {
@@ -73,7 +75,7 @@
             this.eDITToolStripMenuItem});
          this.menuStrip1.Location = new System.Drawing.Point(0, 0);
          this.menuStrip1.Name = "menuStrip1";
-         this.menuStrip1.Size = new System.Drawing.Size(875, 24);
+         this.menuStrip1.Size = new System.Drawing.Size(1912, 24);
          this.menuStrip1.TabIndex = 0;
          this.menuStrip1.Text = "menuStrip1";
          // 
@@ -104,8 +106,8 @@
          // splitContainer1.Panel2
          // 
          this.splitContainer1.Panel2.Controls.Add(this.splitContainer_Right);
-         this.splitContainer1.Size = new System.Drawing.Size(875, 570);
-         this.splitContainer1.SplitterDistance = 683;
+         this.splitContainer1.Size = new System.Drawing.Size(1912, 1029);
+         this.splitContainer1.SplitterDistance = 1744;
          this.splitContainer1.SplitterWidth = 10;
          this.splitContainer1.TabIndex = 1;
          // 
@@ -122,8 +124,8 @@
          // splitContainer2.Panel2
          // 
          this.splitContainer2.Panel2.Controls.Add(this.splitContainer_Mid);
-         this.splitContainer2.Size = new System.Drawing.Size(679, 566);
-         this.splitContainer2.SplitterDistance = 197;
+         this.splitContainer2.Size = new System.Drawing.Size(1740, 1025);
+         this.splitContainer2.SplitterDistance = 130;
          this.splitContainer2.SplitterWidth = 10;
          this.splitContainer2.TabIndex = 0;
          // 
@@ -143,8 +145,8 @@
          // 
          this.splitContainer_Left.Panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
          this.splitContainer_Left.Panel2.Controls.Add(this.tabCtlEX_LeftDown);
-         this.splitContainer_Left.Size = new System.Drawing.Size(197, 566);
-         this.splitContainer_Left.SplitterDistance = 170;
+         this.splitContainer_Left.Size = new System.Drawing.Size(130, 1025);
+         this.splitContainer_Left.SplitterDistance = 420;
          this.splitContainer_Left.SplitterWidth = 10;
          this.splitContainer_Left.TabIndex = 0;
          // 
@@ -165,8 +167,8 @@
          // 
          this.splitContainer_Mid.Panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
          this.splitContainer_Mid.Panel2.Controls.Add(this.tabCtlEX_MidDown);
-         this.splitContainer_Mid.Size = new System.Drawing.Size(472, 566);
-         this.splitContainer_Mid.SplitterDistance = 448;
+         this.splitContainer_Mid.Size = new System.Drawing.Size(1600, 1025);
+         this.splitContainer_Mid.SplitterDistance = 768;
          this.splitContainer_Mid.SplitterWidth = 10;
          this.splitContainer_Mid.TabIndex = 0;
          // 
@@ -187,8 +189,8 @@
          // 
          this.splitContainer_Right.Panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
          this.splitContainer_Right.Panel2.Controls.Add(this.tabCtlEX_RightDown);
-         this.splitContainer_Right.Size = new System.Drawing.Size(178, 566);
-         this.splitContainer_Right.SplitterDistance = 182;
+         this.splitContainer_Right.Size = new System.Drawing.Size(154, 1025);
+         this.splitContainer_Right.SplitterDistance = 393;
          this.splitContainer_Right.SplitterWidth = 10;
          this.splitContainer_Right.TabIndex = 1;
          // 
@@ -201,7 +203,7 @@
          this.tabCtlEX_LeftUp.Location = new System.Drawing.Point(0, 0);
          this.tabCtlEX_LeftUp.Name = "tabCtlEX_LeftUp";
          this.tabCtlEX_LeftUp.SelectedIndex = 0;
-         this.tabCtlEX_LeftUp.Size = new System.Drawing.Size(197, 170);
+         this.tabCtlEX_LeftUp.Size = new System.Drawing.Size(130, 420);
          this.tabCtlEX_LeftUp.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
          this.tabCtlEX_LeftUp.TabIndex = 0;
          this.tabCtlEX_LeftUp.TabStop = false;
@@ -215,7 +217,7 @@
          this.tabCtlEX_LeftDown.Location = new System.Drawing.Point(0, 0);
          this.tabCtlEX_LeftDown.Name = "tabCtlEX_LeftDown";
          this.tabCtlEX_LeftDown.SelectedIndex = 0;
-         this.tabCtlEX_LeftDown.Size = new System.Drawing.Size(197, 386);
+         this.tabCtlEX_LeftDown.Size = new System.Drawing.Size(130, 595);
          this.tabCtlEX_LeftDown.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
          this.tabCtlEX_LeftDown.TabIndex = 0;
          this.tabCtlEX_LeftDown.TabStop = false;
@@ -228,7 +230,7 @@
          this.tabCtlEX_MidUp.Location = new System.Drawing.Point(0, 0);
          this.tabCtlEX_MidUp.Name = "tabCtlEX_MidUp";
          this.tabCtlEX_MidUp.SelectedIndex = 0;
-         this.tabCtlEX_MidUp.Size = new System.Drawing.Size(472, 448);
+         this.tabCtlEX_MidUp.Size = new System.Drawing.Size(1600, 768);
          this.tabCtlEX_MidUp.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
          this.tabCtlEX_MidUp.TabIndex = 0;
          this.tabCtlEX_MidUp.TabStop = false;
@@ -242,7 +244,7 @@
          this.tabCtlEX_MidDown.Location = new System.Drawing.Point(0, 0);
          this.tabCtlEX_MidDown.Name = "tabCtlEX_MidDown";
          this.tabCtlEX_MidDown.SelectedIndex = 0;
-         this.tabCtlEX_MidDown.Size = new System.Drawing.Size(472, 108);
+         this.tabCtlEX_MidDown.Size = new System.Drawing.Size(1600, 247);
          this.tabCtlEX_MidDown.TabIndex = 0;
          this.tabCtlEX_MidDown.TabStop = false;
          // 
@@ -254,7 +256,7 @@
          this.tabCtlEX_RightUp.Location = new System.Drawing.Point(0, 0);
          this.tabCtlEX_RightUp.Name = "tabCtlEX_RightUp";
          this.tabCtlEX_RightUp.SelectedIndex = 0;
-         this.tabCtlEX_RightUp.Size = new System.Drawing.Size(178, 182);
+         this.tabCtlEX_RightUp.Size = new System.Drawing.Size(154, 393);
          this.tabCtlEX_RightUp.TabIndex = 0;
          this.tabCtlEX_RightUp.TabStop = false;
          // 
@@ -266,7 +268,7 @@
          this.tabCtlEX_RightDown.Location = new System.Drawing.Point(0, 0);
          this.tabCtlEX_RightDown.Name = "tabCtlEX_RightDown";
          this.tabCtlEX_RightDown.SelectedIndex = 0;
-         this.tabCtlEX_RightDown.Size = new System.Drawing.Size(178, 374);
+         this.tabCtlEX_RightDown.Size = new System.Drawing.Size(154, 622);
          this.tabCtlEX_RightDown.TabIndex = 0;
          this.tabCtlEX_RightDown.TabStop = false;
          // 
@@ -274,7 +276,7 @@
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-         this.ClientSize = new System.Drawing.Size(875, 594);
+         this.ClientSize = new System.Drawing.Size(1912, 1053);
          this.Controls.Add(this.splitContainer1);
          this.Controls.Add(this.menuStrip1);
          this.MainMenuStrip = this.menuStrip1;

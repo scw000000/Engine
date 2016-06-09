@@ -9,7 +9,8 @@ namespace LevelEditorApp
    {
    static class Program
       {
-      public static FormThread m_FormThread;
+      public static SDLThread s_SDLThread;
+      public static Editor s_Editor;
       /// <summary>
       /// The main entry point for the application.
       /// </summary>
@@ -18,51 +19,11 @@ namespace LevelEditorApp
          {
          Application.EnableVisualStyles();
          Application.SetCompatibleTextRenderingDefault( false );
-         //Editor editor = new Editor();
-         m_FormThread = new FormThread();
-         Thread workerThread = new Thread( m_FormThread.Init );
+         s_Editor = new Editor();
+         s_SDLThread = new SDLThread();
+         Thread workerThread = new Thread( s_SDLThread.Run );
          workerThread.Start();
-         workerThread.Join();
-
-         MessageHandler messageHandler = new MessageHandler( ref  m_FormThread.m_Editor.tabPageEX_World, ref m_FormThread.m_Editor );
-         //Application.AddMessageFilter( messageHandler );
-
-         workerThread = new Thread( m_FormThread.Run );
-
-         workerThread.Start();
-
-         //Application.Idle += new EventHandler( messageHandler.Application_Idle );
-         Application.Run( m_FormThread.m_Editor );
-
-
-
-
-
-         
-         }
-      }
-   public class FormThread
-      {
-      public Editor m_Editor;
-      public FormThread() 
-         {    
-         //MessageHandler messageHandler = new MessageHandler( ref m_Editor.tabPageEX_World, ref m_Editor );
-         //Application.AddMessageFilter( messageHandler );
-         //Application.Idle += new EventHandler( messageHandler.Application_Idle );
-         }
-
-      public void Init() 
-         {
-         m_Editor = new Editor();
-         }
-
-      public void Run() 
-         {
-         Application.Run( m_Editor );
-         while( true )
-            {
-            NativeMethods.SingleLoop();
-            }
+         Application.Run( s_Editor );
          }
       }
    }

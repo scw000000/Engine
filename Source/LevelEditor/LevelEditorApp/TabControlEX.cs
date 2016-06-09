@@ -127,6 +127,7 @@ namespace LevelEditorApp
       protected override void OnControlAdded( ControlEventArgs e )
          {
          base.OnControlAdded( e );
+         this.SelectedIndex = this.TabCount - 1;
          TabPage curTab = this.TabPages[ this.TabCount - 1 ];
          Graphics g = Graphics.FromHwnd( curTab.Handle );
          SizeF size = g.MeasureString( curTab.Text, curTab.Font, 300 );

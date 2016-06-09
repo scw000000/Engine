@@ -37,7 +37,7 @@ class EditorController : public Controller
       virtual void VOnUpdate( unsigned long elapsedMs ) override;
 
    protected:
-      shared_ptr<SceneNode> m_object;
+      shared_ptr<SceneNode> m_pControllingObject;
       Vec3     m_TargetRotShift;
       TransformPtr m_pTransform;
 

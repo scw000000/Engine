@@ -20,8 +20,9 @@ namespace LevelEditorApp
       {
       //private ActorComponentEditor m_ActorComponentEditor;
       public IntPtr m_pSDLWindow;
-      public delegate void mydalegate();
-      public mydalegate m_UpdateSDLDelegate;
+      public delegate void myDalegate();
+      public myDalegate m_UpdateSDLDelegate;
+
       private List<XmlNode> m_ActorsXmlNodes = new List<XmlNode>();
       private System.Windows.Forms.TreeView treeView_Assets;
 
@@ -59,7 +60,6 @@ namespace LevelEditorApp
 
          int SDLWindowWidth = 1366;
          int SDLWindowHeight = 768;
-
          int lrPageWidth = ( this.splitContainer1.Width - SDLWindowWidth - 2 * splitterWidth - 8 ) / 2;
          this.splitContainer1.SplitterDistance = this.splitContainer1.Width - lrPageWidth - splitterWidth - 4;
          this.splitContainer2.SplitterDistance = this.splitContainer2.Width - SDLWindowWidth - splitterWidth;
@@ -76,7 +76,7 @@ namespace LevelEditorApp
          this.tabPageEX_Assets.Controls.Add( this.treeView_Assets );
          InitializeAssetTree();
 
-         m_UpdateSDLDelegate = new mydalegate( UpdateSDLWindow );
+         m_UpdateSDLDelegate = new myDalegate( UpdateSDLWindow );
          InitSDLWindow();
 
          }
@@ -139,9 +139,14 @@ namespace LevelEditorApp
             }
          }
 
-      public void UpdateSDLWindow()
+      private void UpdateSDLWindow()
          {
          NativeMethods.SingleLoop();
+         }
+
+      public void ShutDownSDLWindow()
+         {
+         NativeMethods.Shutdown();
          }
 
       private void InitializeAssetTree()

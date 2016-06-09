@@ -24,7 +24,7 @@ EditorController::EditorController( shared_ptr<SceneNode> object,
                                         bool isMouseLocked,
                                         float smoothness ) :
                                         Controller( isMouseLocked ),
-                                        m_object( object ),
+                                        m_pControllingObject( object ),
                                         m_pTransform( ENG_NEW Transform( object->VGetProperties().GetTransform() ) )
    {
    m_MaxSpeed = 40.0f / 1000.f;			// 40 meters per Ms
@@ -131,5 +131,5 @@ void EditorController::VOnUpdate( unsigned long deltaMilliseconds )
       m_CurrentSpeed = 0.0f;
       }
 
-   m_object->VSetTransform( *m_pTransform );
+   m_pControllingObject->VSetTransform( *m_pTransform );
    }

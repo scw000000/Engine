@@ -318,11 +318,6 @@ void EngineApp::MsgProc( void )
    HumanView*  pHumanView;
    if( SDL_PollEvent( &event ) )
       {
-      if( event.type == SDL_KEYDOWN )
-         {
-         int i = 0;
-         ++i;
-         }
       if( event.type == m_ShutDownEventType )
          {
          pHumanView = GetHumanView();

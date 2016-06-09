@@ -212,7 +212,6 @@ namespace LevelEditorApp
                               Color.FromArgb(255, 210, 35, 2),
                               Color.FromArgb(255, 210, 35, 2)
                            };
-                        Console.Write( "detected!@!" );
                         }
                      else
                         {
@@ -265,7 +264,6 @@ namespace LevelEditorApp
                      }
                   if( CanDrawCloseButton( e.Index ) )
                      {
-                     Console.Write( m_MouseOnCloseBtnPageIndx );
                      if( m_MouseOnCloseBtnPageIndx == e.Index )
                         {
                         _ColorBlend.Colors = new Color[]
@@ -275,7 +273,6 @@ namespace LevelEditorApp
                               Color.FromArgb(255, 210, 35, 2),
                               Color.FromArgb(255, 210, 35, 2)
                            };
-                        Console.Write( "detected!@!" );
                         }
                      else
                         {

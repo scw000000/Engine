@@ -63,7 +63,6 @@ BaseEngineLogic::~BaseEngineLogic()
    for ( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
       {
       it->second->Destroy();
-      std::cout << it->second.use_count() << std::endl;
       }
    m_Actors.clear();
 

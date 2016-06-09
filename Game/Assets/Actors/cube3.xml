@@ -8,6 +8,7 @@
         <Mesh path="art\cube.obj" />
 		<Material>
 		<Texture path="art\cube.jpg" />
+		<Diffuse r="1" g="1" b="1" a="0.3">
 		</Material>
 	</MeshRenderComponent>
 

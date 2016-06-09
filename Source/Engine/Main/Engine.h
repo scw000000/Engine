@@ -27,38 +27,28 @@ class EngineApp
    public:
       EngineApp( void );
       ~EngineApp( void );
-      
-      static Renderer GetRendererImpl();
 
-      //virtual bool VLoadLevel( void );
-      virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
-
-      void MainLoop( void );
-      void SingleLoop( void );
       void AbortGame( void ) { m_bQuitting = true; }
-
-      bool IsRunning() { return m_bIsRunning; }
-      bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );
-      bool LoadStrings( std::string language );
-
-      int Modal( shared_ptr<PromptBox> pModalScreen, int defaultAnswer );
-
-      Uint32  GetWindowState( void );
-      static Uint32 RegisterEvent( int eventNum );
-
-      std::wstring GetString( std::wstring sID );
-
-      SDL_Window* GetWindow() { return m_pWindow; }
-
-      Point GetScreenSize( void ) const { return m_screenSize; }
+      void MainLoop( void );
+      void OnClose( void );
+      void SingleLoop( void );
 
       BaseEngineLogic* GetGameLogic(void) const { return m_pEngineLogic; }
       BaseEngineLogic* VCreateLogic();
-      
       HWND GetHwnd( void );      
-
       HumanView* GetHumanView( void );
-
+      Point GetScreenSize( void ) const { return m_screenSize; }
+      SDL_Window* GetWindow() { return m_pWindow; }
+      Uint32  GetWindowState( void );
+      bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );
+      bool IsRunning() { return m_bIsRunning; }
+      bool LoadStrings( std::string language );
+      int Modal( shared_ptr<PromptBox> pModalScreen, int defaultAnswer );
+      static Renderer GetRendererImpl();
+      static Uint32 RegisterEvent( int eventNum );
+      std::wstring GetString( std::wstring sID );
+      virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
+   
    public:
       struct EngineOptions m_EngineOptions;
       TCHAR m_saveGameDirectory[MAX_PATH];
@@ -75,7 +65,6 @@ class EngineApp
       void MsgProc( void );
       void OnUpdateGame( double fTime, float fElapsedTime );
       void OnFrameRender( double fTime, float fElapsedTime );
-      void OnClose( void );
       /* 
       Why use TCHAR? because we may support multiple languages, some of them 
       will take 2 char instead of one for each character, in this case, we set the char class to ANSI (1) or Unicode (2)

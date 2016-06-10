@@ -21,8 +21,11 @@
 class Resource
    {
    public:
-      std::string m_Name;
       Resource( const std::string &name, bool caseSensitive = false );
+      std::string GetExtension( void );
+
+   public:
+      std::string m_Name;
    };
 
 class IResourceExtraData
@@ -36,10 +39,10 @@ class IResourceExtraData
 // derive IResourceExtraData instead
 class ResHandle
    {
-   friend class ResCache;
+   friend class ResourceCache;
 
    public:
-      ResHandle( Resource &resource, char *buffer, unsigned int size, ResCache *pResCache );
+      ResHandle( Resource &resource, char *buffer, unsigned int size, ResourceCache *pResCache );
       virtual ~ResHandle();
 
       unsigned int GetSize( void ) const { return m_Size; }
@@ -54,7 +57,7 @@ class ResHandle
       char *m_pBuffer;
       unsigned int m_Size;
       shared_ptr<IResourceExtraData> m_Extra;
-      ResCache *m_pResCache;
+      ResourceCache *m_pResCache;
    };
 
 class ResourceLoader : public IResourceLoader
@@ -94,13 +97,13 @@ typedef std::list< shared_ptr< IResourceLoader > > ResourceLoaders;
 
 // This class holds all of resource loader and ptr to resource handle
 // Also, this class holds resource file - a zip file with all assets
-class ResCache
+class ResourceCache
    {
    friend class ResHandle;
 
    public:
-      ResCache( const unsigned int sizeInMb, IResourceFile *resFile );
-      ~ResCache();
+      ResourceCache( const unsigned int sizeInMb, IResourceFile *resFile );
+      ~ResourceCache();
 
       bool Init();
       void RegisterLoader( shared_ptr< IResourceLoader > loader );

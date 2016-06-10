@@ -87,10 +87,14 @@ class BaseEngineLogic : public IEngineLogic
       virtual void VOnUpdate( float time, float elapsedTime ) override;
       virtual void VOnRender( double fTime, float fElapsedTime ) override;
 
-	   const BaseGameState GetState() const { return m_State; }
+      virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) override;
+	   
+      const BaseGameState GetState() const { return m_State; }
 
       void AttachProcess(StrongProcessPtr pProcess) { if (m_pProcessManager) {m_pProcessManager->AttachProcess(pProcess);} }
       
+      
+
    public:
       shared_ptr<Scene> m_pWrold;
       shared_ptr<GUIManager> m_pGUIManager;

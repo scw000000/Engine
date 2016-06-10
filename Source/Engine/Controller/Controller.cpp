@@ -19,9 +19,7 @@
 
 Controller::Controller( bool isMouseLocked = false ) : m_IsMouseLocked( isMouseLocked )
    {
-   int x, y;
-   SDL_GetMouseState( &x, &y );
-   m_CurMousePos = m_LastMousePos = Point( x, y );
+   m_CurMousePos = m_LastMousePos = g_pApp->GetMouseLocation();
    m_MouseShift = Point( 0, 0 );
    memset( &m_KeyButton[ 0 ], 0x00, sizeof( bool ) * SDL_NUM_SCANCODES );
    memset( &m_MouseButton[ 0 ], 0x00, sizeof( bool ) * 256 );

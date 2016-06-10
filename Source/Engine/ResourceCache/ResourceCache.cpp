@@ -30,8 +30,14 @@ Resource::Resource( const std::string &name, bool caseSensitive )
       }
    }
 
+std::string Resource::GetExtension( void )
+   {
+   size_t extensionStart = m_Name.find_last_of( '.' );
+   ENG_ASSERT( extensionStart != std::string::npos );
+   return m_Name.substr( extensionStart + 1 );
+   }
 
-ResHandle::ResHandle( Resource &resource, char *buffer, unsigned int size, ResCache *pResCache ) : m_Resource( resource )
+ResHandle::ResHandle( Resource &resource, char *buffer, unsigned int size, ResourceCache *pResCache ) : m_Resource( resource )
    {
    m_pBuffer = buffer;
 	m_Size = size;
@@ -63,7 +69,7 @@ DefaultResourceLoader::DefaultResourceLoader( void ) : ResourceLoader( std::vect
 
    }
 
-ResCache::ResCache( const unsigned int sizeInMb, IResourceFile *resFile )
+ResourceCache::ResourceCache( const unsigned int sizeInMb, IResourceFile *resFile )
    {
    m_CacheSize = sizeInMb * 1024 * 1024;
    m_AllocatedSize = 0;
@@ -71,7 +77,7 @@ ResCache::ResCache( const unsigned int sizeInMb, IResourceFile *resFile )
    }
 
 // delete all of the resources handle in the list
-ResCache::~ResCache()
+ResourceCache::~ResourceCache()
    {
    while( !m_lruResHandleList.empty() )
       {
@@ -80,7 +86,7 @@ ResCache::~ResCache()
       SAFE_DELETE( m_pResourceFile );
    }
 
-bool ResCache::Init()
+bool ResourceCache::Init()
    {
    bool ret = false;
    if( m_pResourceFile->VOpen() )
@@ -92,13 +98,13 @@ bool ResCache::Init()
    }
 
 // The DefaultResourceLoader is last one in the list, so any loader will match it before it
-void ResCache::RegisterLoader( shared_ptr< IResourceLoader > loader )
+void ResourceCache::RegisterLoader( shared_ptr< IResourceLoader > loader )
    {
    m_ResourceLoaders.push_front( loader );
    }
 
 // This function is callled by ResCache::preload to 
-shared_ptr< ResHandle > ResCache::GetHandle( Resource *resource )
+shared_ptr< ResHandle > ResourceCache::GetHandle( Resource *resource )
    {
    shared_ptr< ResHandle > handle( Find( resource ) );
    // if the handle is not loaded yet ( cannot find the resource handle map ), then load it
@@ -114,7 +120,7 @@ shared_ptr< ResHandle > ResCache::GetHandle( Resource *resource )
    }
 
 // preload specific type of resource
-int ResCache::Preload( const std::string pattern, void (*progressCallback)( int, bool & ) )
+int ResourceCache::Preload( const std::string pattern, void (*progressCallback)( int, bool & ) )
    {
    if( !m_pResourceFile )
       {
@@ -149,7 +155,7 @@ int ResCache::Preload( const std::string pattern, void (*progressCallback)( int,
 //    level, or if you wanted to force a refresh of all the data in the cache - which might be 
 //    good in a development environment.
 //
-void ResCache::Flush( void )
+void ResourceCache::Flush( void )
    {
    while ( !m_lruResHandleList.empty())
 	   {
@@ -159,7 +165,7 @@ void ResCache::Flush( void )
 	   }
    }
 
-shared_ptr< ResHandle > ResCache::Find( Resource *resource )
+shared_ptr< ResHandle > ResourceCache::Find( Resource *resource )
    {
    ResHandleMap::iterator i = m_Resources.find( resource->m_Name );
 	if ( i == m_Resources.end() )
@@ -169,14 +175,14 @@ shared_ptr< ResHandle > ResCache::Find( Resource *resource )
    }
 
 // move the handle to front of list is this resource is accessed by engine
-void ResCache::Update( shared_ptr< ResHandle > handle  )
+void ResourceCache::Update( shared_ptr< ResHandle > handle  )
    {
    m_lruResHandleList.remove(handle);
 	m_lruResHandleList.push_front(handle);
 
    }
 
-shared_ptr< ResHandle > ResCache::Load( Resource *resource )
+shared_ptr< ResHandle > ResourceCache::Load( Resource *resource )
    {
    shared_ptr< IResourceLoader > loader;
    shared_ptr< ResHandle > handle;
@@ -278,7 +284,7 @@ shared_ptr< ResHandle > ResCache::Load( Resource *resource )
    }
 
 // remove the resource from list and map
-void ResCache::Free( shared_ptr< ResHandle > gonner )
+void ResourceCache::Free( shared_ptr< ResHandle > gonner )
    {
    m_lruResHandleList.remove( gonner ); // This calls the destructor of shared_ptr
 	m_Resources.erase( gonner->m_Resource.m_Name );
@@ -287,7 +293,7 @@ void ResCache::Free( shared_ptr< ResHandle > gonner )
 	// ResHandle pointing to it is destroyed. ( destructor of ResHandle has been called ) 
    }
 
-bool ResCache::MakeRoom( unsigned int size )
+bool ResourceCache::MakeRoom( unsigned int size )
    {
    if( size > m_CacheSize ) // impossible, this resource is lager than the whole cache
       {
@@ -305,7 +311,7 @@ bool ResCache::MakeRoom( unsigned int size )
    return true;
    }
 
-bool ResCache::Allocate( char** pAllocBuffer, unsigned int size, bool useRealAllocation )
+bool ResourceCache::Allocate( char** pAllocBuffer, unsigned int size, bool useRealAllocation )
    {
    if( !MakeRoom( size ) )
       {
@@ -330,7 +336,7 @@ bool ResCache::Allocate( char** pAllocBuffer, unsigned int size, bool useRealAll
    }
 
 // remove last resource from the list and map
-void ResCache::FreeOneResource()
+void ResourceCache::FreeOneResource()
    {
    auto gonner = m_lruResHandleList.end();
    --gonner;
@@ -341,7 +347,7 @@ void ResCache::FreeOneResource()
    }
 
 // This function is called by destructor of ResHandle
-void ResCache::MemoryHasBeenFreed( unsigned int size )
+void ResourceCache::MemoryHasBeenFreed( unsigned int size )
    {
    m_AllocatedSize -= size;
    }
@@ -352,7 +358,7 @@ void ResCache::MemoryHasBeenFreed( unsigned int size )
 //   Searches the resource cache assets for files matching the pattern. Useful for providing a 
 //   a list of levels for a main menu screen, for example.
 //
-std::vector<std::string> ResCache::Match( const std::string pattern )
+std::vector<std::string> ResourceCache::Match( const std::string pattern )
    {
 	std::vector<std::string> matchingNames;
 	if ( m_pResourceFile == NULL )

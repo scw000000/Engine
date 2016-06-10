@@ -1,6 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: XmlResource.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file XmlResource.cpp
+ * \date 2016/06/10 21:22
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "EngineStd.h"
 #include "XmlResource.h"

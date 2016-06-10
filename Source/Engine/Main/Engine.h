@@ -48,12 +48,13 @@ class EngineApp
       static Uint32 RegisterEvent( int eventNum );
       std::wstring GetString( std::wstring sID );
       virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
-   
+      Point GetMouseLocation( void );
+
    public:
       struct EngineOptions m_EngineOptions;
       TCHAR m_saveGameDirectory[MAX_PATH];
       BaseEngineLogic *m_pEngineLogic;
-      ResCache *m_pResCache;
+      ResourceCache *m_pResCache;
       shared_ptr<IRenderer> m_pRenderer;
       EventManager *m_pEventManager;
 

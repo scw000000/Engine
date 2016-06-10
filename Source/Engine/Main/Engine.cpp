@@ -128,7 +128,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       {
       pFile = ENG_NEW ResourceZipFile( L"Assets.zip" );
       }
-   m_pResCache = ENG_NEW ResCache( 50, pFile );
+   m_pResCache = ENG_NEW ResourceCache( 50, pFile );
 
 	if ( !m_pResCache->Init() )
 	   {
@@ -205,6 +205,8 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       {
       m_pWindow = window;
       }
+
+   SDL_EventState( SDL_DROPFILE, SDL_ENABLE );
 
 	m_screenSize = Point( screenWidth, screenHeight );
    if( m_EngineOptions.m_ShowMouseCursor )
@@ -337,8 +339,7 @@ void EngineApp::MsgProc( void )
       switch( event.type )
          {
          case SDL_WINDOWEVENT:
-            
-         break;
+            break;
          case SDL_QUIT: // this case is triggered by hitting 'x' at the window
             if( m_bQuitRequested )
                {
@@ -362,6 +363,10 @@ void EngineApp::MsgProc( void )
                   }
 			      }
             m_bQuitting = true;
+            break;
+         case SDL_DROPFILE:
+            m_pEngineLogic->VOnFileDrop( event.drop.file, GetMouseLocation() );
+            SDL_free( event.drop.file );    // Free dropped_filedir memory
             break;
          case SDL_KEYDOWN:
          case SDL_KEYUP:
@@ -482,6 +487,13 @@ std::wstring EngineApp::GetString( std::wstring sID )
 	   }
 	return localizedString->second;
    }  
+
+Point EngineApp::GetMouseLocation( void )
+   {
+   int x, y;
+   SDL_GetMouseState( &x, &y );
+   return Point( x, y );
+   }
 
 //
 // class GameCodeApp::PumpUntilMessage			- Chapter 10, page 295

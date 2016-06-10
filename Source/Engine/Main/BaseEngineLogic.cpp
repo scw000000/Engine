@@ -297,3 +297,16 @@ bool BaseEngineLogic::VLoadLevel( const char* levelResource )
    
    return true;
    }
+
+void BaseEngineLogic::VOnFileDrop( const char* filePath, const Point& dropLocation )
+   {
+   Resource fileRes( filePath );
+   std::string extension = fileRes.GetExtension();
+   if( !std::strcmp( extension.c_str(), "xml" ) )
+      {
+      auto fileHandle = g_pApp->m_pResCache->GetHandle( &fileRes );
+      ENG_ASSERT( fileHandle );
+      }
+   
+   
+   }

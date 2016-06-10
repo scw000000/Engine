@@ -99,6 +99,7 @@ class IEngineLogic
       virtual void VModifyActor( const ActorId actorId, TiXmlElement *overrides ) = 0;
       virtual void VSetActorUpdate( bool isUpdatable ) = 0;
       virtual void VSetWorldUpdate( bool isUpdatable ) = 0;
+      virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) = 0;
    };
 
 typedef std::list<shared_ptr<IView> > ViewList;

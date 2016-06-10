@@ -66,6 +66,9 @@ namespace LevelEditorApp
          this.splitContainer_Mid.SplitterDistance = SDLWindowHeight;
 
          this.tabPageEX_World = AddTabePage( "tabPageEX_World", this.tabCtlEX_MidUp.Controls, false );
+         tabPageEX_World.AllowDrop = true;
+         tabPageEX_World.DragEnter += new DragEventHandler( tabPageEX_World.tabPageEX_DragEnter );
+         tabPageEX_World.DragDrop += new DragEventHandler( tabPageEX_World.tabPageEX_DragDrop );
 
          this.tabPageEX_Assets = AddTabePage( "tabPageEX_Assets", this.tabCtlEX_RightUp.Controls, false );
          this.treeView_Assets = new System.Windows.Forms.TreeView();
@@ -73,6 +76,7 @@ namespace LevelEditorApp
          this.treeView_Assets.BackColor = Color.FromArgb( 255, 70, 70, 70 );
          this.treeView_Assets.LineColor = Color.WhiteSmoke;
          this.treeView_Assets.NodeMouseDoubleClick += new TreeNodeMouseClickEventHandler( this.treeView_Assets_NodeMouseClick );
+         this.treeView_Assets.ItemDrag += new ItemDragEventHandler( this.treeView_Assets_ItemDrag );
          this.tabPageEX_Assets.Controls.Add( this.treeView_Assets );
          InitializeAssetTree();
 
@@ -94,13 +98,26 @@ namespace LevelEditorApp
                tempNode = tempNode.Parent;
                }
             textPage.TextBox = new EditorTextBox( e.Node.Text, m_CurrentDirectory + "\\" + filePath );
-            textPage.TextBox.Font = new Font( textPage.TextBox.Font.FontFamily, 20 );
+            textPage.TextBox.Font = new Font( textPage.TextBox.Font.FontFamily, 18 );
             textPage.Controls.Add( textPage.TextBox );
             }
          else
             {
             MessageBox.Show( "This file format is not supported yet.", "Error", MessageBoxButtons.OK );
             }
+         }
+
+      public void treeView_Assets_ItemDrag( object sender, ItemDragEventArgs e ) 
+         {
+         String filePath = "";
+         TreeNode tempNode = (TreeNode) e.Item;
+         while( tempNode != treeView_Assets.Nodes[0] )
+            {
+            filePath = "\\" + tempNode.Text + filePath;
+            tempNode = tempNode.Parent;
+            }
+         String[] filesToDrag = { filePath.Substring( 1 ) };
+         DoDragDrop( new DataObject( DataFormats.FileDrop, filesToDrag ), DragDropEffects.Copy );
          }
 
       public void InitSDLWindow()
@@ -130,8 +147,6 @@ namespace LevelEditorApp
             NativeMethods.SetParent( winHandle, this.tabPageEX_World.Handle );
             NativeMethods.ShowWindow( winHandle, 1 ); // SHOWNORMAL
             NativeMethods.EditorMain( m_pSDLWindow, this.splitContainer_Mid.Panel1.Width, this.splitContainer_Mid.Panel1.Height );
-            //   NativeMethods.test( pWindow );
-
             }
          catch( Exception e )
             {

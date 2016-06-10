@@ -31,7 +31,6 @@ void GUIManager::Init(  const std::string& resourceDirectory  )
    if( !s_pRenderer || !s_pResProvider )
       {
       s_pRenderer = &CEGUI::OpenGL3Renderer::bootstrapSystem();
-      s_pRenderer->enableExtraStateSettings( true );
       s_pResProvider = static_cast< CEGUI::DefaultResourceProvider* >( CEGUI::System::getSingleton().getResourceProvider() );
       m_ResourceDir = resourceDirectory;
       s_pResProvider->setResourceGroupDirectory( "imagesets", m_ResourceDir + "imagesets/" );
@@ -111,7 +110,9 @@ void GUIManager::OnUpdate( unsigned long deltaMs )
 
 void GUIManager::OnRender( double fTime, float fElapsedTime )
    {
+   s_pRenderer->enableExtraStateSettings( false );
    CEGUI::System::getSingleton().renderAllGUIContexts();
+   s_pRenderer->enableExtraStateSettings( true );
    /*s_pRenderer->beginRendering( );
    m_pContext->draw( );
    s_pRenderer->endRendering( );*/

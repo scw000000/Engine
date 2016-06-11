@@ -28,7 +28,6 @@ class ActorComponentFactory : public ENG_Noncopyable
       ActorComponentFactory( void );
 
    private:
-     // template <typename T> static void RegisterComponent( ComponentId compId );
       std::map< std::string, ComponentId > m_NameToIdMap;
       GenericObjectFactory< IActorComponent, ComponentId> m_CompFactory;
    };

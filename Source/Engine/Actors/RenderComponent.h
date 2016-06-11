@@ -30,7 +30,7 @@ class IRenderComponent : virtual public IActorComponent
       virtual void VPostInit( void ) override;
       virtual void VUpdate( const unsigned long deltaMs ) override { };
 	   //virtual void VOnChanged( void ) override;
-      //virtual TiXmlElement* VGenerateXml(void) override;
+      virtual TiXmlElement* VGenerateXml( void ) override;
 
    protected:
       virtual void SetOwner( StrongActorPtr pOwner ) override
@@ -47,12 +47,14 @@ class IRenderComponent : virtual public IActorComponent
       // factory method to create the appropriate scene node
       // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
       virtual shared_ptr<SceneNode> VCreateSceneNode( void ) = 0;  
+      virtual void VCreateInheritedXmlElements( TiXmlElement* pBaseElement ) = 0;
       static Color LoadColor( TiXmlElement* pData );
 
    protected:
       StrongActorPtr m_pOwner;
       shared_ptr<SceneNode> m_pRootSceneNode;
-      
+      TransformPtr m_pTransform;
+
    private:
       virtual shared_ptr<SceneNode> VGetSceneNode(void);
    };

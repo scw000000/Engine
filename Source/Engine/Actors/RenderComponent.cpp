@@ -38,6 +38,24 @@ void IRenderComponent::VPostInit( void )
    IEventManager::GetSingleton()->VTriggerEvent( pEvent ); // process this event immediately
    }
 
+TiXmlElement* IRenderComponent::VGenerateXml( void )
+   {
+   TiXmlElement* pBaseElement = ENG_NEW TiXmlElement( VGetName().c_str() );
+
+   //// color
+   //TiXmlElement* pColor = ENG_NEW TiXmlElement( "Color" );
+   //pColor->SetAttribute( "r", ToStr( m_color.r ).c_str() );
+   //pColor->SetAttribute( "g", ToStr( m_color.g ).c_str() );
+   //pColor->SetAttribute( "b", ToStr( m_color.b ).c_str() );
+   //pColor->SetAttribute( "a", ToStr( m_color.a ).c_str() );
+   //pBaseElement->LinkEndChild( pColor );
+
+   // create XML for inherited classes
+   VCreateInheritedXmlElements( pBaseElement );
+
+   return pBaseElement;
+   }
+
 /*
 void BaseRenderComponent::VOnChanged( void )
    {
@@ -149,25 +167,6 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
          m_pMaterial->SetDiffuse( BaseRenderComponent::LoadColor( pDiffuseElement ) );
          }
       }
-
-   //// Set texture file path
-   //TiXmlElement* pTextureFileElement = pData->FirstChildElement( "Texture" );
-   //if( pTextureFileElement )
-   //   {
-   //   const char *pTextureFilePath = pTextureFileElement->Attribute( "path" );
-   //   if( !pTextureFilePath )
-   //      {
-   //      return false;
-   //      }
-   //   else
-   //      {
-   //      m_pMaterial->SetTextureResource( Resource( pTextureFilePath ) );
-   //      }
-   //   }
-   //else
-   //   {
-   //   return false;      
-   //   }
 
    return true;
    }

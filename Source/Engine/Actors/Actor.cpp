@@ -17,7 +17,7 @@
 #include "ActorComponent.h"
 #include "ActorFactory.h"
 
-Actor::Actor(ActorId id)
+Actor::Actor( ActorId id )
    {
    m_Id = id;
    m_Type = "Unknown";
@@ -27,10 +27,10 @@ Actor::Actor(ActorId id)
    }
 
 // The actor should call Destroy() before calling destructor
-Actor::~Actor(void)
+Actor::~Actor( void )
    {
-   ENG_LOG("Actor", std::string( "Destroying Actor " ) + ToStr( m_Id ));
-   ENG_ASSERT(m_Components.empty());  // [rez] if this assert fires, the actor was destroyed without calling Actor::Destroy()
+   ENG_LOG( "Actor", std::string( "Destroying Actor " ) + ToStr( m_Id ) );
+   ENG_ASSERT( m_Components.empty() );  // [rez] if this assert fires, the actor was destroyed without calling Actor::Destroy()
    }
 
 bool Actor::Init( TiXmlElement* pData )
@@ -42,7 +42,7 @@ bool Actor::Init( TiXmlElement* pData )
    return true;
    }
 
-void Actor::PostInit(void)
+void Actor::PostInit( void )
    {
    for (ActorComponents::iterator it = m_Components.begin(); it != m_Components.end(); ++it)
       {
@@ -51,7 +51,7 @@ void Actor::PostInit(void)
    }
 
 // Once these pointers are deleted from map, it will delete itself automatically
-void Actor::Destroy(void)
+void Actor::Destroy( void )
    {
    // Call map::clear
    for( auto comp : m_Components )
@@ -69,34 +69,32 @@ void Actor::Update( const unsigned long deltaMs)
       }
    }
 
-/* 
-Not used yet ( for editor )
-std::string Actor::ToXML()
-{
-    TiXmlDocument outDoc;
+std::string Actor::ToXML( void )
+   {
+   TiXmlDocument outDoc;
 
-    // Actor element
-    TiXmlElement* pActorElement = ENG_NEW TiXmlElement("Actor");
-    pActorElement->SetAttribute("type", m_Type.c_str());
-	pActorElement->SetAttribute("resource", m_Resource.c_str());
+   // Actor element
+   TiXmlElement* pActorElement = ENG_NEW TiXmlElement( "Actor" );
+   pActorElement->SetAttribute( "type", m_Type.c_str() );
+	pActorElement->SetAttribute( "resource", m_Resource.c_str() );
 
-    // components
-    for (auto it = m_Components.begin(); it != m_Components.end(); ++it)
-    {
-        StrongActorComponentPtr pComponent = it->second;
-        TiXmlElement* pComponentElement = pComponent->VGenerateXml();
-        pActorElement->LinkEndChild(pComponentElement);
-    }
+   // components
+   for ( auto it = m_Components.begin(); it != m_Components.end(); ++it )
+      {
+      StrongActorComponentPtr pComponent = it->second;
+      //TiXmlElement* pComponentElement = pComponent->VGenerateXml();
+      //pActorElement->LinkEndChild(pComponentElement);
+      }
 
-    outDoc.LinkEndChild(pActorElement);
+   outDoc.LinkEndChild( pActorElement );
 	TiXmlPrinter printer;
-	outDoc.Accept(&printer);
+	outDoc.Accept( &printer );
 
 	return printer.CStr();
-}*/
+   }
 
 
-void Actor::AddComponent(StrongActorComponentPtr pComponent)
+void Actor::AddComponent( StrongActorComponentPtr pComponent )
    {
    std::pair<ActorComponents::iterator, bool> success = m_Components.insert(std::make_pair( pComponent->VGetId(), pComponent) );
    ENG_ASSERT(success.second);

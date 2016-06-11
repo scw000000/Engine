@@ -30,6 +30,7 @@ class IActorComponent
       virtual void VUpdate( const unsigned long deltaMs ) = 0;
       virtual void SetOwner( StrongActorPtr pOwner ) = 0;
       virtual void Destory( void ) = 0;
+      virtual TiXmlElement* VGenerateXml( void ) = 0;
    };
 
 // Using Curiously recurring template pattern (CRTP) to prevent declaring GUID mulit times
@@ -37,12 +38,11 @@ template <typename T>class BaseActorComponent : public IActorComponent
    {
    friend class ActorFactory;
    public:
-
       virtual ComponentId VGetId( void ) const override { return s_ComponentId; };
-
       virtual const std::string& VGetName( void ) const override { return s_Name; }
       virtual void VPostInit( void ) override { };
       virtual void VUpdate( const unsigned long deltaMs ) override { };
+
    public:
       // GUID of this event
       const static ComponentId  s_ComponentId;

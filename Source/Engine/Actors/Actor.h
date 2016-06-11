@@ -31,6 +31,7 @@ class Actor
       // To break out the circular reference strongPtr chain of Actor & actorComponent
       void Destroy( void );
       void Update( const unsigned long deltaMs );
+      std::string ToXML( void );
 
       ActorId GetId( void ) const { return m_Id; }
       template<class ComponenType> weak_ptr<ComponenType> GetComponent( ComponentId id )

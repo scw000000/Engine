@@ -19,7 +19,7 @@
 
 Controller::Controller( bool isMouseLocked = false ) : m_IsMouseLocked( isMouseLocked )
    {
-   m_CurMousePos = m_LastMousePos = g_pApp->GetMouseLocation();
+   m_CurMousePos = m_LastMousePos = g_pApp->GetMousePosition();
    m_MouseShift = Point( 0, 0 );
    memset( &m_KeyButton[ 0 ], 0x00, sizeof( bool ) * SDL_NUM_SCANCODES );
    memset( &m_MouseButton[ 0 ], 0x00, sizeof( bool ) * 256 );
@@ -27,12 +27,18 @@ Controller::Controller( bool isMouseLocked = false ) : m_IsMouseLocked( isMouseL
 
 void Controller::VOnTickUpdate( unsigned long deltaMilliseconds )
    {
+   m_CurMousePos = g_pApp->GetMousePosition();
+   m_MouseShift = m_CurMousePos - m_LastMousePos;
    VOnUpdate( deltaMilliseconds );
    if( m_IsMouseLocked )
       {
-      SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
+      g_pApp->ResetMousePosition();
+      m_LastMousePos = Point( g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
       }
-   m_LastMousePos = m_CurMousePos;
+   else
+      {
+      m_LastMousePos = m_CurMousePos;
+      }
    m_MouseShift = Point( 0, 0 );
    }
 
@@ -83,6 +89,5 @@ bool Controller::VOnMsgProc( const SDL_Event& event )
 bool Controller::VOnPointerMove( Point motion )
    {
    m_CurMousePos = motion;
-   m_MouseShift = m_CurMousePos - m_LastMousePos;
    return true;
    }

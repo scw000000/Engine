@@ -94,11 +94,11 @@ void BaseEngineLogic::VAddView( shared_ptr<IView> pView )
 	pView->VOnRestore(); 
    }
 
-StrongActorPtr BaseEngineLogic::VCreateActor(const std::string &actorResource, TiXmlElement *overrides, const Mat4x4* initialTransform, const ActorId serversActorId )
+StrongActorPtr BaseEngineLogic::VCreateActor( const char* actorResource, const char* overrides, TransformPtr pTransform, ActorId serversActorId )
    {
    ENG_ASSERT( m_pActorFactory );
 
-   StrongActorPtr pActor = m_pActorFactory->CreateActor(actorResource.c_str() );
+   StrongActorPtr pActor = m_pActorFactory->CreateActor( actorResource, overrides, pTransform );
    if ( pActor )
       {
       // Insert into actor map
@@ -112,7 +112,7 @@ StrongActorPtr BaseEngineLogic::VCreateActor(const std::string &actorResource, T
       }
    }
 
-void BaseEngineLogic::VDestroyActor( const ActorId actorId )
+void BaseEngineLogic::VDestroyActor( ActorId actorId )
    {
    // We need to trigger a synchronous event to ensure that any systems responding to this event can still access a 
    // valid actor if need be.  The actor will be destroyed after this.
@@ -126,7 +126,7 @@ void BaseEngineLogic::VDestroyActor( const ActorId actorId )
       }
    }
 
-WeakActorPtr BaseEngineLogic::VGetActor( const ActorId actorId )
+WeakActorPtr BaseEngineLogic::VGetActor( ActorId actorId )
    {
    ActorMap::iterator findIt = m_Actors.find(actorId);
     if (findIt != m_Actors.end())
@@ -136,7 +136,7 @@ WeakActorPtr BaseEngineLogic::VGetActor( const ActorId actorId )
    return WeakActorPtr();
    }
 
-void BaseEngineLogic::VModifyActor( const ActorId actorId, TiXmlElement *overrides )
+void BaseEngineLogic::VModifyActor( ActorId actorId, TiXmlElement *overrides )
    {
    ENG_ASSERT( m_pActorFactory );
 	// if (!m_pActorFactory)
@@ -256,14 +256,14 @@ bool BaseEngineLogic::VLoadLevel( const char* levelResource )
       }
 
     // load all initial actors
-    TiXmlElement* pActorsNode = pRoot->FirstChildElement("StaticActors");
+    TiXmlElement* pActorsNode = pRoot->FirstChildElement( "StaticActors" );
    if ( pActorsNode )
       {
-      for (TiXmlElement* pNode = pActorsNode->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement())
+      for ( TiXmlElement* pNode = pActorsNode->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
          {
-         const char* actorResource = pNode->Attribute("resource");
+         const char* actorResource = pNode->Attribute( "resource" );
 
-			StrongActorPtr pActor = VCreateActor(actorResource, pNode);
+			StrongActorPtr pActor = VCreateActor( actorResource );
 			if ( pActor )
 			   {
 				// fire an event letting everyone else know that we created a new actor
@@ -304,9 +304,23 @@ void BaseEngineLogic::VOnFileDrop( const char* filePath, const Point& dropLocati
    std::string extension = fileRes.GetExtension();
    if( !std::strcmp( extension.c_str(), "xml" ) )
       {
-      auto fileHandle = g_pApp->m_pResCache->GetHandle( &fileRes );
-      ENG_ASSERT( fileHandle );
+      TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( &fileRes );
+      std::string rootName = pRoot->Value();
+      if( !std::strcmp( rootName.c_str(), "Actor" ) )
+         {
+         auto pCamera = m_pWrold->GetCamera();
+         TransformPtr pTransform( pCamera->VGetProperties().GetTransformPtr() );
+         pTransform->SetPosition( pCamera->GetScreenProjectPoint( 17.f, dropLocation ) );
+         VCreateActor( fileRes.m_Name.c_str(), NULL, pTransform );
+         
+         }
+      else if( !std::strcmp( rootName.c_str(), "ActorOverrides" ) )
+         {
+         auto pCamera = m_pWrold->GetCamera();
+         const char* actorClassResFile = pRoot->Attribute( "resource" );
+         TransformPtr pTransform( pCamera->VGetProperties().GetTransformPtr() );
+         pTransform->SetPosition( pCamera->GetScreenProjectPoint( 17.f, dropLocation ) );
+         VCreateActor( actorClassResFile, fileRes.m_Name.c_str(), pTransform );
+         }
       }
-   
-   
    }

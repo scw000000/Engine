@@ -85,18 +85,21 @@ class IView
 class IEngineLogic
    {
    public:
-   	virtual WeakActorPtr VGetActor( const ActorId id ) = 0;
-      virtual StrongActorPtr VCreateActor( const std::string &actorResource, TiXmlElement *overrides, const Mat4x4 *initialTransform=NULL, const ActorId serversActorId=INVALID_ACTOR_ID) = 0;
-      virtual void VDestroyActor( const ActorId actorId ) = 0;
+   	virtual WeakActorPtr VGetActor( ActorId id ) = 0;
+      virtual StrongActorPtr VCreateActor( const char* actorResource,
+                                           const char* overrides = NULL,
+                                           TransformPtr pTransform = NULL,
+                                           ActorId serversActorId = INVALID_ACTOR_ID ) = 0;
+      virtual void VDestroyActor( ActorId actorId ) = 0;
 	   virtual bool VLoadLevel( const char* levelResource ) = 0;
 	   //virtual void VSetProxy()=0;				
       virtual int VOnRestore( void ) = 0;
 	   virtual void VOnMsgProc( SDL_Event event ) = 0;
       virtual void VOnUpdate( float time, float elapsedTime ) = 0;
       virtual void VOnRender( double fTime, float fElapsedTime ) = 0;
-	   virtual void VMoveActor( const ActorId id, Mat4x4 const &mat ) = 0;
+	   virtual void VMoveActor( ActorId id, Mat4x4 const &mat ) = 0;
       virtual void VAddView( shared_ptr<IView> pView ) = 0;
-      virtual void VModifyActor( const ActorId actorId, TiXmlElement *overrides ) = 0;
+      virtual void VModifyActor( ActorId actorId, TiXmlElement *overrides ) = 0;
       virtual void VSetActorUpdate( bool isUpdatable ) = 0;
       virtual void VSetWorldUpdate( bool isUpdatable ) = 0;
       virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) = 0;

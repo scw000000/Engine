@@ -52,10 +52,14 @@ template <typename T> void EventFactory::RegisterEventCreation( EventType type )
 
 #define REGISTER_EVENT( eventClass ) EventFactory::RegisterEventCreation<eventClass>( eventClass::s_EventType )
 // This Macro is for online features
-#define CREATE_EVENT( s_EventType ) EventFactory::CreateEvent( s_EventType )
+#define CREATE_EVENT( s_EventType ) EventFactory::CreateEvent( s_EventType )   
 
 #define REGISTER_SCRIPT_EVENT( eventClass ) \
+do \
+   { \
 	EventFactory::RegisterEventTypeWithScript( #eventClass, eventClass::s_EventType ); \
-	EventFactory::RegisterScriptEventCreation<eventClass>( eventClass::s_EventType )
+	EventFactory::RegisterScriptEventCreation<eventClass>( eventClass::s_EventType ); \
+   } \
+while( 0 )\
 
 #define CREATE_SCRIPT_EVENT( s_EventType, eventData ) EventFactory::BuildEvent( s_EventType, eventData )

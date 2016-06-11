@@ -182,13 +182,6 @@ PromptBox::PromptBox( CEGUI::Window* pRoot, Uint32 eventType, const std::wstring
       button0->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &PromptBox::OnButtonClicked, this ) );
       m_pWindow->addChild( button0 );
 	   }
-   std::ofstream fout("temp.xml");
-
-      
-   CEGUI::XMLSerializer xml( fout );
-   m_pWindow->writeXMLToStream( xml );
-
-      fout.close( );
    }
 
 bool PromptBox::OnButtonClicked( const CEGUI::EventArgs& arg )

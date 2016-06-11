@@ -20,6 +20,7 @@ namespace LevelEditorApp
       {
       //private ActorComponentEditor m_ActorComponentEditor;
       public IntPtr m_pSDLWindow;
+      public IntPtr m_pSDLWindowHandle;
       public delegate void myDalegate();
       public myDalegate m_UpdateSDLDelegate;
 
@@ -134,9 +135,9 @@ namespace LevelEditorApp
             //IntPtr pContext = SDL2.SDL.SDL_GL_CreateContext( m_pSDLWindow );
             SDL.SDL_SysWMinfo info = new SDL.SDL_SysWMinfo();
             SDL.SDL_GetWindowWMInfo( m_pSDLWindow, ref info );
-            IntPtr winHandle = info.info.win.window;
+            m_pSDLWindowHandle = info.info.win.window;
             NativeMethods.SetWindowPos(
-               winHandle,
+               m_pSDLWindowHandle,
                Handle,
                0,
                0,
@@ -144,8 +145,8 @@ namespace LevelEditorApp
                0,
                0x0401 // NOSIZE | SHOWWINDOW 
                );
-            NativeMethods.SetParent( winHandle, this.tabPageEX_World.Handle );
-            NativeMethods.ShowWindow( winHandle, 1 ); // SHOWNORMAL
+            NativeMethods.SetParent( m_pSDLWindowHandle, this.tabPageEX_World.Handle );
+            NativeMethods.ShowWindow( m_pSDLWindowHandle, 1 ); // SHOWNORMAL
             NativeMethods.EditorMain( m_pSDLWindow, this.splitContainer_Mid.Panel1.Width, this.splitContainer_Mid.Panel1.Height );
             }
          catch( Exception e )

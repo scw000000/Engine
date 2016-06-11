@@ -1,10 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Math.cpp
-////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////
-// MY CLASS INCLUDES //
-///////////////////////
+/*!
+ * \file Math.cpp
+ * \date 2016/06/11 18:33
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "EngineStd.h"
 #include "Math.h"
 
@@ -12,14 +18,20 @@
 //
 // void Interpolate									- Chapter 9, page 258
 //
-float Interpolate(float normalizedValue, float begin, float end)
+float Interpolate( float normalizedValue, float begin, float end )
    {
 	// first check input values
 	ENG_ASSERT( normalizedValue >= 0.0f );
 	ENG_ASSERT( normalizedValue <= 1.0f );
-	ENG_ASSERT( end > begin );
 
 	return ( normalizedValue * (end - begin) ) + begin;
+   }
+
+Vec3 Interpolate( float normalizedValue, Vec3 begin, Vec3 end )
+   {
+   return Vec3( Interpolate( normalizedValue, begin.x, end.x ), 
+                Interpolate( normalizedValue, begin.y, end.y ),
+                Interpolate( normalizedValue, begin.z, end.z ) );
    }
 
 

@@ -1,0 +1,14 @@
+<ActorOverrides type="Cube" resource="actors\cube5.xml">
+
+	<TransformComponent>
+		<Position x="0" y="2" z="0"/>
+	</TransformComponent>
+
+    <MeshRenderComponent>
+        <Mesh path="art\cube.obj" />
+		<Material>
+		<Texture path="art\cube.jpg" />
+		</Material>
+	</MeshRenderComponent>
+
+</ActorOverrides>

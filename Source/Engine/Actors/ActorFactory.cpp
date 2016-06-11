@@ -40,9 +40,9 @@ ActorFactory::ActorFactory( void )
 
 // This version of function is different than the source code
 // Including function arguments LATER: modify it and let it consistant
-StrongActorPtr ActorFactory::CreateActor( const char* actorResource )
+StrongActorPtr ActorFactory::CreateActor( const char* actorResource, const char* overridesResource, TransformPtr pInitialTransform, ActorId serversActorId )
    {
-   Resource actorRes( actorResource, g_pApp->m_EngineOptions.m_UseDevDir );
+   Resource actorRes( actorResource );
    TiXmlElement *pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( &actorRes );
 
    // Resource loading failed, return empty pointer
@@ -78,16 +78,36 @@ StrongActorPtr ActorFactory::CreateActor( const char* actorResource )
          }
       }
 
-   // Actor has been fully created, run the post ini phase
+   
+   if( overridesResource )
+      {
+      Resource overrideRes( overridesResource );
+      TiXmlElement *pOverrides = XmlResourceLoader::LoadAndReturnRootXmlElement( &overrideRes );
+      ENG_ASSERT( pOverrides && "Failed to load overrides resource" );
+      if( ModifyActor( pActor, pOverrides ) )
+         {
+         return StrongActorPtr();
+         }
+      }
+
+   // This is a bit of a hack to get the initial transform of the transform component set before the 
+   // other components (like PhysicsComponent) read it.
+   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
+   if( pInitialTransform && pTransformComponent )
+      {
+      pTransformComponent->SetTransform( *pInitialTransform );
+      }
+
+   // Actor has been fully created, run the post init phase
    pActor->PostInit();
 
    return pActor;
    }
 
-void ActorFactory::ModifyActor(StrongActorPtr pActor, TiXmlElement* overrides)
+bool ActorFactory::ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides )
    {
 	// Loop through each child element and load the component
-	for (TiXmlElement* pNode = overrides->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement())
+	for ( TiXmlElement* pNode = overrides->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
 	   {
 		ComponentId componentId = ActorComponentFactory::GetIdFromName( pNode->Value() );
 		StrongActorComponentPtr pComponent = MakeStrongPtr( pActor->GetComponent<IActorComponent>( componentId ) );
@@ -95,16 +115,18 @@ void ActorFactory::ModifyActor(StrongActorPtr pActor, TiXmlElement* overrides)
 		   {
 			pComponent->VInit( pNode );
 		   }
-		else
+		else // this should not happen, actor override file should only contains existing components
 		   {
-			pComponent = CreateComponent( pNode );
-			if (pComponent)
-			   {
-				pActor->AddComponent(pComponent);
-				pComponent->SetOwner(pActor);
-			   }
+         /*pComponent = CreateComponent( pNode );
+         if (pComponent)
+         {
+         pActor->AddComponent(pComponent);
+         pComponent->SetOwner(pActor);
+         }*/
+         return false;
 		   }
 	   }  		
+   return true;
    }
 
 StrongActorComponentPtr ActorFactory::CreateComponent( TiXmlElement* pData )

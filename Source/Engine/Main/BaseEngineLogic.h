@@ -61,12 +61,16 @@ class BaseEngineLogic : public IEngineLogic
       virtual void VAddView( shared_ptr<IView> pView ) override;
 
       ActorId GetNewActorID( void ) { return ++m_LastActorId; }
-      std::string BaseEngineLogic::GetActorXml( const ActorId id );
-      virtual StrongActorPtr VCreateActor(const std::string &actorResource, TiXmlElement *overrides, const Mat4x4* initialTransform=NULL, const ActorId serversActorId=INVALID_ACTOR_ID) override;  // [rez] note: don't store this strong pointer outside of this class
-      virtual WeakActorPtr VGetActor( const ActorId actorId ) override;
-      virtual void VDestroyActor( const ActorId actorId ) override;
-      virtual void VModifyActor(const ActorId actorId, TiXmlElement *overrides) override ;
-      virtual void VMoveActor(const ActorId id, Mat4x4 const &mat) override {}
+      std::string BaseEngineLogic::GetActorXml( ActorId id );
+      virtual StrongActorPtr VCreateActor( const char* actorResource, 
+                                           const char* overrides = NULL,
+                                           TransformPtr pTransform = NULL,
+                                           ActorId serversActorId=INVALID_ACTOR_ID ) override;  // [rez] note: don't store this strong pointer outside of this class
+
+      virtual WeakActorPtr VGetActor( ActorId actorId ) override;
+      virtual void VDestroyActor( ActorId actorId ) override;
+      virtual void VModifyActor( ActorId actorId, TiXmlElement *overrides) override ;
+      virtual void VMoveActor( ActorId id, Mat4x4 const &mat) override {}
       virtual void VSetActorUpdate( bool isUpdatable ) override;
 
       virtual bool VLoadLevel( const char* levelResource ) override;

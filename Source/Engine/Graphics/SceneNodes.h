@@ -119,7 +119,7 @@ class SceneNode : public ISceneNode
 	   float GetAlpha() const { return m_Props.GetAlpha(); }
       
       // return position in parent space
-	   virtual Vec3 GetToWorldPosition( void ) const override { return m_Props.m_pTransform->GetPosition(); }
+	   virtual Vec3 GetToWorldPosition( void ) const override { return m_Props.m_pTransform->GetToWorldPosition(); }
 	   // set position in actor space
       virtual void SetToWorldPosition( const Vec3 &pos )  override { m_Props.m_pTransform->SetPosition( pos ); }
 
@@ -179,7 +179,8 @@ class CameraNode : public SceneNode
 	   const Frustum &GetFrustum( void ) { return m_Frustum; }
 	   void SetTarget(shared_ptr<SceneNode> pTarget) { m_pTarget = pTarget; }
 	   void ClearTarget( void ) { m_pTarget = shared_ptr<SceneNode>(); }
-	   shared_ptr<SceneNode> GetTarget( void ) { return m_pTarget; }
+	   
+      shared_ptr<SceneNode> GetTarget( void ) { return m_pTarget; }
 
 	   Mat4x4 GetWorldViewProjection(Scene *pScene);
 	   int SetViewTransform(Scene *pScene);
@@ -187,10 +188,15 @@ class CameraNode : public SceneNode
 	   Mat4x4 GetProjection() { return m_Projection; }
 	   Mat4x4 GetView( void ) { return m_View; }
 
-	   void SetCameraOffset( const Vec4 & cameraOffset )
-	      {
-		   m_CamOffsetVector = cameraOffset;
-	      }
+	   void SetCameraOffset( const Vec4 & cameraOffset ) { m_CamOffsetVector = cameraOffset; }
+      /**
+       * @brief return projection point on screen position in world space
+       *
+       * @param  distance float distance
+       * @param  screenPosition const Point & screenPosition
+       * @return Vec3
+       */
+       Vec3 GetScreenProjectPoint( float distance, const Point& screenPosition );
 
    protected:
 	   Frustum			m_Frustum;

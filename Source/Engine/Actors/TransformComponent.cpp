@@ -36,7 +36,7 @@ bool TransformComponent::VInit(TiXmlElement* pData)
     
 	Vec3 pitchYawRoll = m_pTransform->GetPitchYawRollRad();
 
-	Vec3 position = m_pTransform->GetPosition();	
+   Vec3 position = m_pTransform->GetToWorldPosition();
 
    Vec3 scale = m_pTransform->GetScale();
 

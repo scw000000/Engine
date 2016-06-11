@@ -33,5 +33,8 @@ namespace LevelEditorApp
 
       [DllImport( "user32.dll" )]
       public static extern int ShowWindow( IntPtr hwnd, int nCmdShow );
+
+      [DllImport( "coredll.dll" )]
+      public static extern bool SetForegroundWindow( IntPtr hWnd );
       }
    }

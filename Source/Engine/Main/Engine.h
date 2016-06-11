@@ -48,7 +48,17 @@ class EngineApp
       static Uint32 RegisterEvent( int eventNum );
       std::wstring GetString( std::wstring sID );
       virtual TCHAR *VGetGameAppDirectory( void ){ return _T("Engine\\base\\0.1"); };
-      Point GetMouseLocation( void );
+      void SetIsMouseCursorEnable( bool isDisplay );
+      /**
+       * @brief Return x and y coordinate of mouse location, left up = ( 0, 0 )
+       *
+       * @param   void
+       * @return Point
+       */
+       Point GetMousePosition( void );
+       bool IsMouseInsideWindow( void );
+       void SetWindowFocus( void );
+       void ResetMousePosition( void );
 
    public:
       struct EngineOptions m_EngineOptions;
@@ -75,6 +85,7 @@ class EngineApp
       http://www.codeproject.com/Articles/76252/What-are-TCHAR-WCHAR-LPSTR-LPWSTR-LPCTSTR-etc
       */
       virtual TCHAR* VGetGameTitle() { return _T("Engine"); };
+      
 
    protected:
       bool m_bIsRunning;

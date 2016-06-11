@@ -34,7 +34,7 @@ class TransformComponent : public BaseActorComponent<TransformComponent>
       void SetTransformPtr( const TransformPtr pNewTransform ) { m_pTransform = pNewTransform; }
       void SetTransform( const Transform& newTransform ) { *m_pTransform = newTransform; }
       
-      Vec3 GetToWorldPosition(void) const { return m_pTransform->GetPosition(); }
+      Vec3 GetToWorldPosition( void ) const { return m_pTransform->GetToWorldPosition(); }
       void SetToWorldPosition(const Vec3& pos) { m_pTransform->SetPosition( pos ); }
       Vec3 GetForward(void) const { return m_pTransform->GetForward(); }
    

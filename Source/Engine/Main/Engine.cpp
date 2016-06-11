@@ -365,16 +365,17 @@ void EngineApp::MsgProc( void )
             m_bQuitting = true;
             break;
          case SDL_DROPFILE:
-            m_pEngineLogic->VOnFileDrop( event.drop.file, GetMouseLocation() );
+            SetWindowFocus();
+            m_pEngineLogic->VOnFileDrop( event.drop.file, GetMousePosition() );
             SDL_free( event.drop.file );    // Free dropped_filedir memory
             break;
+         case SDL_MOUSEBUTTONDOWN:
          case SDL_KEYDOWN:
          case SDL_KEYUP:
          case SDL_TEXTEDITING:
          case SDL_TEXTINPUT:
          case SDL_KEYMAPCHANGED:
          case SDL_MOUSEMOTION:
-         case SDL_MOUSEBUTTONDOWN:
          case SDL_MOUSEBUTTONUP:
          case SDL_MOUSEWHEEL:
          case SDL_JOYAXISMOTION:
@@ -488,11 +489,37 @@ std::wstring EngineApp::GetString( std::wstring sID )
 	return localizedString->second;
    }  
 
-Point EngineApp::GetMouseLocation( void )
+void EngineApp::SetIsMouseCursorEnable( bool isDisplay )
+   {
+   if( isDisplay )
+      {
+      SDL_ShowCursor( SDL_ENABLE );
+      }
+   else
+      {
+      SDL_ShowCursor( SDL_DISABLE );
+      }
+
+   }
+
+Point EngineApp::GetMousePosition( void )
    {
    int x, y;
    SDL_GetMouseState( &x, &y );
    return Point( x, y );
+   }
+
+void EngineApp::SetWindowFocus( void )
+   {
+#if defined( _WINDOWS ) || defined( WINDOWS )
+   SetFocus( GetHwnd() );
+#endif   
+   }
+
+void EngineApp::ResetMousePosition( void ) 
+   {
+   SetWindowFocus();
+   SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
    }
 
 //
@@ -601,7 +628,7 @@ void EngineApp::OnFrameRender( double fTime, float fElapsedTime )
 // LATER: This function doesn't work as expected, it won't "blink" on and off, and I cann't find a solution yet
 void EngineApp::FlashWhileMinimized( void )
    {
-#ifndef _WINDOWS
+#if !defined( _WINDOWS ) && !defined( WINDOWS )
    return;
 #endif
 

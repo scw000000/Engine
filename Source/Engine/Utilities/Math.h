@@ -1,12 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Math.h
-////////////////////////////////////////////////////////////////////////////////
-
-
-//////////////
-// INCLUDES //
-//////////////
+/*!
+ * \file Math.h
+ * \date 2016/06/11 18:33
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include <functional>
 #include <vector>
@@ -47,3 +52,6 @@ class ENGRandom
       int mti; /* mti==N+1 means mt[N] is not initialized */
    
    };
+
+extern float Interpolate( float normalizedValue, float begin, float end );
+extern Vec3 Interpolate( float normalizedValue, Vec3 begin, Vec3 end );

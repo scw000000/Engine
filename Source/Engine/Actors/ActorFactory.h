@@ -34,8 +34,8 @@ class ActorFactory
       GenericObjectFactory< IActorComponent, ComponentId > m_ComponentFactory;
 
    private:
-      ActorId GetNextActorId( void ){ ++m_lastActorId; return m_lastActorId; }
+      ActorId GetNextActorId( void ){ ++m_LastActorId; return m_LastActorId; }
 
    private:
-      ActorId m_lastActorId;
+      ActorId m_LastActorId;
    };

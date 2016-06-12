@@ -26,9 +26,11 @@ class IActorComponent;
 
 typedef unsigned int ActorId;
 typedef unsigned int ComponentId;
+typedef unsigned int ActorComponentId;
 
 const ActorId INVALID_ACTOR_ID = 0;
 const ComponentId INVALID_COMPONENT_ID = 0;
+const ActorComponentId INVALID_ACTOR_COMPONENT_ID = 0;
 
 typedef shared_ptr<Actor> StrongActorPtr;
 typedef weak_ptr<Actor> WeakActorPtr;

@@ -43,23 +43,35 @@ bool LightRenderComponent::VDelegateInit( TiXmlElement* pData )
    return true;
    }
 
-shared_ptr<SceneNode> LightRenderComponent::VCreateSceneNode(void)
+shared_ptr<SceneNode> LightRenderComponent::VCreateSceneNode( void )
    {
-   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
-   if (pTransformComponent)
+   TransformPtr pActorTransform = m_pOwner->GetTransformPtr();
+   WeakBaseRenderComponentPtr weakThis( this );
+   switch( EngineApp::GetRendererImpl() )
       {
-		WeakBaseRenderComponentPtr weakThis(this);
-
-		switch ( EngineApp::GetRendererImpl() )
-		   {
-         case Renderer::Renderer_OpenGL :
+      case Renderer::Renderer_OpenGL:
             {
-				return shared_ptr<SceneNode>( ENG_NEW LightNode( m_pOwner->GetId(), weakThis, m_pLightProps, pTransformComponent->GetTransform( ) ) );  
+            return shared_ptr<SceneNode>( ENG_NEW LightNode( m_pOwner->GetId(), weakThis, m_pLightProps, pActorTransform ) );
             }
-         default:
-				ENG_ASSERT( 0 && "Unknown Renderer Implementation in GridRenderComponent" );
-		   }
-	   }
+      default:
+         ENG_ASSERT( 0 && "Unknown Renderer Implementation in GridRenderComponent" );
+      }
+
+   /*shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
+   if (pTransformComponent)
+   {
+   WeakBaseRenderComponentPtr weakThis(this);
+
+   switch ( EngineApp::GetRendererImpl() )
+   {
+   case Renderer::Renderer_OpenGL :
+   {
+   return shared_ptr<SceneNode>( ENG_NEW LightNode( m_pOwner->GetId(), weakThis, m_pLightProps, pTransformComponent->GetTransform( ) ) );
+   }
+   default:
+   ENG_ASSERT( 0 && "Unknown Renderer Implementation in GridRenderComponent" );
+   }
+   }*/
     return shared_ptr<SceneNode>();
    }
 

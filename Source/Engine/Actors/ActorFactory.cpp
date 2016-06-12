@@ -25,7 +25,7 @@
 
 ActorFactory::ActorFactory( void )
    {
-   m_lastActorId = INVALID_ACTOR_ID;
+   m_LastActorId = INVALID_ACTOR_ID;
 
    REGISTER_COMPONENT( TransformComponent );
    REGISTER_COMPONENT( MeshRenderComponent );

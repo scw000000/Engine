@@ -125,3 +125,12 @@ bool XMLParser::ReadColor( TiXmlElement* pData, Color* pReadVar )
    return true;
    }
 
+bool WriteXMLToFile( const char* fileName, TiXmlElement* pRoot )
+   {
+   TiXmlDocument doc;
+   doc.LinkEndChild( pRoot );
+   doc.SaveFile( fileName );
+   doc.Clear();
+   return true;
+   }
+

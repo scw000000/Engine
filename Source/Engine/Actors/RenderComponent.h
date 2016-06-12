@@ -16,7 +16,9 @@
 
 class RenderComponent : virtual public IActorComponent
    {
+   friend class Actor;
    public:
+      RenderComponent( void );
       virtual void Destory( void ) override;
       /**
        * @brief set member variable from xml elements
@@ -30,7 +32,7 @@ class RenderComponent : virtual public IActorComponent
       virtual void VPostInit( void ) override;
       virtual void VUpdate( const unsigned long deltaMs ) override { };
 	   //virtual void VOnChanged( void ) override;
-      virtual TiXmlElement* VGenerateXml( void ) override;
+      virtual TiXmlElement* VGenerateXML( void ) override;
 
    protected:
       virtual void SetOwner( StrongActorPtr pOwner ) override

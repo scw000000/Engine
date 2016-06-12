@@ -28,7 +28,7 @@ class TransformComponent : public BaseActorComponent<TransformComponent>
       virtual void Destory( void ) override;
       TransformComponent( void ) : m_pTransform( ENG_NEW Transform( Transform::g_Identity ) ) { }
       virtual bool VInit( TiXmlElement* pData ) override;
-      virtual TiXmlElement* VGenerateXml( void ) override;
+      virtual TiXmlElement* VGenerateXML( void ) override;
       // transform functions
       TransformPtr GetTransform( void ) const { return m_pTransform; }
       void SetTransformPtr( const TransformPtr pNewTransform ) { m_pTransform = pNewTransform; }

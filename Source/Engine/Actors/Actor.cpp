@@ -24,6 +24,7 @@ Actor::Actor( ActorId id )
 
 	// [mrmike] added post press - this is an editor helper
 	m_Resource = "Unknown";
+   m_LastActorComponentId = INVALID_ACTOR_COMPONENT_ID;
    }
 
 // The actor should call Destroy() before calling destructor
@@ -61,7 +62,7 @@ void Actor::Destroy( void )
    m_Components.clear();
    }
 
-void Actor::Update( const unsigned long deltaMs)
+void Actor::Update( unsigned long deltaMs)
    {
    for (ActorComponents::iterator it = m_Components.begin(); it != m_Components.end(); ++it)
       {
@@ -69,10 +70,8 @@ void Actor::Update( const unsigned long deltaMs)
       }
    }
 
-std::string Actor::ToXML( void )
+TiXmlElement* Actor::GenerateXML( void )
    {
-   TiXmlDocument outDoc;
-
    // Actor element
    TiXmlElement* pActorElement = ENG_NEW TiXmlElement( "Actor" );
    pActorElement->SetAttribute( "type", m_Type.c_str() );
@@ -82,20 +81,18 @@ std::string Actor::ToXML( void )
    for ( auto it = m_Components.begin(); it != m_Components.end(); ++it )
       {
       StrongActorComponentPtr pComponent = it->second;
-      //TiXmlElement* pComponentElement = pComponent->VGenerateXml();
-      //pActorElement->LinkEndChild(pComponentElement);
+      TiXmlElement* pComponentElement = pComponent->VGenerateXML();
+      pActorElement->LinkEndChild( pComponentElement );
       }
 
-   outDoc.LinkEndChild( pActorElement );
-	TiXmlPrinter printer;
-	outDoc.Accept( &printer );
-
-	return printer.CStr();
+   return pActorElement;
    }
 
 
 void Actor::AddComponent( StrongActorComponentPtr pComponent )
    {
-   std::pair<ActorComponents::iterator, bool> success = m_Components.insert(std::make_pair( pComponent->VGetId(), pComponent) );
-   ENG_ASSERT(success.second);
+   ENG_ASSERT( GetNextActorCompnentId() != INVALID_ACTOR_COMPONENT_ID );
+
+   std::pair<ActorComponents::iterator, bool> success = m_Components.insert( std::make_pair( m_LastActorComponentId, pComponent ) );
+   ENG_ASSERT( success.second );
    }

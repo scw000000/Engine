@@ -27,3 +27,5 @@ class XMLParser
       static bool ReadTransform( TiXmlElement* pData, Transform* pReadVar );
       static bool ReadColor( TiXmlElement* pData, Color* pReadVar );
    };
+
+extern bool WriteXMLToFile( const char* fileName, TiXmlElement* pRoot );

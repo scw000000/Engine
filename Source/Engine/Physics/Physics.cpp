@@ -252,18 +252,27 @@ void BulletPhysics::VSyncVisibleScene( )
       StrongActorPtr pActor = MakeStrongPtr( g_pApp->m_pEngineLogic->VGetActor( id ) );
       if( pActor && actorMotionState )
          {
-         shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
-         if( pTransformComponent )
+         TransformPtr pActorTransform = pActor->GetTransformPtr();
+         if( pActorTransform->GetToWorld() != actorMotionState->m_Transform.GetToWorld() )
             {
-            if( pTransformComponent->GetTransform( )->GetToWorld() != actorMotionState->m_Transform.GetToWorld() )
-               {
-               // Bullet has moved the actor's physics object.  Sync the transform and inform the game an actor has moved
-               pTransformComponent->SetTransform( actorMotionState->m_Transform );
-               shared_ptr<EvtData_Move_Actor> pEvent( ENG_NEW EvtData_Move_Actor( id, actorMotionState->m_Transform.GetToWorld() ) );
-               IEventManager::GetSingleton()->VQueueEvent( pEvent );
-               }
+            // Bullet has moved the actor's physics object.  Sync the transform and inform the game an actor has moved
+            *pActorTransform = Transform( actorMotionState->m_Transform );
+            shared_ptr<EvtData_Move_Actor> pEvent( ENG_NEW EvtData_Move_Actor( id, actorMotionState->m_Transform.GetToWorld() ) );
+            IEventManager::GetSingleton()->VQueueEvent( pEvent );
             }
          }
+         //shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
+         //if( pTransformComponent )
+         //   {
+         //   if( pTransformComponent->GetTransform( )->GetToWorld() != actorMotionState->m_Transform.GetToWorld() )
+         //      {
+         //      // Bullet has moved the actor's physics object.  Sync the transform and inform the game an actor has moved
+         //      pTransformComponent->SetTransform( actorMotionState->m_Transform );
+         //      shared_ptr<EvtData_Move_Actor> pEvent( ENG_NEW EvtData_Move_Actor( id, actorMotionState->m_Transform.GetToWorld() ) );
+         //      IEventManager::GetSingleton()->VQueueEvent( pEvent );
+         //      }
+         //   }
+         //}
       }
    }
 

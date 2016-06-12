@@ -89,7 +89,7 @@ bool TransformComponent::VInit( TiXmlElement* pData )
     return true;
 }
 
-TiXmlElement* TransformComponent::VGenerateXml( void )
+TiXmlElement* TransformComponent::VGenerateXML( void )
    {
    TiXmlElement* pRoot = m_pTransform->GenerateXML();
    pRoot->SetValue( s_Name.c_str() );

@@ -19,7 +19,12 @@
 #include "..\Graphics\MeshSceneNode.h"
 #include "TransformComponent.h"
 
-   
+
+RenderComponent::RenderComponent( void )
+   {
+   m_pTransform = TransformPtr( ENG_NEW Transform( Transform::g_Identity ) );
+   }
+
 void RenderComponent::Destory( void )
    {
    m_pRootSceneNode.reset();
@@ -38,7 +43,7 @@ void RenderComponent::VPostInit( void )
    IEventManager::GetSingleton()->VTriggerEvent( pEvent ); // process this event immediately
    }
 
-TiXmlElement* RenderComponent::VGenerateXml( void )
+TiXmlElement* RenderComponent::VGenerateXML( void )
    {
    TiXmlElement* pBaseElement = ENG_NEW TiXmlElement( VGetName().c_str() );
    
@@ -114,17 +119,21 @@ MeshRenderComponent::MeshRenderComponent( void ) : m_pMeshResource( ENG_NEW Reso
 // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
 shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
    {
-   // get the transform component
-   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
-   if ( !pTransformComponent )
-      {
-      // can't render without a transform
-      return shared_ptr<SceneNode>();
-      }
+   TransformPtr pActorTransform = m_pOwner->GetTransformPtr();
+   WeakBaseRenderComponentPtr wbrcp( this );
+   shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), wbrcp, m_pMeshResource, m_pMaterial, RenderPass::RenderPass_Actor, pActorTransform ) );
 
-   WeakBaseRenderComponentPtr wbrcp(this);
-   shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), wbrcp, m_pMeshResource, m_pMaterial, RenderPass::RenderPass_Actor, pTransformComponent->GetTransform() ) );
-   
+   //// get the transform component
+   //shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
+   //if ( !pTransformComponent )
+   //   {
+   //   // can't render without a transform
+   //   return shared_ptr<SceneNode>();
+   //   }
+
+   //WeakBaseRenderComponentPtr wbrcp(this);
+   //shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), wbrcp, m_pMeshResource, m_pMaterial, RenderPass::RenderPass_Actor, pTransformComponent->GetTransform() ) );
+   //
    return pMeshSceneNode;
    }
 

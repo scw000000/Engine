@@ -30,7 +30,7 @@ class IActorComponent
       virtual void VUpdate( const unsigned long deltaMs ) = 0;
       virtual void SetOwner( StrongActorPtr pOwner ) = 0;
       virtual void Destory( void ) = 0;
-      virtual TiXmlElement* VGenerateXml( void ) = 0;
+      virtual TiXmlElement* VGenerateXML( void ) = 0;
    };
 
 // Using Curiously recurring template pattern (CRTP) to prevent declaring GUID mulit times

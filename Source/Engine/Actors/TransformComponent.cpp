@@ -27,13 +27,17 @@ void TransformComponent::Destory( void )
    m_pTransform.reset();
    }
 
-bool TransformComponent::VInit(TiXmlElement* pData)
+bool TransformComponent::VInit( TiXmlElement* pData )
    {
-   ENG_ASSERT(pData);
+   ENG_ASSERT( pData );
 
 	// [mrmike] - this was changed post-press - because changes to the TransformComponents can come in partial definitions,
 	//            such as from the editor, its better to grab the current values rather than clear them out.
+
+   Transform transform = *m_pTransform;
     
+   XMLParser::ReadTransform( pData, &*m_pTransform );
+/*
 	Vec3 pitchYawRoll = m_pTransform->GetPitchYawRollRad();
 
    Vec3 position = m_pTransform->GetToWorldPosition();
@@ -64,28 +68,9 @@ bool TransformComponent::VInit(TiXmlElement* pData)
 	  pitchYawRoll = Vec3(pitch, yaw, roll);
 	  }
 
-	Mat4x4 translation;
-	translation.AddTranslation( position );
-
 	Quaternion rotation;
 	rotation.BuildPitchYawRollDeg( pitchYawRoll.x, pitchYawRoll.y, pitchYawRoll.z );
 
-	/**
-	// This is not supported yet.
-    TiXmlElement* pLookAtElement = pData->FirstChildElement("LookAt");
-    if (pLookAtElement)
-    {
-        double x = 0;
-        double y = 0;
-        double z = 0;
-        pLookAtElement->Attribute("x", &x);
-        pLookAtElement->Attribute("y", &y);
-        pLookAtElement->Attribute("z", &z);
-
-		Vec3 lookAt((float)x, (float)y, (float)z);
-		rotation.BuildRotationLookAt(translation.GetPosition(), lookAt, g_Up);
-    }
-    */
     TiXmlElement* pScaleElement = pData->FirstChildElement( "Scale" );
    if (pScaleElement)
       {
@@ -98,10 +83,41 @@ bool TransformComponent::VInit(TiXmlElement* pData)
       scale = Vec3( (float)x, (float)y, (float)z );
       }
 	
-
-    //m_Transform = rotation * translation;
     m_pTransform->SetRotation( rotation );
     m_pTransform->SetPosition( position );
-    m_pTransform->SetScale( scale );
+    m_pTransform->SetScale( scale );*/
     return true;
 }
+
+TiXmlElement* TransformComponent::VGenerateXml( void )
+   {
+   TiXmlElement* pRoot = m_pTransform->GenerateXML();
+   pRoot->SetValue( s_Name.c_str() );
+
+   //// initial transform -> position
+   //TiXmlElement* pPosition = ENG_NEW TiXmlElement( "Position" );
+   //Vec3 pos( m_pTransform->GetToWorldPosition() );
+   //pPosition->SetAttribute( "x", ToStr( pos.x ).c_str() );
+   //pPosition->SetAttribute( "y", ToStr( pos.y ).c_str() );
+   //pPosition->SetAttribute( "z", ToStr( pos.z ).c_str() );
+   //pBaseElement->LinkEndChild( pPosition );
+
+   //// initial transform -> LookAt
+   //TiXmlElement* pDirection = ENG_NEW TiXmlElement( "PitchYawRoll" );
+   //Vec3 orient( m_pTransform->GetPitchYawRollDeg() );
+   //pDirection->SetAttribute( "x", ToStr( orient.x ).c_str() );
+   //pDirection->SetAttribute( "y", ToStr( orient.y ).c_str() );
+   //pDirection->SetAttribute( "z", ToStr( orient.z ).c_str() );
+   //pBaseElement->LinkEndChild( pDirection );
+
+   //// This is not supported yet
+   //// initial transform -> position
+   //TiXmlElement* pScale = ENG_NEW TiXmlElement( "Scale" );
+   //Vec3 scale( m_pTransform->GetScale() );
+   //pPosition->SetAttribute( "x", ToStr( scale.x ).c_str() );
+   //pPosition->SetAttribute( "y", ToStr( scale.y ).c_str() );
+   //pPosition->SetAttribute( "z", ToStr( scale.z ).c_str() );
+   //pBaseElement->LinkEndChild( pScale );
+
+   return pRoot;
+   }

@@ -14,7 +14,7 @@
 */
 #include "ActorComponent.h"
 
-class IRenderComponent : virtual public IActorComponent
+class RenderComponent : virtual public IActorComponent
    {
    public:
       virtual void Destory( void ) override;
@@ -59,7 +59,7 @@ class IRenderComponent : virtual public IActorComponent
       virtual shared_ptr<SceneNode> VGetSceneNode(void);
    };
 
-template <typename T>class BaseRenderComponent : public IRenderComponent 
+template <typename T>class BaseRenderComponent : public RenderComponent 
    {
    public:
 
@@ -99,7 +99,7 @@ class MeshRenderComponent : public BaseRenderComponent<MeshRenderComponent>
        */
       virtual shared_ptr<SceneNode> VCreateSceneNode( void ) override; 
       virtual bool VDelegateInit( TiXmlElement* pData ) override;
-      //virtual void VCreateInheritedXmlElements(TiXmlElement* pBaseElement);
+      virtual void VCreateInheritedXmlElements( TiXmlElement* pBaseElement ) override;
 
    protected:
       MaterialPtr m_pMaterial;

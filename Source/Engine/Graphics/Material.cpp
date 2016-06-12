@@ -24,6 +24,37 @@ Material::Material( void ) : m_TextureResource( "art\\default.jpg" )
    m_AlphaType = AlphaOpaque;
    }
 
+bool Material::Init( TiXmlElement* pData )
+   {
+   if( !pData )
+      {
+      return false;
+      }
+   TiXmlElement* pTextureFileElement = pData->FirstChildElement( "Texture" );
+   if( pTextureFileElement )
+      {
+      const char *pTextureFilePath = pTextureFileElement->Attribute( "path" );
+      if( pTextureFilePath )
+         {
+         SetTextureResource( Resource( pTextureFilePath ) );
+         }
+      }
+
+   Color diffuse;
+   if( XMLParser::ReadColor( pData->FirstChildElement( "Diffuse" ), &diffuse ) )
+      {
+      SetDiffuse( diffuse );
+      }
+
+   Color ambient;
+   if( XMLParser::ReadColor( pData->FirstChildElement( "Ambient" ), &ambient ) )
+      {
+      SetAmbient( ambient );
+      }
+
+   return true;
+   }
+
 void Material::SetTextureResource( const Resource& newTexture )
    {
    m_TextureResource = newTexture;
@@ -64,5 +95,30 @@ void Material::ApplyMaterial( void )
    glMaterialfv( GL_FRONT, GL_EMISSION, m_Emissive );
 
    glMaterialfv( GL_FRONT, GL_SHININESS, &m_Shininess ); 
+   }
+
+TiXmlElement* Material::GenerateXML( void )
+   {
+   TiXmlElement* pBaseElement = ENG_NEW TiXmlElement( "Material" );
+
+   TiXmlElement* pTexture = ENG_NEW TiXmlElement( "Texture" );
+   pTexture->SetAttribute( "path", m_TextureResource.m_Name.c_str() );
+   pBaseElement->LinkEndChild( pTexture );
+
+   TiXmlElement* pDiffuse = ENG_NEW TiXmlElement( "Diffuse" );
+   pDiffuse->SetAttribute( "r", ToStr( m_Diffuse.m_Component.r ).c_str() );
+   pDiffuse->SetAttribute( "g", ToStr( m_Diffuse.m_Component.g ).c_str() );
+   pDiffuse->SetAttribute( "b", ToStr( m_Diffuse.m_Component.b ).c_str() );
+   pDiffuse->SetAttribute( "a", ToStr( m_Diffuse.m_Component.a ).c_str() );
+   pBaseElement->LinkEndChild( pDiffuse );
+
+   TiXmlElement* pAmbient = ENG_NEW TiXmlElement( "Ambient" );
+   pAmbient->SetAttribute( "r", ToStr( m_Ambient.m_Component.r ).c_str() );
+   pAmbient->SetAttribute( "g", ToStr( m_Ambient.m_Component.g ).c_str() );
+   pAmbient->SetAttribute( "b", ToStr( m_Ambient.m_Component.b ).c_str() );
+   pAmbient->SetAttribute( "a", ToStr( m_Ambient.m_Component.a ).c_str() );
+   pBaseElement->LinkEndChild( pAmbient );
+
+   return pBaseElement;
    }
 

@@ -82,6 +82,7 @@ class Vec3 : public glm::vec3
          glm::cross( glm::vec3(), glm::vec3() );
          return ( glm::cross<float, glm::highp>( (*this), b ) );
          }
+      TiXmlElement* GernerateXML( void );
 
    public:
       static const Vec3 g_Zero;
@@ -399,6 +400,8 @@ typedef struct Color
 
     operator const GLfloat*( void ){ return &m_Array[0]; }
 
+    TiXmlElement* GenerateXML( void );
+
    public:
       union
          {
@@ -608,7 +611,9 @@ class Frustum
        Vec3       GetToWorldPosition( void ) const { return m_ToWorld.GetToWorldPosition(); }
  
        Vec3       GetScale( void ) const { return m_ToWorld.GetScale(); }
- 
+       
+       TiXmlElement* GenerateXML( void );
+
     public:
        const static Transform g_Identity;
  

@@ -17,9 +17,9 @@
 #include "Material.h"
 
 
-class IRenderComponent;
+class RenderComponent;
 
-typedef IRenderComponent* WeakBaseRenderComponentPtr;
+typedef RenderComponent* WeakBaseRenderComponentPtr;
 
 
 //   This enum defines the different types of alpha blending

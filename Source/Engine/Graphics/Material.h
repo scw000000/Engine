@@ -21,7 +21,7 @@ class Material
    {
    public:
       Material( void );
-
+      bool Init( TiXmlElement* pData );
       void SetTextureResource( const Resource& newTextureRes );
       Resource GetTextureResource( void ) const { return m_TextureResource; };
 
@@ -42,6 +42,7 @@ class Material
 	   float GetAlpha( void ) const { return m_Diffuse.GetAlpha(); }
 
 	   void ApplyMaterial( void );
+      TiXmlElement* GenerateXML( void );
 
    private:
       Resource m_TextureResource;

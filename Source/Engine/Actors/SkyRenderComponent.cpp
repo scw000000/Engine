@@ -93,3 +93,15 @@ shared_ptr<SceneNode> SkyRenderComponent::VCreateSceneNode( void )
       }
    return shared_ptr<SceneNode>( );
    }
+
+void SkyRenderComponent::VCreateInheritedXmlElements( TiXmlElement* pBaseElement )
+   {
+   // initial transform -> position
+   TiXmlElement* pMesh = ENG_NEW TiXmlElement( "Mesh" );
+   pMesh->SetAttribute( "path", m_pMeshResource->m_Name.c_str() );
+   pBaseElement->LinkEndChild( pMesh );
+
+   TiXmlElement* pTexture = ENG_NEW TiXmlElement( "Texture" );
+   pTexture->SetAttribute( "path", m_pTextureResource->m_Name.c_str() );
+   pBaseElement->LinkEndChild( pTexture );
+   }

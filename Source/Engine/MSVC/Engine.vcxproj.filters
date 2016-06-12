@@ -202,6 +202,9 @@
     <ClCompile Include="..\Controller\Controller.cpp">
       <Filter>Controller</Filter>
     </ClCompile>
+    <ClCompile Include="..\Utilities\XMLParser.cpp">
+      <Filter>Utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -370,6 +373,9 @@
     </ClInclude>
     <ClInclude Include="..\Controller\Controller.h">
       <Filter>Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Utilities\XMLParser.h">
+      <Filter>Utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

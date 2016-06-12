@@ -20,13 +20,12 @@ typedef shared_ptr<LightProperties> LightPropertiesPtr;
 
 // Note: Light color is stored in the Material structure, which is already present in all SceneNodes.
 
-//
-// struct LightProperties				- Chapter 16, page 551
-//
 struct LightProperties
    {
-   Color m_Color;
+   Color m_Diffuse;
    float m_Power;
+   bool Init( TiXmlElement* pData );
+   TiXmlElement* GenerateXML( void );
    };
 
 
@@ -70,15 +69,6 @@ class LightManager
    {
 	friend class Scene;
 
-   protected:
-	   Lights	m_Lights;
-      Lights   m_ActiveLights;
-      Vec3     m_LightPosWorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
-      Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
-      float     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
-      Color		m_LightColor[ MAXIMUM_LIGHTS_SUPPORTED ];
-      Color		m_LightAmbient;
-
    public:
 	   /**
 	    * @brief This function is called by Scene::OnRender
@@ -99,4 +89,13 @@ class LightManager
       float* GetLightPower( void ) { return m_LightPower; }
       Color* GetLightColor( void ) { return m_LightColor; }
       Color* GetLightAmbient( void ) { return &m_LightAmbient; }
+
+   protected:
+      Lights	m_Lights;
+      Lights   m_ActiveLights;
+      Vec3     m_LightPosWorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
+      float     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Color		m_LightColor[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Color		m_LightAmbient;
    };

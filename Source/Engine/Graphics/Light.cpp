@@ -1,11 +1,68 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Light.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file Light.cpp
+ * \date 2016/06/12 11:24
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "EngineStd.h"
 #include "Light.h"
 #include "..\Actors\LightRenderComponent.h"
 
+
+bool LightProperties::Init( TiXmlElement* pData )
+   {
+   XMLParser::ReadColor( pData->FirstChildElement( "Diffuse" ), &m_Diffuse );
+   //TiXmlElement* pDiffuseNode = pData->FirstChildElement( "Diffuse" );
+   //if( pDiffuseNode )
+   //   {
+   //   
+   //  // m_Diffuse = BaseRenderComponent::LoadColor( pDiffuseNode );
+   //   }
+
+   TiXmlElement* pPowerNode = pData->FirstChildElement( "Power" );
+   if( pPowerNode )
+      {
+      double temp;
+      pPowerNode->Attribute( "magnitude", &temp );
+      m_Power = ( float ) temp;
+      }
+
+   return true;
+   }
+
+TiXmlElement* LightProperties::GenerateXML( void )
+   {
+   TiXmlElement* pRoot = ENG_NEW TiXmlElement( "Light" );
+
+   TiXmlElement* pDiffuse = m_Diffuse.GenerateXML();
+   pDiffuse->SetValue( "Diffuse" );
+   pRoot->LinkEndChild( pDiffuse );
+
+   TiXmlElement* pPower = ENG_NEW TiXmlElement( "Power" );
+   pPower->SetAttribute( "magnitude", ToStr( m_Power ).c_str() );
+   pRoot->LinkEndChild( pPower );
+
+   /*TiXmlElement* pDiffuse = ENG_NEW TiXmlElement( "Diffuse" );
+   pDiffuse->SetAttribute( "r", ToStr( m_Diffuse.m_Component.r ).c_str() );
+   pDiffuse->SetAttribute( "g", ToStr( m_Diffuse.m_Component.g ).c_str() );
+   pDiffuse->SetAttribute( "b", ToStr( m_Diffuse.m_Component.b ).c_str() );
+   pDiffuse->SetAttribute( "a", ToStr( m_Diffuse.m_Component.a ).c_str() );
+   pBaseElement->LinkEndChild( pDiffuse );
+
+   TiXmlElement* pPower = ENG_NEW TiXmlElement( "Power" );
+   pPower->SetAttribute( "magnitude", ToStr( m_Power ).c_str() );
+   pBaseElement->LinkEndChild( pPower );*/
+
+   return pRoot;
+   }
 
 LightNode::LightNode( const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const LightPropertiesPtr& props, TransformPtr pTransform )
  : SceneNode( actorId, renderComponent,  RenderPass_NotRendered, pTransform ) 
@@ -33,12 +90,12 @@ void LightManager::CalcLighting( Scene *pScene )
       {
       if( lightIt == m_ActiveLights.begin() )
          {
-         m_LightAmbient = lightIt->get()->GetLightPropertiesPtr()->m_Color * 0.2f;
+         m_LightAmbient = lightIt->get()->GetLightPropertiesPtr()->m_Diffuse * 0.2f;
          }
       memcpy( m_LightPosWorldSpace, &lightIt->get( )->GetWorldPosition( ), sizeof( Vec3 ) );
       memcpy( m_LightDir, &lightIt->get( )->GetForward( ), sizeof( Vec3 ) );
       memcpy( m_LightPower, &lightIt->get( )->GetLightPropertiesPtr( )->m_Power, sizeof( float ) );
-      memcpy( m_LightColor, &lightIt->get( )->GetLightPropertiesPtr( )->m_Color, sizeof( Color ) );
+      memcpy( m_LightColor, &lightIt->get()->GetLightPropertiesPtr()->m_Diffuse, sizeof( Color ) );
       }
    }  
 

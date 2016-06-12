@@ -20,35 +20,55 @@
 #include "TransformComponent.h"
 
    
-void IRenderComponent::Destory( void )
+void RenderComponent::Destory( void )
    {
    m_pRootSceneNode.reset();
    }
 
-bool IRenderComponent::VInit( TiXmlElement* pData )
+bool RenderComponent::VInit( TiXmlElement* pData )
    {
    ENG_ASSERT( pData );
    return VDelegateInit( pData );
    }
 
-void IRenderComponent::VPostInit( void )
+void RenderComponent::VPostInit( void )
    {
    shared_ptr<SceneNode> pSceneNode( VGetSceneNode() );
    shared_ptr<EvtData_New_Render_Component> pEvent( ENG_NEW EvtData_New_Render_Component( m_pOwner->GetId(), pSceneNode ) );
    IEventManager::GetSingleton()->VTriggerEvent( pEvent ); // process this event immediately
    }
 
-TiXmlElement* IRenderComponent::VGenerateXml( void )
+TiXmlElement* RenderComponent::VGenerateXml( void )
    {
    TiXmlElement* pBaseElement = ENG_NEW TiXmlElement( VGetName().c_str() );
+   
+   TiXmlElement* pTransform = m_pTransform->GenerateXML();
+   pBaseElement->LinkEndChild( pTransform );
 
-   //// color
-   //TiXmlElement* pColor = ENG_NEW TiXmlElement( "Color" );
-   //pColor->SetAttribute( "r", ToStr( m_color.r ).c_str() );
-   //pColor->SetAttribute( "g", ToStr( m_color.g ).c_str() );
-   //pColor->SetAttribute( "b", ToStr( m_color.b ).c_str() );
-   //pColor->SetAttribute( "a", ToStr( m_color.a ).c_str() );
-   //pBaseElement->LinkEndChild( pColor );
+   //// initial transform -> position
+   //TiXmlElement* pPosition = ENG_NEW TiXmlElement( "Position" );
+   //Vec3 pos( m_pTransform->GetToWorldPosition() );
+   //pPosition->SetAttribute( "x", ToStr( pos.x ).c_str() );
+   //pPosition->SetAttribute( "y", ToStr( pos.y ).c_str() );
+   //pPosition->SetAttribute( "z", ToStr( pos.z ).c_str() );
+   //pBaseElement->LinkEndChild( pPosition );
+
+   //// initial transform -> LookAt
+   //TiXmlElement* pDirection = ENG_NEW TiXmlElement( "PitchYawRoll" );
+   //Vec3 orient( m_pTransform->GetPitchYawRollDeg() );
+   //pDirection->SetAttribute( "x", ToStr( orient.x ).c_str() );
+   //pDirection->SetAttribute( "y", ToStr( orient.y ).c_str() );
+   //pDirection->SetAttribute( "z", ToStr( orient.z ).c_str() );
+   //pBaseElement->LinkEndChild( pDirection );
+   //
+   //// This is not supported yet
+   //// initial transform -> position
+   //TiXmlElement* pScale = ENG_NEW TiXmlElement( "Scale" );
+   //Vec3 scale( m_pTransform->GetScale() );
+   //pPosition->SetAttribute( "x", ToStr( scale.x ).c_str() );
+   //pPosition->SetAttribute( "y", ToStr( scale.y ).c_str() );
+   //pPosition->SetAttribute( "z", ToStr( scale.z ).c_str() );
+   //pBaseElement->LinkEndChild( pScale );
 
    // create XML for inherited classes
    VCreateInheritedXmlElements( pBaseElement );
@@ -63,7 +83,7 @@ void BaseRenderComponent::VOnChanged( void )
    IEventManager::GetSingleton()->VTriggerEvent( pEvent );
    }*/
 
-shared_ptr<SceneNode> IRenderComponent::VGetSceneNode( void )
+shared_ptr<SceneNode> RenderComponent::VGetSceneNode( void )
    {
    if( !m_pRootSceneNode )
       {
@@ -71,29 +91,6 @@ shared_ptr<SceneNode> IRenderComponent::VGetSceneNode( void )
       }
    return m_pRootSceneNode;
    }
-
-Color IRenderComponent::LoadColor( TiXmlElement* pData )
-   {
-   Color color;
-
-   double r = 1.0;
-   double g = 1.0;
-   double b = 1.0;
-   double a = 1.0;
-
-   pData->Attribute( "r", &r );
-   pData->Attribute( "g", &g );
-   pData->Attribute( "b", &b );
-   pData->Attribute( "a", &a );
-
-   color.m_Component.r = ( float ) r;
-   color.m_Component.g = ( float ) g;
-   color.m_Component.b = ( float ) b;
-   color.m_Component.a = ( float ) a;
-
-   return color;
-   }
-
 
 //---------------------------------------------------------------------------------------------------------------------
 // MeshRenderComponent
@@ -152,28 +149,36 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
    TiXmlElement* pMaterialElement = pData->FirstChildElement( "Material" );
    if( pMaterialElement )
       {
-      TiXmlElement* pTextureFileElement = pMaterialElement->FirstChildElement( "Texture" );
+      m_pMaterial->Init( pMaterialElement );
+      /*TiXmlElement* pTextureFileElement = pMaterialElement->FirstChildElement( "Texture" );
       if( pTextureFileElement )
-         {
-         const char *pTextureFilePath = pTextureFileElement->Attribute( "path" );
-         if( pTextureFilePath )
-            {
-            m_pMaterial->SetTextureResource( Resource( pTextureFilePath ) );
-            }
-         }
-      TiXmlElement* pDiffuseElement = pMaterialElement->FirstChildElement( "Diffuse" );
-      if( pDiffuseElement )
-         {
-         m_pMaterial->SetDiffuse( BaseRenderComponent::LoadColor( pDiffuseElement ) );
-         }
+      {
+      const char *pTextureFilePath = pTextureFileElement->Attribute( "path" );
+      if( pTextureFilePath )
+      {
+      m_pMaterial->SetTextureResource( Resource( pTextureFilePath ) );
+      }
+      }
+
+      Color diffuse;
+      if( XMLParser::ReadColor( pMaterialElement->FirstChildElement( "Diffuse" ), &diffuse ) )
+      {
+      m_pMaterial->SetDiffuse( diffuse );
+      }*/
       }
 
    return true;
    }
 
-/*
-void MeshRenderComponent::VCreateInheritedXmlElements(TiXmlElement *)
-{
-    GCC_ERROR("MeshRenderComponent::VGenerateSubclassXml() not implemented");
-}
-*/
+
+void MeshRenderComponent::VCreateInheritedXmlElements( TiXmlElement* pBaseElement )
+   {
+   // initial transform -> position
+   TiXmlElement* pMesh = ENG_NEW TiXmlElement( "Mesh" );
+   pMesh->SetAttribute( "path", m_pMeshResource->m_Name.c_str() );
+   pBaseElement->LinkEndChild( pMesh );
+
+   TiXmlElement* pMaterial = m_pMaterial->GenerateXML();
+   pBaseElement->LinkEndChild( pMaterial );
+   }
+

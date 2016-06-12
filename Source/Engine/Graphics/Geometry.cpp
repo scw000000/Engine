@@ -1,7 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Geometry.cpp
-////////////////////////////////////////////////////////////////////////////////
-
+/*!
+ * \file Geometry.cpp
+ * \date 2016/06/12 14:45
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "EngineStd.h"
 #include "Geometry.h"
 
@@ -11,6 +20,16 @@ const Vec3 Vec3::g_Identity( 1.0f, 1.0f, 1.0f );
 const Mat4x4 Mat4x4::g_Identity( glm::mat4( 1.0f ) );
 const Quaternion Quaternion::g_Identity( 1.0f, 0.0f, 0.0f, 0.0f );
 const Transform Transform::g_Identity( Vec3::g_Zero, Vec3::g_Identity, Quaternion::g_Identity );
+
+TiXmlElement* Vec3::GernerateXML( void )
+   {
+   TiXmlElement* pRoot = ENG_NEW TiXmlElement( "Vector3" );
+   pRoot->SetAttribute( "x", ToStr( x ).c_str() );
+   pRoot->SetAttribute( "y", ToStr( y ).c_str() );
+   pRoot->SetAttribute( "z", ToStr( z ).c_str() );
+   
+   return pRoot;
+   }
 
 bool Plane::Inside( Vec3 p ) const
    {
@@ -160,15 +179,26 @@ bool Color::operator != ( const Color& color ) const
 
  void Color::Satuate()
     {
-    m_Array[0] = std::min( m_Array[0], 1.0f );
-    m_Array[1] = std::min( m_Array[1], 1.0f );
-    m_Array[2] = std::min( m_Array[2], 1.0f );
-    m_Array[3] = std::min( m_Array[3], 1.0f );
+    m_Array[ 0 ] = std::max( 0.f, std::min( m_Array[ 0 ], 1.0f ) );
+    m_Array[ 1 ] = std::max( 0.f, std::min( m_Array[ 1 ], 1.0f ) );
+    m_Array[ 2 ] = std::max( 0.f, std::min( m_Array[ 2 ], 1.0f ) );
+    m_Array[ 3 ] = std::max( 0.f, std::min( m_Array[ 3 ], 1.0f ) );
    // r = min( r, 1.0f );
 //    g = glm::min( g, 1.0f );
   //  b = glm::min( b, 1.0f );
     //a = glm::min( a, 1.0f );
 
+    }
+
+ TiXmlElement* Color::GenerateXML( void )
+    {
+    TiXmlElement* pRoot = ENG_NEW TiXmlElement( "Color" );
+    pRoot->SetAttribute( "r", ToStr( m_Component.r ).c_str() );
+    pRoot->SetAttribute( "g", ToStr( m_Component.g ).c_str() );
+    pRoot->SetAttribute( "b", ToStr( m_Component.b ).c_str() );
+    pRoot->SetAttribute( "a", ToStr( m_Component.a ).c_str() );
+    
+    return pRoot;
     }
 
 Frustum::Frustum( void )
@@ -251,6 +281,25 @@ Transform::Transform( const Vec3& position, const Vec3& scale,const Quaternion& 
    m_ToWorld.SetToWorldPosition( position );// m = T R S
    m_FromWorld = m_ToWorld.Inverse( );
    m_IsFromWorldDirty = false;
+   }
+
+TiXmlElement* Transform::GenerateXML( void )
+   {
+   TiXmlElement* pRoot = ENG_NEW TiXmlElement( "Transform" );
+
+   TiXmlElement* pPosition = GetToWorldPosition().GernerateXML();
+   pPosition->SetValue( "Position" );
+   pRoot->LinkEndChild( pPosition );
+
+   TiXmlElement* pRotation = GetPitchYawRollDeg().GernerateXML();
+   pRotation->SetValue( "PitchYawRoll" );
+   pRoot->LinkEndChild( pRotation );
+
+   TiXmlElement* pScale = GetScale().GernerateXML();
+   pScale->SetValue( "Scale" );
+   pRoot->LinkEndChild( pScale );
+
+   return pRoot;
    }
 
 //Transform::Transform( const Mat4x4& toWorld )

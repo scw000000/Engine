@@ -25,7 +25,7 @@ class SkyRenderComponent : public BaseRenderComponent<SkyRenderComponent>
       virtual shared_ptr<SceneNode> VCreateSceneNode( void ) override;  // factory method to create the appropriate scene node
 
       // editor stuff
-      //virtual void VCreateInheritedXmlElements(TiXmlElement* pBaseElement);
+      virtual void VCreateInheritedXmlElements( TiXmlElement* pBaseElement ) override;
 
    protected:
       shared_ptr<Resource> m_pTextureResource;

@@ -28,7 +28,7 @@ class LightRenderComponent : public BaseRenderComponent<LightRenderComponent>
       virtual shared_ptr<SceneNode> VCreateSceneNode(void) override;  // factory method to create the appropriate scene node
 
       // editor stuff
-      //virtual void VCreateInheritedXmlElements(TiXmlElement* pBaseElement);
+      virtual void VCreateInheritedXmlElements( TiXmlElement* pBaseElement ) override;
 
    protected:
       LightPropertiesPtr m_pLightProps; 

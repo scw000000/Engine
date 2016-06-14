@@ -1,17 +1,18 @@
-<Actor type="Cube" resource="actors\cube.xml">
+<Actor type="Cube" resource="actors\cube2.xml" rootComponentId="1">
 
-	<TransformComponent>
-		<Position x="0" y="0" z="-10"/>
-	</TransformComponent>
-	
     <MeshRenderComponent>
-		<Mesh path="art\cube.obj" />
+		<Data>
+			<Transform>
+				<Position x="0" y="0" z="-10"/>
+			</Transform>
 		
-		<Material>
-		<Texture path="art\cube.jpg" />
-		<Diffuse r="1" g="1" b="1" a="0.3">
-		</Material>
-	
+			<Mesh path="art\cube.obj"/>
+		
+			<Material>
+				<Texture path="art\cube.jpg"/>
+				<Diffuse r="1" g="1" b="1" a="0.3"/>
+			</Material>
+		</Data>
 	</MeshRenderComponent>
 
 	

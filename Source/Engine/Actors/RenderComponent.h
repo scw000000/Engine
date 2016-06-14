@@ -35,10 +35,10 @@ class RenderComponent : virtual public IActorComponent
       virtual TiXmlElement* VGenerateXML( void ) override;
 
    protected:
-      virtual void SetOwner( StrongActorPtr pOwner ) override
-         {
-         m_pOwner = pOwner;
-         }
+      virtual void SetOwner( StrongActorPtr pOwner ) override { m_pOwner = pOwner; }
+      virtual void AddChildComponent( weak_ptr<IActorComponent> pChild ) override { m_ChildComponents.push_back( pChild ); }
+      virtual void SetParentComponent( weak_ptr<IActorComponent> pParent ) override { m_pParentComponent = pParent; }
+      void BuildSceneNode( SceneNode* pParentNode );
       /**
        * @brief loads the SceneNode specific data ( represented in the <SceneNode> tag )
        *
@@ -49,16 +49,17 @@ class RenderComponent : virtual public IActorComponent
       // factory method to create the appropriate scene node
       // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
       virtual shared_ptr<SceneNode> VCreateSceneNode( void ) = 0;  
-      virtual void VCreateInheritedXmlElements( TiXmlElement* pBaseElement ) = 0;
-      static Color LoadColor( TiXmlElement* pData );
+      virtual void VCreateInheritedXmlElements( TiXmlElement* pBaseElement ) = 0; 
 
    protected:
       StrongActorPtr m_pOwner;
-      shared_ptr<SceneNode> m_pRootSceneNode;
+      weak_ptr<IActorComponent> m_pParentComponent;
+      ChildComponents m_ChildComponents;
+      shared_ptr<SceneNode> m_pSceneNode;
       TransformPtr m_pTransform;
 
    private:
-      virtual shared_ptr<SceneNode> VGetSceneNode(void);
+      virtual shared_ptr<SceneNode> VGetSceneNode( void );
    };
 
 template <typename T>class BaseRenderComponent : public RenderComponent 

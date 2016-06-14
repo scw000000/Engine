@@ -257,7 +257,7 @@ void BulletPhysics::VSyncVisibleScene( )
             {
             // Bullet has moved the actor's physics object.  Sync the transform and inform the game an actor has moved
             *pActorTransform = Transform( actorMotionState->m_Transform );
-            shared_ptr<EvtData_Move_Actor> pEvent( ENG_NEW EvtData_Move_Actor( id, actorMotionState->m_Transform.GetToWorld() ) );
+            shared_ptr<Event_Move_Actor> pEvent( ENG_NEW Event_Move_Actor( id, actorMotionState->m_Transform.GetToWorld() ) );
             IEventManager::GetSingleton()->VQueueEvent( pEvent );
             }
          }
@@ -294,19 +294,20 @@ void BulletPhysics::AddShape( StrongActorPtr pActor, btCollisionShape* shape, fl
    if( mass > 0.f )
       shape->calculateLocalInertia( mass, localInertia );
 
-
    Transform transform = Transform::g_Identity;
-   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
-   ENG_ASSERT( pTransformComponent );
-   if( pTransformComponent )
-      {
-      transform = *pTransformComponent->GetTransform( );
-      }
-   else
-      {
-      // Physics can't work on an actor that doesn't have a TransformComponent!
-      return;
-      }
+   transform = *pActor->GetTransformPtr();
+   //Transform transform = Transform::g_Identity;
+   //shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
+   //ENG_ASSERT( pTransformComponent );
+   //if( pTransformComponent )
+   //   {
+   //   transform = *pTransformComponent->GetTransform( );
+   //   }
+   //else
+   //   {
+   //   // Physics can't work on an actor that doesn't have a TransformComponent!
+   //   return;
+   //   }
 
    // set the initial transform of the body from the actor
    ActorMotionState * const myMotionState = ENG_NEW ActorMotionState( transform );

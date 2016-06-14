@@ -30,7 +30,7 @@ class IEvent
       // This function returns eventType when you don't know the event instance ID
       // IF you want to know the instance ID of a specific event type, access the const static
       // menber variable in BaseEvent instead
-      virtual const EventType& VGetEventType( void ) const = 0;
+      virtual EventType VGetEventType( void ) const = 0;
       virtual float VGetTimeStamp( void ) const = 0;
       // for Networking
       // virtual void VSerialize( std::ostrstream& out ) const  = 0;
@@ -46,7 +46,7 @@ template <typename T>class BaseEvent : virtual public IEvent
       
       virtual ~BaseEvent( void ) { }
 
-      virtual const EventType& VGetEventType( void ) const override { return s_EventType; };
+      virtual EventType VGetEventType( void ) const override { return s_EventType; };
 
       virtual float VGetTimeStamp( void ) const override { return m_TimeStamp; }
    
@@ -65,11 +65,11 @@ template <typename T>class BaseEvent : virtual public IEvent
       const float m_TimeStamp;
    };
 
-class EvtData_Destroy_Actor : public BaseEvent<EvtData_Destroy_Actor>
+class Event_Destroy_Actor : public BaseEvent<Event_Destroy_Actor>
    {
    public:
-      explicit EvtData_Destroy_Actor( ActorId id ) : m_Id( id ) {  }
-      virtual IEventPtr VCopy( void ) const { return IEventPtr( ENG_NEW EvtData_Destroy_Actor( m_Id ) ); }
+      explicit Event_Destroy_Actor( ActorId id ) : m_Id( id ) {  }
+      virtual IEventPtr VCopy( void ) const { return IEventPtr( ENG_NEW Event_Destroy_Actor( m_Id ) ); }
       //virtual void VSerialize( std::ostre )
      // virtual const char* GetName( void ) const { return "EvtDat_Destyot_Actor"; } 
       ActorId GetId( void ) const { return m_Id; }
@@ -78,15 +78,15 @@ class EvtData_Destroy_Actor : public BaseEvent<EvtData_Destroy_Actor>
       ActorId m_Id;
    };
 
-class EvtData_Move_Actor : public BaseEvent<EvtData_Move_Actor>
+class Event_Move_Actor : public BaseEvent<Event_Move_Actor>
    {
 
 
 public:
 
-   EvtData_Move_Actor( void ) { m_Id = INVALID_ACTOR_ID; }
+   Event_Move_Actor( void ) { m_Id = INVALID_ACTOR_ID; }
 
-   EvtData_Move_Actor( ActorId id, const Mat4x4& matrix ) : m_Id( id ), m_Matrix( matrix ){ }
+   Event_Move_Actor( ActorId id, const Mat4x4& matrix ) : m_Id( id ), m_Matrix( matrix ){ }
 
    //virtual void VSerialize( std::ostrstream &out ) const
    //   {
@@ -112,7 +112,7 @@ public:
          }
       }*/
 
-   virtual IEventPtr VCopy( ) const override{ return IEventPtr( ENG_NEW EvtData_Move_Actor( m_Id, m_Matrix ) ); }
+   virtual IEventPtr VCopy( ) const override{ return IEventPtr( ENG_NEW Event_Move_Actor( m_Id, m_Matrix ) ); }
 
    ActorId GetId( void ) const { m_Id; }
 
@@ -123,25 +123,42 @@ public:
       Mat4x4 m_Matrix;
    };
 
-class EvtData_New_Render_Component : public BaseEvent<EvtData_New_Render_Component>
+class Event_New_Render_Component_Root : public BaseEvent<Event_New_Render_Component_Root>
    {
 
    public:
-      EvtData_New_Render_Component( void ) { m_ActorId = INVALID_ACTOR_ID; }
+      Event_New_Render_Component_Root( void ) { m_ActorId = INVALID_ACTOR_ID; }
 
-      explicit EvtData_New_Render_Component( ActorId actorId, shared_ptr<SceneNode> pSceneNode ) : m_ActorId(actorId), m_pSceneNode(pSceneNode) { }
+      explicit Event_New_Render_Component_Root( ActorId actorId, weak_ptr<SceneNode> pSceneNode ) : m_ActorId( actorId ), m_pSceneNode( pSceneNode ) {}
 
-      virtual IEventPtr VCopy(void) const override { return IEventPtr( ENG_NEW EvtData_New_Render_Component( m_ActorId, m_pSceneNode ) ); }
+      virtual IEventPtr VCopy(void) const override { return IEventPtr( ENG_NEW Event_New_Render_Component_Root( m_ActorId, m_pSceneNode ) ); }
 
     //  virtual const char* GetName(void) const override { return "EvtData_New_Render_Component"; }
 
       const ActorId GetActorId(void) const { return m_ActorId; }
 
-      shared_ptr<SceneNode> GetSceneNode(void) const { return m_pSceneNode; }
+      weak_ptr<SceneNode> GetSceneNode( void ) const { return m_pSceneNode; }
 
    private:
       ActorId m_ActorId;
       
-      shared_ptr<SceneNode> m_pSceneNode;
+      weak_ptr<SceneNode> m_pSceneNode;
    
+   };
+
+class Event_New_Scene_Node : public BaseEvent < Event_New_Scene_Node >
+   {
+
+   public:
+      Event_New_Scene_Node( void ) {  }
+
+      explicit Event_New_Scene_Node( weak_ptr<SceneNode> pSceneNode ) : m_pSceneNode( pSceneNode ) {}
+
+      virtual IEventPtr VCopy( void ) const override { return IEventPtr( ENG_NEW Event_New_Scene_Node( m_pSceneNode ) ); }
+
+      weak_ptr<SceneNode> GetSceneNode( void ) const { return m_pSceneNode; }
+
+   private:
+      weak_ptr<SceneNode> m_pSceneNode;
+
    };

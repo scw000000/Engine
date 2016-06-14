@@ -70,6 +70,7 @@ class LightManager
 	friend class Scene;
 
    public:
+      LightManager( void );
 	   /**
 	    * @brief This function is called by Scene::OnRender
 	    *
@@ -89,6 +90,7 @@ class LightManager
       float* GetLightPower( void ) { return m_LightPower; }
       Color* GetLightColor( void ) { return m_LightColor; }
       Color* GetLightAmbient( void ) { return &m_LightAmbient; }
+      void NewSceneNodeDelegate( IEventPtr pEvent );
 
    protected:
       Lights	m_Lights;

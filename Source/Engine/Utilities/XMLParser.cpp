@@ -78,7 +78,10 @@ bool XMLParser::ReadTransform( TiXmlElement* pData, Transform* pReadVar )
    Vec3 pitchYawRoll;
    Vec3 position;
    Vec3 scale;
-
+   if( !pData ) 
+      {
+      return false;
+      }
    if( ReadVector3( pData->FirstChildElement( "PitchYawRoll" ), &pitchYawRoll ) )
       {
       pReadVar->SetRotation( pitchYawRoll );

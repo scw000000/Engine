@@ -22,8 +22,8 @@ Scene::Scene( shared_ptr<IRenderer> renderer ) : m_Root( ENG_NEW RootNode ), m_p
    m_pRenderer = renderer;
 	
    IEventManager* pEventMgr = IEventManager::GetSingleton();
-   pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::NewRenderComponentDelegate ), EvtData_New_Render_Component::s_EventType );
-   pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::DestroyActorDelegate ), EvtData_Destroy_Actor::s_EventType);
+   pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::NewRenderComponentDelegate ), Event_New_Render_Component_Root::s_EventType );
+   pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::DestroyActorDelegate ), Event_Destroy_Actor::s_EventType);
    //pEventMgr->VAddListener(fastdelegate::MakeDelegate(this, &Scene::MoveActorDelegate), EvtData_Move_Actor::sk_EventType);
    //pEventMgr->VAddListener(fastdelegate::MakeDelegate(this, &Scene::ModifiedRenderComponentDelegate), EvtData_Modified_Render_Component::sk_EventType);
    }
@@ -120,12 +120,12 @@ bool Scene::AddChild( ActorId id, shared_ptr< ISceneNode > pNode )
       m_ActorMap[id] = pNode;
       }
 
-   //  If this node is light node, it is not renderable and it should be added to light manager
-   shared_ptr<LightNode> pLight = dynamic_pointer_cast< LightNode >( pNode );
-   if( pLight != NULL )
-      {
-      return m_pLightManager->AddLightNode( pLight );
-      }
+   ////  If this node is light node, it is not renderable and it should be added to light manager
+   //shared_ptr<LightNode> pLight = dynamic_pointer_cast< LightNode >( pNode );
+   //if( pLight != NULL )
+   //   {
+   //   return m_pLightManager->AddLightNode( pLight );
+   //   }
 
    return m_Root->VAddChild( pNode );
    }
@@ -164,14 +164,14 @@ void Scene::RenderAlphaPass()
 
 void Scene::NewRenderComponentDelegate( IEventPtr pEvent )
    {
-   shared_ptr<EvtData_New_Render_Component> pDerivedEvent = dynamic_pointer_cast<EvtData_New_Render_Component>( pEvent );
+   shared_ptr<Event_New_Render_Component_Root> pDerivedEvent = dynamic_pointer_cast<Event_New_Render_Component_Root>( pEvent );
 
     ActorId actorId = pDerivedEvent->GetActorId();
     shared_ptr<SceneNode> pSceneNode( pDerivedEvent->GetSceneNode() );
 
     // TODO: implement and call VOnInit instead of VOnRestore
     // because it will be called again in HumanView
-    if ( pSceneNode->VOnRestore(this) != S_OK )
+    if ( pSceneNode->VOnRestore(this ) != S_OK )
       {
 		std::string error = "Failed to restore scene node to the scene for actorid " + ToStr(actorId);
       ENG_ERROR( error );
@@ -183,7 +183,7 @@ void Scene::NewRenderComponentDelegate( IEventPtr pEvent )
 
 void Scene::DestroyActorDelegate( IEventPtr pEvent )
    {
-   shared_ptr<EvtData_Destroy_Actor> pDerivedEvent = dynamic_pointer_cast<EvtData_Destroy_Actor>( pEvent );
+   shared_ptr<Event_Destroy_Actor> pDerivedEvent = dynamic_pointer_cast<Event_Destroy_Actor>( pEvent );
 
    RemoveChild( pDerivedEvent->GetId() );
    }

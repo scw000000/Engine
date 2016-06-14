@@ -1,13 +1,18 @@
-<Actor type="Sky" resource="actors\sky.xml">
+<Actor type="Sky" resource="actors\sky.xml" rootComponentId="1">
 
-	<TransformComponent>
-		<Position x="0" y="0" z="0"/>
-		<Scale x="500" y="500" z="500"/>
-	</TransformComponent>
+	
 
     <SkyRenderComponent>
-        <Mesh path="art\sphere.obj" />
-		<Texture path="art\SkyDome-Cloud-Medium-MidMorning.png" />
+		<Data>
+			<Transform>
+				<Position x="0" y="0" z="0"/>
+				<Scale x="500" y="500" z="500"/>
+			</Transform>
+		
+			<Mesh path="art\sphere.obj" />
+		
+			<Texture path="art\SkyDome-Cloud-Medium-MidMorning.png" />
+		</Data>
 	</SkyRenderComponent>
 
 </Actor>

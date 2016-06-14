@@ -35,12 +35,12 @@ class Actor
       TiXmlElement* GenerateXML( void );
 
       ActorId GetId( void ) const { return m_Id; }
-      TransformPtr GetTransformPtr( void ) { return m_pRootComponent.lock()->m_pTransform; }
-      //template< class ComponenType > weak_ptr<ComponenType> GetComponent( ComponentId id );
+      TransformPtr GetTransformPtr( void );
+      weak_ptr< IActorComponent > GetComponent( ActorComponentId id );
       //template< class ComponentType > weak_ptr<ComponentType> GetComponent( const char* name );
 
    public:
-      std::weak_ptr< RenderComponent > m_pRootComponent;
+     // std::weak_ptr< RenderComponent > m_pRootComponent;
 
    private:
       void AddComponent( StrongActorComponentPtr pComponent );
@@ -53,25 +53,6 @@ class Actor
       ActorComponentId m_LastActorComponentId;
       std::string m_Resource; // actor XML file name
    };
-
-//template< class ComponenType > weak_ptr<ComponenType> Actor::GetComponent( ComponentId id )
-//   {
-//   ActorComponents::iterator findIt = m_Components.find( id );
-//   if( findIt != m_Components.end() )
-//      {
-//      // Get component ptr as class actor component
-//      // We need to down cast it to specific actor component class
-//      StrongActorComponentPtr pBase( findIt->second );
-//      shared_ptr< ComponenType > pSub( std::static_pointer_cast< ComponenType >( pBase ) );
-//      // transfer it to weak ptr
-//      weak_ptr< ComponenType > pWeakSub( pSub );
-//      return pWeakSub;
-//      }
-//   else
-//      {
-//      return weak_ptr< ComponenType>();
-//      }
-//   }
 
 //template< class ComponentType > weak_ptr<ComponentType> Actor::GetComponent( const char* name )
 //   {

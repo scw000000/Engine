@@ -40,6 +40,7 @@ bool Actor::Init( TiXmlElement* pData )
 
 	m_Type = pData->Attribute( "type" );
 	m_Resource = pData->Attribute( "resource" );
+   unsigned int rootComponentId = 0;
    return true;
    }
 
@@ -88,6 +89,14 @@ TiXmlElement* Actor::GenerateXML( void )
    return pActorElement;
    }
 
+TransformPtr Actor::GetTransformPtr( void )
+   {
+   weak_ptr<IActorComponent> pComponent = GetComponent( 1 );
+   ENG_ASSERT( !pComponent.expired() );
+   shared_ptr<RenderComponent> pRootComponent = dynamic_pointer_cast< RenderComponent >( pComponent.lock() );
+   ENG_ASSERT( pRootComponent );
+   return pRootComponent->m_pTransform;
+   }
 
 void Actor::AddComponent( StrongActorComponentPtr pComponent )
    {
@@ -95,4 +104,21 @@ void Actor::AddComponent( StrongActorComponentPtr pComponent )
 
    std::pair<ActorComponents::iterator, bool> success = m_Components.insert( std::make_pair( m_LastActorComponentId, pComponent ) );
    ENG_ASSERT( success.second );
+   }
+
+weak_ptr<IActorComponent> Actor::GetComponent( ActorComponentId id )
+   {
+   ActorComponents::iterator findIt = m_Components.find( id );
+   if( findIt != m_Components.end() )
+      {
+      // Get component ptr as class actor component
+      // We need to down cast it to specific actor component class
+      StrongActorComponentPtr pStrong( findIt->second );
+      weak_ptr< IActorComponent > pWeak( pStrong );
+      return pWeak;
+      }
+   else
+      {
+      return weak_ptr< IActorComponent>();
+      }
    }

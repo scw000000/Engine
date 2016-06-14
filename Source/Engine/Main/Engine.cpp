@@ -171,8 +171,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 		ENG_ERROR( "Failed to create EventManager." );
 		return false;
 	   }
-
-   REGISTER_EVENT( EvtData_New_Render_Component );
+   
    //--------------------------------- 
    //  Initialize EventManager
    //--------------------------------- 

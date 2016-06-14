@@ -45,13 +45,12 @@ bool LightRenderComponent::VDelegateInit( TiXmlElement* pData )
 
 shared_ptr<SceneNode> LightRenderComponent::VCreateSceneNode( void )
    {
-   TransformPtr pActorTransform = m_pOwner->GetTransformPtr();
    WeakBaseRenderComponentPtr weakThis( this );
    switch( EngineApp::GetRendererImpl() )
       {
       case Renderer::Renderer_OpenGL:
             {
-            return shared_ptr<SceneNode>( ENG_NEW LightNode( m_pOwner->GetId(), weakThis, m_pLightProps, pActorTransform ) );
+            return shared_ptr<SceneNode>( ENG_NEW LightNode( m_pOwner->GetId(), weakThis, m_pLightProps, m_pTransform ) );
             }
       default:
          ENG_ASSERT( 0 && "Unknown Renderer Implementation in GridRenderComponent" );

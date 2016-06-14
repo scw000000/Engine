@@ -80,7 +80,7 @@ typedef std::vector< std::shared_ptr< ISceneNode > > SceneNodeList;
 class SceneNode : public ISceneNode
    {
 	friend class Scene;
-
+   friend class RenderComponent;
    public:
       // TODO: finish constructor
 	   SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ), MaterialPtr pMaterial = MaterialPtr() );

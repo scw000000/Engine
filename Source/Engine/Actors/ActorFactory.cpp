@@ -65,17 +65,18 @@ StrongActorPtr ActorFactory::CreateActor( const char* actorResource, const char*
    
    for( TiXmlElement* pNode = pRoot->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
       {
-      StrongActorComponentPtr pComponent( CreateComponent( pNode ) );
+      BuildComponentTree( pNode, pActor, StrongActorComponentPtr() );
+      /*StrongActorComponentPtr pComponent( CreateComponent( pNode ) );
 
       if( pComponent )
-         {
-         pActor->AddComponent( pComponent );
-         pComponent->SetOwner( pActor );
-         }
+      {
+      pActor->AddComponent( pComponent );
+      pComponent->SetOwner( pActor );
+      }
       else
-         {
-         return StrongActorPtr();
-         }
+      {
+      return StrongActorPtr();
+      }*/
       }
 
    
@@ -84,19 +85,19 @@ StrongActorPtr ActorFactory::CreateActor( const char* actorResource, const char*
       Resource overrideRes( overridesResource );
       TiXmlElement *pOverrides = XmlResourceLoader::LoadAndReturnRootXmlElement( &overrideRes );
       ENG_ASSERT( pOverrides && "Failed to load overrides resource" );
-      if( ModifyActor( pActor, pOverrides ) )
+      /*if( ModifyActor( pActor, pOverrides ) )
          {
          return StrongActorPtr();
-         }
+         }*/
       }
 
    // This is a bit of a hack to get the initial transform of the transform component set before the 
    // other components (like PhysicsComponent) read it.
-   shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
+   /*shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
    if( pInitialTransform && pTransformComponent )
       {
       pTransformComponent->SetTransform( *pInitialTransform );
-      }
+      }*/
 
    // Actor has been fully created, run the post init phase
    pActor->PostInit();
@@ -104,36 +105,34 @@ StrongActorPtr ActorFactory::CreateActor( const char* actorResource, const char*
    return pActor;
    }
 
-bool ActorFactory::ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides )
-   {
-	// Loop through each child element and load the component
-	for ( TiXmlElement* pNode = overrides->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
-	   {
-		ComponentId componentId = ActorComponentFactory::GetIdFromName( pNode->Value() );
-		StrongActorComponentPtr pComponent = MakeStrongPtr( pActor->GetComponent<IActorComponent>( componentId ) );
-		if (pComponent)
-		   {
-			pComponent->VInit( pNode );
-		   }
-		else // this should not happen, actor override file should only contains existing components
-		   {
-         /*pComponent = CreateComponent( pNode );
-         if (pComponent)
-         {
-         pActor->AddComponent(pComponent);
-         pComponent->SetOwner(pActor);
-         }*/
-         return false;
-		   }
-	   }  		
-   return true;
-   }
+//bool ActorFactory::ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides )
+//   {
+//	// Loop through each child element and load the component
+//	for ( TiXmlElement* pNode = overrides->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
+//	   {
+//		ComponentId componentId = ActorComponentFactory::GetIdFromName( pNode->Value() );
+//		StrongActorComponentPtr pComponent = MakeStrongPtr( pActor->GetComponent<IActorComponent>( componentId ) );
+//		if (pComponent)
+//		   {
+//			pComponent->VInit( pNode );
+//		   }
+//		else // this should not happen, actor override file should only contains existing components
+//		   {
+//         /*pComponent = CreateComponent( pNode );
+//         if (pComponent)
+//         {
+//         pActor->AddComponent(pComponent);
+//         pComponent->SetOwner(pActor);
+//         }*/
+//         return false;
+//		   }
+//	   }  		
+//   return true;
+//   }
 
-StrongActorComponentPtr ActorFactory::CreateComponent( TiXmlElement* pData )
+StrongActorComponentPtr ActorFactory::CreateComponent( const std::string& componentName, TiXmlElement* pData )
    {
-   std::string name( pData->Value() );
-
-   auto pComponent = ActorComponentFactory::CreateComponent( name, pData );
+   auto pComponent = ActorComponentFactory::CreateComponent( componentName, pData );
 
    ENG_ASSERT( pComponent );
 
@@ -157,4 +156,42 @@ StrongActorComponentPtr ActorFactory::CreateComponent( TiXmlElement* pData )
       }*/
 
    return pComponent;
+   }
+
+StrongActorComponentPtr ActorFactory::BuildComponentTree( TiXmlElement* pData, StrongActorPtr pActor, StrongActorComponentPtr pParent )
+   {
+   // Build current level component first
+   TiXmlElement* pDataNode = pData->FirstChildElement( "Data" );
+   ENG_ASSERT( pDataNode );
+   StrongActorComponentPtr pCurrLevelComponent( CreateComponent( pData->Value(), pDataNode ) );
+
+   if( pCurrLevelComponent )
+      {
+      pActor->AddComponent( pCurrLevelComponent );
+      pCurrLevelComponent->SetOwner( pActor );
+      pCurrLevelComponent->SetParentComponent( pParent );
+      }
+   else
+      {
+      return StrongActorComponentPtr();
+      }
+
+   // Build the children components for current level component
+   for( TiXmlElement* pNode = pData->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
+      {
+      if( !std::strcmp( pNode->Value(), "Data" ) )
+         {
+         
+         }
+      else
+         {
+         StrongActorComponentPtr pChildComponent = BuildComponentTree( pNode, pActor, pCurrLevelComponent );
+         if( !pChildComponent )
+            {
+            return StrongActorComponentPtr();
+            }
+         pCurrLevelComponent->AddChildComponent( pChildComponent );
+         }
+      }
+   return pCurrLevelComponent;
    }

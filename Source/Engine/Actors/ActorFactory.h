@@ -24,10 +24,11 @@ class ActorFactory
                                   const char* overridesResource = NULL, 
                                   TransformPtr pInitialTransform = NULL, 
                                   ActorId serversActorId = INVALID_ACTOR_ID );
-      bool ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides );
+     // bool ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides );
 
    protected:
-      virtual StrongActorComponentPtr CreateComponent( TiXmlElement* pData );
+      virtual StrongActorComponentPtr CreateComponent( const std::string& componentName, TiXmlElement* pData );
+      virtual StrongActorComponentPtr BuildComponentTree( TiXmlElement* pData, StrongActorPtr pActor, StrongActorComponentPtr pParent );
 
    protected:
       // This factory is defined in Templates.h

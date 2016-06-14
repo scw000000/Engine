@@ -44,11 +44,11 @@ void main()
 		
 	for( int i = 0; i < LightNumber; ++i )
 		{
-		dotProduct = max( 0, dot( vecNormal_WorldSpace, LighDirection[i] ) );
+		dotProduct = max( 0, dot( vecNormal_WorldSpace, -LighDirection[i] ) );
 		dist = distance( vecPosition_Worldspace, LightPosition_WorldSpace[i] );
 		
 		// Direction in which the triangle reflects the light
-		reflection = reflect ( -LighDirection[i], vecNormal_WorldSpace );
+		reflection = reflect ( LighDirection[i], vecNormal_WorldSpace );
 		// Cosine of the angle between the Eye vector and the Reflect vector,
 		// clamped to 0
 		//  - Looking into the reflection -> 1

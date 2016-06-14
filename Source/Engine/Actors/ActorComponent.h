@@ -16,10 +16,13 @@
 
 #include "../Utilities/String.h"
 
+typedef std::list< weak_ptr<IActorComponent> > ChildComponents;
+
 class TiXmlElement;
 
 class IActorComponent
    {
+   friend class ActorFactory;
    public:
       virtual ~IActorComponent( void ){}
       virtual ComponentId VGetId( void ) const = 0;
@@ -31,6 +34,10 @@ class IActorComponent
       virtual void SetOwner( StrongActorPtr pOwner ) = 0;
       virtual void Destory( void ) = 0;
       virtual TiXmlElement* VGenerateXML( void ) = 0;
+   
+   protected:
+      virtual void AddChildComponent( weak_ptr<IActorComponent> ) = 0;
+      virtual void SetParentComponent( weak_ptr<IActorComponent> ) = 0;
    };
 
 // Using Curiously recurring template pattern (CRTP) to prevent declaring GUID mulit times
@@ -50,9 +57,13 @@ template <typename T>class BaseActorComponent : public IActorComponent
 
    protected:
       virtual void SetOwner( StrongActorPtr pOwner ) override { m_pOwner = pOwner; }
-   
+      virtual void AddChildComponent( weak_ptr<IActorComponent> pChild ) override { m_ChildComponents.push_back( pChild ); }
+      virtual void SetParentComponent( weak_ptr<IActorComponent> pParent ) override { m_pParentComponent = pParent; }
+
    protected:
       StrongActorPtr m_pOwner;
+      weak_ptr<IActorComponent> m_pParentComponent;
+      ChildComponents m_ChildComponents;
    };
 
 //class ActorComponent : public IActorComponent 

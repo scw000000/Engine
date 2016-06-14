@@ -117,7 +117,7 @@ void BaseEngineLogic::VDestroyActor( ActorId actorId )
    {
    // We need to trigger a synchronous event to ensure that any systems responding to this event can still access a 
    // valid actor if need be.  The actor will be destroyed after this.
-   shared_ptr<EvtData_Destroy_Actor> pEvent( ENG_NEW EvtData_Destroy_Actor( actorId ) );
+   shared_ptr<Event_Destroy_Actor> pEvent( ENG_NEW Event_Destroy_Actor( actorId ) );
    IEventManager::GetSingleton()->VTriggerEvent( pEvent );
    auto findIt = m_Actors.find(actorId);
    if (findIt != m_Actors.end())
@@ -146,7 +146,7 @@ void BaseEngineLogic::VModifyActor( ActorId actorId, TiXmlElement *overrides )
 	auto findIt = m_Actors.find(actorId);
    if (findIt != m_Actors.end())
       {
-		m_pActorFactory->ModifyActor( findIt->second, overrides );
+		//m_pActorFactory->ModifyActor( findIt->second, overrides );
       }
    }
 

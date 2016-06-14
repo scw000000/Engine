@@ -20,7 +20,7 @@ class MeshSceneNode : public SceneNode
    {
    public:
 	   MeshSceneNode( const ActorId actorId, 
-                     WeakBaseRenderComponentPtr renderComponent, 
+                     IRenderComponent* pRenderComponent,
                      shared_ptr<Resource> pMeshResouce, 
                      MaterialPtr pMaterial, 
                      RenderPass renderPass,  

@@ -19,8 +19,8 @@
 
 //const char* SkyRenderComponent::g_Name = "SkyRenderComponent";
 
-const ComponentId BaseRenderComponent<SkyRenderComponent>::s_ComponentId = 0x249dbe49;
-const std::string BaseRenderComponent<SkyRenderComponent>::s_Name = "SkyRenderComponent";
+const ComponentId BaseActorComponent<SkyRenderComponent>::s_ComponentId = 0x249dbe49;
+const std::string BaseActorComponent<SkyRenderComponent>::s_Name = "SkyRenderComponent";
 
 
 void SkyRenderComponent::Destory( void )
@@ -76,14 +76,12 @@ bool SkyRenderComponent::VDelegateInit( TiXmlElement* pData )
 
 shared_ptr<SceneNode> SkyRenderComponent::VCreateSceneNode( void )
    {
-   WeakBaseRenderComponentPtr weakThis( this );
-
    switch( EngineApp::GetRendererImpl() )
       {
       case Renderer::Renderer_OpenGL:
             {
             return shared_ptr<SceneNode>( ENG_NEW SkySceneNode( m_pOwner->GetId(), 
-                                                                weakThis, 
+                                                                this, 
                                                                 m_pMeshResource, 
                                                                 m_pTextureResource, 
                                                                 RenderPass::RenderPass_Sky, 

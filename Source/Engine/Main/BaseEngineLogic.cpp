@@ -62,7 +62,7 @@ BaseEngineLogic::~BaseEngineLogic()
     // destroy all actors
    for ( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
       {
-    //  WriteXMLToFile( std::string( ToStr( it->first ) + ".xml" ).c_str(), it->second->GenerateXML() );
+      WriteXMLToFile( std::string( ToStr( it->first ) + ".xml" ).c_str(), it->second->GenerateXML() );
       it->second->Destroy();
       }
    m_Actors.clear();

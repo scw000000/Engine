@@ -32,7 +32,9 @@ class Actor
       // To break out the circular reference strongPtr chain of Actor & actorComponent
       void Destroy( void );
       void Update( unsigned long deltaMs );
+      TiXmlElement* BuildXML( StrongActorComponentPtr pComponent );
       TiXmlElement* GenerateXML( void );
+      TiXmlElement* GenerateOverridesXML( void );
 
       ActorId GetId( void ) const { return m_Id; }
       TransformPtr GetTransformPtr( void );

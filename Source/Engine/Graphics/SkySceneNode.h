@@ -22,11 +22,11 @@ class SkySceneNode : public SceneNode
    {
    public:
 	   SkySceneNode( const ActorId actorId, 
-                     WeakBaseRenderComponentPtr renderComponent, 
-                     shared_ptr<Resource> pMeshResource,
-                     shared_ptr<Resource> pTextureResource, 
-                     RenderPass renderPass,  
-                     TransformPtr pTransform );
+                    IRenderComponent* pRenderComponent,
+                    shared_ptr<Resource> pMeshResource,
+                    shared_ptr<Resource> pTextureResource, 
+                    RenderPass renderPass,  
+                    TransformPtr pTransform );
       ~SkySceneNode( void );
 	   virtual int VOnRestore( Scene *pScene ) override; ;
 	   virtual int VOnLostDevice( Scene *pScene ) override { return S_OK; }

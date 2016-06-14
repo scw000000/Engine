@@ -59,14 +59,14 @@ float SceneNodeProperties::GetAlpha( void ) const
    return fOPAQUE; 
    }
 
-SceneNode::SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, TransformPtr pNewTransform, MaterialPtr pMaterial )
+SceneNode::SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderPass renderPass, TransformPtr pNewTransform, MaterialPtr pMaterial )
    {
    m_pParent= NULL;
 	m_Props.m_ActorId = actorId;
-	m_Props.m_Name = ( renderComponent ) ? renderComponent->VGetName(): "SceneNode";
+   m_Props.m_Name = ( pRenderComponent ) ? pRenderComponent->VGetName() : "SceneNode";
 	m_Props.m_RenderPass = renderPass;
 	//m_Props.m_AlphaType = AlphaOpaque;
-	m_RenderComponent = renderComponent;
+   m_pRenderComponent = pRenderComponent;
    m_Props.m_pMaterial = pMaterial;
 	VSetTransformPtr( pNewTransform ); 
 	SetRadius( 0.0f );
@@ -115,7 +115,7 @@ int SceneNode::VPreRender( Scene *pScene )
 bool SceneNode::VIsVisible( Scene *pScene )
    {
    auto camTransform = pScene->GetCamera()->VGetProperties().GetTransform();
-   Vec3 nodeInCamWorldPos = GetWorldPosition();
+   Vec3 nodeInCamWorldPos = VGetWorldPosition();
    // transform to camera's local space
    nodeInCamWorldPos = camTransform.GetFromWorld().Xform( nodeInCamWorldPos );;
    const Frustum &frustum = pScene->GetCamera()->GetFrustum();
@@ -216,31 +216,31 @@ void SceneNode::SetAlpha( float alpha )
    }
 
 // Sum up relative position from child to root node in order to get position in world space
-Vec3 SceneNode::GetWorldPosition( void ) const
+Vec3 SceneNode::VGetWorldPosition( void ) const
    {
    Vec3 pos = GetToWorldPosition();
 	if ( m_pParent )
 	   {
-		pos += m_pParent->GetWorldPosition();
+		pos += m_pParent->VGetWorldPosition();
 	   }
 	return pos;
    }
 
 
-RootNode::RootNode(): SceneNode( INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(), RenderPass_0 ) 
+RootNode::RootNode() : SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_0 )
    {
 	m_Children.reserve(RenderPass_Last);
 
-	shared_ptr<SceneNode> staticGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Static ) );
+   shared_ptr<SceneNode> staticGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_Static ) );
 	m_Children.push_back(staticGroup);	// RenderPass_Static = 0
 
-	shared_ptr<SceneNode> actorGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Actor ) );
+   shared_ptr<SceneNode> actorGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_Actor ) );
 	m_Children.push_back(actorGroup);	// RenderPass_Actor = 1
 
-	shared_ptr<SceneNode> skyGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_Sky ) );
+   shared_ptr<SceneNode> skyGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_Sky ) );
 	m_Children.push_back(skyGroup);	// RenderPass_Sky = 2
 
-	shared_ptr<SceneNode> invisibleGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID,  WeakBaseRenderComponentPtr(),  RenderPass_NotRendered ) );
+   shared_ptr<SceneNode> invisibleGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_NotRendered ) );
 	m_Children.push_back(invisibleGroup);	// RenderPass_NotRendered = 3
    }
    
@@ -299,7 +299,7 @@ bool RootNode::VRemoveChild( ActorId id )
    }
 
 CameraNode::CameraNode( TransformPtr pTransform, Frustum const &frustum ) 
-	      : SceneNode(INVALID_ACTOR_ID, WeakBaseRenderComponentPtr(), RenderPass_0, pTransform ),
+	      : SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_0, pTransform ),
 	      m_Frustum( frustum ),
 	      m_IsActive( true ),
 	      m_IsDebugCamera( false ),
@@ -311,10 +311,10 @@ CameraNode::CameraNode( TransformPtr pTransform, Frustum const &frustum )
 
 CameraNode::CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, Frustum const &frustum ) 
 	      : SceneNode( INVALID_ACTOR_ID, 
-                  WeakBaseRenderComponentPtr(), 
-                  RenderPass_0, 
-                  TransformPtr ( ENG_NEW Transform( Mat4x4::LookAt( eye, center, up ).Inverse() ) )
-                  ),
+                      NULL,
+                      RenderPass_0, 
+                      TransformPtr ( ENG_NEW Transform( Mat4x4::LookAt( eye, center, up ).Inverse() ) )
+                      ),
             m_Frustum( frustum ),
 	         m_IsActive( true ),
 	         m_IsDebugCamera( false ),

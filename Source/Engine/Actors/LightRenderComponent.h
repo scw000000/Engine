@@ -15,6 +15,8 @@
 #include "RenderComponent.h"
 #include "..\Graphics\Light.h"
 
+#pragma warning( push )
+#pragma warning( disable : 4250 )
 
 class LightRenderComponent : public BaseRenderComponent<LightRenderComponent>
    {
@@ -34,3 +36,5 @@ class LightRenderComponent : public BaseRenderComponent<LightRenderComponent>
       LightPropertiesPtr m_pLightProps; 
 
    };
+
+#pragma warning( pop )

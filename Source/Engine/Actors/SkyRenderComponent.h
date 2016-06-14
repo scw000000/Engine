@@ -14,6 +14,9 @@
 
 #include "RenderComponent.h"
 
+#pragma warning( push )
+#pragma warning( disable : 4250 )
+
 class SkyRenderComponent : public BaseRenderComponent<SkyRenderComponent>
    {
    public:
@@ -31,3 +34,5 @@ class SkyRenderComponent : public BaseRenderComponent<SkyRenderComponent>
       shared_ptr<Resource> m_pTextureResource;
       shared_ptr<Resource> m_pMeshResource;
    };
+
+#pragma warning( pop )

@@ -66,8 +66,8 @@ TiXmlElement* LightProperties::GenerateXML( void )
    return pRoot;
    }
 
-LightNode::LightNode( const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, const LightPropertiesPtr& props, TransformPtr pTransform )
- : SceneNode( actorId, renderComponent,  RenderPass_NotRendered, pTransform ) 
+LightNode::LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& props, TransformPtr pTransform )
+   : SceneNode( actorId, pRenderComponent, RenderPass_NotRendered, pTransform )
    {
 	m_pLightProps = props;
    }
@@ -75,7 +75,7 @@ LightNode::LightNode( const ActorId actorId, WeakBaseRenderComponentPtr renderCo
 int GLLightNode::VOnUpdate( Scene *, const unsigned long deltaMs )
    { 
 	// light color can change anytime! Check the BaseRenderComponent!
-	LightRenderComponent* lrc = static_cast<LightRenderComponent*>( m_RenderComponent );
+	//LightRenderComponent* lrc = static_cast<LightRenderComponent*>( m_pRenderComponent );
 	/*m_Props.GetMaterial().SetDiffuse( lrc->GetLightProperties().m_Color );*/
 	return S_OK; 
    }
@@ -99,7 +99,7 @@ void LightManager::CalcLighting( Scene *pScene )
          {
          m_LightAmbient = lightIt->get()->GetLightPropertiesPtr()->m_Diffuse * 0.2f;
          }
-      memcpy( m_LightPosWorldSpace, &lightIt->get( )->GetWorldPosition( ), sizeof( Vec3 ) );
+      memcpy( m_LightPosWorldSpace, &lightIt->get( )->VGetWorldPosition( ), sizeof( Vec3 ) );
       memcpy( m_LightDir, &lightIt->get( )->GetForward( ), sizeof( Vec3 ) );
       memcpy( m_LightPower, &lightIt->get( )->GetLightPropertiesPtr( )->m_Power, sizeof( float ) );
       memcpy( m_LightColor, &lightIt->get()->GetLightPropertiesPtr()->m_Diffuse, sizeof( Color ) );

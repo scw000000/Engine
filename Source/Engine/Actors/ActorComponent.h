@@ -34,14 +34,16 @@ class IActorComponent
       virtual void SetOwner( StrongActorPtr pOwner ) = 0;
       virtual void Destory( void ) = 0;
       virtual TiXmlElement* VGenerateXML( void ) = 0;
-   
+      virtual const ChildComponents& GetChildComponents( void ) const = 0;
+      virtual const weak_ptr<IActorComponent> GetParentComponent( void ) = 0;
+
    protected:
       virtual void AddChildComponent( weak_ptr<IActorComponent> ) = 0;
       virtual void SetParentComponent( weak_ptr<IActorComponent> ) = 0;
    };
 
 // Using Curiously recurring template pattern (CRTP) to prevent declaring GUID mulit times
-template <typename T>class BaseActorComponent : public IActorComponent 
+template <typename T>class BaseActorComponent : virtual public IActorComponent 
    {
    friend class ActorFactory;
    public:
@@ -49,6 +51,8 @@ template <typename T>class BaseActorComponent : public IActorComponent
       virtual const std::string& VGetName( void ) const override { return s_Name; }
       virtual void VPostInit( void ) override { };
       virtual void VUpdate( const unsigned long deltaMs ) override { };
+      virtual const ChildComponents& GetChildComponents( void ) const override { return m_ChildComponents; };
+      virtual const weak_ptr<IActorComponent> GetParentComponent( void ) override { return m_pParentComponent; }
 
    public:
       // GUID of this event

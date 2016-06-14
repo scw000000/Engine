@@ -19,8 +19,6 @@
 
 class RenderComponent;
 
-typedef RenderComponent* WeakBaseRenderComponentPtr;
-
 
 //   This enum defines the different types of alpha blending
 //   types that can be set on a scene node.
@@ -80,10 +78,10 @@ typedef std::vector< std::shared_ptr< ISceneNode > > SceneNodeList;
 class SceneNode : public ISceneNode
    {
 	friend class Scene;
-   friend class RenderComponent;
+   
    public:
       // TODO: finish constructor
-	   SceneNode( ActorId actorId, WeakBaseRenderComponentPtr renderComponent, RenderPass renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ), MaterialPtr pMaterial = MaterialPtr() );
+   SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderPass renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ), MaterialPtr pMaterial = MaterialPtr() );
 
 	   virtual ~SceneNode();
 
@@ -125,17 +123,20 @@ class SceneNode : public ISceneNode
 
       Vec3 GetForward( void ) const { return m_Props.m_pTransform->GetForward(); }
 
-	   Vec3 GetWorldPosition( void ) const;
+      virtual Vec3 VGetWorldPosition( void ) const override final;
 
-	   void SetRadius(const float radius) { m_Props.m_Radius = radius; }
+	   void SetRadius( float radius ) { m_Props.m_Radius = radius; }
+
+      virtual void VSetParentNode( ISceneNode* pParent ) override { m_pParent = pParent; }
+      virtual ISceneNode* VGetParentNode( void ) override { return m_pParent; };
 
 	   /*void SetMaterial( const Material& mat ) { m_Props.m_Material = mat; }*/
 
    protected:
 	   SceneNodeList			m_Children;
-	   SceneNode				*m_pParent;
+      ISceneNode				*m_pParent;
 	   SceneNodeProperties		m_Props;
-   	WeakBaseRenderComponentPtr	m_RenderComponent;
+      IRenderComponent*	m_pRenderComponent;
    };
 
 

@@ -19,8 +19,8 @@
 
 //const char* LightRenderComponent::g_Name = "LightRenderComponent";
 
-const ComponentId BaseRenderComponent<LightRenderComponent>::s_ComponentId = 0xf501193f;
-const std::string BaseRenderComponent<LightRenderComponent>::s_Name = "LightRenderComponent";
+const ComponentId BaseActorComponent<LightRenderComponent>::s_ComponentId = 0xf501193f;
+const std::string BaseActorComponent<LightRenderComponent>::s_Name = "LightRenderComponent";
 
 void LightRenderComponent::Destory( void )
    {
@@ -45,12 +45,11 @@ bool LightRenderComponent::VDelegateInit( TiXmlElement* pData )
 
 shared_ptr<SceneNode> LightRenderComponent::VCreateSceneNode( void )
    {
-   WeakBaseRenderComponentPtr weakThis( this );
    switch( EngineApp::GetRendererImpl() )
       {
       case Renderer::Renderer_OpenGL:
             {
-            return shared_ptr<SceneNode>( ENG_NEW LightNode( m_pOwner->GetId(), weakThis, m_pLightProps, m_pTransform ) );
+            return shared_ptr<SceneNode>( ENG_NEW LightNode( m_pOwner->GetId(), this, m_pLightProps, m_pTransform ) );
             }
       default:
          ENG_ASSERT( 0 && "Unknown Renderer Implementation in GridRenderComponent" );

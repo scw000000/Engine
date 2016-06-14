@@ -71,6 +71,25 @@ void Actor::Update( unsigned long deltaMs)
       }
    }
 
+TiXmlElement* Actor::BuildXML( StrongActorComponentPtr pComponent )
+   {
+   ENG_ASSERT( pComponent );
+   TiXmlElement* pCurrLevelNode = ENG_NEW TiXmlElement( pComponent->VGetName().c_str() );
+   TiXmlElement* pCurrLevelNodeData = pComponent->VGenerateXML();
+   pCurrLevelNodeData->SetValue( "Data" );
+   pCurrLevelNode->LinkEndChild( pCurrLevelNodeData );
+   const ChildComponents& childComponents = pComponent->GetChildComponents();
+   for( auto pChildComponent : childComponents )
+      {
+      auto pStrongChildComponent = pChildComponent.lock();
+      if( pStrongChildComponent )
+         {
+         pCurrLevelNode->LinkEndChild( BuildXML( pStrongChildComponent ) );
+         }
+      }
+   return pCurrLevelNode;
+   }
+
 TiXmlElement* Actor::GenerateXML( void )
    {
    // Actor element
@@ -82,20 +101,29 @@ TiXmlElement* Actor::GenerateXML( void )
    for ( auto it = m_Components.begin(); it != m_Components.end(); ++it )
       {
       StrongActorComponentPtr pComponent = it->second;
-      TiXmlElement* pComponentElement = pComponent->VGenerateXML();
-      pActorElement->LinkEndChild( pComponentElement );
+      StrongActorComponentPtr pParentComponent = pComponent->GetParentComponent().lock();
+      if( !pParentComponent )
+         {
+         pActorElement->LinkEndChild( BuildXML( pComponent ) );
+         }
+      
       }
 
    return pActorElement;
+   }
+
+TiXmlElement* Actor::GenerateOverridesXML( void )
+   {
+   return NULL;
    }
 
 TransformPtr Actor::GetTransformPtr( void )
    {
    weak_ptr<IActorComponent> pComponent = GetComponent( 1 );
    ENG_ASSERT( !pComponent.expired() );
-   shared_ptr<RenderComponent> pRootComponent = dynamic_pointer_cast< RenderComponent >( pComponent.lock() );
+   shared_ptr<IRenderComponent> pRootComponent = dynamic_pointer_cast< IRenderComponent >( pComponent.lock() );
    ENG_ASSERT( pRootComponent );
-   return pRootComponent->m_pTransform;
+   return pRootComponent->VGetTransform();
    }
 
 void Actor::AddComponent( StrongActorComponentPtr pComponent )

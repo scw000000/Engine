@@ -22,8 +22,8 @@ const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureVertexShader.vertex
 const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureFragmentShader.fragmentshader";
 
 SkySceneNode::SkySceneNode( 
-   const ActorId actorId, WeakBaseRenderComponentPtr renderComponent, shared_ptr<Resource> pMeshResource, shared_ptr<Resource> ptextureResource, RenderPass renderPass, TransformPtr pTransform )
-   : SceneNode( actorId, renderComponent, renderPass, pTransform ), 
+   const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResource, shared_ptr<Resource> ptextureResource, RenderPass renderPass, TransformPtr pTransform )
+   : SceneNode( actorId, pRenderComponent, renderPass, pTransform ),
    m_pMeshResource( pMeshResource ),
    m_pTextureResource( ptextureResource ),
    m_VertexShader( VERTEX_SHADER_FILE_NAME ),

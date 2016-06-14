@@ -23,6 +23,7 @@ enum Renderer
 
 class Actor;
 class IActorComponent;
+class IRenderComponent;
 
 typedef unsigned int ActorId;
 typedef unsigned int ComponentId;
@@ -32,11 +33,13 @@ const ActorId INVALID_ACTOR_ID = 0;
 const ComponentId INVALID_COMPONENT_ID = 0;
 const ActorComponentId INVALID_ACTOR_COMPONENT_ID = 0;
 
-typedef shared_ptr<Actor> StrongActorPtr;
-typedef weak_ptr<Actor> WeakActorPtr;
-typedef shared_ptr<IActorComponent> StrongActorComponentPtr;
-typedef weak_ptr<IActorComponent> WeakActorComponentPtr;
+typedef shared_ptr< Actor > StrongActorPtr;
+typedef weak_ptr< Actor > WeakActorPtr;
+typedef shared_ptr< IActorComponent > StrongActorComponentPtr;
+typedef weak_ptr< IActorComponent > WeakActorComponentPtr;
 
+typedef shared_ptr< IRenderComponent > StrongRenderComponentPtr;
+typedef weak_ptr< IRenderComponent > WeakRenderComponentPtr;
 //
 // class IScreenElement							- Chapter 10, page 285
 //
@@ -249,10 +252,14 @@ class ISceneNode
 
       virtual Vec3 GetToWorldPosition( void ) const = 0;
       virtual void SetToWorldPosition( const Vec3& pos ) = 0;
+      virtual Vec3 VGetWorldPosition( void ) const = 0;
 
 	   virtual bool VAddChild( shared_ptr<ISceneNode> kid )=0;
 	   virtual bool VRemoveChild( ActorId id ) = 0;
 	   virtual int VOnLostDevice( Scene *pScene ) = 0;
+
+      virtual void VSetParentNode( ISceneNode* pParent ) = 0;
+      virtual ISceneNode* VGetParentNode( void ) = 0;
 
 //	   virtual int VPick( Scene *pScene, RayCast *pRayCast ) = 0;
    };

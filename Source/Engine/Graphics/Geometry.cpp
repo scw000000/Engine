@@ -31,6 +31,20 @@ TiXmlElement* Vec3::GernerateXML( void )
    return pRoot;
    }
 
+TiXmlElement* Vec3::GenerateOverridesXML( TiXmlElement* pResourceNode )
+   {
+   TiXmlElement* pRetXML = GernerateXML();
+   if( !std::strcmp( pRetXML->Attribute( "x" ), pResourceNode->Attribute( "x" ) ) &&
+       !std::strcmp( pRetXML->Attribute( "y" ), pResourceNode->Attribute( "y" ) ) &&
+       !std::strcmp( pRetXML->Attribute( "z" ), pResourceNode->Attribute( "z" ) ) )
+      {
+      pRetXML->RemoveAttribute( "x" );
+      pRetXML->RemoveAttribute( "y" );
+      pRetXML->RemoveAttribute( "z" );
+      }
+   return pRetXML;
+   }
+
 bool Plane::Inside( Vec3 p ) const
    {
    return ( p.Dot( n ) + d >= 0.0f );
@@ -285,21 +299,40 @@ Transform::Transform( const Vec3& position, const Vec3& scale,const Quaternion& 
 
 TiXmlElement* Transform::GenerateXML( void )
    {
-   TiXmlElement* pRoot = ENG_NEW TiXmlElement( "Transform" );
+   TiXmlElement* pRetXMLNode = ENG_NEW TiXmlElement( "Transform" );
 
    TiXmlElement* pPosition = GetToWorldPosition().GernerateXML();
    pPosition->SetValue( "Position" );
-   pRoot->LinkEndChild( pPosition );
+   pRetXMLNode->LinkEndChild( pPosition );
 
    TiXmlElement* pRotation = GetPitchYawRollDeg().GernerateXML();
    pRotation->SetValue( "PitchYawRoll" );
-   pRoot->LinkEndChild( pRotation );
+   pRetXMLNode->LinkEndChild( pRotation );
 
    TiXmlElement* pScale = GetScale().GernerateXML();
    pScale->SetValue( "Scale" );
-   pRoot->LinkEndChild( pScale );
+   pRetXMLNode->LinkEndChild( pScale );
 
-   return pRoot;
+   return pRetXMLNode;
+   }
+
+TiXmlElement* Transform::GenerateOverridesXML( TiXmlElement* pResourceNode )
+   {
+   TiXmlElement* pRetXMLNode = ENG_NEW TiXmlElement( "Transform" );
+
+   TiXmlElement* pPosition = GetToWorldPosition().GenerateOverridesXML( pResourceNode->FirstChildElement( "Position" ) );
+   pPosition->SetValue( "Position" );
+   pRetXMLNode->LinkEndChild( pPosition );
+
+   TiXmlElement* pRotation = GetToWorldPosition().GenerateOverridesXML( pResourceNode->FirstChildElement( "PitchYawRoll" ) );
+   pRotation->SetValue( "PitchYawRoll" );
+   pRetXMLNode->LinkEndChild( pRotation );
+
+   TiXmlElement* pScale = GetToWorldPosition().GenerateOverridesXML( pResourceNode->FirstChildElement( "Scale" ) );
+   pScale->SetValue( "Scale" );
+   pRetXMLNode->LinkEndChild( pScale );
+
+   return pRetXMLNode;
    }
 
 //Transform::Transform( const Mat4x4& toWorld )

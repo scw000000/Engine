@@ -73,7 +73,7 @@ shared_ptr<SceneNode> LightRenderComponent::VCreateSceneNode( void )
     return shared_ptr<SceneNode>();
    }
 
-void LightRenderComponent::VCreateInheritedXmlElements( TiXmlElement *pBaseElement )
+void LightRenderComponent::VDelegateGenerateXML( TiXmlElement *pBaseElement )
    {
    TiXmlElement* pLight = m_pLightProps->GenerateXML();
    pBaseElement->LinkEndChild( pLight );

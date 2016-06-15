@@ -109,7 +109,7 @@ shared_ptr<SceneNode> SkyRenderComponent::VCreateSceneNode( void )
    return shared_ptr<SceneNode>( );
    }
 
-void SkyRenderComponent::VCreateInheritedXmlElements( TiXmlElement* pBaseElement )
+void SkyRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )
    {
    // initial transform -> position
    TiXmlElement* pMesh = ENG_NEW TiXmlElement( "Mesh" );

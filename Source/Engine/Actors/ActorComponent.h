@@ -34,6 +34,7 @@ class IActorComponent
       virtual void SetOwner( StrongActorPtr pOwner ) = 0;
       virtual void Destory( void ) = 0;
       virtual TiXmlElement* VGenerateXML( void ) = 0;
+      virtual TiXmlElement* VGenerateOverridesXML( TiXmlElement* pResourceNode ) = 0;
       virtual const ChildComponents& GetChildComponents( void ) const = 0;
       virtual const weak_ptr<IActorComponent> GetParentComponent( void ) = 0;
 

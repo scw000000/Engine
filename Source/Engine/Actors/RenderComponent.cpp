@@ -209,7 +209,7 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
    }
 
 
-void MeshRenderComponent::VCreateInheritedXmlElements( TiXmlElement* pBaseElement )
+void MeshRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )
    {
    // initial transform -> position
    TiXmlElement* pMesh = ENG_NEW TiXmlElement( "Mesh" );

@@ -62,8 +62,12 @@ BaseEngineLogic::~BaseEngineLogic()
     // destroy all actors
    for ( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
       {
-      WriteXMLToFile( std::string( ToStr( it->first ) + ".xml" ).c_str(), it->second->GenerateXML() );
+      TiXmlElement* pResource = it->second->GenerateXML();
+      TiXmlElement* pOverrides = it->second->GenerateOverridesXML( pResource );
+      SAFE_DELETE( pResource );
+      XMLHelper::WriteXMLToFile( std::string( ToStr( it->first ) + ".xml" ).c_str(), pOverrides );
       it->second->Destroy();
+      //SAFE_DELETE( pOverrides );
       }
    m_Actors.clear();
 

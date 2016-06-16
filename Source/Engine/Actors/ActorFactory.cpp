@@ -27,7 +27,6 @@ ActorFactory::ActorFactory( void )
    {
    m_LastActorId = INVALID_ACTOR_ID;
 
-   REGISTER_COMPONENT( TransformComponent );
    REGISTER_COMPONENT( MeshRenderComponent );
    REGISTER_COMPONENT( LightRenderComponent );
    REGISTER_COMPONENT( SkyRenderComponent );
@@ -57,13 +56,15 @@ StrongActorPtr ActorFactory::CreateActor( const char* actorResource, const char*
       ENG_ERROR( "Actor ID generation failed: " + std::string( actorResource ) );
       }
 
+   TiXmlElement* pResDataNode = pRoot->FirstChildElement( "Data" );
    StrongActorPtr pActor( ENG_NEW Actor( nextActorId ) );
-   if( !pActor->Init( pRoot ) )
+   if( !pActor->Init( pResDataNode ) )
       {
       ENG_ERROR( "Failed to initialize actor " + std::string( actorResource ) );
       }
    
-   for( TiXmlElement* pNode = pRoot->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
+   TiXmlElement* pFirstResComponentNode = pResDataNode->NextSiblingElement();
+   for( TiXmlElement* pNode = pFirstResComponentNode; pNode; pNode = pNode->NextSiblingElement() )
       {
       BuildComponentTree( pNode, pActor, StrongActorComponentPtr() );
       /*StrongActorComponentPtr pComponent( CreateComponent( pNode ) );

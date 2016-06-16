@@ -32,9 +32,10 @@ class Actor
       // To break out the circular reference strongPtr chain of Actor & actorComponent
       void Destroy( void );
       void Update( unsigned long deltaMs );
-      TiXmlElement* BuildXML( StrongActorComponentPtr pComponent );
+      TiXmlElement* BuildComponentXML( StrongActorComponentPtr pComponent );
       TiXmlElement* GenerateXML( void );
-      TiXmlElement* GenerateOverridesXML( void );
+      TiXmlElement* BuildOverridesXML( StrongActorComponentPtr pComponent, TiXmlElement* pResouce );
+      TiXmlElement* GenerateOverridesXML( TiXmlElement* pResouce );
 
       ActorId GetId( void ) const { return m_Id; }
       TransformPtr GetTransformPtr( void );
@@ -53,7 +54,7 @@ class Actor
       ActorType m_Type;
       ActorComponents m_Components;
       ActorComponentId m_LastActorComponentId;
-      std::string m_Resource; // actor XML file name
+      Resource m_ActorResource; // actor XML file name
    };
 
 //template< class ComponentType > weak_ptr<ComponentType> Actor::GetComponent( const char* name )

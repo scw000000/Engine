@@ -21,20 +21,24 @@
 
 bool LightProperties::Init( TiXmlElement* pData )
    {
-   XMLParser::ReadColor( pData->FirstChildElement( "Diffuse" ), &m_Diffuse );
+   if( !pData )
+      {
+      return false;
+      }
+   if( !m_Diffuse.Init( pData->FirstChildElement( "Diffuse" ) ) )
+      {
+      return false;
+      }
+   
    //TiXmlElement* pDiffuseNode = pData->FirstChildElement( "Diffuse" );
    //if( pDiffuseNode )
    //   {
    //   
    //  // m_Diffuse = BaseRenderComponent::LoadColor( pDiffuseNode );
    //   }
-
-   TiXmlElement* pPowerNode = pData->FirstChildElement( "Power" );
-   if( pPowerNode )
+   if( TIXML_SUCCESS != pData->QueryFloatAttribute( "power", &m_Power ) )
       {
-      double temp;
-      pPowerNode->Attribute( "magnitude", &temp );
-      m_Power = ( float ) temp;
+      return false;
       }
 
    return true;
@@ -42,15 +46,13 @@ bool LightProperties::Init( TiXmlElement* pData )
 
 TiXmlElement* LightProperties::GenerateXML( void )
    {
-   TiXmlElement* pRoot = ENG_NEW TiXmlElement( "Light" );
+   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Light" );
 
    TiXmlElement* pDiffuse = m_Diffuse.GenerateXML();
    pDiffuse->SetValue( "Diffuse" );
-   pRoot->LinkEndChild( pDiffuse );
+   pRetNode->LinkEndChild( pDiffuse );
 
-   TiXmlElement* pPower = ENG_NEW TiXmlElement( "Power" );
-   pPower->SetAttribute( "magnitude", ToStr( m_Power ).c_str() );
-   pRoot->LinkEndChild( pPower );
+   pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
 
    /*TiXmlElement* pDiffuse = ENG_NEW TiXmlElement( "Diffuse" );
    pDiffuse->SetAttribute( "r", ToStr( m_Diffuse.m_Component.r ).c_str() );
@@ -63,7 +65,23 @@ TiXmlElement* LightProperties::GenerateXML( void )
    pPower->SetAttribute( "magnitude", ToStr( m_Power ).c_str() );
    pBaseElement->LinkEndChild( pPower );*/
 
-   return pRoot;
+   return pRetNode;
+   }
+
+TiXmlElement* LightProperties::GenerateOverridesXML( TiXmlElement* pResource ) 
+   {
+   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Light" );
+
+   TiXmlElement* pDiffuse = m_Diffuse.GenerateOverridesXML( pResource->FirstChildElement( "Diffuse" ) );
+   pDiffuse->SetValue( "Diffuse" );
+   pRetNode->LinkEndChild( pDiffuse );
+
+   pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
+   if( !strcmp( pRetNode->Attribute( "power" ), pResource->Attribute( "power" ) ) )
+      {
+      pRetNode->RemoveAttribute( "power" );
+      }
+   return pRetNode;
    }
 
 LightNode::LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& props, TransformPtr pTransform )

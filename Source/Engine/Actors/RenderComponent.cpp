@@ -168,55 +168,37 @@ shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
 
 bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
    {
-   TiXmlElement* pMeshElement = pData->FirstChildElement( "Mesh" );
-   // Set mesh file path
-   if( pMeshElement )
-      {
-      const char *pMeshFilePath = pMeshElement->Attribute( "path" );
-      if( !pMeshFilePath )
-         {
-         return false;
-         }
-      m_pMeshResource = shared_ptr<Resource>( ENG_NEW Resource( pMeshFilePath ) );
-      }
-   else
+   if( !pData )
       {
       return false;
       }
-   // Set texture file path
-   TiXmlElement* pMaterialElement = pData->FirstChildElement( "Material" );
-   if( pMaterialElement )
-      {
-      m_pMaterial->Init( pMaterialElement );
-      /*TiXmlElement* pTextureFileElement = pMaterialElement->FirstChildElement( "Texture" );
-      if( pTextureFileElement )
-      {
-      const char *pTextureFilePath = pTextureFileElement->Attribute( "path" );
-      if( pTextureFilePath )
-      {
-      m_pMaterial->SetTextureResource( Resource( pTextureFilePath ) );
-      }
-      }
 
-      Color diffuse;
-      if( XMLParser::ReadColor( pMaterialElement->FirstChildElement( "Diffuse" ), &diffuse ) )
-      {
-      m_pMaterial->SetDiffuse( diffuse );
-      }*/
-      }
-
+   // Set mesh file path
+   m_pMeshResource->Init( pData->FirstChildElement( "Mesh" ) );
+      
+   m_pMaterial->Init( pData->FirstChildElement( "Material" ) );
+     
    return true;
    }
 
 
 void MeshRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )
    {
-   // initial transform -> position
-   TiXmlElement* pMesh = ENG_NEW TiXmlElement( "Mesh" );
-   pMesh->SetAttribute( "path", m_pMeshResource->m_Name.c_str() );
+   TiXmlElement* pMesh = m_pMeshResource->GenerateXML();
+   pMesh->SetValue( "Mesh" );
    pBaseElement->LinkEndChild( pMesh );
 
    TiXmlElement* pMaterial = m_pMaterial->GenerateXML();
+   pBaseElement->LinkEndChild( pMaterial );
+   }
+
+void MeshRenderComponent::VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode )
+   {
+   TiXmlElement* pMesh = m_pMeshResource->GenerateOverridesXML( pResourceNode->FirstChildElement( "Mesh" ) );
+   pMesh->SetValue( "Mesh" );
+   pBaseElement->LinkEndChild( pMesh );
+
+   TiXmlElement* pMaterial = m_pMaterial->GenerateOverridesXML( pResourceNode->FirstChildElement( "Material" ) );
    pBaseElement->LinkEndChild( pMaterial );
    }
 

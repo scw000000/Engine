@@ -37,6 +37,37 @@ std::string Resource::GetExtension( void )
    return m_Name.substr( extensionStart + 1 );
    }
 
+bool Resource::Init( TiXmlElement* pData, bool caseSensitive )
+   {
+   if( !pData || !pData->Attribute( "path" ) )
+      {
+      return false;
+      }
+   m_Name = pData->Attribute( "path" );
+   if( !caseSensitive )
+      {
+      std::transform( m_Name.begin(), m_Name.end(), m_Name.begin(), ( int( *)( int ) )std::tolower );
+      }
+   return true;
+   }
+
+TiXmlElement* Resource::GenerateXML( void )
+   {
+   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Resource" );
+   pRetNode->SetAttribute( "path", m_Name.c_str() );
+   return pRetNode;
+   }
+
+TiXmlElement* Resource::GenerateOverridesXML( TiXmlElement* pResource )
+   {
+   TiXmlElement* pRetNode = GenerateXML();
+   if( !strcmp( pRetNode->Attribute( "path" ), pResource->Attribute( "path" ) ) )
+      {
+      pRetNode->RemoveAttribute( "path" );
+      }
+   return pRetNode;
+   }
+
 ResHandle::ResHandle( Resource &resource, char *buffer, unsigned int size, ResourceCache *pResCache ) : m_Resource( resource )
    {
    m_pBuffer = buffer;

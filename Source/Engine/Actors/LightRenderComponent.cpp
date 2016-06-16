@@ -38,7 +38,7 @@ LightRenderComponent::LightRenderComponent(void) : m_pLightProps( ENG_NEW( Light
 // This function is calle by BaseRenderComponent
 bool LightRenderComponent::VDelegateInit( TiXmlElement* pData )
    {
-   m_pLightProps->Init( pData );
+   m_pLightProps->Init( pData->FirstChildElement( "Light" ) );
 
    return true;
    }
@@ -79,3 +79,8 @@ void LightRenderComponent::VDelegateGenerateXML( TiXmlElement *pBaseElement )
    pBaseElement->LinkEndChild( pLight );
    }
 
+void LightRenderComponent::VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode )
+   {
+   TiXmlElement* pLight = m_pLightProps->GenerateOverridesXML( pResourceNode->FirstChildElement( "Light" ) );
+   pBaseElement->LinkEndChild( pLight );
+   }

@@ -42,7 +42,9 @@ class Material
 	   float GetAlpha( void ) const { return m_Diffuse.GetAlpha(); }
 
 	   void ApplyMaterial( void );
+
       TiXmlElement* GenerateXML( void );
+      TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
 
    private:
       Resource m_TextureResource;

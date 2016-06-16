@@ -29,6 +29,7 @@ class SkyRenderComponent : public BaseRenderComponent<SkyRenderComponent>
 
       // editor stuff
       virtual void VDelegateGenerateXML( TiXmlElement* pBaseElement ) override;
+      virtual void VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode ) override;
 
    protected:
       shared_ptr<Resource> m_pTextureResource;

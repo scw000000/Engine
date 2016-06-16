@@ -30,47 +30,21 @@ void SkyRenderComponent::Destory( void )
    m_pMeshResource.reset();
    }
 
-SkyRenderComponent::SkyRenderComponent( void )
+SkyRenderComponent::SkyRenderComponent( void ) : m_pMeshResource( ENG_NEW Resource( "" ) ), m_pTextureResource( ENG_NEW Resource( "" ) )
    {
    }
 
 // This function is calle by BaseRenderComponent
 bool SkyRenderComponent::VDelegateInit( TiXmlElement* pData )
    {
-   TiXmlElement* pMeshFileElement = pData->FirstChildElement( "Mesh" );
    // Set mesh file path
-   if( pMeshFileElement )
-      {
-      const char *pMeshFilePath = pMeshFileElement->Attribute( "path" );
-      if( !pMeshFilePath )
-         {
-         return false;
-         }
-      m_pMeshResource = shared_ptr<Resource>( ENG_NEW Resource( pMeshFilePath ) );
-      }
-   else
+   if( !pData ) 
       {
       return false;
       }
+   m_pMeshResource->Init( pData->FirstChildElement( "Mesh" ) );
 
-   // Set texture file path
-   TiXmlElement* pTextureFileElement = pData->FirstChildElement( "Texture" );
-   if( pTextureFileElement )
-      {
-      const char *pTextureFilePath = pTextureFileElement->Attribute( "path" );
-      if( !pTextureFilePath )
-         {
-         return false;
-         }
-      else
-         {
-        m_pTextureResource = shared_ptr<Resource>( ENG_NEW Resource( pTextureFilePath ) );
-         }
-      }
-   else
-      {
-      return false;
-      }
+   m_pTextureResource->Init( pData->FirstChildElement( "Texture" ) );
    return true;
    }
 
@@ -111,12 +85,22 @@ shared_ptr<SceneNode> SkyRenderComponent::VCreateSceneNode( void )
 
 void SkyRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )
    {
-   // initial transform -> position
-   TiXmlElement* pMesh = ENG_NEW TiXmlElement( "Mesh" );
-   pMesh->SetAttribute( "path", m_pMeshResource->m_Name.c_str() );
+   TiXmlElement* pMesh = m_pMeshResource->GenerateXML();
+   pMesh->SetValue( "Mesh" );
    pBaseElement->LinkEndChild( pMesh );
 
-   TiXmlElement* pTexture = ENG_NEW TiXmlElement( "Texture" );
-   pTexture->SetAttribute( "path", m_pTextureResource->m_Name.c_str() );
+   TiXmlElement* pTexture = m_pTextureResource->GenerateXML();
+   pTexture->SetValue( "Texture" );
    pBaseElement->LinkEndChild( pTexture );
+   }
+
+void SkyRenderComponent::VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode )
+   {
+   TiXmlElement* pMesh = m_pMeshResource->GenerateOverridesXML( pResourceNode->FirstChildElement( "Mesh" ) );
+   pMesh->SetValue( "Mesh" );
+   pBaseElement->LinkEndChild( pMesh );
+
+   TiXmlElement* pTextrue = m_pTextureResource->GenerateOverridesXML( pResourceNode->FirstChildElement( "Texture" ) );
+   pTextrue->SetValue( "Texture" );
+   pBaseElement->LinkEndChild( pTextrue );
    }

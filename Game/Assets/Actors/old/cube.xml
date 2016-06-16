@@ -1,0 +1,30 @@
+<Actor type="Cube" resource="actors\cube.xml" rootComponentId="1">
+
+
+    <MeshRenderComponent>
+		<Data>
+			<Mesh path="art\cube.obj"/>
+		
+			<Material>
+				<Texture path="art\cube.jpg"/>
+			</Material>
+		
+			<Transform>
+				<Position x="0" y="0" z="10"/>
+			</Transform>
+		</Data>
+		
+		<LightRenderComponent>
+			<Data>
+			<Light power="150">
+			<Diffuse r="1" g="1" b="1" a="1"/>
+			</Light>
+				
+				<Transform>
+					<Position x="0" y="0" z="-10"/>
+				</Transform>
+			</Data>
+		</LightRenderComponent>
+	</MeshRenderComponent>
+
+</Actor>

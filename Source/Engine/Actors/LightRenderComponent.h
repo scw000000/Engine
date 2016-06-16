@@ -31,6 +31,7 @@ class LightRenderComponent : public BaseRenderComponent<LightRenderComponent>
 
       // editor stuff
       virtual void VDelegateGenerateXML( TiXmlElement* pBaseElement ) override;
+      virtual void VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode ) override;
 
    protected:
       LightPropertiesPtr m_pLightProps; 

@@ -124,7 +124,7 @@ extern const int SCREEN_HEIGHT;
 #include "..\Graphics\Geometry.h"
 #include "..\Utilities\Math.h"
 #include "..\Utilities\String.h"
-#include "..\Utilities\XMLParser.h"
+#include "..\Utilities\XMLHelper.h"
 #include "..\Main\Interfaces.h"
 #include "..\ResourceCache\ResourceCache.h"
 #include "..\MainLoop\Timer.h"

@@ -42,12 +42,9 @@ class IRenderComponent : virtual public IActorComponent
       // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
       virtual shared_ptr<SceneNode> VCreateSceneNode( void ) = 0;
       virtual void VDelegateGenerateXML( TiXmlElement* pBaseElement ) = 0;
-      virtual void VDelegateGenerateOverridesXML( TiXmlElement* pResourceNode ) = 0;
+      virtual void VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode ) = 0;
 
    protected:
-      
-
-   private:
       
    };
 
@@ -83,7 +80,6 @@ template <typename T>class BaseRenderComponent : public IRenderComponent, public
        * @return shared_ptr<SceneNode>
        */
        virtual shared_ptr<SceneNode> VCreateSceneNode( void ) = 0;  
-       virtual void VDelegateGenerateXML( TiXmlElement* pBaseElement ) = 0; 
 
    protected:
          shared_ptr<SceneNode> m_pSceneNode;
@@ -107,10 +103,11 @@ template < typename T > void BaseRenderComponent<T>::Destory( void )
 
 template < typename T > bool BaseRenderComponent<T>::VInit( TiXmlElement* pData )
    {
-   ENG_ASSERT( pData );
-   Transform transform( Transform::g_Identity );
-   XMLParser::ReadTransform( pData->FirstChildElement( "Transform" ), &transform );
-   *m_pTransform = transform;
+   if( !pData )
+      {
+      return false;
+      }
+   m_pTransform->Init( pData->FirstChildElement( "Transform" ) );
    return VDelegateInit( pData );
    }
 
@@ -184,7 +181,7 @@ template < typename T > TiXmlElement* BaseRenderComponent<T>::VGenerateOverrides
    TiXmlElement* pTransform = m_pTransform->GenerateOverridesXML( pResourceNode->FirstChildElement( "Transform" ) );
    pBaseElement->LinkEndChild( pTransform );
 
-   VDelegateGenerateOverridesXML( pResourceNode ); // change signature!
+   VDelegateGenerateOverridesXML( pBaseElement, pResourceNode );
 
    return pBaseElement;
    }
@@ -279,6 +276,7 @@ class MeshRenderComponent : public BaseRenderComponent<MeshRenderComponent>
       virtual shared_ptr<SceneNode> VCreateSceneNode( void ) override; 
       virtual bool VDelegateInit( TiXmlElement* pData ) override;
       virtual void VDelegateGenerateXML( TiXmlElement* pBaseElement ) override;
+      virtual void VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode ) override;
 
    protected:
       MaterialPtr m_pMaterial;

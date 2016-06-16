@@ -21,28 +21,56 @@ const Mat4x4 Mat4x4::g_Identity( glm::mat4( 1.0f ) );
 const Quaternion Quaternion::g_Identity( 1.0f, 0.0f, 0.0f, 0.0f );
 const Transform Transform::g_Identity( Vec3::g_Zero, Vec3::g_Identity, Quaternion::g_Identity );
 
-TiXmlElement* Vec3::GernerateXML( void )
+bool Vec3::Init( TiXmlElement* pData )
    {
-   TiXmlElement* pRoot = ENG_NEW TiXmlElement( "Vector3" );
-   pRoot->SetAttribute( "x", ToStr( x ).c_str() );
-   pRoot->SetAttribute( "y", ToStr( y ).c_str() );
-   pRoot->SetAttribute( "z", ToStr( z ).c_str() );
+   float rX = 0;
+   float rY = 0;
+   float rZ = 0;
+   if( !pData )
+      {
+      return false;
+      }
+   if( TIXML_SUCCESS != pData->QueryFloatAttribute( "x", &rX ) )
+      {
+      return false;
+      }
+   if( TIXML_SUCCESS != pData->QueryFloatAttribute( "y", &rY ) )
+      {
+      return false;
+      }
+   if( TIXML_SUCCESS != pData->QueryFloatAttribute( "z", &rZ ) )
+      {
+      return false;
+      }
    
-   return pRoot;
+   x = rX;
+   y = rY;
+   z = rZ;
+   return true;
    }
 
-TiXmlElement* Vec3::GenerateOverridesXML( TiXmlElement* pResourceNode )
+TiXmlElement* Vec3::GernerateXML( void )
    {
-   TiXmlElement* pRetXML = GernerateXML();
-   if( !std::strcmp( pRetXML->Attribute( "x" ), pResourceNode->Attribute( "x" ) ) &&
-       !std::strcmp( pRetXML->Attribute( "y" ), pResourceNode->Attribute( "y" ) ) &&
-       !std::strcmp( pRetXML->Attribute( "z" ), pResourceNode->Attribute( "z" ) ) )
+   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Vector3" );
+   pRetNode->SetAttribute( "x", ToStr( x ).c_str() );
+   pRetNode->SetAttribute( "y", ToStr( y ).c_str() );
+   pRetNode->SetAttribute( "z", ToStr( z ).c_str() );
+   
+   return pRetNode;
+   }
+
+TiXmlElement* Vec3::GenerateOverridesXML( TiXmlElement* pResource )
+   {
+   TiXmlElement* pRetNode = GernerateXML();
+   if( !std::strcmp( pRetNode->Attribute( "x" ), pResource->Attribute( "x" ) ) &&
+       !std::strcmp( pRetNode->Attribute( "y" ), pResource->Attribute( "y" ) ) &&
+       !std::strcmp( pRetNode->Attribute( "z" ), pResource->Attribute( "z" ) ) )
       {
-      pRetXML->RemoveAttribute( "x" );
-      pRetXML->RemoveAttribute( "y" );
-      pRetXML->RemoveAttribute( "z" );
+      pRetNode->RemoveAttribute( "x" );
+      pRetNode->RemoveAttribute( "y" );
+      pRetNode->RemoveAttribute( "z" );
       }
-   return pRetXML;
+   return pRetNode;
    }
 
 bool Plane::Inside( Vec3 p ) const
@@ -204,15 +232,66 @@ bool Color::operator != ( const Color& color ) const
 
     }
 
+ bool Color::Init( TiXmlElement* pData )
+    {
+    float r;
+    float g;
+    float b;
+    float a;
+
+    if( !pData )
+       {
+       return false;
+       }
+    if( TIXML_SUCCESS != pData->QueryFloatAttribute( "r", &r ) )
+       {
+       return false;
+       }
+    if( TIXML_SUCCESS != pData->QueryFloatAttribute( "g", &g ) )
+       {
+       return false;
+       }
+    if( TIXML_SUCCESS != pData->QueryFloatAttribute( "b", &b ) )
+       {
+       return false;
+       }
+    if( TIXML_SUCCESS != pData->QueryFloatAttribute( "a", &a ) )
+       {
+       return false;
+       }
+
+    m_Component.r = r;
+    m_Component.g = g;
+    m_Component.b = b;
+    m_Component.a = a;
+    return true;
+    }
+
  TiXmlElement* Color::GenerateXML( void )
     {
-    TiXmlElement* pRoot = ENG_NEW TiXmlElement( "Color" );
-    pRoot->SetAttribute( "r", ToStr( m_Component.r ).c_str() );
-    pRoot->SetAttribute( "g", ToStr( m_Component.g ).c_str() );
-    pRoot->SetAttribute( "b", ToStr( m_Component.b ).c_str() );
-    pRoot->SetAttribute( "a", ToStr( m_Component.a ).c_str() );
+    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Color" );
+    pRetNode->SetAttribute( "r", ToStr( m_Component.r ).c_str() );
+    pRetNode->SetAttribute( "g", ToStr( m_Component.g ).c_str() );
+    pRetNode->SetAttribute( "b", ToStr( m_Component.b ).c_str() );
+    pRetNode->SetAttribute( "a", ToStr( m_Component.a ).c_str() );
     
-    return pRoot;
+    return pRetNode;
+    }
+
+TiXmlElement* Color::GenerateOverridesXML( TiXmlElement* pResource )
+    {
+    TiXmlElement* pRetNode = GenerateXML();
+    if( !std::strcmp( pRetNode->Attribute( "r" ), pResource->Attribute( "r" ) ) &&
+        !std::strcmp( pRetNode->Attribute( "g" ), pResource->Attribute( "g" ) ) &&
+        !std::strcmp( pRetNode->Attribute( "b" ), pResource->Attribute( "b" ) ) &&
+        !std::strcmp( pRetNode->Attribute( "a" ), pResource->Attribute( "a" ) ) )
+       {
+       pRetNode->RemoveAttribute( "r" );
+       pRetNode->RemoveAttribute( "g" );
+       pRetNode->RemoveAttribute( "b" );
+       pRetNode->RemoveAttribute( "a" );
+       }
+    return pRetNode;
     }
 
 Frustum::Frustum( void )
@@ -297,6 +376,33 @@ Transform::Transform( const Vec3& position, const Vec3& scale,const Quaternion& 
    m_IsFromWorldDirty = false;
    }
 
+bool Transform::Init( TiXmlElement* pData )
+   {
+   Vec3 pitchYawRoll;
+   Vec3 position;
+   Vec3 scale;
+   if( !pData )
+      {
+      return false;
+      }
+   if( pitchYawRoll.Init( pData->FirstChildElement( "PitchYawRoll" ) ) )
+      {
+      SetRotation( pitchYawRoll );
+      }
+
+   if( position.Init( pData->FirstChildElement( "Position" ) ) )
+      {
+      SetPosition( position );
+      }
+
+   if( scale.Init( pData->FirstChildElement( "Scale" ) ) )
+      {
+      SetScale( scale );
+      }
+
+   return true;
+   }
+
 TiXmlElement* Transform::GenerateXML( void )
    {
    TiXmlElement* pRetXMLNode = ENG_NEW TiXmlElement( "Transform" );
@@ -324,11 +430,11 @@ TiXmlElement* Transform::GenerateOverridesXML( TiXmlElement* pResourceNode )
    pPosition->SetValue( "Position" );
    pRetXMLNode->LinkEndChild( pPosition );
 
-   TiXmlElement* pRotation = GetToWorldPosition().GenerateOverridesXML( pResourceNode->FirstChildElement( "PitchYawRoll" ) );
+   TiXmlElement* pRotation = GetPitchYawRollDeg().GenerateOverridesXML( pResourceNode->FirstChildElement( "PitchYawRoll" ) );
    pRotation->SetValue( "PitchYawRoll" );
    pRetXMLNode->LinkEndChild( pRotation );
 
-   TiXmlElement* pScale = GetToWorldPosition().GenerateOverridesXML( pResourceNode->FirstChildElement( "Scale" ) );
+   TiXmlElement* pScale = GetScale().GenerateOverridesXML( pResourceNode->FirstChildElement( "Scale" ) );
    pScale->SetValue( "Scale" );
    pRetXMLNode->LinkEndChild( pScale );
 

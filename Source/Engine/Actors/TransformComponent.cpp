@@ -36,7 +36,6 @@ bool TransformComponent::VInit( TiXmlElement* pData )
 
    Transform transform = *m_pTransform;
     
-   XMLParser::ReadTransform( pData, &*m_pTransform );
 /*
 	Vec3 pitchYawRoll = m_pTransform->GetPitchYawRollRad();
 

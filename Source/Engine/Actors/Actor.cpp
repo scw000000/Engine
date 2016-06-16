@@ -17,13 +17,11 @@
 #include "ActorComponent.h"
 #include "ActorFactory.h"
 
-Actor::Actor( ActorId id )
+Actor::Actor( ActorId id ) : m_ActorResource( "Unknown" )
    {
    m_Id = id;
    m_Type = "Unknown";
 
-	// [mrmike] added post press - this is an editor helper
-	m_Resource = "Unknown";
    m_LastActorComponentId = INVALID_ACTOR_COMPONENT_ID;
    }
 
@@ -36,10 +34,10 @@ Actor::~Actor( void )
 
 bool Actor::Init( TiXmlElement* pData )
    {
-   ENG_LOG("Actor", std::string( "Initializing Actor " ) + ToStr( m_Id ) );
+   ENG_LOG( "Actor", std::string( "Initializing Actor " ) + ToStr( m_Id ) );
 
 	m_Type = pData->Attribute( "type" );
-	m_Resource = pData->Attribute( "resource" );
+   m_ActorResource.Init( pData->FirstChildElement( "Resource" ) );
    unsigned int rootComponentId = 0;
    return true;
    }
@@ -71,7 +69,7 @@ void Actor::Update( unsigned long deltaMs)
       }
    }
 
-TiXmlElement* Actor::BuildXML( StrongActorComponentPtr pComponent )
+TiXmlElement* Actor::BuildComponentXML( StrongActorComponentPtr pComponent )
    {
    ENG_ASSERT( pComponent );
    TiXmlElement* pCurrLevelNode = ENG_NEW TiXmlElement( pComponent->VGetName().c_str() );
@@ -84,7 +82,7 @@ TiXmlElement* Actor::BuildXML( StrongActorComponentPtr pComponent )
       auto pStrongChildComponent = pChildComponent.lock();
       if( pStrongChildComponent )
          {
-         pCurrLevelNode->LinkEndChild( BuildXML( pStrongChildComponent ) );
+         pCurrLevelNode->LinkEndChild( BuildComponentXML( pStrongChildComponent ) );
          }
       }
    return pCurrLevelNode;
@@ -93,9 +91,11 @@ TiXmlElement* Actor::BuildXML( StrongActorComponentPtr pComponent )
 TiXmlElement* Actor::GenerateXML( void )
    {
    // Actor element
-   TiXmlElement* pActorElement = ENG_NEW TiXmlElement( "Actor" );
-   pActorElement->SetAttribute( "type", m_Type.c_str() );
-	pActorElement->SetAttribute( "resource", m_Resource.c_str() );
+   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Actor" );
+   TiXmlElement* pDataNode = ENG_NEW TiXmlElement( "Data" );
+   pDataNode->SetAttribute( "type", m_Type.c_str() );
+   pDataNode->LinkEndChild( m_ActorResource.GenerateXML() );
+   pRetNode->LinkEndChild( pDataNode );
 
    // components
    for ( auto it = m_Components.begin(); it != m_Components.end(); ++it )
@@ -104,17 +104,62 @@ TiXmlElement* Actor::GenerateXML( void )
       StrongActorComponentPtr pParentComponent = pComponent->GetParentComponent().lock();
       if( !pParentComponent )
          {
-         pActorElement->LinkEndChild( BuildXML( pComponent ) );
+         pRetNode->LinkEndChild( BuildComponentXML( pComponent ) );
          }
       
       }
 
-   return pActorElement;
+   return pRetNode;
    }
 
-TiXmlElement* Actor::GenerateOverridesXML( void )
+TiXmlElement* Actor::BuildOverridesXML( StrongActorComponentPtr pComponent, TiXmlElement* pResouce )
    {
-   return NULL;
+   ENG_ASSERT( pComponent );
+   TiXmlElement* pCurrLevelNode = ENG_NEW TiXmlElement( pComponent->VGetName().c_str() );
+   TiXmlElement* pResDataNode = pResouce->FirstChildElement( "Data" );
+   TiXmlElement* pCurrLevelNodeData = pComponent->VGenerateOverridesXML( pResDataNode );
+   pCurrLevelNodeData->SetValue( "Data" );
+   pCurrLevelNode->LinkEndChild( pCurrLevelNodeData );
+
+   TiXmlElement* pResChildComponentNode = pResDataNode->NextSiblingElement();
+   const ChildComponents& childComponents = pComponent->GetChildComponents();
+
+   for( auto pChildComponent : childComponents )
+      {
+      auto pStrongChildComponent = pChildComponent.lock();
+      if( pStrongChildComponent )
+         {
+         pCurrLevelNode->LinkEndChild( BuildOverridesXML( pStrongChildComponent, pResChildComponentNode ) );
+         pResChildComponentNode = pResChildComponentNode->NextSiblingElement();
+         }
+      }
+   return pCurrLevelNode;
+   }
+
+TiXmlElement* Actor::GenerateOverridesXML( TiXmlElement* pResouce )
+   {
+   // Actor element
+   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Actor" );
+
+   //Type and resource should not be changed in overrides file, so no need to write it
+   
+   TiXmlElement* pResComponentNode = pResouce->FirstChildElement( "Data" )->NextSiblingElement();
+  
+   // components
+   for( auto it = m_Components.begin(); it != m_Components.end(); ++it )
+      {
+      StrongActorComponentPtr pComponent = it->second;
+      StrongActorComponentPtr pParentComponent = pComponent->GetParentComponent().lock();
+      if( !pParentComponent )
+         {
+         TiXmlElement* pComponentNode = BuildOverridesXML( pComponent, pResComponentNode );
+         pRetNode->LinkEndChild( pComponentNode );
+         pResComponentNode = pResComponentNode->NextSiblingElement();
+         }
+
+      }
+
+   return pRetNode;
    }
 
 TransformPtr Actor::GetTransformPtr( void )

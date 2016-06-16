@@ -30,27 +30,11 @@ bool Material::Init( TiXmlElement* pData )
       {
       return false;
       }
-   TiXmlElement* pTextureFileElement = pData->FirstChildElement( "Texture" );
-   if( pTextureFileElement )
-      {
-      const char *pTextureFilePath = pTextureFileElement->Attribute( "path" );
-      if( pTextureFilePath )
-         {
-         SetTextureResource( Resource( pTextureFilePath ) );
-         }
-      }
+   m_TextureResource.Init( pData->FirstChildElement( "Texture" ) );
 
-   Color diffuse;
-   if( XMLParser::ReadColor( pData->FirstChildElement( "Diffuse" ), &diffuse ) )
-      {
-      SetDiffuse( diffuse );
-      }
+   m_Diffuse.Init( pData->FirstChildElement( "Diffuse" ) );
 
-   Color ambient;
-   if( XMLParser::ReadColor( pData->FirstChildElement( "Ambient" ), &ambient ) )
-      {
-      SetAmbient( ambient );
-      }
+   m_Ambient.Init( pData->FirstChildElement( "Ambient" ) );
 
    return true;
    }
@@ -99,26 +83,40 @@ void Material::ApplyMaterial( void )
 
 TiXmlElement* Material::GenerateXML( void )
    {
-   TiXmlElement* pBaseElement = ENG_NEW TiXmlElement( "Material" );
+   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Material" );
 
-   TiXmlElement* pTexture = ENG_NEW TiXmlElement( "Texture" );
-   pTexture->SetAttribute( "path", m_TextureResource.m_Name.c_str() );
-   pBaseElement->LinkEndChild( pTexture );
+   TiXmlElement* pTexture = m_TextureResource.GenerateXML();
+   pTexture->SetValue( "Texture" );
+   pRetNode->LinkEndChild( pTexture );
 
-   TiXmlElement* pDiffuse = ENG_NEW TiXmlElement( "Diffuse" );
-   pDiffuse->SetAttribute( "r", ToStr( m_Diffuse.m_Component.r ).c_str() );
-   pDiffuse->SetAttribute( "g", ToStr( m_Diffuse.m_Component.g ).c_str() );
-   pDiffuse->SetAttribute( "b", ToStr( m_Diffuse.m_Component.b ).c_str() );
-   pDiffuse->SetAttribute( "a", ToStr( m_Diffuse.m_Component.a ).c_str() );
-   pBaseElement->LinkEndChild( pDiffuse );
+   TiXmlElement* pDiffuse = m_Diffuse.GenerateXML();
+   pDiffuse->SetValue( "Diffuse" );
+   pRetNode->LinkEndChild( pDiffuse );
 
-   TiXmlElement* pAmbient = ENG_NEW TiXmlElement( "Ambient" );
-   pAmbient->SetAttribute( "r", ToStr( m_Ambient.m_Component.r ).c_str() );
-   pAmbient->SetAttribute( "g", ToStr( m_Ambient.m_Component.g ).c_str() );
-   pAmbient->SetAttribute( "b", ToStr( m_Ambient.m_Component.b ).c_str() );
-   pAmbient->SetAttribute( "a", ToStr( m_Ambient.m_Component.a ).c_str() );
-   pBaseElement->LinkEndChild( pAmbient );
+   TiXmlElement* pAmbient = m_Ambient.GenerateXML();
+   pAmbient->SetValue( "Ambient" );
+   pRetNode->LinkEndChild( pAmbient );
 
-   return pBaseElement;
+   return pRetNode;
+   }
+
+TiXmlElement* Material::GenerateOverridesXML( TiXmlElement* pResource )
+   {
+   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Material" );
+   
+   TiXmlElement* pTexture = m_TextureResource.GenerateOverridesXML( pResource->FirstChildElement( "Texture" ) );
+   pTexture->SetValue( "Texture" );
+   pRetNode->LinkEndChild( pTexture );
+
+   TiXmlElement* pDiffuse = m_Diffuse.GenerateOverridesXML( pResource->FirstChildElement( "Diffuse" ) );
+   pDiffuse->SetValue( "Diffuse" );
+   pRetNode->LinkEndChild( pDiffuse );
+
+   TiXmlElement* pAmbient = m_Ambient.GenerateOverridesXML( pResource->FirstChildElement( "Ambient" ) );
+   pAmbient->SetValue( "Ambient" );
+   pRetNode->LinkEndChild( pAmbient );
+
+   return pRetNode;
+   
    }
 

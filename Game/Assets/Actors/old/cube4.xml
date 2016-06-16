@@ -1,0 +1,19 @@
+<Actor type="Cube" resource="actors\cube4.xml" rootComponentId="1">
+
+	
+
+    <MeshRenderComponent>
+		<Data>
+			<Transform>
+				<Position x="-10" y="0" z="0"/>
+			</Transform>
+		
+			<Mesh path="art\cube.obj"/>
+		
+			<Material>
+				<Texture path="art\cube.jpg"/>
+			</Material>
+		</Data>
+	</MeshRenderComponent>
+
+</Actor>

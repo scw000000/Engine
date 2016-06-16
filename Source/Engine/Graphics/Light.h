@@ -26,6 +26,7 @@ struct LightProperties
    float m_Power;
    bool Init( TiXmlElement* pData );
    TiXmlElement* GenerateXML( void );
+   TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
    };
 
 

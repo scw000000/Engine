@@ -202,7 +202,7 @@
     <ClCompile Include="..\Controller\Controller.cpp">
       <Filter>Controller</Filter>
     </ClCompile>
-    <ClCompile Include="..\Utilities\XMLParser.cpp">
+    <ClCompile Include="..\Utilities\XMLHelper.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
   </ItemGroup>
@@ -374,7 +374,7 @@
     <ClInclude Include="..\Controller\Controller.h">
       <Filter>Controller</Filter>
     </ClInclude>
-    <ClInclude Include="..\Utilities\XMLParser.h">
+    <ClInclude Include="..\Utilities\XMLHelper.h">
       <Filter>Utilities</Filter>
     </ClInclude>
   </ItemGroup>

@@ -16,5 +16,6 @@
 class XMLHelper
    {
    public:
-      static bool WriteXMLToFile( const char* fileName, TiXmlElement* pData );
+      static void WriteXMLToFile( const char* fileName, TiXmlElement* pData );
+      static std::string WriteXMLToString( TiXmlElement* pData );
    };

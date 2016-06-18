@@ -1,6 +1,6 @@
-<Actor>
+<ActorClass>
     <Data type="Cube">
-        <Resource path="actors\cube2.xml" />
+        <ActorClassResource path="actors\cube2.xml" />
     </Data>
     <MeshRenderComponent>
         <Data>
@@ -17,4 +17,4 @@
             </Material>
         </Data>
     </MeshRenderComponent>
-</Actor>
+</ActorClass>

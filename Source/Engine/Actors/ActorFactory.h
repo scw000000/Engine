@@ -20,15 +20,17 @@ class ActorFactory
    {
    public:
       ActorFactory( void );
-      StrongActorPtr CreateActor( const char* actorResource, 
-                                  const char* overridesResource = NULL, 
+      StrongActorPtr CreateActor( Resource* pClassRes, 
+                                  Resource* pOverridesRes,
                                   TransformPtr pInitialTransform = NULL, 
                                   ActorId serversActorId = INVALID_ACTOR_ID );
-     // bool ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides );
+      bool ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides );
 
    protected:
-      virtual StrongActorComponentPtr CreateComponent( const std::string& componentName, TiXmlElement* pData );
-      virtual StrongActorComponentPtr BuildComponentTree( TiXmlElement* pData, StrongActorPtr pActor, StrongActorComponentPtr pParent );
+      StrongActorComponentPtr CreateComponent( const std::string& componentName, TiXmlElement* pData );
+      StrongActorComponentPtr BuildComponentTree( TiXmlElement* pData, StrongActorPtr pActor, StrongActorComponentPtr pParent );
+      bool ModifyActorComponent( StrongActorComponentPtr pActorComponent, TiXmlElement* pOverrides );
+
 
    protected:
       // This factory is defined in Templates.h

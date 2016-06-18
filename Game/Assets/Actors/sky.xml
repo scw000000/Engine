@@ -1,6 +1,6 @@
-<Actor>
+<ActorClass>
     <Data type="Sky">
-        <Resource path="actors\sky.xml" />
+        <ActorClassResource path="actors\sky.xml" />
     </Data>
     <SkyRenderComponent>
         <Data>
@@ -13,4 +13,4 @@
             <Texture path="art\skydome-cloud-medium-midmorning.png" />
         </Data>
     </SkyRenderComponent>
-</Actor>
+</ActorClass>

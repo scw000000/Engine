@@ -91,10 +91,12 @@ class IEngineLogic
    {
    public:
    	virtual WeakActorPtr VGetActor( ActorId id ) = 0;
-      virtual StrongActorPtr VCreateActor( const char* actorResource,
-                                           const char* overrides = NULL,
-                                           TransformPtr pTransform = NULL,
-                                           ActorId serversActorId = INVALID_ACTOR_ID ) = 0;
+      virtual StrongActorPtr VCreateActorFromOverrides( const char* overrides,
+                                           TransformPtr pTransform,
+                                           ActorId serversActorId ) = 0;
+      virtual StrongActorPtr VCreateActorFromClass( const char* classFilePath,
+                                                        TransformPtr pTransform,
+                                                        ActorId serversActorId ) = 0;
       virtual void VDestroyActor( ActorId actorId ) = 0;
 	   virtual bool VLoadLevel( const char* levelResource ) = 0;
 	   //virtual void VSetProxy()=0;				

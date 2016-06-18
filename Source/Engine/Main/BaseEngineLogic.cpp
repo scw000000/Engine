@@ -65,7 +65,9 @@ BaseEngineLogic::~BaseEngineLogic()
       TiXmlElement* pResource = it->second->GenerateXML();
       TiXmlElement* pOverrides = it->second->GenerateOverridesXML( pResource );
       SAFE_DELETE( pResource );
-      XMLHelper::WriteXMLToFile( std::string( ToStr( it->first ) + ".xml" ).c_str(), pOverrides );
+      
+      
+      XMLHelper::WriteXMLToFile( ( std::string( "Assets\\" ) + it->second->m_ActorResource.GetFileName() ).c_str(), pOverrides );
       it->second->Destroy();
       //SAFE_DELETE( pOverrides );
       }
@@ -99,15 +101,40 @@ void BaseEngineLogic::VAddView( shared_ptr<IView> pView )
 	pView->VOnRestore(); 
    }
 
-StrongActorPtr BaseEngineLogic::VCreateActor( const char* actorResource, const char* overrides, TransformPtr pTransform, ActorId serversActorId )
+StrongActorPtr BaseEngineLogic::VCreateActorFromOverrides( const char* overrides, TransformPtr pTransform, ActorId serversActorId )
    {
    ENG_ASSERT( m_pActorFactory );
+   Resource overridesRes( overrides );
+   TiXmlHandle actorClassResHandle = XmlResourceLoader::LoadAndReturnRootXmlElement( &overridesRes );
+   TiXmlElement* pActorClassReshNode = actorClassResHandle.FirstChild( "Data" ).FirstChild( "ActorClassResource" ).ToElement();
+   ENG_ASSERT( pActorClassReshNode );
+   Resource actorClassRes( pActorClassReshNode->Attribute( "path" ) );
 
-   StrongActorPtr pActor = m_pActorFactory->CreateActor( actorResource, overrides, pTransform );
+   StrongActorPtr pActor = m_pActorFactory->CreateActor( &actorClassRes, &overridesRes, pTransform );
    if ( pActor )
       {
       // Insert into actor map
       m_Actors.insert( std::make_pair(pActor->GetId(), pActor) );
+      return pActor;
+      }
+   else
+      {
+      // FUTURE WORK: Log error: couldn't create actor
+      return StrongActorPtr();
+      }
+   }
+
+StrongActorPtr BaseEngineLogic::VCreateActorFromClass( const char* classFilePath, TransformPtr pTransform, ActorId serversActorId )
+   {
+   ENG_ASSERT( m_pActorFactory );
+
+   Resource actorClassRes( classFilePath );
+
+   StrongActorPtr pActor = m_pActorFactory->CreateActor( &actorClassRes, NULL, pTransform );
+   if( pActor )
+      {
+      // Insert into actor map
+      m_Actors.insert( std::make_pair( pActor->GetId(), pActor ) );
       return pActor;
       }
    else
@@ -266,9 +293,9 @@ bool BaseEngineLogic::VLoadLevel( const char* levelResource )
       {
       for ( TiXmlElement* pNode = pActorsNode->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
          {
-         const char* actorResource = pNode->Attribute( "resource" );
+         const char* actorResource = pNode->Attribute( "actoroverridsresource" );
 
-			StrongActorPtr pActor = VCreateActor( actorResource );
+			StrongActorPtr pActor = VCreateActorFromOverrides( actorResource );
 			if ( pActor )
 			   {
 				// fire an event letting everyone else know that we created a new actor
@@ -306,26 +333,22 @@ bool BaseEngineLogic::VLoadLevel( const char* levelResource )
 void BaseEngineLogic::VOnFileDrop( const char* filePath, const Point& dropLocation )
    {
    Resource fileRes( filePath );
-   std::string extension = fileRes.GetExtension();
-   if( !std::strcmp( extension.c_str(), "xml" ) )
+  // std::string extension = fileRes.GetExtension();
+   if( WildcardMatch( "*.xml", fileRes.m_Name.c_str() ) )
       {
       TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( &fileRes );
       std::string rootName = pRoot->Value();
-      if( !std::strcmp( rootName.c_str(), "Actor" ) )
+      auto pCamera = m_pWrold->GetCamera();
+      TransformPtr pTransform( pCamera->VGetProperties().GetTransformPtr() );
+      pTransform->SetPosition( pCamera->GetScreenProjectPoint( 17.f, dropLocation ) );
+      if( !std::strcmp( rootName.c_str(), "ActorClass" ) )
          {
-         auto pCamera = m_pWrold->GetCamera();
-         TransformPtr pTransform( pCamera->VGetProperties().GetTransformPtr() );
-         pTransform->SetPosition( pCamera->GetScreenProjectPoint( 17.f, dropLocation ) );
-         VCreateActor( fileRes.m_Name.c_str(), NULL, pTransform );
+         VCreateActorFromClass( fileRes.m_Name.c_str(), pTransform );
          
          }
       else if( !std::strcmp( rootName.c_str(), "ActorOverrides" ) )
          {
-         auto pCamera = m_pWrold->GetCamera();
-         const char* actorClassResFile = pRoot->Attribute( "resource" );
-         TransformPtr pTransform( pCamera->VGetProperties().GetTransformPtr() );
-         pTransform->SetPosition( pCamera->GetScreenProjectPoint( 17.f, dropLocation ) );
-         VCreateActor( actorClassResFile, fileRes.m_Name.c_str(), pTransform );
+         VCreateActorFromOverrides( fileRes.m_Name.c_str(), pTransform );
          }
       }
    }

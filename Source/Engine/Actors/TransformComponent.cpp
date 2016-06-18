@@ -29,8 +29,10 @@ void TransformComponent::Destory( void )
 
 bool TransformComponent::VInit( TiXmlElement* pData )
    {
-   ENG_ASSERT( pData );
-
+   if( !pData ) 
+      {
+      return false;
+      }
 	// [mrmike] - this was changed post-press - because changes to the TransformComponents can come in partial definitions,
 	//            such as from the editor, its better to grab the current values rather than clear them out.
 

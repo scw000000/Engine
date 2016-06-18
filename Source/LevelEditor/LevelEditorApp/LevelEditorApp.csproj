@@ -84,6 +84,12 @@
     <Compile Include="TabPageEX.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="XMLControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="XMLControl.Designer.cs">
+      <DependentUpon>XMLControl.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Editor.resx">
       <DependentUpon>Editor.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -97,6 +103,9 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="XMLControl.resx">
+      <DependentUpon>XMLControl.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

@@ -44,6 +44,7 @@ namespace LevelEditorApp
          this.tabCtlEX_MidDown = new LevelEditorApp.TabControlEX();
          this.tabCtlEX_RightUp = new LevelEditorApp.TabControlEX();
          this.tabCtlEX_RightDown = new LevelEditorApp.TabControlEX();
+         this.xmlControl_ActorXML = new LevelEditorApp.XMLControl();
          this.menuStrip1.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
          this.splitContainer1.Panel1.SuspendLayout();
@@ -273,6 +274,17 @@ namespace LevelEditorApp
          this.tabCtlEX_RightDown.TabIndex = 0;
          this.tabCtlEX_RightDown.TabStop = false;
          // 
+         // xmlControl_ActorXML
+         // 
+         this.xmlControl_ActorXML.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+         this.xmlControl_ActorXML.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.xmlControl_ActorXML.DataFilePath = "";
+         this.xmlControl_ActorXML.DataSetTableIndex = 0;
+         this.xmlControl_ActorXML.Location = new System.Drawing.Point( 12, 41 );
+         this.xmlControl_ActorXML.Name = "XMLControl";
+         this.xmlControl_ActorXML.TabIndex = 0;
+         this.xmlControl_ActorXML.ViewMode = LevelEditorApp.XMLControl.VIEW_MODE.XML;
+         // 
          // Editor
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -327,7 +339,9 @@ namespace LevelEditorApp
         private LevelEditorApp.TabControlEX tabCtlEX_RightUp;
         private LevelEditorApp.TabControlEX tabCtlEX_RightDown;
         private LevelEditorApp.TabPageEX tabPageEX_Assets;
-        public LevelEditorApp.TabPageEX tabPageEX_World;
+        private LevelEditorApp.TabPageEX tabPageEX_World;
+        private LevelEditorApp.TabPageEX tabPageEX_ActorXML;
+        private LevelEditorApp.XMLControl xmlControl_ActorXML;
     }
 }
 

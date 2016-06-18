@@ -37,6 +37,16 @@ std::string Resource::GetExtension( void )
    return m_Name.substr( extensionStart + 1 );
    }
 
+std::string Resource::GetFileName( void )
+   {
+   size_t fileNameStart = m_Name.find_last_of( "\\" );
+   if( fileNameStart == std::string::npos )
+      {
+      fileNameStart = 0;
+      }
+   return m_Name.substr( fileNameStart + 1 );
+   }
+
 bool Resource::Init( TiXmlElement* pData, bool caseSensitive )
    {
    if( !pData || !pData->Attribute( "path" ) )

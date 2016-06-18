@@ -17,5 +17,5 @@
 
 extern "C" DllExport int EditorMain( int *pWindow, int screenWidth, int screenHeight );
 extern "C" DllExport void SingleLoop( void );
-extern "C" DllExport void PushSDLEvent( int* event );
 extern "C" DllExport void Shutdown( void );
+extern "C" DllExport void GetActorXML( int *actorXMLAddress, ActorId actorId );

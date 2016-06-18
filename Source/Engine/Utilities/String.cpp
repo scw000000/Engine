@@ -115,36 +115,36 @@ int CountLines(const std::wstring &s)
 // the C/C++ Users Journal, written by Mike Cornelison. It is a little ugly, but it is FAST. Use this as an excercise in not reinventing the
 // wheel, even if you see gotos. 
 
-BOOL WildcardMatch(const char *pat, const char *str) {
+BOOL WildcardMatch(const char *pattern, const char *str) {
    int i, star;
 
 new_segment:
 
    star = 0;
-   if (*pat == '*') {
+   if (*pattern == '*') {
       star = 1;
-      do { pat++; } while (*pat == '*'); /* enddo */
+      do { pattern++; } while (*pattern == '*'); /* enddo */
    } /* endif */
 
 test_match:
 
-   for (i = 0; pat[i] && (pat[i] != '*'); i++) {
+   for (i = 0; pattern[i] && (pattern[i] != '*'); i++) {
       //if (mapCaseTable[str[i]] != mapCaseTable[pat[i]]) {
-	  if (str[i] != pat[i]) {
+	  if (str[i] != pattern[i]) {
          if (!str[i]) return 0;
-         if ((pat[i] == '?') && (str[i] != '.')) continue;
+         if ((pattern[i] == '?') && (str[i] != '.')) continue;
          if (!star) return 0;
          str++;
          goto test_match;
       }
    }
-   if (pat[i] == '*') {
+   if (pattern[i] == '*') {
       str += i;
-      pat += i;
+      pattern += i;
       goto new_segment;
    }
    if (!str[i]) return 1;
-   if (i && pat[i - 1] == '*') return 1;
+   if (i && pattern[i - 1] == '*') return 1;
    if (!star) return 0;
    str++;
    goto test_match;

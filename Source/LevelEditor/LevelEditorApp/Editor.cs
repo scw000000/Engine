@@ -50,6 +50,10 @@ namespace LevelEditorApp
                                                 "*.fragmentshader", 
                                                 "*.vertexshader",
                                                 "*.lua"};
+         for ( int i = 0; i < m_SupportTextPattern.Count; i++)
+            {
+            m_SupportTextPattern[i] = WildCardToRegular( m_SupportTextPattern[i] );
+            }
 
          // Setting all of splitter width in all comtainers
          int splitterWidth = 10;
@@ -69,9 +73,8 @@ namespace LevelEditorApp
          this.tabPageEX_World = AddTabePage( "tabPageEX_World", this.tabCtlEX_MidUp.Controls, false );
          tabPageEX_World.AllowDrop = true;
          tabPageEX_World.DragEnter += new DragEventHandler( tabPageEX_World.tabPageEX_DragEnter );
-         tabPageEX_World.DragDrop += new DragEventHandler( tabPageEX_World.tabPageEX_DragDrop );
 
-         this.tabPageEX_Assets = AddTabePage( "tabPageEX_Assets", this.tabCtlEX_RightUp.Controls, false );
+         this.tabPageEX_Assets = AddTabePage( "tabPageEX_Assets", this.tabCtlEX_LeftDown.Controls, false );
          this.treeView_Assets = new System.Windows.Forms.TreeView();
          this.treeView_Assets.Dock = DockStyle.Fill;
          this.treeView_Assets.BackColor = Color.FromArgb( 255, 70, 70, 70 );
@@ -80,6 +83,9 @@ namespace LevelEditorApp
          this.treeView_Assets.ItemDrag += new ItemDragEventHandler( this.treeView_Assets_ItemDrag );
          this.tabPageEX_Assets.Controls.Add( this.treeView_Assets );
          InitializeAssetTree();
+
+         this.tabPageEX_ActorXML = AddTabePage( "tabPageEX_ActorXML", this.tabCtlEX_RightDown.Controls, false );
+         this.tabPageEX_ActorXML.Controls.Add( this.xmlControl_ActorXML );
 
          m_UpdateSDLDelegate = new myDalegate( UpdateSDLWindow );
          InitSDLWindow();
@@ -222,7 +228,7 @@ namespace LevelEditorApp
          {
          for( int i = 0; i < m_SupportTextPattern.Count; ++i )
             {
-            if( Regex.IsMatch( fileName, WildCardToRegular( m_SupportTextPattern[ i ] ) ) )
+            if( Regex.IsMatch( fileName, m_SupportTextPattern[ i ] ) )
                {
                return true;
                }

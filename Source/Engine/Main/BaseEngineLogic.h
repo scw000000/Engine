@@ -62,11 +62,12 @@ class BaseEngineLogic : public IEngineLogic
 
       ActorId GetNewActorID( void ) { return ++m_LastActorId; }
       std::string BaseEngineLogic::GetActorXml( ActorId id );
-      virtual StrongActorPtr VCreateActor( const char* actorResource, 
-                                           const char* overrides = NULL,
+      virtual StrongActorPtr VCreateActorFromOverrides( const char* overrides,
                                            TransformPtr pTransform = NULL,
-                                           ActorId serversActorId=INVALID_ACTOR_ID ) override;  // [rez] note: don't store this strong pointer outside of this class
-
+                                           ActorId serversActorId = INVALID_ACTOR_ID ) override;  // [rez] note: don't store this strong pointer outside of this class
+      virtual StrongActorPtr VCreateActorFromClass( const char* classFilePath,
+                                                    TransformPtr pTransform = NULL,
+                                                    ActorId serversActorId = INVALID_ACTOR_ID ) override;
       virtual WeakActorPtr VGetActor( ActorId actorId ) override;
       virtual void VDestroyActor( ActorId actorId ) override;
       virtual void VModifyActor( ActorId actorId, TiXmlElement *overrides) override ;

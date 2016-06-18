@@ -17,7 +17,7 @@
 #include "ActorComponent.h"
 #include "ActorFactory.h"
 
-Actor::Actor( ActorId id ) : m_ActorResource( "Unknown" )
+Actor::Actor( ActorId id ) : m_ActorResource( "Unknown" ), m_OverridesResource( "Unknown" )
    {
    m_Id = id;
    m_Type = "Unknown";
@@ -37,7 +37,8 @@ bool Actor::Init( TiXmlElement* pData )
    ENG_LOG( "Actor", std::string( "Initializing Actor " ) + ToStr( m_Id ) );
 
 	m_Type = pData->Attribute( "type" );
-   m_ActorResource.Init( pData->FirstChildElement( "Resource" ) );
+   m_ActorResource.Init( pData->FirstChildElement( "ActorClassResource" ) );
+   //m_OverridesResource.Init( pData->FirstChildElement( "OverridesResource" ) );
    unsigned int rootComponentId = 0;
    return true;
    }
@@ -91,10 +92,12 @@ TiXmlElement* Actor::BuildComponentXML( StrongActorComponentPtr pComponent )
 TiXmlElement* Actor::GenerateXML( void )
    {
    // Actor element
-   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Actor" );
+   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "ActorClass" );
    TiXmlElement* pDataNode = ENG_NEW TiXmlElement( "Data" );
    pDataNode->SetAttribute( "type", m_Type.c_str() );
-   pDataNode->LinkEndChild( m_ActorResource.GenerateXML() );
+   TiXmlElement* pActorResNode = m_ActorResource.GenerateXML();
+   pActorResNode->SetValue( "ActorClassResource" );
+   pDataNode->LinkEndChild( pActorResNode );
    pRetNode->LinkEndChild( pDataNode );
 
    // components
@@ -139,13 +142,18 @@ TiXmlElement* Actor::BuildOverridesXML( StrongActorComponentPtr pComponent, TiXm
 TiXmlElement* Actor::GenerateOverridesXML( TiXmlElement* pResouce )
    {
    // Actor element
-   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Actor" );
+   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "ActorOverrides" );
 
-   //Type and resource should not be changed in overrides file, so no need to write it
-   
+   TiXmlElement* pDataNode = ENG_NEW TiXmlElement( "Data" );
+   TiXmlElement* pActorResNode = m_ActorResource.GenerateXML();
+   pActorResNode->SetValue( "ActorClassResource" );
+   pDataNode->LinkEndChild( pActorResNode );
+   pRetNode->LinkEndChild( pDataNode );
+
    TiXmlElement* pResComponentNode = pResouce->FirstChildElement( "Data" )->NextSiblingElement();
-  
-   // components
+   
+
+   //Actor components elements
    for( auto it = m_Components.begin(); it != m_Components.end(); ++it )
       {
       StrongActorComponentPtr pComponent = it->second;

@@ -20,6 +20,7 @@ typedef std::string ActorType;
 class Actor
    {
    friend class ActorFactory;
+   friend class BaseEngineLogic;
  //  typedef std::map< ComponentId, StrongActorComponentPtr > ActorComponents;
    typedef std::map< ActorComponentId, StrongActorComponentPtr > ActorComponents;
 
@@ -54,7 +55,8 @@ class Actor
       ActorType m_Type;
       ActorComponents m_Components;
       ActorComponentId m_LastActorComponentId;
-      Resource m_ActorResource; // actor XML file name
+      Resource m_ActorResource; // actor class XML file name
+      Resource m_OverridesResource;
    };
 
 //template< class ComponentType > weak_ptr<ComponentType> Actor::GetComponent( const char* name )

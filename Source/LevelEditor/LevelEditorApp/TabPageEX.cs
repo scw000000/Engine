@@ -52,12 +52,6 @@ namespace LevelEditorApp
          e.Effect = DragDropEffects.All;
          }
 
-      public void tabPageEX_DragDrop( object sender, DragEventArgs e )
-         {
-         Object data = e.Data.GetData( DataFormats.FileDrop, false );
-         int i = 0;
-         }
-
 		/// <summary> 
 		/// Clean up any resources being used.
 		/// </summary>

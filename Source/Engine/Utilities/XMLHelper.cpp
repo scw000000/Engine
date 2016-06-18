@@ -15,11 +15,18 @@
 #include "EngineStd.h"
 #include "XMLHelper.h"
 
-bool XMLHelper::WriteXMLToFile( const char* fileName, TiXmlElement* pData )
+void XMLHelper::WriteXMLToFile( const char* fileName, TiXmlElement* pData )
    {
    TiXmlDocument doc;
    doc.LinkEndChild( pData );
    doc.SaveFile( fileName );
-   return true;
    }
 
+std::string XMLHelper::WriteXMLToString( TiXmlElement* pData )
+   {
+   TiXmlDocument doc;
+   doc.LinkEndChild( pData );
+   TiXmlPrinter printer;
+   doc.Accept( &printer );
+   return printer.CStr();
+   }

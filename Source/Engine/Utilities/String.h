@@ -51,7 +51,7 @@ extern void TrimLeft(std::wstring &s);
 extern int CountLines(const std::wstring &s);
 
 // Does a classic * & ? pattern match on a file name - this is case sensitive!
-extern BOOL WildcardMatch(const char *pat, const char *str);
+extern BOOL WildcardMatch(const char *pattern, const char *str);
 
 // converts a regular string to a wide string
 extern void StringToWideString(const std::string& source, std::wstring& outDest);

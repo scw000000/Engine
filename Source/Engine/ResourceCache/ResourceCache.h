@@ -23,6 +23,7 @@ class Resource
    public:
       Resource( const std::string &name, bool caseSensitive = false );
       std::string GetExtension( void );
+      std::string GetFileName( void );
       bool Init( TiXmlElement* pData, bool caseSensitive = false );
       TiXmlElement* GenerateXML( void );
       TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );

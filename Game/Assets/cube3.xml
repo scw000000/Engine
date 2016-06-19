@@ -1,0 +1,20 @@
+<ActorOverrides>
+    <Data>
+        <ActorClassResource path="actors\cube3.xml" />
+    </Data>
+    <MeshRenderComponent>
+        <Data>
+            <Transform>
+                <Position />
+                <PitchYawRoll />
+                <Scale />
+            </Transform>
+            <Mesh />
+            <Material>
+                <Texture />
+                <Diffuse />
+                <Ambient />
+            </Material>
+        </Data>
+    </MeshRenderComponent>
+</ActorOverrides>

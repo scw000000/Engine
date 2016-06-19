@@ -283,7 +283,7 @@ namespace LevelEditorApp
          this.xmlControl_ActorXML.Location = new System.Drawing.Point( 12, 41 );
          this.xmlControl_ActorXML.Name = "XMLControl";
          this.xmlControl_ActorXML.TabIndex = 0;
-         this.xmlControl_ActorXML.ViewMode = LevelEditorApp.XMLControl.VIEW_MODE.XML;
+         this.xmlControl_ActorXML.ViewMode = LevelEditorApp.XMLControl.VIEW_MODE.TABLE;
          // 
          // Editor
          // 

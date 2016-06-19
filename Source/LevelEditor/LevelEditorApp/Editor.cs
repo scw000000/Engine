@@ -86,6 +86,7 @@ namespace LevelEditorApp
 
          this.tabPageEX_ActorXML = AddTabePage( "tabPageEX_ActorXML", this.tabCtlEX_RightDown.Controls, false );
          this.tabPageEX_ActorXML.Controls.Add( this.xmlControl_ActorXML );
+         this.xmlControl_ActorXML.DataFilePath = "D:\\Workspace\\Engine\\Game\\Assets\\Actors\\cube.xml";
 
          m_UpdateSDLDelegate = new myDalegate( UpdateSDLWindow );
          InitSDLWindow();

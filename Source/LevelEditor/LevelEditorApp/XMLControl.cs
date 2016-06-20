@@ -26,7 +26,7 @@ namespace LevelEditorApp
          {
             get
             {
-                return (webXMLView.Visible ? VIEW_MODE.XML : VIEW_MODE.TABLE);
+            return ( !this.xmlPanel.Visible ? VIEW_MODE.XML : VIEW_MODE.TABLE );
             }
             set
             {
@@ -76,12 +76,10 @@ namespace LevelEditorApp
 
          if( mode == VIEW_MODE.XML )
             {
-            webXMLView.Visible = true;
             xmlPanel.Visible = false;
             }
          else
             {
-            webXMLView.Visible = false;
             xmlPanel.Visible = true;
             }
         }
@@ -89,9 +87,6 @@ namespace LevelEditorApp
       private void LoadDataFile()
          {
          m_bGridViewModeReadError = false;
-
-         // use the webbrowser control to automatically parse the file
-         webXMLView.Navigate(m_sDataFilePath);
 
          if ((m_sDataFilePath != string.Empty) && (File.Exists(m_sDataFilePath) == true))
             {
@@ -112,7 +107,6 @@ namespace LevelEditorApp
                {
                m_bGridViewModeReadError = true;
                m_nDataTableCount = 0;
-               webXMLView.Navigate(m_sDataFilePath);
                SetViewMode(VIEW_MODE.XML);
                MessageBox.Show( "Error: " + e.ToString() );
                }
@@ -140,20 +134,18 @@ namespace LevelEditorApp
             // Each table represents an unique XML node name
             // Rows count represents how many node has the same name
             //
-            if( m_DataSet.Tables[ i ].Rows.Count > 0 )
+            bool hasAttribute = false;
+            for( int j = 0; j < m_DataSet.Tables[ i ].Rows[ 0 ].Table.Columns.Count; ++j )
                {
-               Console.WriteLine( "table: " + i );
-               for( int j = 0; j < m_DataSet.Tables[ i ].Rows.Count; j++ )
+               if( m_DataSet.Tables[ i ].Rows[ 0 ].Table.Columns[ j ].DataType.Name.Equals( "String" ) )
                   {
-                  
-                  int len = m_DataSet.Tables[ i ].Rows[ j ].ItemArray.Length;
-                  Console.WriteLine( "row " + j + " " + "coujnt = " + len );
+                  hasAttribute = true;
+                  break;
                   }
-               
                }
-            if( true || ( m_DataSet.Tables[ i ].Rows.Count > 0 && m_DataSet.Tables[ i ].Rows[0].ItemArray.Length > 0 ) )
+            if( hasAttribute )
                {
-               System.Windows.Forms.DataGridView dataGridView = new System.Windows.Forms.DataGridView ();
+               System.Windows.Forms.DataGridView dataGridView = new System.Windows.Forms.DataGridView();
                System.Windows.Forms.Button button = new Button();
                System.Windows.Forms.ToolTip toolTip1 = new System.Windows.Forms.ToolTip();
                toolTip1.SetToolTip( button, "motherfucker" );
@@ -161,11 +153,7 @@ namespace LevelEditorApp
                this.xmlPanel.Controls.Add( dataGridView, 1, this.xmlPanel.RowCount - 1 );
                this.xmlPanel.Controls.Add( button, 0, this.xmlPanel.RowCount - 1 );
                button.Text = ( m_DataSet.Tables[ i ].TableName );
-               Console.WriteLine( m_DataSet.Tables[ i ].TableName );
-               if( m_DataSet.Tables[ i ].Rows[ 0 ].ItemArray.Length > 0 )
-                  {
-                  int asdasdas = 0;
-                  }
+
                //if( m_DataSet.Tables[ i ].Rows[ 0 ].Table.ParentRelations.Count > 0 )
                //   {
 
@@ -191,7 +179,7 @@ namespace LevelEditorApp
                //   {
                //   int asdasdasd = 0;
                //   }
-              
+
                dataGridView.DataSource = m_DataSet.Tables[ i ];
                dataGridView.AllowUserToAddRows = false;
                dataGridView.AllowUserToDeleteRows = false;
@@ -200,19 +188,43 @@ namespace LevelEditorApp
                dataGridView.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
 
                dataGridView.BackgroundColor = System.Drawing.Color.FromArgb( ( (int) ( ( (byte) ( 49 ) ) ) ), ( (int) ( ( (byte) ( 49 ) ) ) ), ( (int) ( ( (byte) ( 49 ) ) ) ) );
-               
+
                var totalHeight = dataGridView.Rows.GetRowsHeight( DataGridViewElementStates.None );
                if( dataGridView.Rows.Count > 0 )
                   {
                   totalHeight += dataGridView.ColumnHeadersHeight;
                   }
-               else 
-                  {
-                  int asdasdasdsd = 0;
-                  }
+               dataGridView.Height = totalHeight;
                this.xmlPanel.RowStyles.Add( new System.Windows.Forms.RowStyle( System.Windows.Forms.SizeType.Absolute, totalHeight ) );
                this.xmlPanel.ColumnStyles[ 1 ] = new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Absolute, 10 );
                }
+            //if( m_DataSet.Tables[ i ].Rows.Count > 0 )
+            //   {
+            //   Console.WriteLine(  );
+            //   Console.WriteLine("table: " + i + " " + m_DataSet.Tables[ i ].TableName );
+            //   for( int j = 0; j < m_DataSet.Tables[ i ].Rows.Count; j++ )
+            //      {
+                  
+            //      int len = m_DataSet.Tables[ i ].Rows[ j ].Table.Rows.Count;
+            //      int clen = m_DataSet.Tables[ i ].Rows[ j ].Table.Columns.Count;
+            //      int ilen = m_DataSet.Tables[ i ].Rows[ j ].ItemArray.Length;
+            //      Console.WriteLine( "row " + j + " " + "coujnt = " + len + " " + clen + " " + ilen );
+            //      for( int k = 0; k < m_DataSet.Tables[ i ].Rows[ j ].Table.Columns.Count; ++k )
+            //         {
+            //         Console.WriteLine( "name " + m_DataSet.Tables[ i ].Rows[ j ].Table.Columns[ k ].ColumnName 
+            //            + " " + m_DataSet.Tables[ i ].Rows[ j ].Table.Columns[ k ].DataType.FullName 
+            //            + " " + m_DataSet.Tables[ i ].Rows[ j ].Table.Columns[k].Caption
+            //            + " " + m_DataSet.Tables[ i ].Rows[ j ].Table.Columns[ k ].DataType.Name );
+                     
+            //         }
+                  
+            //      }
+               
+            //   }
+            //if( true || ( m_DataSet.Tables[ i ].Rows.Count > 0 && m_DataSet.Tables[ i ].Rows[0].ItemArray.Length > 0 ) )
+            //   {
+               
+            //   }
             }
          
          

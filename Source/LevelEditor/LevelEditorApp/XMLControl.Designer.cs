@@ -28,36 +28,23 @@
       /// </summary>
       private void InitializeComponent()
          {
-         this.webXMLView = new System.Windows.Forms.WebBrowser();
          this.rootPanel = new System.Windows.Forms.TableLayoutPanel();
          this.xmlPanel = new System.Windows.Forms.TableLayoutPanel();
          this.button1 = new System.Windows.Forms.Button();
          this.rootPanel.SuspendLayout();
          this.SuspendLayout();
          // 
-         // webXMLView
-         // 
-         this.webXMLView.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.webXMLView.Location = new System.Drawing.Point(3, 43);
-         this.webXMLView.MinimumSize = new System.Drawing.Size(20, 20);
-         this.webXMLView.Name = "webXMLView";
-         this.webXMLView.Size = new System.Drawing.Size(250, 260);
-         this.webXMLView.TabIndex = 0;
-         this.webXMLView.Visible = false;
-         // 
          // rootPanel
          // 
          this.rootPanel.AutoScroll = true;
          this.rootPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-         this.rootPanel.Controls.Add(this.webXMLView, 0, 1);
          this.rootPanel.Controls.Add(this.xmlPanel, 0, 1);
          this.rootPanel.Controls.Add(this.button1, 0, 0);
          this.rootPanel.Dock = System.Windows.Forms.DockStyle.Fill;
          this.rootPanel.Location = new System.Drawing.Point(0, 0);
          this.rootPanel.Name = "rootPanel";
-         this.rootPanel.RowCount = 1;
+         this.rootPanel.RowCount = 2;
          this.rootPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-         this.rootPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
          this.rootPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
          this.rootPanel.Size = new System.Drawing.Size(0, 0);
          this.rootPanel.TabIndex = 0;
@@ -70,9 +57,9 @@
          this.xmlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
          this.xmlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
          this.xmlPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.xmlPanel.Location = new System.Drawing.Point(3, 309);
+         this.xmlPanel.Location = new System.Drawing.Point(3, 43);
          this.xmlPanel.Name = "xmlPanel";
-         this.xmlPanel.Size = new System.Drawing.Size(250, 1);
+         this.xmlPanel.Size = new System.Drawing.Size(75, 1);
          this.xmlPanel.TabIndex = 1;
          // 
          // button1
@@ -80,7 +67,7 @@
          this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
          this.button1.BackColor = System.Drawing.Color.Silver;
-         this.button1.Location = new System.Drawing.Point(178, 3);
+         this.button1.Location = new System.Drawing.Point(3, 3);
          this.button1.Name = "button1";
          this.button1.Size = new System.Drawing.Size(75, 34);
          this.button1.TabIndex = 1;
@@ -106,8 +93,6 @@
          }
 
       #endregion
-
-      private System.Windows.Forms.WebBrowser webXMLView;
       private System.Windows.Forms.TableLayoutPanel rootPanel;
       private System.Windows.Forms.Button button1;
       private System.Windows.Forms.TableLayoutPanel xmlPanel;

@@ -151,17 +151,88 @@ namespace LevelEditorApp
             treeNode.Text = xmlNode.OuterXml.Trim();
          }
 
+      private int GetExpandedNodeCount( TreeNode tn ) 
+         {
+         int retCount = 0;
+         if( tn.IsExpanded )
+            {
+            retCount += tn.Nodes.Count;
+            foreach( TreeNode child in tn.Nodes)
+               {
+               if( child.IsExpanded )
+                  {
+                  retCount += GetExpandedNodeCount( child );
+                  }
+               }
+            }
+         
+         return retCount;
+         }
+
       private void treeViewAfterExpand( object sender, TreeViewEventArgs e )
          {
-         
-         //int maxRight = this.xmlTreeView.ClientSize.Width;
-         //int originWidth = maxRight;
-         //if( e.Node.Nodes != null )
-         //   foreach( TreeNode node in e.Node.Nodes )
-         //      {
-         //      maxRight = Math.Max( maxRight, node.Bounds.Right + node.Level * 8 );
-         //      }
-         //this.xmlTreeView.ClientSize = new Size( maxRight, this.xmlTreeView.ClientSize.Height );
+
+         int maxRight = this.xmlTreeView.ClientSize.Width;
+         if( e.Node.Nodes != null )
+            foreach( TreeNode node in e.Node.Nodes )
+               {
+               maxRight = Math.Max( maxRight, node.Bounds.Right + node.Level * 8 );
+               }
+
+         int nodeHeight = this.xmlTreeView.Nodes[ 0 ].Bounds.Height + 2;
+
+         int openNodeCount = GetExpandedNodeCount( this.xmlTreeView.Nodes[ 0 ] ) + 1;
+
+         int requiredFormHeight = ( openNodeCount * nodeHeight );
+
+         this.xmlTreeView.Size = new Size( maxRight, requiredFormHeight );
+         }
+
+      private bool GetParentTableRow( ref String parentNodeName, ref int parentNodeIndex, String curNodeName, int curNodeIndex ) 
+         {
+         for( int i = 0; i < m_DataSet.Tables[ curNodeName ].Rows[ curNodeIndex ].ItemArray.Length; ++i )
+            {
+            object element = m_DataSet.Tables[ curNodeName ].Rows[ curNodeIndex ].ItemArray[ i ];
+            string typename = element.GetType().Name;
+            string elementName = m_DataSet.Tables[ curNodeName ].Rows[ curNodeIndex ].Table.Columns[ i ].ColumnName;
+            if( element.GetType().Name.Equals( "Int32" ) && !m_DataSet.Tables[ curNodeName ].Rows[ curNodeIndex ].Table.Columns[ i ].ColumnName.Equals( curNodeName + "_Id" ) )
+               {
+               string removeString = "_Id";
+               int index = elementName.IndexOf( removeString );
+               parentNodeName = ( index < 0 ) ? elementName : elementName.Remove( index, removeString.Length );
+               parentNodeIndex = Convert.ToInt32( element );
+               //Int32 ddd( element );
+              
+               return true;
+               }
+            }
+         return false;
+         }
+
+
+      private void dataGridView_CellToolTipTextNeeded( object sender, DataGridViewCellToolTipTextNeededEventArgs e)
+         {
+         //DataGridView dgrv( );
+         var dataGridView = sender as System.Windows.Forms.DataGridView;
+         var dataTable = dataGridView.DataSource as DataTable;
+         if( e.RowIndex >= 0 )
+            {
+            string pathName = dataTable.TableName;
+            string currentNodeName = pathName;
+            int currentRow = e.RowIndex;
+            string space = " ";
+            while( GetParentTableRow( ref currentNodeName, ref currentRow, currentNodeName, currentRow ) )
+               {
+               pathName = currentNodeName + "\n" + space + "->" + pathName;
+               space += " ";
+               }
+            e.ToolTipText = string.Format( pathName );
+            }
+         else 
+            {
+            e.ToolTipText = string.Format( "tip for row {0}, col {1}",
+         e.RowIndex, e.ColumnIndex + dataTable.TableName );
+            }
          }
 
       private void GenerateXMLTreeView()
@@ -216,15 +287,37 @@ namespace LevelEditorApp
             if( hasAttribute )
                {
                System.Windows.Forms.DataGridView dataGridView = new System.Windows.Forms.DataGridView();
-               System.Windows.Forms.Button button = new Button();
-               System.Windows.Forms.ToolTip toolTip1 = new System.Windows.Forms.ToolTip();
-               toolTip1.SetToolTip( button, "motherfucker" );
+               System.Windows.Forms.Label label = new System.Windows.Forms.Label();
+               label.BackColor = System.Drawing.Color.FromArgb( ( (int) ( ( (byte) ( 120 ) ) ) ), ( (int) ( ( (byte) ( 120 ) ) ) ), ( (int) ( ( (byte) ( 120 ) ) ) ) );
+               label.AutoSize = true;
+               label.Anchor = ( (System.Windows.Forms.AnchorStyles) ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left )
+            | System.Windows.Forms.AnchorStyles.Right ) ) );
                this.xmlPanel.RowCount = this.xmlPanel.RowCount + 1;
                this.xmlPanel.Controls.Add( dataGridView, 1, this.xmlPanel.RowCount - 1 );
-               this.xmlPanel.Controls.Add( button, 0, this.xmlPanel.RowCount - 1 );
-               button.Text = ( m_DataSet.Tables[ i ].TableName );
+               this.xmlPanel.Controls.Add( label, 0, this.xmlPanel.RowCount - 1 );
 
-               //if( m_DataSet.Tables[ i ].Rows[ 0 ].Table.ParentRelations.Count > 0 )
+               label.Text = ( m_DataSet.Tables[ i ].TableName );
+               
+               
+
+               //for( int j = 0; j < m_DataSet.Tables[ i ].Rows[0].Table.ParentRelations.Count; ++j )
+               //   {
+               //   m_DataSet.Tables[i].Rows[0].GetP
+               //   DataTable table = m_DataSet.Tables[ i ].Rows[ 0 ].Table;
+               //   String relationStr = table.TableName;
+               //   table = table.ParentRelations[ j ].ParentTable;
+               //   relationStr = table.TableName + "->" + relationStr;
+               //   while( table.ParentRelations.Count > 0 )
+               //      {
+
+               //      table = table.ParentRelations[ 0 ].ParentTable;
+               //      relationStr = table.TableName + "->" + relationStr;
+               //      }
+               //   Console.WriteLine( relationStr );
+               //   }
+            //   
+
+               //if( .ParentRelations.Count > 0 )
                //   {
 
                //   Console.WriteLine( m_DataSet.Tables[ i ].TableName );
@@ -258,7 +351,7 @@ namespace LevelEditorApp
                dataGridView.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
 
                dataGridView.BackgroundColor = System.Drawing.Color.FromArgb( ( (int) ( ( (byte) ( 49 ) ) ) ), ( (int) ( ( (byte) ( 49 ) ) ) ), ( (int) ( ( (byte) ( 49 ) ) ) ) );
-
+               
                var totalHeight = dataGridView.Rows.GetRowsHeight( DataGridViewElementStates.None );
                if( dataGridView.Rows.Count > 0 )
                   {
@@ -267,6 +360,45 @@ namespace LevelEditorApp
                dataGridView.Height = totalHeight;
                this.xmlPanel.RowStyles.Add( new System.Windows.Forms.RowStyle( System.Windows.Forms.SizeType.Absolute, totalHeight ) );
                //     this.xmlPanel.ColumnStyles[ 1 ] = new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Absolute, dataGridView.Columns.GetColumnsWidth( DataGridViewElementStates.None ) );
+               Console.WriteLine( "----TABLE : " + m_DataSet.Tables[ i ].TableName );
+               for( int j = 0; j < m_DataSet.Tables[ i ].Rows.Count; ++j )
+                  {
+                  Console.WriteLine( "row" + j );
+                  string parentName = "";
+                  int parentRow = -1;
+                  System.Windows.Forms.ToolTip toolTip1 = new System.Windows.Forms.ToolTip();
+                  DataGridViewCell cell = dataGridView.Rows[ j ].Cells[ 0 ];
+
+                  cell.ToolTipText = "test " + i;
+                  dataGridView.CellToolTipTextNeeded += new DataGridViewCellToolTipTextNeededEventHandler( this.dataGridView_CellToolTipTextNeeded );
+                  if( GetParentTableRow( ref parentName, ref parentRow, m_DataSet.Tables[ i ].TableName, j ) )
+                     {
+                     Console.WriteLine( "None Root Node! " + parentName + parentRow );
+                     }
+                  else
+                     {
+                     Console.WriteLine( "Root Node! " );
+                     }
+                  //if( m_DataSet.Tables[ i ].Rows[ j ].Table.ParentRelations.Count == 0 )
+                  //   {
+                  //   Console.WriteLine( " no parent" );
+                  //   }
+                  //else
+                  //   {
+                  //   for( int k = 0; k < m_DataSet.Tables[ i ].Rows[ j ].Table.ParentRelations.Count; ++k )
+                  //   {
+                  //   Console.WriteLine( m_DataSet.Tables[ i ].Rows[ j ].Table.ParentRelations[k].RelationName );
+                  //   }
+                  //   }
+                  for( int k = 0; k < m_DataSet.Tables[ i ].Rows[ j ].ItemArray.Length; ++k )
+                     {
+                     if( m_DataSet.Tables[ i ].Rows[ j ].ItemArray[ k ] == null )
+                        {
+                        Console.WriteLine( "empty!" );
+                        }
+                     Console.WriteLine( m_DataSet.Tables[ i ].Rows[ j ].Table.Columns[ k ].ColumnName + " " + "\"" + m_DataSet.Tables[ i ].Rows[ j ].ItemArray[ k ] + "\"" );
+                     }
+                  }
                }
             //if( m_DataSet.Tables[ i ].Rows.Count > 0 )
             //   {

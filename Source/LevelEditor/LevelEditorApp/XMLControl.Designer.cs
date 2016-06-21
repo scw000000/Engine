@@ -36,10 +36,10 @@
          // 
          // rootPanel
          // 
-         this.rootPanel.AutoScroll = true;
          this.rootPanel.AutoSize = true;
          this.rootPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
          this.rootPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+         this.rootPanel.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Outset;
          this.rootPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
          this.rootPanel.Controls.Add(this.xmlTreeView, 0, 0);
          this.rootPanel.Controls.Add(this.xmlPanel, 0, 1);
@@ -48,7 +48,7 @@
          this.rootPanel.RowCount = 2;
          this.rootPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
          this.rootPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-         this.rootPanel.Size = new System.Drawing.Size(127, 112);
+         this.rootPanel.Size = new System.Drawing.Size(131, 118);
          this.rootPanel.TabIndex = 0;
          // 
          // xmlTreeView
@@ -58,7 +58,7 @@
          this.xmlTreeView.ForeColor = System.Drawing.Color.Silver;
          this.xmlTreeView.HotTracking = true;
          this.xmlTreeView.LineColor = System.Drawing.Color.Silver;
-         this.xmlTreeView.Location = new System.Drawing.Point(3, 3);
+         this.xmlTreeView.Location = new System.Drawing.Point(5, 5);
          this.xmlTreeView.Name = "xmlTreeView";
          this.xmlTreeView.Size = new System.Drawing.Size(121, 100);
          this.xmlTreeView.TabIndex = 0;
@@ -73,7 +73,7 @@
          this.xmlPanel.ColumnCount = 2;
          this.xmlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
          this.xmlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-         this.xmlPanel.Location = new System.Drawing.Point(3, 109);
+         this.xmlPanel.Location = new System.Drawing.Point(5, 113);
          this.xmlPanel.Name = "xmlPanel";
          this.xmlPanel.Size = new System.Drawing.Size(0, 0);
          this.xmlPanel.TabIndex = 1;
@@ -88,7 +88,7 @@
          this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
          this.Controls.Add(this.rootPanel);
          this.Name = "XMLControl";
-         this.Size = new System.Drawing.Size(130, 115);
+         this.Size = new System.Drawing.Size(134, 121);
          this.rootPanel.ResumeLayout(false);
          this.rootPanel.PerformLayout();
          this.ResumeLayout(false);

@@ -29,51 +29,54 @@
       private void InitializeComponent()
          {
          this.rootPanel = new System.Windows.Forms.TableLayoutPanel();
+         this.xmlTreeView = new System.Windows.Forms.TreeView();
          this.xmlPanel = new System.Windows.Forms.TableLayoutPanel();
-         this.button1 = new System.Windows.Forms.Button();
          this.rootPanel.SuspendLayout();
          this.SuspendLayout();
          // 
          // rootPanel
          // 
          this.rootPanel.AutoScroll = true;
+         this.rootPanel.AutoSize = true;
+         this.rootPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+         this.rootPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
          this.rootPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+         this.rootPanel.Controls.Add(this.xmlTreeView, 0, 0);
          this.rootPanel.Controls.Add(this.xmlPanel, 0, 1);
-         this.rootPanel.Controls.Add(this.button1, 0, 0);
-         this.rootPanel.Dock = System.Windows.Forms.DockStyle.Fill;
          this.rootPanel.Location = new System.Drawing.Point(0, 0);
          this.rootPanel.Name = "rootPanel";
          this.rootPanel.RowCount = 2;
-         this.rootPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
          this.rootPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
-         this.rootPanel.Size = new System.Drawing.Size(0, 0);
+         this.rootPanel.RowStyles.Add(new System.Windows.Forms.RowStyle());
+         this.rootPanel.Size = new System.Drawing.Size(127, 112);
          this.rootPanel.TabIndex = 0;
+         // 
+         // xmlTreeView
+         // 
+         this.xmlTreeView.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(49)))), ((int)(((byte)(49)))), ((int)(((byte)(49)))));
+         this.xmlTreeView.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.xmlTreeView.ForeColor = System.Drawing.Color.Silver;
+         this.xmlTreeView.HotTracking = true;
+         this.xmlTreeView.LineColor = System.Drawing.Color.Silver;
+         this.xmlTreeView.Location = new System.Drawing.Point(3, 3);
+         this.xmlTreeView.Name = "xmlTreeView";
+         this.xmlTreeView.Size = new System.Drawing.Size(121, 100);
+         this.xmlTreeView.TabIndex = 0;
+         this.xmlTreeView.AfterExpand += new System.Windows.Forms.TreeViewEventHandler(this.treeViewAfterExpand);
          // 
          // xmlPanel
          // 
+         this.xmlPanel.AutoScroll = true;
          this.xmlPanel.AutoSize = true;
          this.xmlPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+         this.xmlPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(49)))), ((int)(((byte)(49)))), ((int)(((byte)(49)))));
          this.xmlPanel.ColumnCount = 2;
          this.xmlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
          this.xmlPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-         this.xmlPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.xmlPanel.Location = new System.Drawing.Point(3, 43);
+         this.xmlPanel.Location = new System.Drawing.Point(3, 109);
          this.xmlPanel.Name = "xmlPanel";
-         this.xmlPanel.Size = new System.Drawing.Size(75, 1);
+         this.xmlPanel.Size = new System.Drawing.Size(0, 0);
          this.xmlPanel.TabIndex = 1;
-         // 
-         // button1
-         // 
-         this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-         this.button1.BackColor = System.Drawing.Color.Silver;
-         this.button1.Location = new System.Drawing.Point(3, 3);
-         this.button1.Name = "button1";
-         this.button1.Size = new System.Drawing.Size(75, 34);
-         this.button1.TabIndex = 1;
-         this.button1.Text = "button1";
-         this.button1.UseVisualStyleBackColor = false;
-         this.button1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.button1_MouseClick);
          // 
          // XMLControl
          // 
@@ -85,16 +88,17 @@
          this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
          this.Controls.Add(this.rootPanel);
          this.Name = "XMLControl";
-         this.Size = new System.Drawing.Size(0, 0);
+         this.Size = new System.Drawing.Size(130, 115);
          this.rootPanel.ResumeLayout(false);
          this.rootPanel.PerformLayout();
          this.ResumeLayout(false);
+         this.PerformLayout();
 
          }
 
       #endregion
       private System.Windows.Forms.TableLayoutPanel rootPanel;
-      private System.Windows.Forms.Button button1;
       private System.Windows.Forms.TableLayoutPanel xmlPanel;
+      private System.Windows.Forms.TreeView xmlTreeView;
       }
    }

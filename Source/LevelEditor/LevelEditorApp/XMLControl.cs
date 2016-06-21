@@ -20,19 +20,19 @@ namespace LevelEditorApp
          }
       private bool m_bGridViewModeReadError = false;
       private DataSet m_DataSet;
-      private List<System.Windows.Forms.DataGridView> m_XMLGridViews;
-      public enum VIEW_MODE {XML, TABLE}       
+      //private List<System.Windows.Forms.DataGridView> m_XMLGridViews;
+      public enum VIEW_MODE { XML, TABLE }
       public VIEW_MODE ViewMode
          {
-            get
+         get
             {
             return ( !this.xmlPanel.Visible ? VIEW_MODE.XML : VIEW_MODE.TABLE );
             }
-            set
+         set
             {
-                SetViewMode(value);
+            SetViewMode( value );
             }
-        }
+         }
 
       private string m_sDataFilePath = string.Empty;
       public string DataFilePath
@@ -57,22 +57,22 @@ namespace LevelEditorApp
             }
          set
             {
-            SetDataSetTableIndex(value);                
+            SetDataSetTableIndex( value );
             }
          }
-        
+
       private int m_nDataTableCount = 0;
       public int DataTableCount
          {
-        get { return m_nDataTableCount; }            
+         get { return m_nDataTableCount; }
          }
 
-      private void SetViewMode(VIEW_MODE mode)
+      private void SetViewMode( VIEW_MODE mode )
          {
          if( m_bGridViewModeReadError == true )
             {
-            mode = VIEW_MODE.XML;                
-            }                        
+            mode = VIEW_MODE.XML;
+            }
 
          if( mode == VIEW_MODE.XML )
             {
@@ -82,24 +82,27 @@ namespace LevelEditorApp
             {
             xmlPanel.Visible = true;
             }
-        }
+         }
 
       private void LoadDataFile()
          {
          m_bGridViewModeReadError = false;
 
-         if ((m_sDataFilePath != string.Empty) && (File.Exists(m_sDataFilePath) == true))
+         if( ( m_sDataFilePath != string.Empty ) && ( File.Exists( m_sDataFilePath ) == true ) )
             {
             // Creates a DataSet and loads it with the xml content
             try
                {
+               XmlReader reader = XmlReader.Create( m_sDataFilePath );
                m_DataSet = new DataSet();
-               m_DataSet.ReadXml( m_sDataFilePath, XmlReadMode.Auto );
+               m_DataSet.ReadXml( reader );
+               ///m_DataSet.ReadXml( m_sDataFilePath, XmlReadMode.Auto );
                m_nDataTableCount = m_DataSet.Tables.Count;
                // write to XML file
                //System.IO.StreamWriter xmlSW = new System.IO.StreamWriter( "Customers.xml" );
                //m_DataSet.WriteXml( xmlSW, XmlWriteMode.IgnoreSchema );
                //xmlSW.Close();
+               GenerateXMLTreeView();
                GenerateXMLGrieView();
                //    grdTableView.DataSource = dsXmlFile.Tables[DataSetTableIndex];                    
                }
@@ -107,7 +110,7 @@ namespace LevelEditorApp
                {
                m_bGridViewModeReadError = true;
                m_nDataTableCount = 0;
-               SetViewMode(VIEW_MODE.XML);
+               SetViewMode( VIEW_MODE.XML );
                MessageBox.Show( "Error: " + e.ToString() );
                }
             }
@@ -117,9 +120,9 @@ namespace LevelEditorApp
             }
          }
 
-      private void SetDataSetTableIndex(int nTableIndex)
+      private void SetDataSetTableIndex( int nTableIndex )
          {
-         if( nTableIndex >= m_nDataTableCount ) 
+         if( nTableIndex >= m_nDataTableCount )
             {
             return;
             }
@@ -127,7 +130,74 @@ namespace LevelEditorApp
          LoadDataFile();
          }
 
-      private void GenerateXMLGrieView() 
+      private void addTreeNode( XmlNode xmlNode, TreeNode treeNode )
+         {
+         XmlNode xNode;
+         TreeNode tNode;
+         XmlNodeList xNodeList;
+         if( xmlNode.HasChildNodes ) //The current node has children
+            {
+            xNodeList = xmlNode.ChildNodes;
+            for( int x = 0; x <= xNodeList.Count - 1; x++ )
+            //Loop through the child nodes
+               {
+               xNode = xmlNode.ChildNodes[ x ];
+               treeNode.Nodes.Add( new TreeNode( xNode.Name ) );
+               tNode = treeNode.Nodes[ x ];
+               addTreeNode( xNode, tNode );
+               }
+            }
+         else //No children, so add the outer xml (trimming off whitespace)
+            treeNode.Text = xmlNode.OuterXml.Trim();
+         }
+
+      private void treeViewAfterExpand( object sender, TreeViewEventArgs e )
+         {
+         
+         //int maxRight = this.xmlTreeView.ClientSize.Width;
+         //int originWidth = maxRight;
+         //if( e.Node.Nodes != null )
+         //   foreach( TreeNode node in e.Node.Nodes )
+         //      {
+         //      maxRight = Math.Max( maxRight, node.Bounds.Right + node.Level * 8 );
+         //      }
+         //this.xmlTreeView.ClientSize = new Size( maxRight, this.xmlTreeView.ClientSize.Height );
+         }
+
+      private void GenerateXMLTreeView()
+         {
+         try
+            {
+            //Just a good practice -- change the cursor to a 
+            //wait cursor while the nodes populate
+            //First, we'll load the Xml document
+            XmlDocument xDoc = new XmlDocument();
+            xDoc.Load( m_sDataFilePath );
+            //Now, clear out the treeview, 
+            //and add the first (root) node
+            this.xmlTreeView.Nodes.Clear();
+            this.xmlTreeView.Nodes.Add( new TreeNode( xDoc.DocumentElement.Name ) );
+            TreeNode tNode = new TreeNode();
+            tNode = (TreeNode) this.xmlTreeView.Nodes[ 0 ];
+            //We make a call to addTreeNode, 
+            //where we'll add all of our nodes
+            addTreeNode( xDoc.DocumentElement, tNode );
+            //Expand the treeview to show all nodes
+           // this.xmlTreeView.ExpandAll();
+
+            }
+         catch( XmlException xExc )
+            //Exception is thrown is there is an error in the Xml
+            {
+            MessageBox.Show( xExc.Message );
+            }
+         catch( Exception ex ) //General exception
+            {
+            MessageBox.Show( ex.Message );
+            }
+         }
+
+      private void GenerateXMLGrieView()
          {
          for( int i = 0; i < m_DataSet.Tables.Count; ++i )
             {
@@ -196,7 +266,7 @@ namespace LevelEditorApp
                   }
                dataGridView.Height = totalHeight;
                this.xmlPanel.RowStyles.Add( new System.Windows.Forms.RowStyle( System.Windows.Forms.SizeType.Absolute, totalHeight ) );
-               this.xmlPanel.ColumnStyles[ 1 ] = new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Absolute, 10 );
+               //     this.xmlPanel.ColumnStyles[ 1 ] = new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Absolute, dataGridView.Columns.GetColumnsWidth( DataGridViewElementStates.None ) );
                }
             //if( m_DataSet.Tables[ i ].Rows.Count > 0 )
             //   {
@@ -204,7 +274,7 @@ namespace LevelEditorApp
             //   Console.WriteLine("table: " + i + " " + m_DataSet.Tables[ i ].TableName );
             //   for( int j = 0; j < m_DataSet.Tables[ i ].Rows.Count; j++ )
             //      {
-                  
+
             //      int len = m_DataSet.Tables[ i ].Rows[ j ].Table.Rows.Count;
             //      int clen = m_DataSet.Tables[ i ].Rows[ j ].Table.Columns.Count;
             //      int ilen = m_DataSet.Tables[ i ].Rows[ j ].ItemArray.Length;
@@ -215,19 +285,19 @@ namespace LevelEditorApp
             //            + " " + m_DataSet.Tables[ i ].Rows[ j ].Table.Columns[ k ].DataType.FullName 
             //            + " " + m_DataSet.Tables[ i ].Rows[ j ].Table.Columns[k].Caption
             //            + " " + m_DataSet.Tables[ i ].Rows[ j ].Table.Columns[ k ].DataType.Name );
-                     
+
             //         }
-                  
+
             //      }
-               
+
             //   }
             //if( true || ( m_DataSet.Tables[ i ].Rows.Count > 0 && m_DataSet.Tables[ i ].Rows[0].ItemArray.Length > 0 ) )
             //   {
-               
+
             //   }
             }
-         
-         
+
+
          }
 
       private void button1_MouseClick( object sender, MouseEventArgs e )
@@ -236,7 +306,7 @@ namespace LevelEditorApp
             {
             SetViewMode( VIEW_MODE.TABLE );
             }
-         else 
+         else
             {
             SetViewMode( VIEW_MODE.XML );
             }

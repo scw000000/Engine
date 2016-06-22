@@ -30,20 +30,27 @@ namespace LevelEditorApp
         /// </summary>
         private void InitializeComponent()
         {
+         this.components = new System.ComponentModel.Container();
          this.menuStrip1 = new System.Windows.Forms.MenuStrip();
          this.fIleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          this.eDITToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          this.splitContainer1 = new System.Windows.Forms.SplitContainer();
          this.splitContainer2 = new System.Windows.Forms.SplitContainer();
          this.splitContainer_Left = new System.Windows.Forms.SplitContainer();
-         this.splitContainer_Mid = new System.Windows.Forms.SplitContainer();
-         this.splitContainer_Right = new System.Windows.Forms.SplitContainer();
          this.tabCtlEX_LeftUp = new LevelEditorApp.TabControlEX();
          this.tabCtlEX_LeftDown = new LevelEditorApp.TabControlEX();
+         this.tabPageEX_Assets = new LevelEditorApp.TabPageEX(this.components);
+         this.treeView_Assets = new System.Windows.Forms.TreeView();
+         this.splitContainer_Mid = new System.Windows.Forms.SplitContainer();
          this.tabCtlEX_MidUp = new LevelEditorApp.TabControlEX();
+         this.tabPageEX_World = new LevelEditorApp.TabPageEX(this.components);
          this.tabCtlEX_MidDown = new LevelEditorApp.TabControlEX();
+         this.tabPageEX_Console = new LevelEditorApp.TabPageEX(this.components);
+         this.textBox_Console = new System.Windows.Forms.TextBox();
+         this.splitContainer_Right = new System.Windows.Forms.SplitContainer();
          this.tabCtlEX_RightUp = new LevelEditorApp.TabControlEX();
          this.tabCtlEX_RightDown = new LevelEditorApp.TabControlEX();
+         this.tabPageEX_ActorXML = new LevelEditorApp.TabPageEX(this.components);
          this.xmlControl_ActorXML = new LevelEditorApp.XMLControl();
          this.menuStrip1.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -58,14 +65,21 @@ namespace LevelEditorApp
          this.splitContainer_Left.Panel1.SuspendLayout();
          this.splitContainer_Left.Panel2.SuspendLayout();
          this.splitContainer_Left.SuspendLayout();
+         this.tabCtlEX_LeftDown.SuspendLayout();
+         this.tabPageEX_Assets.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Mid)).BeginInit();
          this.splitContainer_Mid.Panel1.SuspendLayout();
          this.splitContainer_Mid.Panel2.SuspendLayout();
          this.splitContainer_Mid.SuspendLayout();
+         this.tabCtlEX_MidUp.SuspendLayout();
+         this.tabCtlEX_MidDown.SuspendLayout();
+         this.tabPageEX_Console.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Right)).BeginInit();
          this.splitContainer_Right.Panel1.SuspendLayout();
          this.splitContainer_Right.Panel2.SuspendLayout();
          this.splitContainer_Right.SuspendLayout();
+         this.tabCtlEX_RightDown.SuspendLayout();
+         this.tabPageEX_ActorXML.SuspendLayout();
          this.SuspendLayout();
          // 
          // menuStrip1
@@ -150,6 +164,60 @@ namespace LevelEditorApp
          this.splitContainer_Left.SplitterWidth = 10;
          this.splitContainer_Left.TabIndex = 0;
          // 
+         // tabCtlEX_LeftUp
+         // 
+         this.tabCtlEX_LeftUp.ConfirmOnClose = true;
+         this.tabCtlEX_LeftUp.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.tabCtlEX_LeftUp.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+         this.tabCtlEX_LeftUp.ItemSize = new System.Drawing.Size(50, 18);
+         this.tabCtlEX_LeftUp.Location = new System.Drawing.Point(0, 0);
+         this.tabCtlEX_LeftUp.Name = "tabCtlEX_LeftUp";
+         this.tabCtlEX_LeftUp.SelectedIndex = 0;
+         this.tabCtlEX_LeftUp.Size = new System.Drawing.Size(130, 421);
+         this.tabCtlEX_LeftUp.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+         this.tabCtlEX_LeftUp.TabIndex = 0;
+         this.tabCtlEX_LeftUp.TabStop = false;
+         // 
+         // tabCtlEX_LeftDown
+         // 
+         this.tabCtlEX_LeftDown.ConfirmOnClose = true;
+         this.tabCtlEX_LeftDown.Controls.Add(this.tabPageEX_Assets);
+         this.tabCtlEX_LeftDown.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.tabCtlEX_LeftDown.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+         this.tabCtlEX_LeftDown.ItemSize = new System.Drawing.Size(91, 18);
+         this.tabCtlEX_LeftDown.Location = new System.Drawing.Point(0, 0);
+         this.tabCtlEX_LeftDown.Name = "tabCtlEX_LeftDown";
+         this.tabCtlEX_LeftDown.SelectedIndex = 0;
+         this.tabCtlEX_LeftDown.Size = new System.Drawing.Size(130, 598);
+         this.tabCtlEX_LeftDown.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+         this.tabCtlEX_LeftDown.TabIndex = 0;
+         this.tabCtlEX_LeftDown.TabStop = false;
+         // 
+         // tabPageEX_Assets
+         // 
+         this.tabPageEX_Assets.AllowDrop = true;
+         this.tabPageEX_Assets.CloseBtnEnabled = false;
+         this.tabPageEX_Assets.Controls.Add(this.treeView_Assets);
+         this.tabPageEX_Assets.Location = new System.Drawing.Point(4, 22);
+         this.tabPageEX_Assets.Menu = null;
+         this.tabPageEX_Assets.Name = "tabPageEX_Assets";
+         this.tabPageEX_Assets.Size = new System.Drawing.Size(122, 572);
+         this.tabPageEX_Assets.TabIndex = 0;
+         this.tabPageEX_Assets.Text = "Assets View";
+         // 
+         // treeView_Assets
+         // 
+         this.treeView_Assets.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+         this.treeView_Assets.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.treeView_Assets.LineColor = System.Drawing.Color.WhiteSmoke;
+         this.treeView_Assets.Location = new System.Drawing.Point(0, 0);
+         this.treeView_Assets.Name = "treeView_Assets";
+         this.treeView_Assets.RightToLeft = System.Windows.Forms.RightToLeft.No;
+         this.treeView_Assets.Size = new System.Drawing.Size(122, 572);
+         this.treeView_Assets.TabIndex = 0;
+         this.treeView_Assets.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.treeView_Assets_ItemDrag);
+         this.treeView_Assets.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_Assets_NodeMouseClick);
+         // 
          // splitContainer_Mid
          // 
          this.splitContainer_Mid.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(49)))), ((int)(((byte)(49)))), ((int)(((byte)(49)))));
@@ -173,6 +241,70 @@ namespace LevelEditorApp
          this.splitContainer_Mid.SplitterWidth = 10;
          this.splitContainer_Mid.TabIndex = 0;
          // 
+         // tabCtlEX_MidUp
+         // 
+         this.tabCtlEX_MidUp.AllowDrop = true;
+         this.tabCtlEX_MidUp.ConfirmOnClose = true;
+         this.tabCtlEX_MidUp.Controls.Add(this.tabPageEX_World);
+         this.tabCtlEX_MidUp.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.tabCtlEX_MidUp.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+         this.tabCtlEX_MidUp.ItemSize = new System.Drawing.Size(91, 18);
+         this.tabCtlEX_MidUp.Location = new System.Drawing.Point(0, 0);
+         this.tabCtlEX_MidUp.Name = "tabCtlEX_MidUp";
+         this.tabCtlEX_MidUp.SelectedIndex = 0;
+         this.tabCtlEX_MidUp.Size = new System.Drawing.Size(1602, 768);
+         this.tabCtlEX_MidUp.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+         this.tabCtlEX_MidUp.TabIndex = 0;
+         this.tabCtlEX_MidUp.TabStop = false;
+         // 
+         // tabPageEX_World
+         // 
+         this.tabPageEX_World.AllowDrop = true;
+         this.tabPageEX_World.CloseBtnEnabled = false;
+         this.tabPageEX_World.Location = new System.Drawing.Point(4, 22);
+         this.tabPageEX_World.Menu = null;
+         this.tabPageEX_World.Name = "tabPageEX_World";
+         this.tabPageEX_World.Size = new System.Drawing.Size(1594, 742);
+         this.tabPageEX_World.TabIndex = 0;
+         this.tabPageEX_World.Text = "World View";
+         // 
+         // tabCtlEX_MidDown
+         // 
+         this.tabCtlEX_MidDown.Alignment = System.Windows.Forms.TabAlignment.Bottom;
+         this.tabCtlEX_MidDown.ConfirmOnClose = true;
+         this.tabCtlEX_MidDown.Controls.Add(this.tabPageEX_Console);
+         this.tabCtlEX_MidDown.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.tabCtlEX_MidDown.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+         this.tabCtlEX_MidDown.ItemSize = new System.Drawing.Size(71, 18);
+         this.tabCtlEX_MidDown.Location = new System.Drawing.Point(0, 0);
+         this.tabCtlEX_MidDown.Name = "tabCtlEX_MidDown";
+         this.tabCtlEX_MidDown.SelectedIndex = 0;
+         this.tabCtlEX_MidDown.Size = new System.Drawing.Size(1602, 247);
+         this.tabCtlEX_MidDown.TabIndex = 0;
+         this.tabCtlEX_MidDown.TabStop = false;
+         // 
+         // tabPageEX_Console
+         // 
+         this.tabPageEX_Console.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+         this.tabPageEX_Console.CloseBtnEnabled = false;
+         this.tabPageEX_Console.Controls.Add(this.textBox_Console);
+         this.tabPageEX_Console.Location = new System.Drawing.Point(4, 4);
+         this.tabPageEX_Console.Menu = null;
+         this.tabPageEX_Console.Name = "tabPageEX_Console";
+         this.tabPageEX_Console.Size = new System.Drawing.Size(1594, 221);
+         this.tabPageEX_Console.TabIndex = 0;
+         this.tabPageEX_Console.Text = "Console";
+         // 
+         // textBox_Console
+         // 
+         this.textBox_Console.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(49)))), ((int)(((byte)(49)))), ((int)(((byte)(49)))));
+         this.textBox_Console.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.textBox_Console.Location = new System.Drawing.Point(0, 0);
+         this.textBox_Console.Multiline = true;
+         this.textBox_Console.Name = "textBox_Console";
+         this.textBox_Console.Size = new System.Drawing.Size(1594, 221);
+         this.textBox_Console.TabIndex = 0;
+         // 
          // splitContainer_Right
          // 
          this.splitContainer_Right.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(49)))), ((int)(((byte)(49)))), ((int)(((byte)(49)))));
@@ -195,61 +327,6 @@ namespace LevelEditorApp
          this.splitContainer_Right.SplitterWidth = 10;
          this.splitContainer_Right.TabIndex = 1;
          // 
-         // tabCtlEX_LeftUp
-         // 
-         this.tabCtlEX_LeftUp.ConfirmOnClose = true;
-         this.tabCtlEX_LeftUp.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.tabCtlEX_LeftUp.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
-         this.tabCtlEX_LeftUp.ItemSize = new System.Drawing.Size(50, 18);
-         this.tabCtlEX_LeftUp.Location = new System.Drawing.Point(0, 0);
-         this.tabCtlEX_LeftUp.Name = "tabCtlEX_LeftUp";
-         this.tabCtlEX_LeftUp.SelectedIndex = 0;
-         this.tabCtlEX_LeftUp.Size = new System.Drawing.Size(130, 421);
-         this.tabCtlEX_LeftUp.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-         this.tabCtlEX_LeftUp.TabIndex = 0;
-         this.tabCtlEX_LeftUp.TabStop = false;
-         // 
-         // tabCtlEX_LeftDown
-         // 
-         this.tabCtlEX_LeftDown.ConfirmOnClose = true;
-         this.tabCtlEX_LeftDown.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.tabCtlEX_LeftDown.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
-         this.tabCtlEX_LeftDown.ItemSize = new System.Drawing.Size(50, 18);
-         this.tabCtlEX_LeftDown.Location = new System.Drawing.Point(0, 0);
-         this.tabCtlEX_LeftDown.Name = "tabCtlEX_LeftDown";
-         this.tabCtlEX_LeftDown.SelectedIndex = 0;
-         this.tabCtlEX_LeftDown.Size = new System.Drawing.Size(130, 598);
-         this.tabCtlEX_LeftDown.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-         this.tabCtlEX_LeftDown.TabIndex = 0;
-         this.tabCtlEX_LeftDown.TabStop = false;
-         // 
-         // tabCtlEX_MidUp
-         // 
-         this.tabCtlEX_MidUp.AllowDrop = true;
-         this.tabCtlEX_MidUp.ConfirmOnClose = true;
-         this.tabCtlEX_MidUp.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.tabCtlEX_MidUp.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
-         this.tabCtlEX_MidUp.Location = new System.Drawing.Point(0, 0);
-         this.tabCtlEX_MidUp.Name = "tabCtlEX_MidUp";
-         this.tabCtlEX_MidUp.SelectedIndex = 0;
-         this.tabCtlEX_MidUp.Size = new System.Drawing.Size(1602, 768);
-         this.tabCtlEX_MidUp.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
-         this.tabCtlEX_MidUp.TabIndex = 0;
-         this.tabCtlEX_MidUp.TabStop = false;
-         // 
-         // tabCtlEX_MidDown
-         // 
-         this.tabCtlEX_MidDown.Alignment = System.Windows.Forms.TabAlignment.Bottom;
-         this.tabCtlEX_MidDown.ConfirmOnClose = true;
-         this.tabCtlEX_MidDown.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.tabCtlEX_MidDown.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
-         this.tabCtlEX_MidDown.Location = new System.Drawing.Point(0, 0);
-         this.tabCtlEX_MidDown.Name = "tabCtlEX_MidDown";
-         this.tabCtlEX_MidDown.SelectedIndex = 0;
-         this.tabCtlEX_MidDown.Size = new System.Drawing.Size(1602, 247);
-         this.tabCtlEX_MidDown.TabIndex = 0;
-         this.tabCtlEX_MidDown.TabStop = false;
-         // 
          // tabCtlEX_RightUp
          // 
          this.tabCtlEX_RightUp.ConfirmOnClose = true;
@@ -265,8 +342,10 @@ namespace LevelEditorApp
          // tabCtlEX_RightDown
          // 
          this.tabCtlEX_RightDown.ConfirmOnClose = true;
+         this.tabCtlEX_RightDown.Controls.Add(this.tabPageEX_ActorXML);
          this.tabCtlEX_RightDown.Dock = System.Windows.Forms.DockStyle.Fill;
          this.tabCtlEX_RightDown.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+         this.tabCtlEX_RightDown.ItemSize = new System.Drawing.Size(88, 18);
          this.tabCtlEX_RightDown.Location = new System.Drawing.Point(0, 0);
          this.tabCtlEX_RightDown.Name = "tabCtlEX_RightDown";
          this.tabCtlEX_RightDown.SelectedIndex = 0;
@@ -274,14 +353,31 @@ namespace LevelEditorApp
          this.tabCtlEX_RightDown.TabIndex = 0;
          this.tabCtlEX_RightDown.TabStop = false;
          // 
+         // tabPageEX_ActorXML
+         // 
+         this.tabPageEX_ActorXML.AllowDrop = true;
+         this.tabPageEX_ActorXML.CloseBtnEnabled = false;
+         this.tabPageEX_ActorXML.Controls.Add(this.xmlControl_ActorXML);
+         this.tabPageEX_ActorXML.Location = new System.Drawing.Point(4, 22);
+         this.tabPageEX_ActorXML.Menu = null;
+         this.tabPageEX_ActorXML.Name = "tabPageEX_ActorXML";
+         this.tabPageEX_ActorXML.Size = new System.Drawing.Size(150, 599);
+         this.tabPageEX_ActorXML.TabIndex = 0;
+         this.tabPageEX_ActorXML.Text = "Actor XML";
+         // 
          // xmlControl_ActorXML
          // 
+         this.xmlControl_ActorXML.AutoScroll = true;
+         this.xmlControl_ActorXML.AutoSize = true;
+         this.xmlControl_ActorXML.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+         this.xmlControl_ActorXML.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
          this.xmlControl_ActorXML.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-         this.xmlControl_ActorXML.Dock = System.Windows.Forms.DockStyle.Fill;
          this.xmlControl_ActorXML.DataFilePath = "";
          this.xmlControl_ActorXML.DataSetTableIndex = 0;
-         this.xmlControl_ActorXML.Location = new System.Drawing.Point( 12, 41 );
-         this.xmlControl_ActorXML.Name = "XMLControl";
+         this.xmlControl_ActorXML.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.xmlControl_ActorXML.Location = new System.Drawing.Point(0, 0);
+         this.xmlControl_ActorXML.Name = "xmlControl_ActorXML";
+         this.xmlControl_ActorXML.Size = new System.Drawing.Size(150, 599);
          this.xmlControl_ActorXML.TabIndex = 0;
          this.xmlControl_ActorXML.ViewMode = LevelEditorApp.XMLControl.VIEW_MODE.TABLE;
          // 
@@ -309,14 +405,23 @@ namespace LevelEditorApp
          this.splitContainer_Left.Panel2.ResumeLayout(false);
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Left)).EndInit();
          this.splitContainer_Left.ResumeLayout(false);
+         this.tabCtlEX_LeftDown.ResumeLayout(false);
+         this.tabPageEX_Assets.ResumeLayout(false);
          this.splitContainer_Mid.Panel1.ResumeLayout(false);
          this.splitContainer_Mid.Panel2.ResumeLayout(false);
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Mid)).EndInit();
          this.splitContainer_Mid.ResumeLayout(false);
+         this.tabCtlEX_MidUp.ResumeLayout(false);
+         this.tabCtlEX_MidDown.ResumeLayout(false);
+         this.tabPageEX_Console.ResumeLayout(false);
+         this.tabPageEX_Console.PerformLayout();
          this.splitContainer_Right.Panel1.ResumeLayout(false);
          this.splitContainer_Right.Panel2.ResumeLayout(false);
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Right)).EndInit();
          this.splitContainer_Right.ResumeLayout(false);
+         this.tabCtlEX_RightDown.ResumeLayout(false);
+         this.tabPageEX_ActorXML.ResumeLayout(false);
+         this.tabPageEX_ActorXML.PerformLayout();
          this.ResumeLayout(false);
          this.PerformLayout();
 
@@ -332,6 +437,8 @@ namespace LevelEditorApp
         private System.Windows.Forms.SplitContainer splitContainer_Left;
         private System.Windows.Forms.SplitContainer splitContainer_Mid;
         private System.Windows.Forms.SplitContainer splitContainer_Right;
+        private System.Windows.Forms.TreeView treeView_Assets;
+        private System.Windows.Forms.TextBox textBox_Console;
         private LevelEditorApp.TabControlEX tabCtlEX_LeftUp;
         private LevelEditorApp.TabControlEX tabCtlEX_LeftDown;
         private LevelEditorApp.TabControlEX tabCtlEX_MidUp;
@@ -341,6 +448,7 @@ namespace LevelEditorApp
         private LevelEditorApp.TabPageEX tabPageEX_Assets;
         private LevelEditorApp.TabPageEX tabPageEX_World;
         private LevelEditorApp.TabPageEX tabPageEX_ActorXML;
+        private LevelEditorApp.TabPageEX tabPageEX_Console;
         private LevelEditorApp.XMLControl xmlControl_ActorXML;
     }
 }

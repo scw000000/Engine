@@ -77,19 +77,6 @@ namespace LevelEditorApp
 			components = new System.ComponentModel.Container();
 		   }
 
-      private LevelEditorApp.EditorTextBox m_EditorTextBox;
-      public LevelEditorApp.EditorTextBox TextBox
-         {
-         get
-            {
-            return m_EditorTextBox;
-            }
-         set
-            {
-            m_EditorTextBox = value;
-            }
-         }
-
       private bool isCloseBtnEnabled = false;
       public bool CloseBtnEnabled
          {

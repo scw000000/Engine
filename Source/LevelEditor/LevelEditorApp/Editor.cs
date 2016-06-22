@@ -25,8 +25,7 @@ namespace LevelEditorApp
       public myDalegate m_UpdateSDLDelegate;
 
       private List<XmlNode> m_ActorsXmlNodes = new List<XmlNode>();
-      private System.Windows.Forms.TreeView treeView_Assets;
-
+      
       private const int INVALID_ACTOR_ID = 0;
       private const int m_MaxTabSize = 100;
       private const int m_MinTabSize = 50;
@@ -70,22 +69,8 @@ namespace LevelEditorApp
          this.splitContainer2.SplitterDistance = this.splitContainer2.Width - SDLWindowWidth - splitterWidth;
          this.splitContainer_Mid.SplitterDistance = SDLWindowHeight;
 
-         this.tabPageEX_World = AddTabePage( "tabPageEX_World", this.tabCtlEX_MidUp.Controls, false );
-         tabPageEX_World.AllowDrop = true;
-         tabPageEX_World.DragEnter += new DragEventHandler( tabPageEX_World.tabPageEX_DragEnter );
-
-         this.tabPageEX_Assets = AddTabePage( "tabPageEX_Assets", this.tabCtlEX_LeftDown.Controls, false );
-         this.treeView_Assets = new System.Windows.Forms.TreeView();
-         this.treeView_Assets.Dock = DockStyle.Fill;
-         this.treeView_Assets.BackColor = Color.FromArgb( 255, 70, 70, 70 );
-         this.treeView_Assets.LineColor = Color.WhiteSmoke;
-         this.treeView_Assets.NodeMouseDoubleClick += new TreeNodeMouseClickEventHandler( this.treeView_Assets_NodeMouseClick );
-         this.treeView_Assets.ItemDrag += new ItemDragEventHandler( this.treeView_Assets_ItemDrag );
-         this.tabPageEX_Assets.Controls.Add( this.treeView_Assets );
          InitializeAssetTree();
 
-         this.tabPageEX_ActorXML = AddTabePage( "tabPageEX_ActorXML", this.tabCtlEX_RightDown.Controls, false );
-         this.tabPageEX_ActorXML.Controls.Add( this.xmlControl_ActorXML );
          this.xmlControl_ActorXML.DataFilePath = "D:\\Workspace\\Engine\\Game\\Assets\\Actors\\cube.xml";
 
          m_UpdateSDLDelegate = new myDalegate( UpdateSDLWindow );
@@ -97,7 +82,8 @@ namespace LevelEditorApp
          {
          if( isTextBoxSupport( e.Node.Text ) )
             {
-            LevelEditorApp.TabPageEX textPage = AddTabePage( e.Node.Text, this.tabCtlEX_MidUp.Controls, true );
+            LevelEditorApp.TabPageEX textPage = this.tabCtlEX_MidUp.AddTabPageEx( e.Node.Text, e.Node.Text, true );
+            //   AddTabePage( e.Node.Text, e.Node.Text, this.tabCtlEX_MidUp.Controls, true );
             String filePath = "";
             TreeNode tempNode = e.Node;
             while( tempNode != null )
@@ -105,9 +91,9 @@ namespace LevelEditorApp
                filePath = "\\" + tempNode.Text + filePath;
                tempNode = tempNode.Parent;
                }
-            textPage.TextBox = new EditorTextBox( e.Node.Text, m_CurrentDirectory + "\\" + filePath );
-            textPage.TextBox.Font = new Font( textPage.TextBox.Font.FontFamily, 18 );
-            textPage.Controls.Add( textPage.TextBox );
+            LevelEditorApp.EditorTextBox textBox = new EditorTextBox( "editorTextBox", m_CurrentDirectory + "\\" + filePath );
+            textBox.Font = new Font( textBox.Font.FontFamily, 18 );
+            textPage.Controls.Add( textBox );
             }
          else
             {
@@ -214,13 +200,13 @@ namespace LevelEditorApp
          treeView_Assets.Nodes.Add( node );
          }
 
-      private LevelEditorApp.TabPageEX AddTabePage( string name, System.Windows.Forms.Control.ControlCollection controls, bool closeBtnEnabled ) 
+      private LevelEditorApp.TabPageEX AddTabePage( string name, string tabText,System.Windows.Forms.Control.ControlCollection controls, bool closeBtnEnabled ) 
          {
          LevelEditorApp.TabPageEX pageEx = new LevelEditorApp.TabPageEX();
          pageEx.Menu = null;
          pageEx.CloseBtnEnabled = closeBtnEnabled;
          pageEx.Name = name;
-         pageEx.Text = name;
+         pageEx.Text = tabText;
          controls.Add( pageEx );
          return pageEx;
          }

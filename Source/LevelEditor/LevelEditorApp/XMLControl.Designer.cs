@@ -38,7 +38,7 @@
          // 
          this.rootPanel.AutoSize = true;
          this.rootPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-         this.rootPanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+         this.rootPanel.BackColor = System.Drawing.Color.FromArgb( ( (int) ( ( (byte) ( 64 ) ) ) ), ( (int) ( ( (byte) ( 64 ) ) ) ), ( (int) ( ( (byte) ( 64 ) ) ) ) );
          this.rootPanel.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Outset;
          this.rootPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
          this.rootPanel.Controls.Add(this.xmlTreeView, 0, 0);

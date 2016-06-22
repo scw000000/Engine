@@ -217,21 +217,37 @@ namespace LevelEditorApp
          var dataTable = dataGridView.DataSource as DataTable;
          if( e.RowIndex >= 0 )
             {
-            string pathName = dataTable.TableName;
-            string currentNodeName = pathName;
+            string currentNodeName = dataTable.TableName; 
+            List<String> pathList = new List<string>();
+            pathList.Add( currentNodeName );
             int currentRow = e.RowIndex;
-            string space = " ";
+            
             while( GetParentTableRow( ref currentNodeName, ref currentRow, currentNodeName, currentRow ) )
                {
-               pathName = currentNodeName + "\n" + space + "->" + pathName;
-               space += " ";
+               pathList.Add( currentNodeName );
+               }
+            pathList.Reverse();
+            string pathName = "";
+            string space = " ";
+            foreach( string pathNode in pathList )
+               {
+               if( pathName.Equals( "" ) )
+                  {
+                  pathName = pathNode;
+                  }
+               else
+                  {
+                  pathName = pathName + "\n" + space + "->" + pathNode;
+                  space += " ";
+                  }
+               
                }
             e.ToolTipText = string.Format( pathName );
             }
          else 
             {
             e.ToolTipText = string.Format( "tip for row {0}, col {1}",
-         e.RowIndex, e.ColumnIndex + dataTable.TableName );
+            e.RowIndex, e.ColumnIndex + dataTable.TableName );
             }
          }
 

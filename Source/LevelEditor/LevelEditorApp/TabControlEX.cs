@@ -52,6 +52,17 @@ namespace LevelEditorApp
             }
          }
 
+      public LevelEditorApp.TabPageEX AddTabPageEx( string name, string tabText, bool closeBtnEnabled ) 
+         {
+         LevelEditorApp.TabPageEX pageEx = new LevelEditorApp.TabPageEX();
+         pageEx.Menu = null;
+         pageEx.CloseBtnEnabled = closeBtnEnabled;
+         pageEx.Name = name;
+         pageEx.Text = tabText;
+         this.Controls.Add( pageEx );
+         return pageEx;
+         }
+
       /// <summary>
       /// Clean up any resources being used.
       /// </summary>
@@ -608,11 +619,12 @@ namespace LevelEditorApp
                   {
                   if( confirmOnClose )
                      {
-                     EditorTextBox textBox = ( ( TabPageEX ) this.TabPages[ SelectedIndex ] ).TextBox;
+                     EditorTextBox editorTextBox = ( (TabPageEX) this.TabPages[ SelectedIndex ] ).Controls.Find( "editorTextBox", true ).FirstOrDefault() as EditorTextBox;
+                      
                      // if textBox exist, ask it instead of the tabPage
-                     if( textBox != null )
+                     if( editorTextBox != null )
                         {
-                        if( textBox.ConfirmClose() == false )
+                        if( editorTextBox.ConfirmClose() == false )
                            {
                            return;
                            }

@@ -296,14 +296,17 @@ LogMgr::ErrorDialogResult LogMgr::Error(const std::string& errorMessage, bool is
 // Output the result of finalBuffer to file or debug window
 //------------------------------------------------------------------------------------------------------------------------------------
 void LogMgr::OutputFinalBufferToLogs(const string& finalBuffer, unsigned char flags)
-{
+   {
 	// Write the log to each display based on the display flags
-	if ((flags & LOGFLAG_WRITE_TO_LOG_FILE) > 0)  // log file
-		WriteToLogFile(finalBuffer);
-	if ((flags & LOGFLAG_WRITE_TO_DEBUGGER) > 0)  // debugger output window
-        ::OutputDebugStringA(finalBuffer.c_str());
-}
-
+   if( ( flags & LOGFLAG_WRITE_TO_LOG_FILE ) > 0 )  // log file
+      {
+      WriteToLogFile( finalBuffer );
+      }
+   if( ( flags & LOGFLAG_WRITE_TO_DEBUGGER ) > 0 ) // debugger output window
+      {  
+      ::OutputDebugStringA( finalBuffer.c_str() );
+      }
+   }
 
 //------------------------------------------------------------------------------------------------------------------------------------
 // This is a helper function that writes the data string to the log file.

@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DllRedirectThreadObject.cs" />
     <Compile Include="EditorTextBox.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -84,6 +85,7 @@
     <Compile Include="TabPageEX.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="TextBoxWritter.cs" />
     <Compile Include="XMLControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

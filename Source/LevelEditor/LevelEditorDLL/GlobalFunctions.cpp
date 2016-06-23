@@ -59,6 +59,9 @@ int EditorMain( int *pWindow, int screenWidth, int screenHeight )
 void SingleLoop( void )
    {
    g_pApp->SingleLoop();
+   std::cout << "test" << std::endl;
+  // ENG_LOG( "Test", "SZZZZZ" );
+  // std::string s( ( "string" ) ); 
    }
 
 void Shutdown( void )

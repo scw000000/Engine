@@ -595,7 +595,6 @@ void EngineApp::SingleLoop( void )
    static double fAppTime = 0.0;
    static double fAbsoluteTime = 0.0;
    static float  fElapasedTime = 0.0f;
-
    MsgProc();
    GetGlobalTimer()->GetTimeValues( &fAppTime, &fAbsoluteTime, &fElapasedTime );
 

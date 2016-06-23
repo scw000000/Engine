@@ -21,8 +21,10 @@ namespace LevelEditorApp
       //private ActorComponentEditor m_ActorComponentEditor;
       public IntPtr m_pSDLWindow;
       public IntPtr m_pSDLWindowHandle;
-      public delegate void myDalegate();
-      public myDalegate m_UpdateSDLDelegate;
+      public delegate void myDelegate();
+      public myDelegate m_UpdateSDLDelegate;
+      public delegate void strDelegate( String str );
+      public strDelegate m_RedirectStringDelegate;
 
       private List<XmlNode> m_ActorsXmlNodes = new List<XmlNode>();
       
@@ -72,9 +74,12 @@ namespace LevelEditorApp
          InitializeAssetTree();
 
          this.xmlControl_ActorXML.DataFilePath = "D:\\Workspace\\Engine\\Game\\Assets\\Actors\\cube.xml";
+         //
 
-         m_UpdateSDLDelegate = new myDalegate( UpdateSDLWindow );
-         InitSDLWindow();
+
+         m_UpdateSDLDelegate = new myDelegate( UpdateSDLWindow );
+         m_RedirectStringDelegate = new strDelegate( RedirectString );
+         //InitSDLWindow();
 
          }
 
@@ -226,6 +231,83 @@ namespace LevelEditorApp
       private static String WildCardToRegular( String value )
          {
          return "^" + Regex.Escape( value ).Replace( "\\?", "." ).Replace( "\\*", ".*" ) + "$";
+         }
+
+      public void RedirectString( String str ) 
+         {
+         Console.WriteLine( str );
+         }
+
+      [System.Runtime.InteropServices.DllImport( "Kernel32.dll", SetLastError = true )]
+      public static extern int SetStdHandle( int device, IntPtr handle );
+
+      public System.IO.Pipes.NamedPipeServerStream m_ServerPipe;
+
+      private void Editor_Load( object sender, EventArgs e )
+         {
+         //FileStream filestream;
+         //StreamWriter streamwriter;
+
+         //int status;
+         //IntPtr handle;
+         //filestream = new FileStream( "logfile.txt", FileMode.Create );
+         //streamwriter = new StreamWriter( filestream );
+         //streamwriter.AutoFlush = true;
+         //Console.SetOut( streamwriter );
+         //Console.SetError( streamwriter );
+
+         //handle = filestream.SafeFileHandle.DangerousGetHandle();
+
+         //status = SetStdHandle( -11, handle ); // set stdout
+         //// Check status as needed
+         //status = SetStdHandle( -12, handle ); // set stderr
+
+         TextBoxWritter textBoxWritter = new TextBoxWritter( this.textBox_Console );
+         Console.SetOut( textBoxWritter );
+
+         Console.WriteLine( "InfoLogWriterthread started" );
+         int id = System.Diagnostics.Process.GetCurrentProcess().Id; // make this instance unique
+         m_ServerPipe = new System.IO.Pipes.NamedPipeServerStream( "consoleRedirect" + id, System.IO.Pipes.PipeDirection.In, 1 );
+         System.IO.Pipes.NamedPipeClientStream clientPipe = new System.IO.Pipes.NamedPipeClientStream( ".", "consoleRedirect" + id, System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.WriteThrough );
+         Console.WriteLine( "Connecting Client Pipe." );
+         clientPipe.Connect();
+         Console.WriteLine( "Connected Client Pipe, redirecting stdout" );
+         System.Runtime.InteropServices.HandleRef hr11 = new System.Runtime.InteropServices.HandleRef( clientPipe, clientPipe.SafePipeHandle.DangerousGetHandle() );
+         SetStdHandle( -11, hr11.Handle ); // redirect stdout to my pipe
+         SetStdHandle( -12, hr11.Handle ); // redirect stdout to my pipe
+         Console.WriteLine( "Redirection of stdout complete." );
+         Console.WriteLine( "Waiting for console connection" );
+         m_ServerPipe.WaitForConnection(); //blocking
+         Console.WriteLine( "Console connection made." );
+
+         Program.s_DllRedirectThreadObject.SetReader( m_ServerPipe );
+         Program.s_DllRedirectThread.Start();
+
+
+         InitSDLWindow();
+
+         
+        
+
+         //int status;
+         //IntPtr handle;
+         //filestream = new FileStream( "logfile.txt", FileMode.Create );
+         //streamwriter = new StreamWriter( filestream );
+         //streamwriter.AutoFlush = true;
+         //Console.SetOut( streamwriter );
+         //Console.SetError( streamwriter );
+
+         
+         //handle = filestream.Handle;
+         //status = SetStdHandle( -11, handle ); // set stdout
+         //// Check status as needed
+         //status = SetStdHandle( -12, handle ); // set stderr
+         
+         
+         //Console.WriteLine( "Now redirecting output to the text box" );
+
+         Program.s_SDLThread.Start();
+         
          }
       }
    }

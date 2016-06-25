@@ -38,6 +38,7 @@ struct EngineOptions
       std::string m_Renderer;
 
       bool m_UseDevDir;
+      Environment m_Environment;
       std::string m_AssetsDirectory;
       std::string m_Level;
       std::string m_LevelDirectory;

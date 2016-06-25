@@ -27,6 +27,7 @@ EngineOptions::EngineOptions()
    // set all the options to decent default valu
    m_UseDevDir = false;
    m_Renderer = "OpenGL";   
+   m_Environment = Environment::Environment_Unknown;
 	m_runFullSpeed = false;
 	m_ScreenSize = Point( 1024, 768 );
 	m_pDoc = NULL;
@@ -123,6 +124,18 @@ void EngineOptions::Init( const char* xmlFileName )
             {
             std::string attribute = pNode->Attribute( "ShowMouseCursor" );
             m_ShowMouseCursor = ( attribute == "yes" ) ? true : false;
+            }
+         if( pNode->Attribute( "Environment" ) )
+            {
+            std::string attribute = pNode->Attribute( "Environment" );
+            if( !std::strcmp( attribute.c_str(), "game" ) )
+               {
+               m_Environment = Environment::Environment_Game;
+               }
+            else if( !std::strcmp( attribute.c_str(), "editor" ) )
+               {
+               m_Environment = Environment::Environment_Editor;
+               }
             }
 
 	   }

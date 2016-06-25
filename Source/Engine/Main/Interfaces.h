@@ -21,6 +21,13 @@ enum Renderer
 	Renderer_D3D11
 	};
 
+enum Environment 
+   {
+   Environment_Unknown,
+   Environment_Game,
+   Environment_Editor
+   };
+
 class Actor;
 class IActorComponent;
 class IRenderComponent;

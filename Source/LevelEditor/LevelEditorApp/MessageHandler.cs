@@ -18,24 +18,12 @@ namespace LevelEditorApp
          }
       public void Application_Closing( Object sender, FormClosingEventArgs e )
          {
-         Program.s_SDLThreadObject.RequestStop();
          }
-
-      
 
       public void Application_Idle( object sender, EventArgs evnt )
          {
-         if( m_Reader == null )
-            {
-            return;
-            }
          try
             {
-            if( Program.s_Editor.m_ServerPipe.IsConnected )
-               {
-               //System.Threading.Tasks.Task< string >txt = m_Reader.ReadLineAsync();
-             //  Console.WriteLine( txt. );
-               }
             
             }
          catch( Exception e )

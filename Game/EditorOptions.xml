@@ -2,6 +2,6 @@
   <Graphics Renderer="OpenGL" RunFullSpeed="no" />
   <Sound SfxVolume="100" MusicVolume="100"/>
   <ResCache UseDevelopmentDirectories="yes" AssetsDirectory=".\Assets\" GUIDirectory="GUI/" LevelDirectory="world\"/> 
-  <User Level="test.xml" Layout="Empty.layout" ShowMouseCursor="yes"/>
+  <User Environment="editor" Level="test.xml" Layout="Empty.layout" ShowMouseCursor="yes"/>
   <PhysicsDebug DrawWireFrame="yes" DrawContactPoints="yes" />
 </EditorOptions>

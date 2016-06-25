@@ -19,9 +19,12 @@ namespace LevelEditorApp
 
       public override void Write( char value )
          {
-         base.Write( value );
+         base.Write( value );      
          String str = value.ToString();
-         _output.AppendText( str );
+         if( !_output.IsDisposed )
+            {
+            _output.AppendText( str );
+            }
          }
 
       public override Encoding Encoding

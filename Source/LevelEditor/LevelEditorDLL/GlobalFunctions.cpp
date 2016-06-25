@@ -59,9 +59,6 @@ int EditorMain( int *pWindow, int screenWidth, int screenHeight )
 void SingleLoop( void )
    {
    g_pApp->SingleLoop();
-   std::cout << "test" << std::endl;
-  // ENG_LOG( "Test", "SZZZZZ" );
-  // std::string s( ( "string" ) ); 
    }
 
 void Shutdown( void )
@@ -116,16 +113,16 @@ void Shutdown( void )
 //   }
 
 
-//int GetActorXmlSize( ActorId actorId )
-//   {
-//   StrongActorPtr pActor = MakeStrongPtr( g_pApp->m_pGame->VGetActor( actorId ) );
-//   if( !pActor )
-//      {
-//      return 0;
-//      }
-//   std::string xml = pActor->ToXML();
-//   return xml.length();
-//   }
+int GetActorXmlSize( ActorId actorId )
+   {
+   StrongActorPtr pActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
+   if( !pActor )
+      {
+      return 0;
+      }
+   std::string xml = XMLHelper::WriteXMLToString( pActor->GenerateXML() );
+   return xml.length();
+   }
 
 
 void GetActorXML( int *actorXMLAddress, ActorId actorId )

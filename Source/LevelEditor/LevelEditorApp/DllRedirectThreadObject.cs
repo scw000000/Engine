@@ -3,39 +3,55 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.IO.Pipes;
 
 namespace LevelEditorApp
    {
 
    class DllRedirectThreadObject
       {
-      System.IO.StreamReader m_Reader = null;
-      System.IO.Pipes.NamedPipeServerStream m_ServerPipe = null;
-      public void SetReader( System.IO.Pipes.NamedPipeServerStream serverPipe )
+      StreamReader m_Reader = null;
+      NamedPipeServerStream m_ServerPipe = null;
+      private volatile bool m_ShouldLoop;
+      public void SetReader( NamedPipeServerStream serverPipe )
          {
          m_ServerPipe = serverPipe;
-         m_Reader = new System.IO.StreamReader( serverPipe );
+         m_Reader = new System.IO.StreamReader( m_ServerPipe );
+         m_ShouldLoop = true;
+         }
+
+      public void RequestStop() 
+         {
+         m_ShouldLoop = false;
          }
 
       public void Run()
          {
-         while( m_ServerPipe.IsConnected )
+         while( m_ShouldLoop && m_ServerPipe.IsConnected )
             {
             try
                {
                string txt = m_Reader.ReadLine();
                if( !string.IsNullOrEmpty( txt ) )
                   {
-                  Program.s_Editor.Invoke( Program.s_Editor.m_RedirectStringDelegate, txt );
+                  var task = Task.Factory.StartNew( () =>
+                     {
+
+                     Program.s_Editor.BeginInvoke( Program.s_Editor.m_RedirectStringDelegate, txt );
+                     } );
+
                   }
-               
+
                }
-            catch(  Exception e )
+            catch( Exception e )
                {
                System.Windows.Forms.MessageBox.Show( e.ToString() );
                break; // normal disconnect
                }
+            
             }
+         return;
          }
 
       }

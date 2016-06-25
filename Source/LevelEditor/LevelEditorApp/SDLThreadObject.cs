@@ -20,7 +20,7 @@ namespace LevelEditorApp
 
       public void Run() 
          {
-         while( m_ShouldLoop )
+         while( m_ShouldLoop && !Program.s_Editor.IsAccessible )
             {
             Program.s_Editor.Invoke( Program.s_Editor.m_UpdateSDLDelegate );
             }

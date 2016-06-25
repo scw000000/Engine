@@ -357,7 +357,9 @@ namespace LevelEditorApp
          // 
          // textBox1
          // 
+         this.textBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(49)))), ((int)(((byte)(49)))), ((int)(((byte)(49)))));
          this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.textBox1.ForeColor = System.Drawing.Color.Silver;
          this.textBox1.Location = new System.Drawing.Point(0, 0);
          this.textBox1.Name = "textBox1";
          this.textBox1.Size = new System.Drawing.Size(1594, 22);
@@ -427,6 +429,7 @@ namespace LevelEditorApp
          this.MainMenuStrip = this.menuStrip1;
          this.Name = "Editor";
          this.Text = "Form1";
+         this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Editor_FormClosing);
          this.Load += new System.EventHandler(this.Editor_Load);
          this.menuStrip1.ResumeLayout(false);
          this.menuStrip1.PerformLayout();

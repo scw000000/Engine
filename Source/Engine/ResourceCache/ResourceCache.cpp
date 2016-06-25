@@ -78,7 +78,7 @@ TiXmlElement* Resource::GenerateOverridesXML( TiXmlElement* pResource )
    return pRetNode;
    }
 
-ResHandle::ResHandle( Resource &resource, char *buffer, unsigned int size, ResourceCache *pResCache ) : m_Resource( resource )
+ResHandle::ResHandle( const Resource &resource, char *buffer, unsigned int size, ResourceCache *pResCache ) : m_Resource( resource )
    {
    m_pBuffer = buffer;
 	m_Size = size;

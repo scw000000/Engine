@@ -46,7 +46,7 @@ class ResHandle
    friend class ResourceCache;
 
    public:
-      ResHandle( Resource &resource, char *buffer, unsigned int size, ResourceCache *pResCache );
+      ResHandle( const Resource &resource, char *buffer, unsigned int size, ResourceCache *pResCache );
       virtual ~ResHandle();
 
       unsigned int GetSize( void ) const { return m_Size; }

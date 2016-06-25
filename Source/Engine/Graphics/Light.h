@@ -15,6 +15,8 @@
 #include "SceneNodes.h"
 #include "OpenGLRenderer.h"
 
+#define MAXIMUM_LIGHTS_SUPPORTED (8)
+
 struct LightProperties;
 typedef shared_ptr<LightProperties> LightPropertiesPtr;
 

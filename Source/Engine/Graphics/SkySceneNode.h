@@ -52,7 +52,7 @@ class SkySceneNode : public SceneNode
       bool					   m_IsActive;
 
 	   GLuint               m_Program;
-      GLuint               m_VerTexBuffer;
+      GLuint               m_VertexBuffer;
       GLuint               m_UVBuffer;
       GLuint               m_IndexBuffer;
       GLuint               m_MVPMatrix;
@@ -64,7 +64,7 @@ class SkySceneNode : public SceneNode
 	   VertexShader		   m_VertexShader;
 	   FragmentShader		   m_FragmentShader;
 
-      
+      unsigned long     m_VerticesCount;
 
 	//float CalcBoundingSphere(CDXUTSDKMesh *mesh11);			// this was added post press.
    };

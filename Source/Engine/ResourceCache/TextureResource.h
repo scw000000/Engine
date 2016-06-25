@@ -1,7 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: TextureResource.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file TextureResource.h
+ * \date 2016/06/25 17:39
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "ResourceCache.h"
 
@@ -35,5 +45,5 @@ public:
 	virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize );
 	virtual bool VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle );
    virtual bool VUsePreAllocate( void ) override { return false; }
-   static SDL_Surface* LoadAndReturnSurface( Resource& resource );
+   static SDL_Surface* LoadAndReturnSurface( Resource* pResource );
 };

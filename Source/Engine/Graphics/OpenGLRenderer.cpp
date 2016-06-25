@@ -60,7 +60,7 @@ void OpenGLRenderer::VSetProjectionTransform( const Mat4x4 *m )
    
    }*/
 
-void OpenGLRenderer::LoadTexture( GLuint* textureId, Resource& textureResource )
+void OpenGLRenderer::LoadTexture( GLuint* textureId, Resource* pTextureResource )
    {
    glGenTextures( 1, textureId );
 
@@ -68,7 +68,7 @@ void OpenGLRenderer::LoadTexture( GLuint* textureId, Resource& textureResource )
    glBindTexture( GL_TEXTURE_2D, *textureId );
    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
-   auto pSurface = TextureResourceLoader::LoadAndReturnSurface( textureResource );
+   auto pSurface = TextureResourceLoader::LoadAndReturnSurface( pTextureResource );
 
    int Mode = GL_RGB;
    if( pSurface->format->BytesPerPixel == 4 )
@@ -82,44 +82,40 @@ void OpenGLRenderer::LoadTexture( GLuint* textureId, Resource& textureResource )
   
    }
 
-void OpenGLRenderer::LoadMesh( GLuint* vertexBuffer, float* radius, GLuint* uvBuffer, GLuint* indexBuffer, GLuint* normalBuffer, Resource& meshResource )
+void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint* pIndexBuffer, GLuint* pNormalBuffer, const aiScene* pAiScene )
    {
-   auto pAiScene = MeshResourceLoader::LoadAndReturnScene( meshResource );
    auto pMesh = pAiScene->mMeshes[0];
 
-   glGenBuffers( 1, vertexBuffer );
-   glBindBuffer( GL_ARRAY_BUFFER, *vertexBuffer );
+   glGenBuffers( 1, pVertexBuffer );
+   glBindBuffer( GL_ARRAY_BUFFER, *pVertexBuffer );
    glBufferData( GL_ARRAY_BUFFER,
                  pMesh->mNumVertices * sizeof( aiVector3t<float> ),
                  &pMesh->mVertices[0],
                  GL_STATIC_DRAW );
-
-   *radius = -1.0f;
 
    // UV coordinates loaded in assimp is 3-dimensions
    // But GLSL expect 2-dimension coordinates
    // So we have to translate them
    aiVector2t<float> *uvVertices = NULL;
 
-   if( uvBuffer )
+   if( pUvBuffer )
       {
       uvVertices = ENG_NEW aiVector2t<float>[pMesh->mNumVertices];
-      glGenBuffers( 1, uvBuffer );
+      glGenBuffers( 1, pUvBuffer );
       }
 
    for( unsigned int vertex = 0; vertex < pMesh->mNumVertices; vertex++ )
       {
       auto curSquareLength = pMesh->mVertices[vertex].SquareLength( );
-      *radius = std::max( *radius, curSquareLength );
-      if( uvBuffer )
+      if( pUvBuffer )
          {
          memcpy( &uvVertices[vertex], &pMesh->mTextureCoords[0][vertex], sizeof( aiVector2t<float> ) );
          }
       }
 
-   if( uvBuffer )
+   if( pUvBuffer )
       {
-      glBindBuffer( GL_ARRAY_BUFFER, *uvBuffer );
+      glBindBuffer( GL_ARRAY_BUFFER, *pUvBuffer );
       glBufferData( GL_ARRAY_BUFFER,
                    pMesh->mNumVertices * sizeof( aiVector2t<float> ),
                     &uvVertices[0],
@@ -129,10 +125,10 @@ void OpenGLRenderer::LoadMesh( GLuint* vertexBuffer, float* radius, GLuint* uvBu
    // Loading UV Buffer & calculate bounding sphere radius
 
 
-   if( normalBuffer )
+   if( pNormalBuffer )
       {
-      glGenBuffers( 1, normalBuffer );
-      glBindBuffer( GL_ARRAY_BUFFER, *normalBuffer );
+      glGenBuffers( 1, pNormalBuffer );
+      glBindBuffer( GL_ARRAY_BUFFER, *pNormalBuffer );
       glBufferData( GL_ARRAY_BUFFER,
                     pMesh->mNumVertices * sizeof( aiVector3t<float> ),
                     &pMesh->mNormals[0],
@@ -140,7 +136,7 @@ void OpenGLRenderer::LoadMesh( GLuint* vertexBuffer, float* radius, GLuint* uvBu
 
       }
 
-   if( indexBuffer )
+   if( pIndexBuffer )
       {
       std::vector<unsigned int> indexes( pMesh->mNumFaces * 3, 0 );
       for( unsigned int t = 0; t < pMesh->mNumFaces; ++t )
@@ -151,8 +147,8 @@ void OpenGLRenderer::LoadMesh( GLuint* vertexBuffer, float* radius, GLuint* uvBu
          indexes[ t * 3 + 1] = face.mIndices[1];
          indexes[ t * 3 + 2] = face.mIndices[2];
          }
-      glGenBuffers( 1, indexBuffer );
-      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, *indexBuffer );
+      glGenBuffers( 1, pIndexBuffer );
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, *pIndexBuffer );
       glBufferData( GL_ELEMENT_ARRAY_BUFFER,
                     indexes.size() * sizeof( unsigned int ),
                     &indexes[0],

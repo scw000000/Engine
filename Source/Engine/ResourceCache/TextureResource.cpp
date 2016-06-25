@@ -1,7 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: TextureResource.cpp
-////////////////////////////////////////////////////////////////////////////////
-
+/*!
+ * \file TextureResource.cpp
+ * \date 2016/06/25 17:39
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "EngineStd.h"
 #include "TextureResource.h"
 #include "SDL_image.h"
@@ -64,9 +73,9 @@ bool TextureResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize
 	return true;
    }
 
-SDL_Surface* TextureResourceLoader::LoadAndReturnSurface( Resource& resource )
+SDL_Surface* TextureResourceLoader::LoadAndReturnSurface( Resource* pResource )
    {
-   shared_ptr<ResHandle> pTextureResHandle = g_pApp->m_pResCache->GetHandle( &resource );
+   shared_ptr<ResHandle> pTextureResHandle = g_pApp->m_pResCache->GetHandle( pResource );
    shared_ptr< SDLTextureResourceExtraData > pTextureExtra = static_pointer_cast< SDLTextureResourceExtraData >( pTextureResHandle->GetExtraData() );
    return pTextureExtra->m_pSurface;
    }

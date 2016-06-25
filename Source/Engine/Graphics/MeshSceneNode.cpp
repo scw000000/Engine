@@ -51,6 +51,8 @@ MeshSceneNode::MeshSceneNode(
    m_LightNumber = 0;
    m_MaterialAmbient = 0;
    m_MaterialDiffuse = 0;
+
+   m_VerticesCount = 0;
    }
 
 MeshSceneNode::~MeshSceneNode( void )
@@ -97,13 +99,16 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 	//glGetProgramiv( m_Program, GL_INFO_LOG_LENGTH, &infoLogLength );
 
 
-   OpenGLRenderer::LoadTexture( &m_Texture, m_Props.GetMaterialPtr()->GetTextureResource() );
+   OpenGLRenderer::LoadTexture( &m_Texture, &m_Props.GetMaterialPtr()->GetTextureResource() );
+
+   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( &*m_pMeshResource );
+   shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
+
+   m_VerticesCount = pMeshExtra->m_pScene->mMeshes[ 0 ]->mNumFaces * 3;
+   SetRadius( pMeshExtra->m_Radius );
+   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &m_UVBuffer, &m_IndexBuffer, &m_NormalBuffer, pMeshExtra->m_pScene );
+
    
-   float radius;
-
-   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &radius, &m_UVBuffer, &m_IndexBuffer, &m_NormalBuffer, *m_pMeshResource );
-
-   SetRadius( radius );
 
    m_MVPMatrix          = glGetUniformLocation( m_Program, "MVP" );
    m_TextureUni         = glGetUniformLocation( m_Program, "myTextureSampler" );
@@ -201,18 +206,15 @@ int MeshSceneNode::VRender( Scene *pScene )
       GL_FALSE,           // normalized?
       0,                  // stride
       ( void* ) 0            // array buffer offset
-      );
+      );    
 
-   // Force the Mesh to reload to getting vertex number
-   auto pAiScene = MeshResourceLoader::LoadAndReturnScene( *m_pMeshResource );
-      
    // Index buffer
    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer );
 
    // Draw the triangles !
    glDrawElements(
       GL_TRIANGLES,      // mode
-      pAiScene->mMeshes[0]->mNumFaces * 3,    // count
+      m_VerticesCount,    // count
       GL_UNSIGNED_INT,   // type
       ( void* ) 0           // element array buffer offset
       );

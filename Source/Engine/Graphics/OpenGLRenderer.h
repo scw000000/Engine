@@ -13,8 +13,7 @@
  * \note
  */
 
-// Maximum number of lights in GLSL shader and light manager
-#define MAXIMUM_LIGHTS_SUPPORTED (8)
+struct aiScene;
 
 /*!
  * \class OpenGlRenderer
@@ -39,8 +38,8 @@ class OpenGLRenderer : public IRenderer
 	   virtual bool VPostRender( void ) override;
 	   //virtual void VCalcLighting( Lights *lights, int maximumLights ) override;
 
-      static void LoadTexture( GLuint* textureId, Resource& textureResource );
-      static void LoadMesh( GLuint* vertexBuffer, float* radius, GLuint* uvBuffer, GLuint* indexBuffer, GLuint* normalBuffer, Resource& meshResource );
+      static void LoadTexture( GLuint* textureId, Resource* pTextureResource );
+      static void LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint* pIndexBuffer, GLuint* pNormalBuffer, const aiScene* pAiScene );
 	   
       //virtual shared_ptr<IRenderState> VPrepareAlphaPass( void )=0;
 	   //virtual shared_ptr<IRenderState> VPrepareSkyBoxPass( void )=0;

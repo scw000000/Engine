@@ -205,6 +205,9 @@
     <ClCompile Include="..\Utilities\XMLHelper.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
+    <ClCompile Include="..\Graphics\Raycast.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -376,6 +379,9 @@
     </ClInclude>
     <ClInclude Include="..\Utilities\XMLHelper.h">
       <Filter>Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Raycast.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

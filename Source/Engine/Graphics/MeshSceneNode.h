@@ -73,5 +73,7 @@ class MeshSceneNode : public SceneNode
 
       GLuint            m_MaterialAmbient;
       GLuint            m_MaterialDiffuse;
+
+      unsigned long     m_VerticesCount;
 	//float CalcBoundingSphere(CDXUTSDKMesh *mesh11);			// this was added post press.
    };

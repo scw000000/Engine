@@ -1,6 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: MeshResouce.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file MeshResource.cpp
+ * \date 2016/06/25 16:41
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "EngineStd.h"
 #include "MeshResource.h"
@@ -41,15 +51,21 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
    shared_ptr< MeshResourceExtraData > extra( ENG_NEW MeshResourceExtraData );
    handle->SetExtraData( extra );
    extra->m_pScene = p_Scene;
+   auto pMesh = extra->m_pScene->mMeshes[ 0 ];
+   for( unsigned int vertex = 0; vertex < pMesh->mNumVertices; vertex++ )
+      {
+      auto curSquareLength = pMesh->mVertices[ vertex ].SquareLength();
+      extra->m_Radius = std::max( extra->m_Radius, curSquareLength );
+      }
    struct aiMemoryInfo memInfo;
    aiGetMemoryRequirements( p_Scene, &memInfo );
    handle->SetSize( memInfo.total );
    return true;
    }
 
-const aiScene* MeshResourceLoader::LoadAndReturnScene( Resource& resource )
+const aiScene* MeshResourceLoader::LoadAndReturnScene( Resource* resource )
    {
-   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( &resource );  	
+   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( resource );  	
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast<MeshResourceExtraData>( pMeshResHandle->GetExtraData() );
    return pMeshExtra->m_pScene;
    }

@@ -73,9 +73,9 @@ bool TextureResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize
 	return true;
    }
 
-SDL_Surface* TextureResourceLoader::LoadAndReturnSurface( Resource* pResource )
+SDL_Surface* TextureResourceLoader::LoadAndReturnSurface( const Resource& resource )
    {
-   shared_ptr<ResHandle> pTextureResHandle = g_pApp->m_pResCache->GetHandle( pResource );
+   shared_ptr<ResHandle> pTextureResHandle = g_pApp->m_pResCache->GetHandle( resource );
    shared_ptr< SDLTextureResourceExtraData > pTextureExtra = static_pointer_cast< SDLTextureResourceExtraData >( pTextureResHandle->GetExtraData() );
    return pTextureExtra->m_pSurface;
    }

@@ -45,5 +45,5 @@ public:
 	virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize );
 	virtual bool VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle );
    virtual bool VUsePreAllocate( void ) override { return false; }
-   static SDL_Surface* LoadAndReturnSurface( Resource* pResource );
+   static SDL_Surface* LoadAndReturnSurface( const Resource& resource );
 };

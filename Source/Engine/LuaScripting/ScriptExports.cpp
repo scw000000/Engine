@@ -55,7 +55,7 @@ void InternalScriptExports::Destroy( void )
 bool InternalScriptExports::LoadAndExecuteScriptResource( const char *scriptRes )
    {
    Resource resource( scriptRes );
-   shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( &resource );
+   shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );
    return pResourceHandle != NULL;
    }
 

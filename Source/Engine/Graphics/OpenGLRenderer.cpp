@@ -60,7 +60,7 @@ void OpenGLRenderer::VSetProjectionTransform( const Mat4x4 *m )
    
    }*/
 
-void OpenGLRenderer::LoadTexture( GLuint* textureId, Resource* pTextureResource )
+void OpenGLRenderer::LoadTexture( GLuint* textureId, const Resource& textureResource )
    {
    glGenTextures( 1, textureId );
 
@@ -68,7 +68,7 @@ void OpenGLRenderer::LoadTexture( GLuint* textureId, Resource* pTextureResource 
    glBindTexture( GL_TEXTURE_2D, *textureId );
    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
-   auto pSurface = TextureResourceLoader::LoadAndReturnSurface( pTextureResource );
+   auto pSurface = TextureResourceLoader::LoadAndReturnSurface( textureResource );
 
    int Mode = GL_RGB;
    if( pSurface->format->BytesPerPixel == 4 )
@@ -209,7 +209,7 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
       }*/
    }
 
-GLuint OpenGLRenderer::GenerateShader( Resource* shaderRes, GLuint shaderType )
+GLuint OpenGLRenderer::GenerateShader( const Resource& shaderRes, GLuint shaderType )
    {
    // Create the shaders
    GLuint shader = glCreateShader( shaderType );
@@ -222,7 +222,7 @@ GLuint OpenGLRenderer::GenerateShader( Resource* shaderRes, GLuint shaderType )
       ENG_ERROR( "Invalid shader file path" );
       }
    // Compile Vertex Shader
-   ENG_LOG( "Renderer", "Compiling vertex shader: " + shaderRes->m_Name );
+   ENG_LOG( "Renderer", "Compiling vertex shader: " + shaderRes.m_Name );
 
    GLchar* p_VSSourcePointer = ( GLchar* ) pResourceHandle->GetBuffer( );
    CompileShader( &p_VSSourcePointer, shader );

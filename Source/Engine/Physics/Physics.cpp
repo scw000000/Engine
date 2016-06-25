@@ -143,7 +143,7 @@ void BulletPhysics::LoadXml( )
    {
    // Load the physics config file and grab the root XML node
    Resource physicsRes( "config\\Physics.xml", g_pApp->m_EngineOptions.m_UseDevDir );
-   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( &physicsRes );
+   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( physicsRes );
    ENG_ASSERT( pRoot );
 
    // load all materials

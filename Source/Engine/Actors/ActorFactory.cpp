@@ -34,27 +34,27 @@ ActorFactory::ActorFactory( void )
 
 // This version of function is different than the source code
 // Including function arguments LATER: modify it and let it consistant
-StrongActorPtr ActorFactory::CreateActor( Resource* pClassRes, Resource* pOverridesRes, TransformPtr pInitialTransform, ActorId serversActorId )
+StrongActorPtr ActorFactory::CreateActor( const Resource& classRes, Resource* pOverridesRes, TransformPtr pInitialTransform, ActorId serversActorId )
    {  
-   TiXmlElement* pActorClassNode = XmlResourceLoader::LoadAndReturnRootXmlElement( pClassRes );
+   TiXmlElement* pActorClassNode = XmlResourceLoader::LoadAndReturnRootXmlElement( classRes );
    
    if( !pActorClassNode )
       {
-      ENG_ERROR( "Failed to read actor class resource: " + pClassRes->m_Name );
+      ENG_ERROR( "Failed to read actor class resource: " + classRes.m_Name );
       return StrongActorPtr();
       }
 
    ActorId nextActorId = GetNextActorId();
    if( nextActorId == INVALID_ACTOR_ID )
       {
-      ENG_ERROR( "Actor ID generation failed: " + pClassRes->m_Name );
+      ENG_ERROR( "Actor ID generation failed: " + classRes.m_Name );
       }
 
    TiXmlElement* pActorClassDataNode = pActorClassNode->FirstChildElement( "Data" );
    StrongActorPtr pActor( ENG_NEW Actor( nextActorId ) );
    if( !pActor->Init( pActorClassDataNode ) )
       {
-      ENG_ERROR( "Failed to initialize actor " + pClassRes->m_Name );
+      ENG_ERROR( "Failed to initialize actor " + classRes.m_Name );
       }
    
    TiXmlElement* pFirstResComponentNode = pActorClassDataNode->NextSiblingElement();
@@ -75,7 +75,7 @@ StrongActorPtr ActorFactory::CreateActor( Resource* pClassRes, Resource* pOverri
 
    if( pOverridesRes )
       {
-      TiXmlElement* pOverridesNode = XmlResourceLoader::LoadAndReturnRootXmlElement( pOverridesRes );
+      TiXmlElement* pOverridesNode = XmlResourceLoader::LoadAndReturnRootXmlElement( *pOverridesRes );
       // Resource loading failed, return empty pointer
       if( !pOverridesNode )
          {

@@ -38,13 +38,13 @@ class OpenGLRenderer : public IRenderer
 	   virtual bool VPostRender( void ) override;
 	   //virtual void VCalcLighting( Lights *lights, int maximumLights ) override;
 
-      static void LoadTexture( GLuint* textureId, Resource* pTextureResource );
+      static void LoadTexture( GLuint* textureId, const Resource& pTextureResource );
       static void LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint* pIndexBuffer, GLuint* pNormalBuffer, const aiScene* pAiScene );
 	   
       //virtual shared_ptr<IRenderState> VPrepareAlphaPass( void )=0;
 	   //virtual shared_ptr<IRenderState> VPrepareSkyBoxPass( void )=0;
       
-      static GLuint GenerateShader( Resource* shaderRes, GLuint shaderType );
+      static GLuint GenerateShader( const Resource& shaderRes, GLuint shaderType );
 
       static GLuint GenerateProgram( GLuint vertexShader, GLuint fragmentShader );
 

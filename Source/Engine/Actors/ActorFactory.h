@@ -20,7 +20,7 @@ class ActorFactory
    {
    public:
       ActorFactory( void );
-      StrongActorPtr CreateActor( Resource* pClassRes, 
+      StrongActorPtr CreateActor( const Resource& classRes,
                                   Resource* pOverridesRes,
                                   TransformPtr pInitialTransform = NULL, 
                                   ActorId serversActorId = INVALID_ACTOR_ID );

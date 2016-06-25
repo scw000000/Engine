@@ -145,7 +145,7 @@ void ResourceCache::RegisterLoader( shared_ptr< IResourceLoader > loader )
    }
 
 // This function is callled by ResCache::preload to 
-shared_ptr< ResHandle > ResourceCache::GetHandle( Resource *resource )
+shared_ptr< ResHandle > ResourceCache::GetHandle( const Resource& resource )
    {
    shared_ptr< ResHandle > handle( Find( resource ) );
    // if the handle is not loaded yet ( cannot find the resource handle map ), then load it
@@ -178,7 +178,7 @@ int ResourceCache::Preload( const std::string pattern, void (*progressCallback)(
       // load the file if pattern is matched
       if( WildcardMatch( pattern.c_str(), resource.m_Name.c_str() ) )
          {
-         shared_ptr< ResHandle > handle = g_pApp->m_pResCache->GetHandle( &resource ); // use resource cache to load resource
+         shared_ptr< ResHandle > handle = g_pApp->m_pResCache->GetHandle( resource ); // use resource cache to load resource
          ++loaded;
          }
       if( progressCallback )
@@ -206,9 +206,9 @@ void ResourceCache::Flush( void )
 	   }
    }
 
-shared_ptr< ResHandle > ResourceCache::Find( Resource *resource )
+shared_ptr< ResHandle > ResourceCache::Find( const Resource& resource )
    {
-   ResHandleMap::iterator i = m_Resources.find( resource->m_Name );
+   ResHandleMap::iterator i = m_Resources.find( resource.m_Name );
 	if ( i == m_Resources.end() )
 		return shared_ptr<ResHandle>();
 
@@ -223,7 +223,7 @@ void ResourceCache::Update( shared_ptr< ResHandle > handle  )
 
    }
 
-shared_ptr< ResHandle > ResourceCache::Load( Resource *resource )
+shared_ptr< ResHandle > ResourceCache::Load( const Resource& resource )
    {
    shared_ptr< IResourceLoader > loader;
    shared_ptr< ResHandle > handle;
@@ -231,7 +231,7 @@ shared_ptr< ResHandle > ResourceCache::Load( Resource *resource )
    for( auto it = m_ResourceLoaders.begin(); it != m_ResourceLoaders.end(); ++it )
       {
       // find correspond matching loader based on resource name
-      if( (*it)->VIsPatternMatch( resource->m_Name.c_str() ) )
+      if( (*it)->VIsPatternMatch( resource.m_Name.c_str() ) )
          {
          loader = (*it);
          break;
@@ -244,7 +244,7 @@ shared_ptr< ResHandle > ResourceCache::Load( Resource *resource )
       return handle;
       }
    // find correspond file in zip file and return its size
-   int rawSize = m_pResourceFile->VGetRawResourceSize( *resource );
+   int rawSize = m_pResourceFile->VGetRawResourceSize( resource );
 	if ( rawSize < 0 )
 	   { 
 		ENG_ASSERT( rawSize > 0 && "Resource size returned -1 - Resource not found" );
@@ -265,7 +265,7 @@ shared_ptr< ResHandle > ResourceCache::Load( Resource *resource )
       }
    memset( pRawBuffer, 0, allocSize );
    // allocate rawBuffer fail or cannot load raw file from zip fIle
-   if( !pRawBuffer || !m_pResourceFile->VGetRawResource( *resource, pRawBuffer ) )
+   if( !pRawBuffer || !m_pResourceFile->VGetRawResource( resource, pRawBuffer ) )
       {
       return shared_ptr< ResHandle >();
       }
@@ -275,7 +275,7 @@ shared_ptr< ResHandle > ResourceCache::Load( Resource *resource )
    if( loader->VUseRawFile() ) // use raw pBuffer directly
       {
       pBuffer = pRawBuffer;
-      handle = shared_ptr< ResHandle >( ENG_NEW ResHandle( *resource, pBuffer, rawSize, this ) );
+      handle = shared_ptr< ResHandle >( ENG_NEW ResHandle( resource, pBuffer, rawSize, this ) );
       }
    else // allocate another buffer for processing
       {
@@ -288,7 +288,7 @@ shared_ptr< ResHandle > ResourceCache::Load( Resource *resource )
             }
          }
       // set buffer for handle
-      handle = shared_ptr< ResHandle >( ENG_NEW ResHandle( *resource, pBuffer, size, this ) );
+      handle = shared_ptr< ResHandle >( ENG_NEW ResHandle( resource, pBuffer, size, this ) );
       // loader store processed data into handle from pRawBuffer
       bool success = loader->VLoadResource( pRawBuffer, rawSize, handle ); 
 
@@ -318,7 +318,7 @@ shared_ptr< ResHandle > ResourceCache::Load( Resource *resource )
    if( handle )
       {
       m_lruResHandleList.push_front( handle ); // this resource is newly loaded, put it in the start of list
-      m_Resources[ resource->m_Name ] = handle; // add resource name & handle mapping
+      m_Resources[ resource.m_Name ] = handle; // add resource name & handle mapping
       }
 
    return handle;

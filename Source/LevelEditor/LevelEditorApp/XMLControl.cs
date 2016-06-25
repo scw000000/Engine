@@ -375,46 +375,43 @@ namespace LevelEditorApp
                   }
                dataGridView.Height = totalHeight;
                this.xmlPanel.RowStyles.Add( new System.Windows.Forms.RowStyle( System.Windows.Forms.SizeType.Absolute, totalHeight ) );
+               dataGridView.CellToolTipTextNeeded += new DataGridViewCellToolTipTextNeededEventHandler( this.dataGridView_CellToolTipTextNeeded );
                //     this.xmlPanel.ColumnStyles[ 1 ] = new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Absolute, dataGridView.Columns.GetColumnsWidth( DataGridViewElementStates.None ) );
-               Console.WriteLine( "----TABLE : " + m_DataSet.Tables[ i ].TableName );
-               for( int j = 0; j < m_DataSet.Tables[ i ].Rows.Count; ++j )
-                  {
-                  Console.WriteLine( "row" + j );
-                  string parentName = "";
-                  int parentRow = -1;
-                  System.Windows.Forms.ToolTip toolTip1 = new System.Windows.Forms.ToolTip();
-                  DataGridViewCell cell = dataGridView.Rows[ j ].Cells[ 0 ];
-
-                  cell.ToolTipText = "test " + i;
-                  dataGridView.CellToolTipTextNeeded += new DataGridViewCellToolTipTextNeededEventHandler( this.dataGridView_CellToolTipTextNeeded );
-                  if( GetParentTableRow( ref parentName, ref parentRow, m_DataSet.Tables[ i ].TableName, j ) )
-                     {
-                     Console.WriteLine( "None Root Node! " + parentName + parentRow );
-                     }
-                  else
-                     {
-                     Console.WriteLine( "Root Node! " );
-                     }
-                  //if( m_DataSet.Tables[ i ].Rows[ j ].Table.ParentRelations.Count == 0 )
-                  //   {
-                  //   Console.WriteLine( " no parent" );
-                  //   }
-                  //else
-                  //   {
-                  //   for( int k = 0; k < m_DataSet.Tables[ i ].Rows[ j ].Table.ParentRelations.Count; ++k )
-                  //   {
-                  //   Console.WriteLine( m_DataSet.Tables[ i ].Rows[ j ].Table.ParentRelations[k].RelationName );
-                  //   }
-                  //   }
-                  for( int k = 0; k < m_DataSet.Tables[ i ].Rows[ j ].ItemArray.Length; ++k )
-                     {
-                     if( m_DataSet.Tables[ i ].Rows[ j ].ItemArray[ k ] == null )
-                        {
-                        Console.WriteLine( "empty!" );
-                        }
-                     Console.WriteLine( m_DataSet.Tables[ i ].Rows[ j ].Table.Columns[ k ].ColumnName + " " + "\"" + m_DataSet.Tables[ i ].Rows[ j ].ItemArray[ k ] + "\"" );
-                     }
-                  }
+               //Console.WriteLine( "----TABLE : " + m_DataSet.Tables[ i ].TableName );
+               //for( int j = 0; j < m_DataSet.Tables[ i ].Rows.Count; ++j )
+               //   {
+               //   Console.WriteLine( "row" + j );
+               //   string parentName = "";
+               //   int parentRow = -1;
+                  
+               //   if( GetParentTableRow( ref parentName, ref parentRow, m_DataSet.Tables[ i ].TableName, j ) )
+               //      {
+               //      Console.WriteLine( "None Root Node! " + parentName + parentRow );
+               //      }
+               //   else
+               //      {
+               //      Console.WriteLine( "Root Node! " );
+               //      }
+               //   //if( m_DataSet.Tables[ i ].Rows[ j ].Table.ParentRelations.Count == 0 )
+               //   //   {
+               //   //   Console.WriteLine( " no parent" );
+               //   //   }
+               //   //else
+               //   //   {
+               //   //   for( int k = 0; k < m_DataSet.Tables[ i ].Rows[ j ].Table.ParentRelations.Count; ++k )
+               //   //   {
+               //   //   Console.WriteLine( m_DataSet.Tables[ i ].Rows[ j ].Table.ParentRelations[k].RelationName );
+               //   //   }
+               //   //   }
+               //   //for( int k = 0; k < m_DataSet.Tables[ i ].Rows[ j ].ItemArray.Length; ++k )
+               //   //   {
+               //   //   if( m_DataSet.Tables[ i ].Rows[ j ].ItemArray[ k ] == null )
+               //   //      {
+               //   //      Console.WriteLine( "empty!" );
+               //   //      }
+               //   //   Console.WriteLine( m_DataSet.Tables[ i ].Rows[ j ].Table.Columns[ k ].ColumnName + " " + "\"" + m_DataSet.Tables[ i ].Rows[ j ].ItemArray[ k ] + "\"" );
+               //   //   }
+               //   }
                }
             //if( m_DataSet.Tables[ i ].Rows.Count > 0 )
             //   {

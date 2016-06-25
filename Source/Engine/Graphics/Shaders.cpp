@@ -19,7 +19,7 @@ VertexShader::~VertexShader( void )
 
 void VertexShader::OnRestore( Scene* pScene )
    {
-   m_VertexShader = OpenGLRenderer::GenerateShader( &m_ShaderResource, GL_VERTEX_SHADER );
+   m_VertexShader = OpenGLRenderer::GenerateShader( m_ShaderResource, GL_VERTEX_SHADER );
  //  shared_ptr<OpenGLRenderer> p_OpenGLRenderer = static_pointer_cast<OpenGLRenderer>( pScene->GetRenderer() );
 	//
  //  // Create the shaders
@@ -72,7 +72,7 @@ FragmentShader::~FragmentShader( void )
 
 void FragmentShader::OnRestore( Scene *pScene )
    {
-   m_FragmentShader = OpenGLRenderer::GenerateShader( &m_ShaderResource, GL_FRAGMENT_SHADER );
+   m_FragmentShader = OpenGLRenderer::GenerateShader( m_ShaderResource, GL_FRAGMENT_SHADER );
  //  shared_ptr<OpenGLRenderer> p_OpenGLRenderer = static_pointer_cast<OpenGLRenderer>( pScene->GetRenderer() );
 	//
  //  // Create the shaders

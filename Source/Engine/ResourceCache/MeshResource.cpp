@@ -63,7 +63,7 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
    return true;
    }
 
-const aiScene* MeshResourceLoader::LoadAndReturnScene( Resource* resource )
+const aiScene* MeshResourceLoader::LoadAndReturnScene( const Resource& resource )
    {
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( resource );  	
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast<MeshResourceExtraData>( pMeshResHandle->GetExtraData() );

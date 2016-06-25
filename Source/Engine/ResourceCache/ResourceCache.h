@@ -112,16 +112,16 @@ class ResourceCache
       bool Init();
       void RegisterLoader( shared_ptr< IResourceLoader > loader );
 
-      shared_ptr< ResHandle > GetHandle( Resource *r );
+      shared_ptr< ResHandle > GetHandle( const Resource& resource );
       int Preload( const std::string pattern, void (*progressCallback)( int, bool & ) );
       void Flush( void );
       bool IsUsingDevelopmentDirectories( void ) const { ENG_ASSERT( m_pResourceFile ); return m_pResourceFile->VIsUsingDevelopmentDirectories(); }
       std::vector<std::string> Match( const std::string pattern );
 
    protected:
-      shared_ptr< ResHandle > Find( Resource *resource );
+      shared_ptr< ResHandle > Find( const Resource& resource );
       void Update( shared_ptr< ResHandle > handle  );
-      shared_ptr< ResHandle > Load( Resource *resource );
+      shared_ptr< ResHandle > Load( const Resource& resource );
       void Free( shared_ptr< ResHandle > gonner );
 
       bool MakeRoom( unsigned int size );

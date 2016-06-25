@@ -452,7 +452,7 @@ bool EngineApp::LoadStrings( std::string language )
 	languageFile += language;
 	languageFile += ".xml";
    Resource languageRes( languageFile, g_pApp->m_EngineOptions.m_UseDevDir );
-   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( &languageRes );
+   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( languageRes );
 	// load failed
    if ( !pRoot )
 	   {

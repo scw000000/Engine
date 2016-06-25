@@ -99,9 +99,9 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 	//glGetProgramiv( m_Program, GL_INFO_LOG_LENGTH, &infoLogLength );
 
 
-   OpenGLRenderer::LoadTexture( &m_Texture, &m_Props.GetMaterialPtr()->GetTextureResource() );
+   OpenGLRenderer::LoadTexture( &m_Texture, m_Props.GetMaterialPtr()->GetTextureResource() );
 
-   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( &*m_pMeshResource );
+   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
    m_VerticesCount = pMeshExtra->m_pScene->mMeshes[ 0 ]->mNumFaces * 3;

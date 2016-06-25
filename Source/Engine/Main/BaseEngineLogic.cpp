@@ -105,12 +105,12 @@ StrongActorPtr BaseEngineLogic::VCreateActorFromOverrides( const char* overrides
    {
    ENG_ASSERT( m_pActorFactory );
    Resource overridesRes( overrides );
-   TiXmlHandle actorClassResHandle = XmlResourceLoader::LoadAndReturnRootXmlElement( &overridesRes );
+   TiXmlHandle actorClassResHandle = XmlResourceLoader::LoadAndReturnRootXmlElement( overridesRes );
    TiXmlElement* pActorClassReshNode = actorClassResHandle.FirstChild( "Data" ).FirstChild( "ActorClassResource" ).ToElement();
    ENG_ASSERT( pActorClassReshNode );
    Resource actorClassRes( pActorClassReshNode->Attribute( "path" ) );
 
-   StrongActorPtr pActor = m_pActorFactory->CreateActor( &actorClassRes, &overridesRes, pTransform );
+   StrongActorPtr pActor = m_pActorFactory->CreateActor( actorClassRes, &overridesRes, pTransform );
    if ( pActor )
       {
       // Insert into actor map
@@ -130,7 +130,7 @@ StrongActorPtr BaseEngineLogic::VCreateActorFromClass( const char* classFilePath
 
    Resource actorClassRes( classFilePath );
 
-   StrongActorPtr pActor = m_pActorFactory->CreateActor( &actorClassRes, NULL, pTransform );
+   StrongActorPtr pActor = m_pActorFactory->CreateActor( actorClassRes, NULL, pTransform );
    if( pActor )
       {
       // Insert into actor map
@@ -261,7 +261,7 @@ bool BaseEngineLogic::VLoadLevel( const char* levelResource )
    {
    Resource levelRes( levelResource, g_pApp->m_EngineOptions.m_UseDevDir );
     // Grab the root XML node
-   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( &levelRes );
+   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( levelRes );
    if (!pRoot)
       { 
       ENG_ERROR( "Failed to find level resource file: " + std::string( levelResource ) );
@@ -284,7 +284,7 @@ bool BaseEngineLogic::VLoadLevel( const char* levelResource )
    if (preLoadScript)
       {
       Resource resource( preLoadScript );
-      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( &resource );  // this actually loads the XML file from the zip file
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );  // this actually loads the XML file from the zip file
       }
 
     // load all initial actors
@@ -324,7 +324,7 @@ bool BaseEngineLogic::VLoadLevel( const char* levelResource )
    if ( postLoadScript )
       {
       Resource resource( postLoadScript );
-      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( &resource );  // this actually loads the XML file from the zip file
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );  // this actually loads the XML file from the zip file
       }
    
    return true;
@@ -336,7 +336,7 @@ void BaseEngineLogic::VOnFileDrop( const char* filePath, const Point& dropLocati
   // std::string extension = fileRes.GetExtension();
    if( WildcardMatch( "*.xml", fileRes.m_Name.c_str() ) )
       {
-      TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( &fileRes );
+      TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( fileRes );
       std::string rootName = pRoot->Value();
       auto pCamera = m_pWrold->GetCamera();
       TransformPtr pTransform( pCamera->VGetProperties().GetTransformPtr() );

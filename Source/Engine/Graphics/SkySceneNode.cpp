@@ -62,9 +62,9 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    m_FragmentShader.ReleaseShader( m_Program );
 
 
-   OpenGLRenderer::LoadTexture( &m_Texture, &*m_pTextureResource );
+   OpenGLRenderer::LoadTexture( &m_Texture, *m_pTextureResource );
    
-   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( &*m_pMeshResource );
+   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
    m_VerticesCount = pMeshExtra->m_pScene->mMeshes[ 0 ]->mNumFaces * 3;

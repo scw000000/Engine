@@ -115,7 +115,7 @@ bool EventManager::VQueueEvent( const IEventPtr& pEvent )
    ENG_ASSERT( m_ActiveQueue >= 0 );
    ENG_ASSERT( m_ActiveQueue < EVENTMANAGER_NUM_QUEUES );
    auto mapIt = m_EventListeners.find( pEvent->VGetEventType() );
-   // If no one is lisiting, abort
+   // If no one is listening, abort
    if( mapIt == m_EventListeners.end() || !mapIt->second.size() )
       {
       return false;
@@ -131,7 +131,7 @@ bool EventManager::VAbortEvent( const EventType&type, bool allOfType )
    ENG_ASSERT( m_ActiveQueue >= 0 );
    ENG_ASSERT( m_ActiveQueue < EVENTMANAGER_NUM_QUEUES );
    auto mapIt = m_EventListeners.find( type );
-   // If no one is lisiting, forget about it
+   // If no one is listening, abort
    if( mapIt == m_EventListeners.end() )
       {
       return false;

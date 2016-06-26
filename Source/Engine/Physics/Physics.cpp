@@ -17,6 +17,7 @@
 
 #include "btBulletDynamicsCommon.h"
 #include "PhysicsDebugDrawer.h"
+#include "CollisionTable.h"
 
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Actors\TransformComponent.h"
@@ -24,6 +25,7 @@
 #include "..\Event\PhysicsEvents.h"
 #include "..\Event\EventManager.h"
 
+IGamePhysics* g_pGamePhysics = NULL;
 
 /////////////////////////////////////////////////////////////////////////////
 // helpers for conversion to and from Bullet's data types
@@ -98,12 +100,23 @@ static Transform btTransform_to_Transform( btTransform const & trans )
    return ret;
    }
 
-BulletPhysics::BulletPhysics( )
+IGamePhysics::IGamePhysics( IGamePhysics* pImplPhysics )
+   {
+   ENG_ASSERT( !g_pGamePhysics );
+   g_pGamePhysics = pImplPhysics;
+   }
+
+IGamePhysics& IGamePhysics::GetSingleton( void )
+   {
+   return *g_pGamePhysics;
+   }
+
+BulletPhysics::BulletPhysics() : IGamePhysics( this )
    {
    // [mrmike] This was changed post-press to add event registration!
    REGISTER_EVENT( EvtData_PhysTrigger_Enter );
    REGISTER_EVENT( EvtData_PhysTrigger_Leave );
-   REGISTER_SCRIPT_EVENT( EvtData_PhysCollision );
+   //REGISTER_SCRIPT_EVENT( EvtData_PhysCollision );
    REGISTER_EVENT( EvtData_PhysSeparation );
    }
 
@@ -134,6 +147,7 @@ BulletPhysics::~BulletPhysics( )
    SAFE_DELETE( m_CollisionConfig );
    }
 
+
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::LoadXml						- not described in the book
 //
@@ -155,7 +169,7 @@ void BulletPhysics::LoadXml( )
       double friction = 0;
       pNode->Attribute( "restitution", &restitution );
       pNode->Attribute( "friction", &friction );
-      m_materialTable.insert( std::make_pair( pNode->Value( ), MaterialData( ( float ) restitution, ( float ) friction ) ) );
+      m_MaterialTable.insert( std::make_pair( pNode->Value( ), MaterialData( ( float ) restitution, ( float ) friction ) ) );
       }
 
    // load all densities
@@ -164,8 +178,13 @@ void BulletPhysics::LoadXml( )
    for( TiXmlElement* pNode = pParentNode->FirstChildElement( ); pNode; pNode = pNode->NextSiblingElement( ) )
       {
       // Insert ( substance name, substance density )
-      m_densityTable.insert( std::make_pair( pNode->Value( ), ( float ) atof( pNode->FirstChild( )->Value( ) ) ) );
+      m_DensityTable.insert( std::make_pair( pNode->Value( ), ( float ) atof( pNode->FirstChild( )->Value( ) ) ) );
       }
+   pParentNode = pRoot->FirstChildElement( "CollisionTable" );
+   ENG_ASSERT( pParentNode );
+   
+   ENG_ASSERT( CollisionTable::GetSingleton().Init( pParentNode ) );
+
    }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -249,7 +268,7 @@ void BulletPhysics::VSyncVisibleScene( )
       ActorMotionState const * const actorMotionState = static_cast< ActorMotionState* >( it->second->getMotionState( ) );
       ENG_ASSERT( actorMotionState );
 
-      StrongActorPtr pActor = MakeStrongPtr( g_pApp->m_pEngineLogic->VGetActor( id ) );
+      StrongActorPtr pActor = g_pApp->m_pEngineLogic->VGetActor( id ).lock();
       if( pActor && actorMotionState )
          {
          TransformPtr pActorTransform = pActor->GetTransformPtr();
@@ -315,11 +334,11 @@ void BulletPhysics::AddShape( StrongActorPtr pActor, btCollisionShape* shape, fl
    btRigidBody::btRigidBodyConstructionInfo rbInfo( mass, myMotionState, shape, localInertia );
 
    // set up the materal properties
-   rbInfo.m_restitution = material.m_restitution;
-   rbInfo.m_friction = material.m_friction;
+   rbInfo.m_restitution = material.m_Restitution;
+   rbInfo.m_friction = material.m_Friction;
 
    btRigidBody * const body = new btRigidBody( rbInfo );
-
+   
    m_DynamicsWorld->addRigidBody( body );
 
    // add it to the collection to be checked for changes in VSyncVisibleScene
@@ -403,7 +422,7 @@ ActorId BulletPhysics::FindActorID( btRigidBody const * const body ) const
 //
 void BulletPhysics::VAddSphere( float const radius, WeakActorPtr pActor, const std::string& densityStr, const std::string& physicsMaterial )
    {
-   StrongActorPtr pStrongActor = MakeStrongPtr( pActor );
+   StrongActorPtr pStrongActor = pActor.lock();
    if( !pStrongActor )
       return;  // FUTURE WORK - Add a call to the error log here
 
@@ -423,7 +442,7 @@ void BulletPhysics::VAddSphere( float const radius, WeakActorPtr pActor, const s
 //
 void BulletPhysics::VAddBox( const Vec3& dimensions, WeakActorPtr pActor, const std::string& densityStr, const std::string& physicsMaterial )
    {
-   StrongActorPtr pStrongActor = MakeStrongPtr( pActor );
+   StrongActorPtr pStrongActor = pActor.lock();
    if( !pStrongActor )
       return;  // FUTURE WORK: Add a call to the error log here
 
@@ -443,7 +462,7 @@ void BulletPhysics::VAddBox( const Vec3& dimensions, WeakActorPtr pActor, const 
 //
 void BulletPhysics::VAddPointCloud( Vec3 *verts, int numPoints, WeakActorPtr pActor, /*const Mat4x4& initialTransform,*/ const std::string& densityStr, const std::string& physicsMaterial )
    {
-   StrongActorPtr pStrongActor = MakeStrongPtr( pActor );
+   StrongActorPtr pStrongActor = pActor.lock();
    if( !pStrongActor )
       return;  // FUTURE WORK: Add a call to the error log here
 
@@ -493,7 +512,7 @@ void BulletPhysics::VRenderDiagnostics( void )
 
 void BulletPhysics::VCreateTrigger( WeakActorPtr pActor, const Vec3 &pos, const float dim )
    {
-   StrongActorPtr pStrongActor = MakeStrongPtr( pActor );
+   StrongActorPtr pStrongActor = pActor.lock();
    if( !pStrongActor )
       return;  // FUTURE WORK: Add a call to the error log here
 
@@ -885,8 +904,8 @@ void BulletPhysics::SendCollisionPairRemoveEvent( btRigidBody const * const body
 float BulletPhysics::LookupSpecificGravity( const std::string& densityStr )
    {
    float density = 0;
-   auto densityIt = m_densityTable.find( densityStr );
-   if( densityIt != m_densityTable.end( ) )
+   auto densityIt = m_DensityTable.find( densityStr );
+   if( densityIt != m_DensityTable.end( ) )
       density = densityIt->second;
    // else: dump error
 
@@ -895,8 +914,8 @@ float BulletPhysics::LookupSpecificGravity( const std::string& densityStr )
 
 MaterialData BulletPhysics::LookupMaterialData( const std::string& materialStr )
    {
-   auto materialIt = m_materialTable.find( materialStr );
-   if( materialIt != m_materialTable.end( ) )
+   auto materialIt = m_MaterialTable.find( materialStr );
+   if( materialIt != m_MaterialTable.end( ) )
       return materialIt->second;
    else
       return MaterialData( 0, 0 );
@@ -908,19 +927,19 @@ MaterialData BulletPhysics::LookupMaterialData( const std::string& materialStr )
 // CreateGamePhysics 
 //   The free function that creates an object that implements the IGamePhysics interface.
 //
-IGamePhysics *CreateGamePhysics( )
-   {
-   std::auto_ptr<IGamePhysics> gamePhysics;
-   gamePhysics.reset( ENG_NEW BulletPhysics );
-
-   if( gamePhysics.get( ) && !gamePhysics->VInitialize( ) )
-      {
-      // physics failed to initialize.  delete it.
-      gamePhysics.reset( );
-      }
-
-   return gamePhysics.release( );
-   }
+//IGamePhysics *CreateGamePhysics( )
+//   {
+//   std::auto_ptr<IGamePhysics> gamePhysics;
+//   gamePhysics.reset( ENG_NEW BulletPhysics );
+//
+//   if( gamePhysics.get( ) && !gamePhysics->VInitialize( ) )
+//      {
+//      // physics failed to initialize.  delete it.
+//      gamePhysics.reset( );
+//      }
+//
+//   return gamePhysics.release( );
+//   }
 //
 //IGamePhysics *CreateNullPhysics( )
 //   {

@@ -138,12 +138,9 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 
  //  extern shared_ptr<IResourceLoader> CreateWAVResourceLoader();
 //	extern shared_ptr<IResourceLoader> CreateOGGResourceLoader();
-	//extern shared_ptr<IResourceLoader> CreateDDSResourceLoader();
-	//extern shared_ptr<IResourceLoader> CreateJPGResourceLoader();
    extern shared_ptr<IResourceLoader> CreateXmlResourceLoader();
    extern shared_ptr<IResourceLoader> CreateMeshResourceLoader();
    extern shared_ptr<IResourceLoader> CreateTextureResourceLoader();
-   //extern shared_ptr<IResourceLoader> CreateSdkMeshResourceLoader();
    //extern shared_ptr<IResourceLoader> CreateScriptResourceLoader();
 
 

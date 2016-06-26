@@ -1,6 +1,12 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: OpenGLRenderer.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file OpenGLRenderer.cpp
+ *
+ * \author SCW
+ * \date д╗ды 2016
+ *
+ *
+ */
+
 #include "EngineStd.h"
 #include "OpenGLRenderer.h"
 #include "..\ResourceCache\TextureResource.h"
@@ -102,28 +108,17 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
       {
       uvVertices = ENG_NEW aiVector2t<float>[pMesh->mNumVertices];
       glGenBuffers( 1, pUvBuffer );
-      }
-
-   for( unsigned int vertex = 0; vertex < pMesh->mNumVertices; vertex++ )
-      {
-      auto curSquareLength = pMesh->mVertices[vertex].SquareLength( );
-      if( pUvBuffer )
+      for( unsigned int vertex = 0; vertex < pMesh->mNumVertices; vertex++ )
          {
-         memcpy( &uvVertices[vertex], &pMesh->mTextureCoords[0][vertex], sizeof( aiVector2t<float> ) );
+         memcpy( &uvVertices[ vertex ], &pMesh->mTextureCoords[ 0 ][ vertex ], sizeof( aiVector2t<float> ) );
          }
-      }
-
-   if( pUvBuffer )
-      {
       glBindBuffer( GL_ARRAY_BUFFER, *pUvBuffer );
       glBufferData( GL_ARRAY_BUFFER,
-                   pMesh->mNumVertices * sizeof( aiVector2t<float> ),
-                    &uvVertices[0],
+                    pMesh->mNumVertices * sizeof( aiVector2t<float> ),
+                    &uvVertices[ 0 ],
                     GL_STATIC_DRAW );
       SAFE_DELETE_ARRAY( uvVertices );
       }
-   // Loading UV Buffer & calculate bounding sphere radius
-
 
    if( pNormalBuffer )
       {
@@ -226,7 +221,7 @@ GLuint OpenGLRenderer::GenerateShader( const Resource& shaderRes, GLuint shaderT
 
    GLchar* p_VSSourcePointer = ( GLchar* ) pResourceHandle->GetBuffer( );
    CompileShader( &p_VSSourcePointer, shader );
-
+   
    return shader;
    }
 

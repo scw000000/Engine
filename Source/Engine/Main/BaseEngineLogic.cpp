@@ -22,6 +22,7 @@
 #include "..\UserInterface\GUIManager.h"
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Event\EventManager.h"
+#include "..\Physics\Physics.h"
 
 void LevelManager::Init( const std::string& levelDir )
    {
@@ -42,7 +43,6 @@ BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer ) : m_pGUIMana
       m_pWrold.reset( ENG_NEW Scene( pRenderer ) );
       m_pRenderer = pRenderer;
       }
-	m_State = BGS_Initializing;
    m_pActorFactory = ENG_NEW ActorFactory;
    m_pLevelManager = ENG_NEW LevelManager;
    m_EnableActorUpdate = true;
@@ -89,6 +89,7 @@ bool BaseEngineLogic::Init()
 
    shared_ptr<IView> pView( ENG_NEW HumanView( ) );
    VAddView( pView );
+   IGamePhysics::RegisterImplementation< BulletPhysics >();
    return true;
    }
 

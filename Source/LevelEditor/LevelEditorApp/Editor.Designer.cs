@@ -37,12 +37,11 @@ namespace LevelEditorApp
          this.splitContainer1 = new System.Windows.Forms.SplitContainer();
          this.splitContainer2 = new System.Windows.Forms.SplitContainer();
          this.splitContainer_Left = new System.Windows.Forms.SplitContainer();
-         this.splitContainer_Mid = new System.Windows.Forms.SplitContainer();
-         this.splitContainer_Right = new System.Windows.Forms.SplitContainer();
          this.tabCtlEX_LeftUp = new LevelEditorApp.TabControlEX();
          this.tabCtlEX_LeftDown = new LevelEditorApp.TabControlEX();
          this.tabPageEX_Assets = new LevelEditorApp.TabPageEX(this.components);
          this.treeView_Assets = new System.Windows.Forms.TreeView();
+         this.splitContainer_Mid = new System.Windows.Forms.SplitContainer();
          this.tabCtlEX_MidUp = new LevelEditorApp.TabControlEX();
          this.tabPageEX_World = new LevelEditorApp.TabPageEX(this.components);
          this.tabCtlEX_MidDown = new LevelEditorApp.TabControlEX();
@@ -50,6 +49,7 @@ namespace LevelEditorApp
          this.splitContainer3 = new System.Windows.Forms.SplitContainer();
          this.textBox_Console = new System.Windows.Forms.TextBox();
          this.textBox1 = new System.Windows.Forms.TextBox();
+         this.splitContainer_Right = new System.Windows.Forms.SplitContainer();
          this.tabCtlEX_RightUp = new LevelEditorApp.TabControlEX();
          this.tabCtlEX_RightDown = new LevelEditorApp.TabControlEX();
          this.tabPageEX_ActorXML = new LevelEditorApp.TabPageEX(this.components);
@@ -67,16 +67,12 @@ namespace LevelEditorApp
          this.splitContainer_Left.Panel1.SuspendLayout();
          this.splitContainer_Left.Panel2.SuspendLayout();
          this.splitContainer_Left.SuspendLayout();
+         this.tabCtlEX_LeftDown.SuspendLayout();
+         this.tabPageEX_Assets.SuspendLayout();
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Mid)).BeginInit();
          this.splitContainer_Mid.Panel1.SuspendLayout();
          this.splitContainer_Mid.Panel2.SuspendLayout();
          this.splitContainer_Mid.SuspendLayout();
-         ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Right)).BeginInit();
-         this.splitContainer_Right.Panel1.SuspendLayout();
-         this.splitContainer_Right.Panel2.SuspendLayout();
-         this.splitContainer_Right.SuspendLayout();
-         this.tabCtlEX_LeftDown.SuspendLayout();
-         this.tabPageEX_Assets.SuspendLayout();
          this.tabCtlEX_MidUp.SuspendLayout();
          this.tabCtlEX_MidDown.SuspendLayout();
          this.tabPageEX_Console.SuspendLayout();
@@ -84,6 +80,10 @@ namespace LevelEditorApp
          this.splitContainer3.Panel1.SuspendLayout();
          this.splitContainer3.Panel2.SuspendLayout();
          this.splitContainer3.SuspendLayout();
+         ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Right)).BeginInit();
+         this.splitContainer_Right.Panel1.SuspendLayout();
+         this.splitContainer_Right.Panel2.SuspendLayout();
+         this.splitContainer_Right.SuspendLayout();
          this.tabCtlEX_RightDown.SuspendLayout();
          this.tabPageEX_ActorXML.SuspendLayout();
          this.SuspendLayout();
@@ -170,51 +170,6 @@ namespace LevelEditorApp
          this.splitContainer_Left.SplitterWidth = 10;
          this.splitContainer_Left.TabIndex = 0;
          // 
-         // splitContainer_Mid
-         // 
-         this.splitContainer_Mid.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(49)))), ((int)(((byte)(49)))), ((int)(((byte)(49)))));
-         this.splitContainer_Mid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-         this.splitContainer_Mid.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.splitContainer_Mid.Location = new System.Drawing.Point(0, 0);
-         this.splitContainer_Mid.Name = "splitContainer_Mid";
-         this.splitContainer_Mid.Orientation = System.Windows.Forms.Orientation.Horizontal;
-         // 
-         // splitContainer_Mid.Panel1
-         // 
-         this.splitContainer_Mid.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-         this.splitContainer_Mid.Panel1.Controls.Add(this.tabCtlEX_MidUp);
-         // 
-         // splitContainer_Mid.Panel2
-         // 
-         this.splitContainer_Mid.Panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-         this.splitContainer_Mid.Panel2.Controls.Add(this.tabCtlEX_MidDown);
-         this.splitContainer_Mid.Size = new System.Drawing.Size(1604, 1029);
-         this.splitContainer_Mid.SplitterDistance = 770;
-         this.splitContainer_Mid.SplitterWidth = 10;
-         this.splitContainer_Mid.TabIndex = 0;
-         // 
-         // splitContainer_Right
-         // 
-         this.splitContainer_Right.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(49)))), ((int)(((byte)(49)))), ((int)(((byte)(49)))));
-         this.splitContainer_Right.Dock = System.Windows.Forms.DockStyle.Fill;
-         this.splitContainer_Right.Location = new System.Drawing.Point(0, 0);
-         this.splitContainer_Right.Name = "splitContainer_Right";
-         this.splitContainer_Right.Orientation = System.Windows.Forms.Orientation.Horizontal;
-         // 
-         // splitContainer_Right.Panel1
-         // 
-         this.splitContainer_Right.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-         this.splitContainer_Right.Panel1.Controls.Add(this.tabCtlEX_RightUp);
-         // 
-         // splitContainer_Right.Panel2
-         // 
-         this.splitContainer_Right.Panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-         this.splitContainer_Right.Panel2.Controls.Add(this.tabCtlEX_RightDown);
-         this.splitContainer_Right.Size = new System.Drawing.Size(158, 1029);
-         this.splitContainer_Right.SplitterDistance = 394;
-         this.splitContainer_Right.SplitterWidth = 10;
-         this.splitContainer_Right.TabIndex = 1;
-         // 
          // tabCtlEX_LeftUp
          // 
          this.tabCtlEX_LeftUp.ConfirmOnClose = true;
@@ -268,6 +223,29 @@ namespace LevelEditorApp
          this.treeView_Assets.TabIndex = 0;
          this.treeView_Assets.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.treeView_Assets_ItemDrag);
          this.treeView_Assets.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView_Assets_NodeMouseClick);
+         // 
+         // splitContainer_Mid
+         // 
+         this.splitContainer_Mid.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(49)))), ((int)(((byte)(49)))), ((int)(((byte)(49)))));
+         this.splitContainer_Mid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+         this.splitContainer_Mid.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.splitContainer_Mid.Location = new System.Drawing.Point(0, 0);
+         this.splitContainer_Mid.Name = "splitContainer_Mid";
+         this.splitContainer_Mid.Orientation = System.Windows.Forms.Orientation.Horizontal;
+         // 
+         // splitContainer_Mid.Panel1
+         // 
+         this.splitContainer_Mid.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+         this.splitContainer_Mid.Panel1.Controls.Add(this.tabCtlEX_MidUp);
+         // 
+         // splitContainer_Mid.Panel2
+         // 
+         this.splitContainer_Mid.Panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+         this.splitContainer_Mid.Panel2.Controls.Add(this.tabCtlEX_MidDown);
+         this.splitContainer_Mid.Size = new System.Drawing.Size(1604, 1029);
+         this.splitContainer_Mid.SplitterDistance = 770;
+         this.splitContainer_Mid.SplitterWidth = 10;
+         this.splitContainer_Mid.TabIndex = 0;
          // 
          // tabCtlEX_MidUp
          // 
@@ -365,6 +343,28 @@ namespace LevelEditorApp
          this.textBox1.Size = new System.Drawing.Size(1594, 22);
          this.textBox1.TabIndex = 1;
          // 
+         // splitContainer_Right
+         // 
+         this.splitContainer_Right.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(49)))), ((int)(((byte)(49)))), ((int)(((byte)(49)))));
+         this.splitContainer_Right.Dock = System.Windows.Forms.DockStyle.Fill;
+         this.splitContainer_Right.Location = new System.Drawing.Point(0, 0);
+         this.splitContainer_Right.Name = "splitContainer_Right";
+         this.splitContainer_Right.Orientation = System.Windows.Forms.Orientation.Horizontal;
+         // 
+         // splitContainer_Right.Panel1
+         // 
+         this.splitContainer_Right.Panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+         this.splitContainer_Right.Panel1.Controls.Add(this.tabCtlEX_RightUp);
+         // 
+         // splitContainer_Right.Panel2
+         // 
+         this.splitContainer_Right.Panel2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+         this.splitContainer_Right.Panel2.Controls.Add(this.tabCtlEX_RightDown);
+         this.splitContainer_Right.Size = new System.Drawing.Size(158, 1029);
+         this.splitContainer_Right.SplitterDistance = 394;
+         this.splitContainer_Right.SplitterWidth = 10;
+         this.splitContainer_Right.TabIndex = 1;
+         // 
          // tabCtlEX_RightUp
          // 
          this.tabCtlEX_RightUp.ConfirmOnClose = true;
@@ -445,16 +445,12 @@ namespace LevelEditorApp
          this.splitContainer_Left.Panel2.ResumeLayout(false);
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Left)).EndInit();
          this.splitContainer_Left.ResumeLayout(false);
+         this.tabCtlEX_LeftDown.ResumeLayout(false);
+         this.tabPageEX_Assets.ResumeLayout(false);
          this.splitContainer_Mid.Panel1.ResumeLayout(false);
          this.splitContainer_Mid.Panel2.ResumeLayout(false);
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Mid)).EndInit();
          this.splitContainer_Mid.ResumeLayout(false);
-         this.splitContainer_Right.Panel1.ResumeLayout(false);
-         this.splitContainer_Right.Panel2.ResumeLayout(false);
-         ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Right)).EndInit();
-         this.splitContainer_Right.ResumeLayout(false);
-         this.tabCtlEX_LeftDown.ResumeLayout(false);
-         this.tabPageEX_Assets.ResumeLayout(false);
          this.tabCtlEX_MidUp.ResumeLayout(false);
          this.tabCtlEX_MidDown.ResumeLayout(false);
          this.tabPageEX_Console.ResumeLayout(false);
@@ -464,6 +460,10 @@ namespace LevelEditorApp
          this.splitContainer3.Panel2.PerformLayout();
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer3)).EndInit();
          this.splitContainer3.ResumeLayout(false);
+         this.splitContainer_Right.Panel1.ResumeLayout(false);
+         this.splitContainer_Right.Panel2.ResumeLayout(false);
+         ((System.ComponentModel.ISupportInitialize)(this.splitContainer_Right)).EndInit();
+         this.splitContainer_Right.ResumeLayout(false);
          this.tabCtlEX_RightDown.ResumeLayout(false);
          this.tabPageEX_ActorXML.ResumeLayout(false);
          this.tabPageEX_ActorXML.PerformLayout();

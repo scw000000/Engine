@@ -33,19 +33,19 @@ extern Transform btTransform_to_Transform( btTransform const & trans );
 
 struct MaterialData 
    {
-   float m_restitution;
-   float m_friction;
+   float m_Restitution;
+   float m_Friction;
 
    MaterialData( float restitution, float friction )
       {
-      m_restitution = restitution;
-      m_friction = friction;
+      m_Restitution = restitution;
+      m_Friction = friction;
       }
 
    MaterialData( const MaterialData& other )
       {
-      m_restitution = other.m_restitution;
-      m_friction = other.m_friction;
+      m_Restitution = other.m_Restitution;
+      m_Friction = other.m_Friction;
       }
    };
 
@@ -59,24 +59,78 @@ struct ActorMotionState : public btMotionState
       }
 
    // btMotionState interface:  Bullet calls these
-   virtual void getWorldTransform( btTransform& worldTrans ) const
+   virtual void getWorldTransform( btTransform& worldTrans ) const override
       {
       worldTrans = Transform_to_btTransform( m_Transform );
       }
 
-   virtual void setWorldTransform( const btTransform& worldTrans )
+   virtual void setWorldTransform( const btTransform& worldTrans ) override
       {
       m_Transform = btTransform_to_Transform( worldTrans );
       }
    };
 
 
-class BulletPhysics : public IGamePhysics, ENG_Noncopyable 
+class IGamePhysics : public ENG_Noncopyable
    {
    public:
-      BulletPhysics( );				// [mrmike] This was changed post-press to add event registration!
-      virtual ~BulletPhysics( );
+      template< typename T > static void RegisterImplementation( void );
+      IGamePhysics& GetSingleton( void );
+      // Initialiazation and Maintenance of the Physics World
+      virtual bool VInitialize() = 0;
+      virtual void VSyncVisibleScene() = 0;
+      virtual void VOnUpdate( const float deltaSeconds ) = 0;
 
+      // Initialization of Physics Objects
+      virtual void VAddSphere( float radius, WeakActorPtr actor, /*const Mat4x4& initialTransform, */const std::string& densityStr, const std::string& physicsMaterial ) = 0;
+      virtual void VAddBox( const Vec3& dimensions, WeakActorPtr gameActor, /*const Mat4x4& initialTransform, */ const std::string& densityStr, const std::string& physicsMaterial ) = 0;
+      virtual void VAddPointCloud( Vec3 *verts, int numPoints, WeakActorPtr gameActor, /*const Mat4x4& initialTransform, */ const std::string& densityStr, const std::string& physicsMaterial ) = 0;
+      virtual void VRemoveActor( ActorId id ) = 0;
+
+      // Debugging
+      virtual void VRenderDiagnostics() = 0;
+
+      // Physics world modifiers
+      virtual void VCreateTrigger( WeakActorPtr pGameActor, const Vec3 &pos, const float dim ) = 0;
+      virtual void VApplyForce( const Vec3 &dir, float newtons, ActorId aid ) = 0;
+      virtual void VApplyTorque( const Vec3 &dir, float newtons, ActorId aid ) = 0;
+      virtual bool VKinematicMove( const Transform &trans, ActorId aid ) = 0;
+
+      // Physics actor states
+      virtual void VRotateY( ActorId actorId, float angleRadians, float time ) = 0;
+      virtual float VGetOrientationY( ActorId actorId ) = 0;
+      virtual void VStopActor( ActorId actorId ) = 0;
+      virtual Vec3 VGetVelocity( ActorId actorId ) = 0;
+      virtual void VSetVelocity( ActorId actorId, const Vec3& vel ) = 0;
+      virtual Vec3 VGetAngularVelocity( ActorId actorId ) = 0;
+      virtual void VSetAngularVelocity( ActorId actorId, const Vec3& vel ) = 0;
+      virtual void VTranslate( ActorId actorId, const Vec3& vec ) = 0;
+
+      virtual void VSetTransform( const ActorId id, const Transform& trans ) = 0;
+      virtual Transform VGetTransform( const ActorId id ) = 0;
+
+      virtual ~IGamePhysics( void ) {};
+      
+   protected:
+      IGamePhysics( IGamePhysics* pImplPhysics );
+   };
+
+template< typename T > void IGamePhysics::RegisterImplementation( void )
+   {
+   if( !std::is_base_of< IGamePhysics, T >::value )
+      {
+      ENG_ERROR( "Invalid implementation register" );
+      return;
+      }
+   static T physicsImp;
+   }
+
+class BulletPhysics : public IGamePhysics
+   {
+   friend class IGamePhysics;
+   public:
+      
+      virtual ~BulletPhysics( );
       // Initialiazation and Maintenance of the Physics World
       virtual bool VInitialize( ) override;
       virtual void VSyncVisibleScene( ) override;
@@ -87,7 +141,7 @@ class BulletPhysics : public IGamePhysics, ENG_Noncopyable
       virtual void VAddBox( const Vec3& dimensions, WeakActorPtr pActor, const std::string& densityStr, const std::string& physicsMaterial ) override;
 
       /**
-       * @brief declare a group of vertice as a rigid body
+       * @brief declare a group of vertices as a rigid body
        *
        * @param  verts Vec3 * verts
        * @param  numPoints int numPoints
@@ -96,7 +150,7 @@ class BulletPhysics : public IGamePhysics, ENG_Noncopyable
        * @param  physicsMaterial const std::string & physicsMaterial
        * @return void
        */
-       virtual void VAddPointCloud( Vec3 *verts, int numPoints, WeakActorPtr pActor, const std::string& densityStr, const std::string& physicsMaterial ) override;
+      virtual void VAddPointCloud( Vec3 *verts, int numPoints, WeakActorPtr pActor, const std::string& densityStr, const std::string& physicsMaterial ) override;
       virtual void VRemoveActor( ActorId id ) override;
 
       // Debugging
@@ -129,7 +183,8 @@ class BulletPhysics : public IGamePhysics, ENG_Noncopyable
 
       virtual Transform VGetTransform( const ActorId id );
 
-   private:
+   protected:
+      BulletPhysics( void );				// [mrmike] This was changed post-press to add event registration!
       void LoadXml( );
       float LookupSpecificGravity( const std::string& densityStr );
       MaterialData LookupMaterialData( const std::string& materialStr );
@@ -153,6 +208,7 @@ class BulletPhysics : public IGamePhysics, ENG_Noncopyable
       static void BulletInternalTickCallback( btDynamicsWorld * const world, btScalar const timeStep );
 
    private:
+
       // use auto pointers to automatically call delete on these objects
       //   during ~BulletPhysics
 
@@ -166,10 +222,11 @@ class BulletPhysics : public IGamePhysics, ENG_Noncopyable
       BulletDebugDrawer*               m_DebugDrawer;
 
       // tables read from the XML
-      typedef std::map<std::string, float> DensityTable;
+      typedef std::map<std::string, float> DensityTable; 
+      DensityTable m_DensityTable;
+
       typedef std::map<std::string, MaterialData> MaterialTable;
-      DensityTable m_densityTable;
-      MaterialTable m_materialTable;
+      MaterialTable m_MaterialTable;
 
       // data used to store which collision pair (bodies that are touching) need
       //   Collision events sent.  When a new pair of touching bodies are detected,

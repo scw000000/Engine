@@ -92,5 +92,25 @@
 
         <Infinite>0.000</Infinite>
     </DensityTable>
+	
+	<CollisionTable>
+		<None>
+			<None collision="no"/>
+			<Mesh collision="no"/>
+			<Wall collision="no"/>
+		</None>
+			
+		<Mesh>
+			<None collision="no"/>
+			<Mesh collision="no"/>
+			<Wall collision="no"/>
+		</Mesh>
+		
+		<Wall>
+			<None collision="no"/>
+			<Mesh collision="no"/>
+			<Wall collision="yes"/>
+		</Wall>
+	</CollisionTable>
 </Physics>
 

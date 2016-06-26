@@ -15,7 +15,7 @@
 #include "Events.h"
 
 
-class IEventManager
+class IEventManager : public ENG_Noncopyable
    {
    public:
       const static unsigned long kINFINITE = 0xffffffff;

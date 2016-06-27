@@ -38,7 +38,7 @@ bool CollisionTable::Init( TiXmlElement* pData )
          }
       CollisionId typeId = m_CollisionIdMap[ typeName ];
       CollisionMask typeMask = 0;
-      for( auto pOtherType = pData->FirstChildElement(); pOtherType; pOtherType = pOtherType->NextSiblingElement() )
+      for( auto pOtherType = pType->FirstChildElement(); pOtherType; pOtherType = pOtherType->NextSiblingElement() )
          {
          std::string otherTypeName = pOtherType->Value();
          if( !AddCollisionType( otherTypeName ) )

@@ -94,20 +94,20 @@
     </DensityTable>
 	
 	<CollisionTable>
-		<None>
-			<None collision="no"/>
+		<RayCast>
+			<RayCast collision="yes"/>
 			<Mesh collision="no"/>
 			<Wall collision="no"/>
-		</None>
+		</RayCast>
 			
 		<Mesh>
-			<None collision="no"/>
+			<RayCast collision="yes"/>
 			<Mesh collision="no"/>
 			<Wall collision="no"/>
 		</Mesh>
 		
 		<Wall>
-			<None collision="no"/>
+			<RayCast collision="yes"/>
 			<Mesh collision="no"/>
 			<Wall collision="yes"/>
 		</Wall>

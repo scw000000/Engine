@@ -100,10 +100,10 @@ static Transform btTransform_to_Transform( btTransform const & trans )
    return ret;
    }
 
-IGamePhysics::IGamePhysics( IGamePhysics* pImplPhysics )
+IGamePhysics::IGamePhysics( void )
    {
    ENG_ASSERT( !g_pGamePhysics );
-   g_pGamePhysics = pImplPhysics;
+   g_pGamePhysics = this;
    }
 
 IGamePhysics& IGamePhysics::GetSingleton( void )
@@ -111,12 +111,12 @@ IGamePhysics& IGamePhysics::GetSingleton( void )
    return *g_pGamePhysics;
    }
 
-BulletPhysics::BulletPhysics() : IGamePhysics( this )
+BulletPhysics::BulletPhysics()
    {
    // [mrmike] This was changed post-press to add event registration!
    REGISTER_EVENT( EvtData_PhysTrigger_Enter );
    REGISTER_EVENT( EvtData_PhysTrigger_Leave );
-   //REGISTER_SCRIPT_EVENT( EvtData_PhysCollision );
+   REGISTER_SCRIPT_EVENT( EvtData_PhysCollision );
    REGISTER_EVENT( EvtData_PhysSeparation );
    }
 

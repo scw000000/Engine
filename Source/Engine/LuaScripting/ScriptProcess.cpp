@@ -1,6 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: ScriptProcess.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file ScriptProcess.cpp
+ * \date 2016/06/27 20:13
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "EngineStd.h"
 #include "ScriptProcess.h"
@@ -9,7 +19,7 @@ const char* SCRIPT_PROCESS_NAME = "ScriptProcess";
 
 void ScriptProcess::RegisterScriptClass( void )
    {
-   LuaPlus::LuaObject metaTableObj = LuaStateManager::GetSingleton()->GetGlobalVars().CreateTable( SCRIPT_PROCESS_NAME );
+   LuaPlus::LuaObject metaTableObj = LuaStateManager::GetSingleton().GetGlobalVars().CreateTable( SCRIPT_PROCESS_NAME );
    metaTableObj.SetObject( "__index", metaTableObj ); // set itself as index table
    metaTableObj.SetObject( "base", metaTableObj );
    metaTableObj.SetBoolean( "cpp", true );
@@ -86,11 +96,11 @@ void ScriptProcess::RegisterScriptClassFunctions( LuaPlus::LuaObject& metaTableO
 LuaPlus::LuaObject ScriptProcess::CreateFromScript( LuaPlus::LuaObject self, LuaPlus::LuaObject constructionData, LuaPlus::LuaObject originalSubClass )
    {
    ScriptProcess *pObj = ENG_NEW ScriptProcess;
-   pObj->m_LuaInstance.AssignNewTable( LuaStateManager::GetSingleton()->GetLuaState() );  
+   pObj->m_LuaInstance.AssignNewTable( LuaStateManager::GetSingleton().GetLuaState() );  
    if( pObj->VBuildCppDataFromScript( originalSubClass, constructionData ) )
       {
       // Find class defination (table) in global variables 
-      LuaPlus::LuaObject metaTableObj = LuaStateManager::GetSingleton()->GetGlobalVars().Lookup( SCRIPT_PROCESS_NAME );
+      LuaPlus::LuaObject metaTableObj = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( SCRIPT_PROCESS_NAME );
       ENG_ASSERT( !metaTableObj.IsNil() );
       // Set C++ pointer in local tabale, because this variable is belong to instance, to class 
       pObj->m_LuaInstance.SetLightUserdata( "__object", pObj );
@@ -99,7 +109,7 @@ LuaPlus::LuaObject ScriptProcess::CreateFromScript( LuaPlus::LuaObject self, Lua
       }
    else // create fail, delete all data
       {
-      pObj->m_LuaInstance.AssignNil( LuaStateManager::GetSingleton()->GetLuaState() );
+      pObj->m_LuaInstance.AssignNil( LuaStateManager::GetSingleton().GetLuaState() );
       SAFE_DELETE( pObj );
       }
    return pObj->m_LuaInstance;
@@ -194,7 +204,7 @@ void ScriptProcess::ScriptAttachChild( LuaPlus::LuaObject child )
 
 ScriptProcess::ScriptProcess( void )
    {
-   LuaPlus::LuaState* pLuaState = LuaStateManager::GetSingleton()->GetLuaState();
+   LuaPlus::LuaState* pLuaState = LuaStateManager::GetSingleton().GetLuaState();
 
 	m_Frequency = 0;
 	m_Time = 0;

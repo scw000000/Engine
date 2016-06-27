@@ -28,10 +28,10 @@ EventFactory& EventFactory::GetSingleton( void )
 void EventFactory::RegisterEventTypeWithScript( const char* key, EventType type )
    {
    // load existing eventType table in lua or create it if its not exist
-   LuaPlus::LuaObject eventTypeTable = LuaStateManager::GetSingleton( )->GetGlobalVars( ).GetByName( "EventType" );
+   LuaPlus::LuaObject eventTypeTable = LuaStateManager::GetSingleton( ).GetGlobalVars( ).GetByName( "EventType" );
    if( eventTypeTable.IsNil( ) )
       {
-      eventTypeTable = LuaStateManager::GetSingleton( )->GetGlobalVars( ).CreateTable( "EventType" );
+      eventTypeTable = LuaStateManager::GetSingleton( ).GetGlobalVars( ).CreateTable( "EventType" );
       }
    ENG_ASSERT( eventTypeTable.IsTable( ) );
    // Make sure this key and type binding pair does not exist

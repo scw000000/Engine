@@ -1,8 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: ScriptProcess.h
-////////////////////////////////////////////////////////////////////////////////
-
+/*!
+ * \file ScriptProcess.h
+ * \date 2016/06/27 20:13
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 #include "..\MainLoop\Process.h"
 #include "LuaStateManager.h"
 

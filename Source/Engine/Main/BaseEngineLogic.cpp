@@ -90,7 +90,8 @@ bool BaseEngineLogic::Init()
    shared_ptr<IView> pView( ENG_NEW HumanView( ) );
    VAddView( pView );
    IGamePhysics::RegisterImplementation< BulletPhysics >();
-   return true;
+   IGamePhysics::GetSingleton().VInitialize();
+   return true;  
    }
 
 void BaseEngineLogic::VAddView( shared_ptr<IView> pView )

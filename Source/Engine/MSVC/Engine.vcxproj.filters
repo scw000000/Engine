@@ -211,6 +211,9 @@
     <ClCompile Include="..\Physics\CollisionTable.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Physics\PhysicsAttributes.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -387,6 +390,9 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\Physics\CollisionTable.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\PhysicsAttributes.h">
       <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>

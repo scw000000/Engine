@@ -1,7 +1,17 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: LuaStateManager.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file LuaStateManager.h
+ * \date 2016/06/27 8:05
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "LuaPlus.h"
 
@@ -9,10 +19,10 @@
 class LuaStateManager : public IScriptManager
    {
    public:
-      static bool Create( void );
-      static void Destroy( void );
-      static LuaStateManager* GetSingleton( void ){ return s_pLuaStateMgr; }
-
+      static LuaStateManager& GetSingleton( void );
+      bool Init( void );
+      void Destroy( void );
+      
       virtual bool VInit( void ) override;
       // demand lua to execute a lua file
       virtual void VExecuteFile( const char* resource ) override;
@@ -30,14 +40,12 @@ class LuaStateManager : public IScriptManager
    private:
       void SetError( int errorNum );
       void ClearStack( void );
-      
+      void ClearLuaState( void );
+
       explicit LuaStateManager( void );
       virtual ~LuaStateManager( void );
 
    private:
-      static LuaStateManager* s_pLuaStateMgr;
       LuaPlus::LuaState* m_pLuaState;
       std::string m_LastError;
-
-
    };

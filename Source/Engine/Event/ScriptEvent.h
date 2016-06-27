@@ -99,7 +99,7 @@ template <typename T> bool BaseScriptEvent<T>::SetEventData( LuaPlus::LuaObject 
 //---------------------------------------------------------------------------------------------------------------------
 template <typename T> void BaseScriptEvent<T>::VBuildScriptEventData( void )
    {
-   m_LuaEventData.AssignNil( LuaStateManager::GetSingleton( )->GetLuaState( ) );
+   m_LuaEventData.AssignNil( LuaStateManager::GetSingleton( ).GetLuaState( ) );
    }
 
 #pragma warning( pop )

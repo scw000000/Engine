@@ -1,33 +1,35 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: LuaStateManager.cpp
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file LuaStateManager.cpp
+ * \date 2016/06/27 8:05
+ *
+ * \author SCW
+ * Contact: scw000000@gmail.com
+ *
+ * \brief 
+ *
+ *  
+ *
+ * \note
+ */
 
 #include "EngineStd.h"
 #include "LuaStateManager.h"
 
-LuaStateManager* LuaStateManager::s_pLuaStateMgr = NULL;
 
-bool LuaStateManager::Create( void )
+LuaStateManager& LuaStateManager::GetSingleton( void )
    {
-   if( s_pLuaStateMgr )
-      {
-      ENG_ERROR( "Overwriting singleton pointer" );
-      SAFE_DELETE( s_pLuaStateMgr );
-      }
-   s_pLuaStateMgr = ENG_NEW LuaStateManager;
+   static LuaStateManager s_LuaStateMgr;
+   return s_LuaStateMgr;
+   }
 
-   if( s_pLuaStateMgr )
-      {
-      return s_pLuaStateMgr->VInit();
-      }
-
-   return true;
+bool LuaStateManager::Init( void )
+   {
+   return GetSingleton().VInit();
    }
 
 void LuaStateManager::Destroy( void )
    {
-   ENG_ASSERT( s_pLuaStateMgr );
-   SAFE_DELETE( s_pLuaStateMgr );
+   GetSingleton().ClearLuaState();
    }
 
 bool LuaStateManager::VInit( void )
@@ -169,6 +171,16 @@ void LuaStateManager::ClearStack( void )
    m_pLuaState->SetTop(0);
    }
 
+void LuaStateManager::ClearLuaState( void )
+   {
+   // Remember not to delete this pointer directly
+   if( m_pLuaState )
+      {
+      LuaPlus::LuaState::Destroy( m_pLuaState );
+      m_pLuaState = NULL;
+      }
+   }
+
 LuaStateManager::LuaStateManager(void)
    {
    m_pLuaState = NULL;
@@ -177,9 +189,5 @@ LuaStateManager::LuaStateManager(void)
 LuaStateManager::~LuaStateManager( void )
    {
    // Remember not to delete this pointer directly
-   if( m_pLuaState )
-      {
-      LuaPlus::LuaState::Destroy( m_pLuaState );
-      m_pLuaState = NULL;
-      }
+   ClearLuaState();
    }

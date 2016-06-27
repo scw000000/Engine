@@ -142,6 +142,7 @@
     </ClCompile>
     <ClCompile Include="..\Physics\CollisionTable.cpp" />
     <ClCompile Include="..\Physics\Physics.cpp" />
+    <ClCompile Include="..\Physics\PhysicsAttributes.cpp" />
     <ClCompile Include="..\Physics\PhysicsDebugDrawer.cpp" />
     <ClCompile Include="..\ResourceCache\DevResourceFile.cpp" />
     <ClCompile Include="..\ResourceCache\MeshResource.cpp" />
@@ -208,6 +209,7 @@
     <ClInclude Include="..\Multicore\CriticalSection.h" />
     <ClInclude Include="..\Physics\CollisionTable.h" />
     <ClInclude Include="..\Physics\Physics.h" />
+    <ClInclude Include="..\Physics\PhysicsAttributes.h" />
     <ClInclude Include="..\Physics\PhysicsDebugDrawer.h" />
     <ClInclude Include="..\ResourceCache\DevResourceFile.h" />
     <ClInclude Include="..\ResourceCache\MeshResource.h" />

@@ -20,7 +20,7 @@ ScriptEventListenerMgr* InternalScriptExports::s_pScriptEventListenerMgr = NULL;
 
 void ScriptExports::Register( void )
    {
-   LuaPlus::LuaObject globals = LuaStateManager::GetSingleton()->GetGlobalVars();
+   LuaPlus::LuaObject globals = LuaStateManager::GetSingleton().GetGlobalVars();
 
 	// init	
 	InternalScriptExports::Init();

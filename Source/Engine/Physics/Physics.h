@@ -75,7 +75,7 @@ class IGamePhysics : public ENG_Noncopyable
    {
    public:
       template< typename T > static void RegisterImplementation( void );
-      IGamePhysics& GetSingleton( void );
+      static IGamePhysics& GetSingleton( void );
       // Initialiazation and Maintenance of the Physics World
       virtual bool VInitialize() = 0;
       virtual void VSyncVisibleScene() = 0;
@@ -112,7 +112,7 @@ class IGamePhysics : public ENG_Noncopyable
       virtual ~IGamePhysics( void ) {};
       
    protected:
-      IGamePhysics( IGamePhysics* pImplPhysics );
+      IGamePhysics( void );
    };
 
 template< typename T > void IGamePhysics::RegisterImplementation( void )

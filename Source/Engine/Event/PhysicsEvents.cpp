@@ -30,7 +30,7 @@ const char* BaseEvent<EvtData_PhysSeparation>::s_pName( "EvtData_PhysSeparation"
 
 void EvtData_PhysCollision::VBuildScriptEventData( void )
    {
-   m_LuaEventData.AssignNewTable( LuaStateManager::GetSingleton( )->GetLuaState( ) );
+   m_LuaEventData.AssignNewTable( LuaStateManager::GetSingleton( ).GetLuaState( ) );
    m_LuaEventData.SetInteger( "actorA", m_ActorA );
    m_LuaEventData.SetInteger( "actorB", m_ActorB );
    }

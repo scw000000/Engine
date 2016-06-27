@@ -20,6 +20,7 @@
 #include "..\Event\EventManager.h"
 #include "..\Event\Events.h"
 #include "..\Graphics\OpenGLRenderer.h"
+#include "..\LuaScripting\LuaStateManager.h"
 #include "SDL_image.h"
 
 
@@ -156,6 +157,13 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
    //  Initialize ResCache
    //--------------------------------- 
+
+   // Rez up the Lua State manager now, and run the initial script - discussed in Chapter 5, page 144.
+   if( !LuaStateManager::GetSingleton().Init() )
+      {
+      ENG_ERROR( "Failed to initialize Lua" );
+      return false;
+      }
 
    //--------------------------------- 
    //  Initialize EventManager

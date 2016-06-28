@@ -298,7 +298,7 @@ void BulletPhysics::VSyncVisibleScene( )
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::AddShape						- Chapter 17, page 600
 //
-void BulletPhysics::AddShape( StrongActorPtr pActor, btCollisionShape* shape, float mass, const std::string& physicsMaterial )
+void BulletPhysics::AddShape( WeakRenderComponentPtr pRenderComp, btCollisionShape* shape, float mass, const std::string& physicsMaterial )
    {
    ENG_ASSERT( pActor );
 
@@ -395,7 +395,7 @@ void BulletPhysics::RemoveCollisionObject( btCollisionObject * const removeMe )
 // BulletPhysics::FindBulletRigidBody			- not described in the book
 //    Finds a Bullet rigid body given an actor ID
 //
-btRigidBody* BulletPhysics::FindBulletRigidBody( ActorId const id ) const
+btRigidBody* BulletPhysics::FindBulletRigidBody( WeakRenderComponentPtr pRenderComp ) const
    {
    ActorIDToBulletRigidBodyMap::const_iterator found = m_ActorIdToRigidBody.find( id );
    if( found != m_ActorIdToRigidBody.end( ) )
@@ -420,7 +420,7 @@ ActorId BulletPhysics::FindActorID( btRigidBody const * const body ) const
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VAddSphere					- Chapter 17, page 599
 //
-void BulletPhysics::VAddSphere( float const radius, WeakActorPtr pActor, const std::string& densityStr, const std::string& physicsMaterial )
+void BulletPhysics::VAddSphere( float const radius, WeakRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial )
    {
    StrongActorPtr pStrongActor = pActor.lock();
    if( !pStrongActor )
@@ -440,7 +440,7 @@ void BulletPhysics::VAddSphere( float const radius, WeakActorPtr pActor, const s
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VAddBox
 //
-void BulletPhysics::VAddBox( const Vec3& dimensions, WeakActorPtr pActor, const std::string& densityStr, const std::string& physicsMaterial )
+void BulletPhysics::VAddBox( const Vec3& dimensions, WeakRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial )
    {
    StrongActorPtr pStrongActor = pActor.lock();
    if( !pStrongActor )
@@ -457,10 +457,7 @@ void BulletPhysics::VAddBox( const Vec3& dimensions, WeakActorPtr pActor, const 
    AddShape( pStrongActor,/* initialTransform,*/ boxShape, mass, physicsMaterial );
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VAddPointCloud				- Chapter 17, page 601
-//
-void BulletPhysics::VAddPointCloud( Vec3 *verts, int numPoints, WeakActorPtr pActor, /*const Mat4x4& initialTransform,*/ const std::string& densityStr, const std::string& physicsMaterial )
+void BulletPhysics::VAddPointCloud( Vec3 *verts, int numPoints, WeakRenderComponentPtr pRenderComp, /*const Mat4x4& initialTransform,*/ const std::string& densityStr, const std::string& physicsMaterial )
    {
    StrongActorPtr pStrongActor = pActor.lock();
    if( !pStrongActor )
@@ -490,7 +487,7 @@ void BulletPhysics::VAddPointCloud( Vec3 *verts, int numPoints, WeakActorPtr pAc
 //
 //    Implements the method to remove actors from the physics simulation
 //
-void BulletPhysics::VRemoveActor( ActorId id )
+void BulletPhysics::VRemoveRenderComponent( WeakRenderComponentPtr pRenderComp )
    {
    if( btRigidBody * const body = FindBulletRigidBody( id ) )
       {

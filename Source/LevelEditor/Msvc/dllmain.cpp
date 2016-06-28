@@ -23,7 +23,6 @@
    #pragma comment( lib, "BulletCollision_Debug.lib" )
    #pragma comment( lib, "BulletDynamics_Debug.lib" )
    #pragma comment( lib, "LinearMath_Debug.lib" )
-   #pragma comment( lib, "CrossGuidd.lib" )
 #else
 
 #endif

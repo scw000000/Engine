@@ -21,7 +21,7 @@ ActorComponentFactory& ActorComponentFactory::GetSingleton( void )
    return factory;
    }
 
-StrongActorComponentPtr ActorComponentFactory::CreateComponent( ComponentId compId, TiXmlElement* pData )
+StrongActorComponentPtr ActorComponentFactory::CreateComponent( ComponentRegisterId compId, TiXmlElement* pData )
    {
    StrongActorComponentPtr pComponent( GetSingleton().m_CompFactory.Create( compId ) );
    ENG_ASSERT( pComponent );
@@ -43,7 +43,7 @@ StrongActorComponentPtr ActorComponentFactory::CreateComponent( const std::strin
    return GetSingleton().CreateComponent( findResult->second, pData );
    }
 
-ComponentId ActorComponentFactory::GetIdFromName( const std::string& name ) 
+ComponentRegisterId ActorComponentFactory::GetIdFromName( const std::string& name ) 
    { 
    auto& map = GetSingleton( ).m_NameToIdMap;
    auto findResult = map.find( name );
@@ -56,5 +56,4 @@ ComponentId ActorComponentFactory::GetIdFromName( const std::string& name )
 
 ActorComponentFactory::ActorComponentFactory( void )
    {
-
    }

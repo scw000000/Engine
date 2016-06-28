@@ -18,21 +18,21 @@ class ActorComponentFactory : public ENG_Noncopyable
    {
    public:
       static ActorComponentFactory& GetSingleton( void );
-      template <typename T> static void RegisterComponentCreation( const std::string& name, ComponentId compId );
+      template <typename T> static void RegisterComponentCreation( const std::string& name, ComponentRegisterId compId );
       
-      static StrongActorComponentPtr CreateComponent( ComponentId compId, TiXmlElement* pData );
+      static StrongActorComponentPtr CreateComponent( ComponentRegisterId compId, TiXmlElement* pData );
       static StrongActorComponentPtr CreateComponent( const std::string& name, TiXmlElement* pData );
-      static ComponentId GetIdFromName( const std::string& name );
+      static ComponentRegisterId GetIdFromName( const std::string& name );
 
    private:
       ActorComponentFactory( void );
 
    private:
-      std::map< std::string, ComponentId > m_NameToIdMap;
-      GenericObjectFactory< IActorComponent, ComponentId> m_CompFactory;
+      std::map< std::string, ComponentRegisterId > m_NameToIdMap;
+      GenericObjectFactory< IActorComponent, ComponentRegisterId> m_CompFactory;
    };
 
-template <typename T> void ActorComponentFactory::RegisterComponentCreation( const std::string& name, ComponentId compId )
+template <typename T> void ActorComponentFactory::RegisterComponentCreation( const std::string& name, ComponentRegisterId compId )
    {
    auto& map = GetSingleton().m_NameToIdMap;
    auto& factory = GetSingleton().m_CompFactory;

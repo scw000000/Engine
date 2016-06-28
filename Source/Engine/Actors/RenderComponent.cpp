@@ -133,7 +133,7 @@
 // MeshRenderComponent
 //---------------------------------------------------------------------------------------------------------------------
 
-const ComponentId BaseActorComponent<MeshRenderComponent>::s_ComponentId = 0x7a02ca99;
+const ComponentRegisterId BaseActorComponent<MeshRenderComponent>::s_ComponentId = 0x7a02ca99;
 const std::string BaseActorComponent<MeshRenderComponent>::s_Name = "MeshRenderComponent";
 
 void MeshRenderComponent::Destory( void )

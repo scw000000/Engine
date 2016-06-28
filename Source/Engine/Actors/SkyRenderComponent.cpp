@@ -19,7 +19,7 @@
 
 //const char* SkyRenderComponent::g_Name = "SkyRenderComponent";
 
-const ComponentId BaseActorComponent<SkyRenderComponent>::s_ComponentId = 0x249dbe49;
+const ComponentRegisterId BaseActorComponent<SkyRenderComponent>::s_ComponentId = 0x249dbe49;
 const std::string BaseActorComponent<SkyRenderComponent>::s_Name = "SkyRenderComponent";
 
 

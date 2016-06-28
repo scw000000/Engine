@@ -27,7 +27,6 @@ class IRenderComponent : virtual public IActorComponent
    public:
       virtual ~IRenderComponent( void ){ }
       virtual shared_ptr<SceneNode> VGetSceneNode( void ) = 0;
-      virtual TransformPtr VGetTransform( void ) = 0;
       virtual void VSetTransform( const Transform& transform ) = 0;
 
    protected:
@@ -56,7 +55,7 @@ template <typename T>class BaseRenderComponent : public IRenderComponent, public
    public:
       BaseRenderComponent( void );
       virtual void Destory( void ) override;
-      virtual TransformPtr VGetTransform( void ) override final { return m_pTransform; }
+      virtual TransformPtr VGetTransformPtr( void ) override final { return m_pTransform; }
       virtual void VSetTransform( const Transform& transform ) override final;
       /**
          * @brief set member variable from xml elements

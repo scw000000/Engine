@@ -112,7 +112,6 @@ extern const int SCREEN_HEIGHT;
 #include "SDL_syswm.h"
 #include "GL\glew.h"
 #include "tinyxml.h"
-#include "guid.h"
 
 
 ///////////////////////

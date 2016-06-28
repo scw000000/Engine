@@ -185,6 +185,7 @@ StrongActorComponentPtr ActorFactory::BuildComponentTree( TiXmlElement* pData, S
    if( pCurrLevelComponent )
       {
       pActor->AddComponent( pCurrLevelComponent );
+      pCurrLevelComponent->SetActorCompoenetId( pActor->m_LastActorComponentId );
       pCurrLevelComponent->SetOwner( pActor );
       pCurrLevelComponent->SetParentComponent( pParent );
       }

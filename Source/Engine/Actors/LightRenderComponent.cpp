@@ -19,7 +19,7 @@
 
 //const char* LightRenderComponent::g_Name = "LightRenderComponent";
 
-const ComponentId BaseActorComponent<LightRenderComponent>::s_ComponentId = 0xf501193f;
+const ComponentRegisterId BaseActorComponent<LightRenderComponent>::s_ComponentId = 0xf501193f;
 const std::string BaseActorComponent<LightRenderComponent>::s_Name = "LightRenderComponent";
 
 void LightRenderComponent::Destory( void )

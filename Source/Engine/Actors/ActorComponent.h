@@ -25,7 +25,7 @@ class IActorComponent
    friend class ActorFactory;
    public:
       virtual ~IActorComponent( void ){}
-      virtual ComponentId VGetId( void ) const = 0;
+      virtual ComponentRegisterId VGetId( void ) const = 0;
       virtual const std::string& VGetName( ) const = 0;
 
       virtual bool VInit( TiXmlElement* pData ) = 0;
@@ -37,38 +37,43 @@ class IActorComponent
       virtual TiXmlElement* VGenerateOverridesXML( TiXmlElement* pResourceNode ) = 0;
       virtual const ChildComponents& GetChildComponents( void ) const = 0;
       virtual const weak_ptr<IActorComponent> GetParentComponent( void ) = 0;
+      virtual ActorComponentId GetActorComponentId( void ) = 0;
 
    protected:
       virtual void AddChildComponent( weak_ptr<IActorComponent> ) = 0;
       virtual void SetParentComponent( weak_ptr<IActorComponent> ) = 0;
+      virtual void SetActorCompoenetId( ActorComponentId id ) = 0;
    };
 
 // Using Curiously recurring template pattern (CRTP) to prevent declaring GUID mulit times
-template <typename T>class BaseActorComponent : virtual public IActorComponent 
+template <typename T>class BaseActorComponent : virtual public IActorComponent
    {
    friend class ActorFactory;
-   public:
-      virtual ComponentId VGetId( void ) const override { return s_ComponentId; };
+      public:
+      virtual ComponentRegisterId VGetId( void ) const override { return s_ComponentId; };
       virtual const std::string& VGetName( void ) const override { return s_Name; }
-      virtual void VPostInit( void ) override { };
-      virtual void VUpdate( const unsigned long deltaMs ) override { };
+      virtual void VPostInit( void ) override {};
+      virtual void VUpdate( const unsigned long deltaMs ) override {};
       virtual const ChildComponents& GetChildComponents( void ) const override { return m_ChildComponents; };
       virtual const weak_ptr<IActorComponent> GetParentComponent( void ) override { return m_pParentComponent; }
+      virtual ActorComponentId GetActorComponentId( void ) const override { return m_ActorComponentId; };
 
    public:
       // GUID of this event
-      const static ComponentId  s_ComponentId;
+      const static ComponentRegisterId  s_ComponentId;
       const static std::string      s_Name;
 
    protected:
       virtual void SetOwner( StrongActorPtr pOwner ) override { m_pOwner = pOwner; }
       virtual void AddChildComponent( weak_ptr<IActorComponent> pChild ) override { m_ChildComponents.push_back( pChild ); }
       virtual void SetParentComponent( weak_ptr<IActorComponent> pParent ) override { m_pParentComponent = pParent; }
+      virtual void SetActorCompoenetId( ActorComponentId id ) override { m_ActorComponentId = id; }
 
    protected:
       StrongActorPtr m_pOwner;
       weak_ptr<IActorComponent> m_pParentComponent;
       ChildComponents m_ChildComponents;
+      ActorComponentId m_ActorComponentId;
    };
 
 //class ActorComponent : public IActorComponent 

@@ -338,7 +338,7 @@ void BulletPhysics::AddShape( StrongActorPtr pActor, btCollisionShape* shape, fl
    rbInfo.m_friction = material.m_Friction;
 
    btRigidBody * const body = new btRigidBody( rbInfo );
-   
+
    m_DynamicsWorld->addRigidBody( body );
 
    // add it to the collection to be checked for changes in VSyncVisibleScene

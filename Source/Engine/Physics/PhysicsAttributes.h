@@ -13,6 +13,7 @@
  */
 
 #include "CollisionTable.h"
+#include "..\Actors\RenderComponent.h"
 
 class IPhysicsAttributes
    {
@@ -28,7 +29,16 @@ class BulletPhysicsAttr : public IPhysicsAttributes
    public:
       BulletPhysicsAttr( void );
 
-
    private:
       CollisionId m_CollisionId;
+      float m_Acceleration;
+      float m_MaxVelocity;
+
+      float m_AngularAcceleration;
+      float m_MaxAngularVelocity;
+
+      std::string m_Density;
+      std::string m_Material;
+
+      weak_ptr< IRenderComponent > m_pOwner;
    };

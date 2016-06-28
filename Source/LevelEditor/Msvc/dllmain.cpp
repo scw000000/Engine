@@ -13,16 +13,17 @@
 
 #pragma comment( lib, "assimp-vc120-mtd.lib" )
 
+
+
 #if defined(_M_IX86)
 #if defined(_DEBUG)
-//#pragma comment(lib, "glew32sd.lib")
-#pragma comment( lib, "glew32d.lib" )
-#pragma comment( lib, "CEGUIBase-0_d.lib" )
-#pragma comment( lib, "CEGUIOpenGLRenderer-0_d.lib" )
-#pragma comment( lib, "BulletCollision_Debug.lib" )
-#pragma comment( lib, "BulletDynamics_Debug.lib" )
-#pragma comment( lib, "LinearMath_Debug.lib" )
-
+   #pragma comment( lib, "glew32d.lib" )
+   #pragma comment( lib, "CEGUIBase-0_d.lib" )
+   #pragma comment( lib, "CEGUIOpenGLRenderer-0_d.lib" )
+   #pragma comment( lib, "BulletCollision_Debug.lib" )
+   #pragma comment( lib, "BulletDynamics_Debug.lib" )
+   #pragma comment( lib, "LinearMath_Debug.lib" )
+   #pragma comment( lib, "CrossGuidd.lib" )
 #else
 
 #endif

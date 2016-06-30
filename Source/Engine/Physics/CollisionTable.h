@@ -1,3 +1,4 @@
+#pragma once
 /*!
  * \file CollisionTable.h
  * \date 2016/06/26 16:53
@@ -12,8 +13,8 @@
  * \note
  */
 
-typedef unsigned int CollisionId;
-typedef unsigned int CollisionMask;
+typedef short CollisionId;
+typedef short CollisionMask;
 
 class CollisionTable : ENG_Noncopyable
    {
@@ -22,16 +23,17 @@ class CollisionTable : ENG_Noncopyable
       bool Init( TiXmlElement* pData );
       CollisionId GetIdFromName( const std::string& typeName );
       bool isCollidable( CollisionId id1, CollisionId id2 );
+      CollisionMask GetCollisionMask( CollisionId id );
 
    private:
       CollisionTable( void ) { m_CurrMaxBit = -1; };
       bool AddCollisionType( const std::string& typeName );
 
-      typedef std::map< CollisionId, CollisionMask > CollisionTableMap;
-      typedef std::map< std::string, CollisionId > CollisionIdMap;
+      typedef std::map< CollisionId, CollisionMask > CollisionIdToMaskMap;
+      typedef std::map< std::string, CollisionId > CollisionNameToIdMap;
       
-      CollisionTableMap m_CollisionTableMap;
-      CollisionIdMap m_CollisionIdMap;
+      CollisionIdToMaskMap m_CollisionIdToMaskMap;
+      CollisionNameToIdMap m_CollisionNameToIdMap;
 
       int m_CurrMaxBit;
    };

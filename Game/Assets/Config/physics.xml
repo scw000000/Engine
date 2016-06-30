@@ -1,5 +1,6 @@
 ﻿<Physics>
     <PhysicsMaterials>
+		<None restitution="0.0" friction="0.0"/>
         <PlayDough restitution="0.05" friction="0.9"/>
         <Normal restitution="0.25" friction="0.5"/>
         <Bouncy restitution = "0.95" friction = "0.5"/>
@@ -14,6 +15,7 @@
 -->
     <DensityTable>
         <!--  specific gravity (these numbers are easier to find) -->
+		<empty>0.0000</empty>
         <air>0.0013</air>
         <water>1.000</water>
 

@@ -36,7 +36,7 @@ bool CollisionTable::Init( TiXmlElement* pData )
          {
          return false;
          }
-      CollisionId typeId = m_CollisionIdMap[ typeName ];
+      CollisionId typeId = m_CollisionNameToIdMap[ typeName ];
       CollisionMask typeMask = 0;
       for( auto pOtherType = pType->FirstChildElement(); pOtherType; pOtherType = pOtherType->NextSiblingElement() )
          {
@@ -54,19 +54,19 @@ bool CollisionTable::Init( TiXmlElement* pData )
          
          if( canCollide )
             {
-            CollisionId otherTypeId = m_CollisionIdMap[ otherTypeName ];
+            CollisionId otherTypeId = m_CollisionNameToIdMap[ otherTypeName ];
             typeMask |= otherTypeId;
             }
          }
-      m_CollisionTableMap[ typeId ] = typeMask;
+      m_CollisionIdToMaskMap[ typeId ] = typeMask;
       }
    return true;
    }
 
 CollisionId CollisionTable::GetIdFromName( const std::string& typeName )
    {
-   auto strToIdIt = m_CollisionIdMap.find( typeName );
-   if( strToIdIt == m_CollisionIdMap.end() )
+   auto strToIdIt = m_CollisionNameToIdMap.find( typeName );
+   if( strToIdIt == m_CollisionNameToIdMap.end() )
       {
       ENG_ERROR( "Collision type is not exist" );
       return 0;
@@ -76,19 +76,29 @@ CollisionId CollisionTable::GetIdFromName( const std::string& typeName )
 
 bool CollisionTable::isCollidable( CollisionId id1, CollisionId id2 )
    {
-   auto idToMapIt1 = m_CollisionTableMap.find( id1 );
-   ENG_ASSERT( idToMapIt1 != m_CollisionTableMap.end() );
+   auto idToMapIt1 = m_CollisionIdToMaskMap.find( id1 );
+   ENG_ASSERT( idToMapIt1 != m_CollisionIdToMaskMap.end() );
 
-   auto idToMapIt2 = m_CollisionTableMap.find( id2 );
-   ENG_ASSERT( idToMapIt2 != m_CollisionTableMap.end() );
+   auto idToMapIt2 = m_CollisionIdToMaskMap.find( id2 );
+   ENG_ASSERT( idToMapIt2 != m_CollisionIdToMaskMap.end() );
 
    return ( ( id1 & idToMapIt2->second ) && ( id2 && idToMapIt1->second ) );
    }
 
+CollisionMask CollisionTable::GetCollisionMask( CollisionId id )
+   {
+   auto colMapIt = m_CollisionIdToMaskMap.find( id );
+   if( colMapIt == m_CollisionIdToMaskMap.end() )
+      {
+      return 0;
+      }
+   return colMapIt->second;
+   }
+
 bool CollisionTable::AddCollisionType( const std::string& typeName )
    {
-   auto strToIdIt = m_CollisionIdMap.find( typeName );
-   if( strToIdIt != m_CollisionIdMap.end() )
+   auto strToIdIt = m_CollisionNameToIdMap.find( typeName );
+   if( strToIdIt != m_CollisionNameToIdMap.end() )
       {
       return true;
       }
@@ -98,6 +108,6 @@ bool CollisionTable::AddCollisionType( const std::string& typeName )
       return false;
       }
    m_CurrMaxBit++;
-   m_CollisionIdMap[ typeName ] = BIT( m_CurrMaxBit );
+   m_CollisionNameToIdMap[ typeName ] = BIT( m_CurrMaxBit );
    return true;
    }

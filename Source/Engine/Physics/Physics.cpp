@@ -64,8 +64,7 @@ static btTransform Transform_to_btTransform( Transform const & trans )
    //// copy position
    //for( int column = 0; column < 3; ++column )
    //   bulletPosition[column] = mat[3][column];
-
-   return btTransform( bulletRotation, Vec3_to_btVector3(  rot.GetRow( 3 ) ) );
+   return btTransform( bulletRotation, Vec3_to_btVector3( trans.GetToWorldPosition() ) );
    }
 
 static Transform btTransform_to_Transform( btTransform const & trans )
@@ -137,7 +136,7 @@ BulletPhysics::~BulletPhysics( )
       RemoveCollisionObject( obj );
       }
 
-   m_RigidBodyToActorId.clear( );
+   m_RigidBodyToRenderComp.clear( );
 
    SAFE_DELETE( m_DebugDrawer );
    SAFE_DELETE( m_DynamicsWorld );
@@ -256,54 +255,39 @@ void BulletPhysics::VSyncVisibleScene( )
 
    // check all the existing actor's bodies for changes. 
    //  If there is a change, send the appropriate event for the game system.
-   for( ActorIDToBulletRigidBodyMap::const_iterator it = m_ActorIdToRigidBody.begin( );
-        it != m_ActorIdToRigidBody.end( );
-        ++it )
+   for( auto renderCompIt : m_RenderCompToRigidBody )
       {
-      ActorId const id = it->first;
+      StrongRenderComponentPtr pRenderComp = renderCompIt.first;
+      ENG_ASSERT( pRenderComp );
 
       // get the MotionState.  this object is updated by Bullet.
       // it's safe to cast the btMotionState to ActorMotionState, because all the bodies in m_ActorIdToRigidBody
       //   were created through AddShape()
-      ActorMotionState const * const actorMotionState = static_cast< ActorMotionState* >( it->second->getMotionState( ) );
-      ENG_ASSERT( actorMotionState );
+      RenderCompMotionState const * const renderCompMotionState = static_cast< RenderCompMotionState* >( renderCompIt.second->getMotionState() );
+      ENG_ASSERT( renderCompMotionState );
 
-      StrongActorPtr pActor = g_pApp->m_pEngineLogic->VGetActor( id ).lock();
-      if( pActor && actorMotionState )
+      TransformPtr pComponentTransform = pRenderComp->VGetTransformPtr();
+      if( pComponentTransform->GetToWorld() != renderCompMotionState->m_Transform.GetToWorld() )
          {
-         TransformPtr pActorTransform = pActor->GetTransformPtr();
-         if( pActorTransform->GetToWorld() != actorMotionState->m_Transform.GetToWorld() )
-            {
-            // Bullet has moved the actor's physics object.  Sync the transform and inform the game an actor has moved
-            *pActorTransform = Transform( actorMotionState->m_Transform );
-            shared_ptr<Event_Move_Actor> pEvent( ENG_NEW Event_Move_Actor( id, actorMotionState->m_Transform.GetToWorld() ) );
-            IEventManager::GetSingleton()->VQueueEvent( pEvent );
-            }
+         // Bullet has moved the actor's physics object.  Sync the transform and inform the game an actor has moved
+         *pComponentTransform = Transform( renderCompMotionState->m_Transform );
+         /*shared_ptr<Event_Move_Actor> pEvent( ENG_NEW Event_Move_Actor( id, actorMotionState->m_Transform.GetToWorld() ) );
+         IEventManager::GetSingleton()->VQueueEvent( pEvent );*/
          }
-         //shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
-         //if( pTransformComponent )
-         //   {
-         //   if( pTransformComponent->GetTransform( )->GetToWorld() != actorMotionState->m_Transform.GetToWorld() )
-         //      {
-         //      // Bullet has moved the actor's physics object.  Sync the transform and inform the game an actor has moved
-         //      pTransformComponent->SetTransform( actorMotionState->m_Transform );
-         //      shared_ptr<EvtData_Move_Actor> pEvent( ENG_NEW EvtData_Move_Actor( id, actorMotionState->m_Transform.GetToWorld() ) );
-         //      IEventManager::GetSingleton()->VQueueEvent( pEvent );
-         //      }
-         //   }
-         //}
       }
    }
 
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::AddShape						- Chapter 17, page 600
 //
-void BulletPhysics::AddShape( WeakRenderComponentPtr pRenderComp, btCollisionShape* shape, float mass, const std::string& physicsMaterial )
+void BulletPhysics::AddShape( StrongRenderComponentPtr pRenderComp, 
+                              btCollisionShape* shape, 
+                              float mass, 
+                              const std::string& physicsMaterial, 
+                              CollisionId collisionGroup, 
+                              int collisionFlag )
    {
-   ENG_ASSERT( pActor );
-
-   ActorId actorID = pActor->GetId( );
-   ENG_ASSERT( m_ActorIdToRigidBody.find( actorID ) == m_ActorIdToRigidBody.end( ) && "Actor with more than one physics body?" );
+   ENG_ASSERT( pRenderComp );
 
    // lookup the material
    MaterialData material( LookupMaterialData( physicsMaterial ) );
@@ -314,36 +298,24 @@ void BulletPhysics::AddShape( WeakRenderComponentPtr pRenderComp, btCollisionSha
       shape->calculateLocalInertia( mass, localInertia );
 
    Transform transform = Transform::g_Identity;
-   transform = *pActor->GetTransformPtr();
-   //Transform transform = Transform::g_Identity;
-   //shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( pActor->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
-   //ENG_ASSERT( pTransformComponent );
-   //if( pTransformComponent )
-   //   {
-   //   transform = *pTransformComponent->GetTransform( );
-   //   }
-   //else
-   //   {
-   //   // Physics can't work on an actor that doesn't have a TransformComponent!
-   //   return;
-   //   }
+   transform = *pRenderComp->VGetTransformPtr();
 
    // set the initial transform of the body from the actor
-   ActorMotionState * const myMotionState = ENG_NEW ActorMotionState( transform );
+   RenderCompMotionState * const myMotionState = ENG_NEW RenderCompMotionState( transform );
 
    btRigidBody::btRigidBodyConstructionInfo rbInfo( mass, myMotionState, shape, localInertia );
-
+   
    // set up the materal properties
    rbInfo.m_restitution = material.m_Restitution;
    rbInfo.m_friction = material.m_Friction;
-
    btRigidBody * const body = new btRigidBody( rbInfo );
+   body->setCollisionFlags( collisionFlag );
 
-   m_DynamicsWorld->addRigidBody( body );
+   m_DynamicsWorld->addRigidBody( body, collisionGroup, CollisionTable::GetSingleton().GetCollisionMask( collisionGroup ) );
 
    // add it to the collection to be checked for changes in VSyncVisibleScene
-   m_ActorIdToRigidBody[actorID] = body;
-   m_RigidBodyToActorId[body] = actorID;
+   m_RenderCompToRigidBody[ pRenderComp ] = body;
+   m_RigidBodyToRenderComp[ body ] = pRenderComp;
    }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -395,10 +367,10 @@ void BulletPhysics::RemoveCollisionObject( btCollisionObject * const removeMe )
 // BulletPhysics::FindBulletRigidBody			- not described in the book
 //    Finds a Bullet rigid body given an actor ID
 //
-btRigidBody* BulletPhysics::FindBulletRigidBody( WeakRenderComponentPtr pRenderComp ) const
+btRigidBody* BulletPhysics::FindBulletRigidBody( StrongRenderComponentPtr pRenderComp ) const
    {
-   ActorIDToBulletRigidBodyMap::const_iterator found = m_ActorIdToRigidBody.find( id );
-   if( found != m_ActorIdToRigidBody.end( ) )
+   RenderCompToRigidBodyMap::const_iterator found = m_RenderCompToRigidBody.find( pRenderComp );
+   if( found != m_RenderCompToRigidBody.end() )
       return found->second;
 
    return NULL;
@@ -408,22 +380,26 @@ btRigidBody* BulletPhysics::FindBulletRigidBody( WeakRenderComponentPtr pRenderC
 // BulletPhysics::FindActorID				- not described in the book
 //    Finds an Actor ID given a Bullet rigid body 
 //
-ActorId BulletPhysics::FindActorID( btRigidBody const * const body ) const
+StrongRenderComponentPtr BulletPhysics::FindRenderComponent( btRigidBody const * pbody ) const
    {
-   BulletRigidBodyToActorIDMap::const_iterator found = m_RigidBodyToActorId.find( body );
-   if( found != m_RigidBodyToActorId.end( ) )
+   RigidBodyToRenderCompMap::const_iterator found = m_RigidBodyToRenderComp.find( pbody );
+   if( found != m_RigidBodyToRenderComp.end() )
       return found->second;
 
-   return ActorId( );
+   return StrongRenderComponentPtr( );
    }
 
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VAddSphere					- Chapter 17, page 599
 //
-void BulletPhysics::VAddSphere( float const radius, WeakRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial )
+void BulletPhysics::VAddSphere( float radius, 
+                                StrongRenderComponentPtr pRenderComp, 
+                                const std::string& densityStr, 
+                                const std::string& physicsMaterial,
+                                CollisionId collisionGroup,
+                                int collisionFlag )
    {
-   StrongActorPtr pStrongActor = pActor.lock();
-   if( !pStrongActor )
+   if( !pRenderComp )
       return;  // FUTURE WORK - Add a call to the error log here
 
    // create the collision body, which specifies the shape of the object
@@ -434,16 +410,16 @@ void BulletPhysics::VAddSphere( float const radius, WeakRenderComponentPtr pRend
    float const volume = ( 4.f / 3.f ) * ENG_PI * radius * radius * radius;
    btScalar const mass = volume * specificGravity;
 
-   AddShape( pStrongActor, /*initialTransform,*/ collisionShape, mass, physicsMaterial );
+   AddShape( pRenderComp, /*initialTransform,*/ collisionShape, mass, physicsMaterial, collisionGroup, collisionFlag );
    }
 
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VAddBox
 //
-void BulletPhysics::VAddBox( const Vec3& dimensions, WeakRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial )
+void BulletPhysics::VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup,
+                             int collisionFlag )
    {
-   StrongActorPtr pStrongActor = pActor.lock();
-   if( !pStrongActor )
+   if( !pRenderComp )
       return;  // FUTURE WORK: Add a call to the error log here
 
    // create the collision body, which specifies the shape of the object
@@ -454,13 +430,18 @@ void BulletPhysics::VAddBox( const Vec3& dimensions, WeakRenderComponentPtr pRen
    float const volume = dimensions.x * dimensions.y * dimensions.z;
    btScalar const mass = volume * specificGravity;
 
-   AddShape( pStrongActor,/* initialTransform,*/ boxShape, mass, physicsMaterial );
+   AddShape( pRenderComp,/* initialTransform,*/ boxShape, mass, physicsMaterial, collisionGroup, collisionFlag );
    }
 
-void BulletPhysics::VAddPointCloud( Vec3 *verts, int numPoints, WeakRenderComponentPtr pRenderComp, /*const Mat4x4& initialTransform,*/ const std::string& densityStr, const std::string& physicsMaterial )
+void BulletPhysics::VAddPointCloud( Vec3 *verts, 
+                                    int numPoints, 
+                                    StrongRenderComponentPtr pRenderComp, 
+                                    const std::string& densityStr, 
+                                    const std::string& physicsMaterial, 
+                                    CollisionId collisionGroup, 
+                                    int collisionFlag )
    {
-   StrongActorPtr pStrongActor = pActor.lock();
-   if( !pStrongActor )
+   if( !pRenderComp )
       return;  // FUTURE WORK: Add a call to the error log here
 
    btConvexHullShape * const shape = new btConvexHullShape( );
@@ -479,7 +460,7 @@ void BulletPhysics::VAddPointCloud( Vec3 *verts, int numPoints, WeakRenderCompon
    float const volume = aabbExtents.x( ) * aabbExtents.y( ) * aabbExtents.z( ); // approximate the volume as bounding box
    btScalar const mass = volume * specificGravity;
 
-   AddShape( pStrongActor, shape, mass, physicsMaterial );
+   AddShape( pRenderComp, shape, mass, physicsMaterial, collisionGroup, collisionFlag );
    }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -487,14 +468,15 @@ void BulletPhysics::VAddPointCloud( Vec3 *verts, int numPoints, WeakRenderCompon
 //
 //    Implements the method to remove actors from the physics simulation
 //
-void BulletPhysics::VRemoveRenderComponent( WeakRenderComponentPtr pRenderComp )
+void BulletPhysics::VRemoveRenderComponent( StrongRenderComponentPtr pRenderComp )
    {
-   if( btRigidBody * const body = FindBulletRigidBody( id ) )
+   ENG_ASSERT( pRenderComp );
+   if( btRigidBody * const body = FindBulletRigidBody( pRenderComp ) )
       {
       // destroy the body and all its components
       RemoveCollisionObject( body );
-      m_ActorIdToRigidBody.erase( id );
-      m_RigidBodyToActorId.erase( body );
+      m_RenderCompToRigidBody.erase( pRenderComp );
+      m_RigidBodyToRenderComp.erase( body );
       }
    }
 
@@ -522,7 +504,7 @@ void BulletPhysics::VCreateTrigger( WeakActorPtr pActor, const Vec3 &pos, const 
    // set the initial position of the body from the actor
    Transform triggerTrans = Transform::g_Identity;
    triggerTrans.SetPosition( pos );
-   ActorMotionState * const myMotionState = ENG_NEW ActorMotionState( triggerTrans );
+   RenderCompMotionState * const myMotionState = ENG_NEW RenderCompMotionState( triggerTrans );
 
    btRigidBody::btRigidBodyConstructionInfo rbInfo( mass, myMotionState, boxShape, btVector3( 0, 0, 0 ) );
    btRigidBody * const body = new btRigidBody( rbInfo );
@@ -530,18 +512,21 @@ void BulletPhysics::VCreateTrigger( WeakActorPtr pActor, const Vec3 &pos, const 
    m_DynamicsWorld->addRigidBody( body );
 
    // a trigger is just a box that doesn't collide with anything.  That's what "CF_NO_CONTACT_RESPONSE" indicates.
-   body->setCollisionFlags( body->getCollisionFlags( ) | btRigidBody::CF_NO_CONTACT_RESPONSE );
-
-   m_ActorIdToRigidBody[pStrongActor->GetId( )] = body;
-   m_RigidBodyToActorId[body] = pStrongActor->GetId( );
+   body->setCollisionFlags( body->getCollisionFlags() | btRigidBody::CF_NO_CONTACT_RESPONSE );
+   StrongRenderComponentPtr pStrongRenderComp = dynamic_pointer_cast< IRenderComponent >( pStrongActor->GetComponent( 0 ).lock() );
+   m_RenderCompToRigidBody[ pStrongRenderComp ] = body;
+   m_RigidBodyToRenderComp[ body ] = pStrongRenderComp;
    }
 
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VApplyForce					- Chapter 17, page 603
 //
-void BulletPhysics::VApplyForce( const Vec3 &dir, float newtons, ActorId aid )
+void BulletPhysics::VApplyForce( const Vec3 &dir, float newtons, ActorId actorId )
    {
-   if( btRigidBody * const body = FindBulletRigidBody( aid ) )
+   StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
+   ENG_ASSERT( pStrongActor );
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast<IRenderComponent>( pStrongActor->GetComponent( 0 ).lock() );
+   if( btRigidBody * const body = FindBulletRigidBody( pRenderComp ) )
       {
       body->setActivationState( DISABLE_DEACTIVATION );
 
@@ -556,15 +541,18 @@ void BulletPhysics::VApplyForce( const Vec3 &dir, float newtons, ActorId aid )
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VApplyTorque					- Chapter 17, page 603
 //
-void BulletPhysics::VApplyTorque( const Vec3 &dir, float magnitude, ActorId aid )
+void BulletPhysics::VApplyTorque( const Vec3 &dir, float newtons, ActorId actorId )
    {
-   if( btRigidBody * const body = FindBulletRigidBody( aid ) )
+   StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
+   ENG_ASSERT( pStrongActor );
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( pStrongActor->GetComponent( 0 ).lock() );
+   if( btRigidBody * const body = FindBulletRigidBody( pRenderComp ) )
       {
       body->setActivationState( DISABLE_DEACTIVATION );
 
-      btVector3 const torque( dir.x * magnitude,
-                              dir.y * magnitude,
-                              dir.z * magnitude );
+      btVector3 const torque( dir.x * newtons,
+                              dir.y * newtons,
+                              dir.z * newtons );
 
       body->applyTorqueImpulse( torque );
       }
@@ -575,9 +563,12 @@ void BulletPhysics::VApplyTorque( const Vec3 &dir, float magnitude, ActorId aid 
 //
 //    Forces a phyics object to a new location/orientation
 //
-bool BulletPhysics::VKinematicMove( const Transform &trans, ActorId aid )
+bool BulletPhysics::VKinematicMove( const Transform &trans, ActorId actorId )
    {
-   if( btRigidBody * const body = FindBulletRigidBody( aid ) )
+   StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
+   ENG_ASSERT( pStrongActor );
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( pStrongActor->GetComponent( 0 ).lock() );
+   if( btRigidBody * const body = FindBulletRigidBody( pRenderComp ) )
       {
       body->setActivationState( DISABLE_DEACTIVATION );
 
@@ -594,9 +585,12 @@ bool BulletPhysics::VKinematicMove( const Transform &trans, ActorId aid )
 //
 //   Returns the current transform of the physics object
 //
-Transform BulletPhysics::VGetTransform( const ActorId id )
+Transform BulletPhysics::VGetTransform( ActorId actorId )
    {
-   btRigidBody * pRigidBody = FindBulletRigidBody( id );
+   StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
+   ENG_ASSERT( pStrongActor );
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( pStrongActor->GetComponent( 0 ).lock() );
+   btRigidBody * pRigidBody = FindBulletRigidBody( pRenderComp );
    ENG_ASSERT( pRigidBody );
 
    const btTransform& actorTransform = pRigidBody->getCenterOfMassTransform( );
@@ -620,7 +614,10 @@ void BulletPhysics::VSetTransform( ActorId actorId, const Transform& trans )
 //
 void BulletPhysics::VRotateY( ActorId const actorId, float const deltaAngleRadians, float const time )
    {
-   btRigidBody * pRigidBody = FindBulletRigidBody( actorId );
+   StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
+   ENG_ASSERT( pStrongActor );
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( pStrongActor->GetComponent( 0 ).lock() );
+   btRigidBody * pRigidBody = FindBulletRigidBody( pRenderComp );
    ENG_ASSERT( pRigidBody );
 
    // create a transform to represent the additional turning this frame
@@ -641,7 +638,10 @@ void BulletPhysics::VRotateY( ActorId const actorId, float const deltaAngleRadia
 //
 float BulletPhysics::VGetOrientationY( ActorId actorId )
    {
-   btRigidBody * pRigidBody = FindBulletRigidBody( actorId );
+   StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
+   ENG_ASSERT( pStrongActor );
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( pStrongActor->GetComponent( 0 ).lock() );
+   btRigidBody * pRigidBody = FindBulletRigidBody( pRenderComp );
    ENG_ASSERT( pRigidBody );
 
    const btTransform& actorTransform = pRigidBody->getCenterOfMassTransform( );
@@ -682,7 +682,10 @@ void BulletPhysics::VStopActor( ActorId actorId )
 //
 Vec3 BulletPhysics::VGetVelocity( ActorId actorId )
    {
-   btRigidBody* pRigidBody = FindBulletRigidBody( actorId );
+   StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
+   ENG_ASSERT( pStrongActor );
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( pStrongActor->GetComponent( 0 ).lock() );
+   btRigidBody* pRigidBody = FindBulletRigidBody( pRenderComp );
    ENG_ASSERT( pRigidBody );
    if( !pRigidBody )
       return Vec3( );
@@ -693,7 +696,10 @@ Vec3 BulletPhysics::VGetVelocity( ActorId actorId )
 /////////////////////////////////////////////////////////////////////////////
 void BulletPhysics::VSetVelocity( ActorId actorId, const Vec3& vel )
    {
-   btRigidBody * pRigidBody = FindBulletRigidBody( actorId );
+   StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
+   ENG_ASSERT( pStrongActor );
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( pStrongActor->GetComponent( 0 ).lock() );
+   btRigidBody * pRigidBody = FindBulletRigidBody( pRenderComp );
    ENG_ASSERT( pRigidBody );
    if( !pRigidBody )
       return;
@@ -704,7 +710,10 @@ void BulletPhysics::VSetVelocity( ActorId actorId, const Vec3& vel )
 /////////////////////////////////////////////////////////////////////////////
 Vec3 BulletPhysics::VGetAngularVelocity( ActorId actorId )
    {
-   btRigidBody* pRigidBody = FindBulletRigidBody( actorId );
+   StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
+   ENG_ASSERT( pStrongActor );
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( pStrongActor->GetComponent( 0 ).lock() );
+   btRigidBody* pRigidBody = FindBulletRigidBody( pRenderComp );
    ENG_ASSERT( pRigidBody );
    if( !pRigidBody )
       return Vec3( );
@@ -715,7 +724,10 @@ Vec3 BulletPhysics::VGetAngularVelocity( ActorId actorId )
 /////////////////////////////////////////////////////////////////////////////
 void BulletPhysics::VSetAngularVelocity( ActorId actorId, const Vec3& vel )
    {
-   btRigidBody * pRigidBody = FindBulletRigidBody( actorId );
+   StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
+   ENG_ASSERT( pStrongActor );
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( pStrongActor->GetComponent( 0 ).lock() );
+   btRigidBody * pRigidBody = FindBulletRigidBody( pRenderComp );
    ENG_ASSERT( pRigidBody );
    if( !pRigidBody )
       return;
@@ -726,7 +738,10 @@ void BulletPhysics::VSetAngularVelocity( ActorId actorId, const Vec3& vel )
 /////////////////////////////////////////////////////////////////////////////
 void BulletPhysics::VTranslate( ActorId actorId, const Vec3& vec )
    {
-   btRigidBody * pRigidBody = FindBulletRigidBody( actorId );
+   StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
+   ENG_ASSERT( pStrongActor );
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( pStrongActor->GetComponent( 0 ).lock() );
+   btRigidBody * pRigidBody = FindBulletRigidBody( pRenderComp );
    ENG_ASSERT( pRigidBody );
    btVector3 btVec = Vec3_to_btVector3( vec );
    pRigidBody->translate( btVec );
@@ -823,14 +838,17 @@ void BulletPhysics::SendCollisionPairAddEvent( btPersistentManifold const * mani
 
       // send the trigger event.
       int const triggerId = *static_cast< int* >( triggerBody->getUserPointer( ) );
-      shared_ptr<EvtData_PhysTrigger_Enter> pEvent( ENG_NEW EvtData_PhysTrigger_Enter( triggerId, FindActorID( otherBody ) ) );
+      StrongRenderComponentPtr pStrongRenderComp = FindRenderComponent( otherBody );
+      ENG_ASSERT( pStrongRenderComp );
+      shared_ptr<EvtData_PhysTrigger_Enter> pEvent( ENG_NEW EvtData_PhysTrigger_Enter( triggerId, pStrongRenderComp->VGetOwner().lock()->GetId() ) );
       IEventManager::GetSingleton( )->VQueueEvent( pEvent );
       }
    else
       {
-      ActorId const id0 = FindActorID( body0 );
-      ActorId const id1 = FindActorID( body1 );
-
+      StrongRenderComponentPtr pRenderComp0 = FindRenderComponent( body0 );
+      StrongRenderComponentPtr pRenderComp1 = FindRenderComponent( body1 );
+      ActorId id0 = pRenderComp0->VGetOwner().lock()->GetId();
+      ActorId id1 = pRenderComp1->VGetOwner().lock()->GetId();
       if( id0 == INVALID_ACTOR_ID || id1 == INVALID_ACTOR_ID )
          {
          // something is colliding with a non-actor.  we currently don't send events for that
@@ -878,14 +896,18 @@ void BulletPhysics::SendCollisionPairRemoveEvent( btRigidBody const * const body
          }
 
       // send the trigger event.
-      int const triggerId = *static_cast< int* >( triggerBody->getUserPointer( ) );
-      shared_ptr<EvtData_PhysTrigger_Leave> pEvent( ENG_NEW EvtData_PhysTrigger_Leave( triggerId, FindActorID( otherBody ) ) );
+      int const triggerId = *static_cast< int* >( triggerBody->getUserPointer() ); 
+      StrongRenderComponentPtr pStrongRenderComp = FindRenderComponent( otherBody );
+      ENG_ASSERT( pStrongRenderComp );
+      shared_ptr<EvtData_PhysTrigger_Leave> pEvent( ENG_NEW EvtData_PhysTrigger_Leave( triggerId, pStrongRenderComp->VGetOwner().lock()->GetId() ) );
       IEventManager::GetSingleton( )->VQueueEvent( pEvent );
       }
    else
       {
-      ActorId const id0 = FindActorID( body0 );
-      ActorId const id1 = FindActorID( body1 );
+      StrongRenderComponentPtr pRenderComp0 = FindRenderComponent( body0 );
+      StrongRenderComponentPtr pRenderComp1 = FindRenderComponent( body1 );
+      ActorId id0 = pRenderComp0->VGetOwner().lock()->GetId();
+      ActorId id1 = pRenderComp1->VGetOwner().lock()->GetId();
 
       if( id0 == INVALID_ACTOR_ID || id1 == INVALID_ACTOR_ID )
          {

@@ -114,7 +114,7 @@ bool ActorFactory::ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides )
    for( auto it = pActor->m_Components.begin(); it != pActor->m_Components.end(); ++it )
       {
       StrongActorComponentPtr pComponent = it->second;
-      StrongActorComponentPtr pParentComponent = pComponent->GetParentComponent().lock();
+      StrongActorComponentPtr pParentComponent = pComponent->VGetParentComponent().lock();
       if( !pParentComponent )
          {
          if( !ModifyActorComponent( pComponent, pOverridesComponentNode ) )
@@ -221,7 +221,7 @@ bool ActorFactory::ModifyActorComponent( StrongActorComponentPtr pActorComponent
       {
       return false;
       }
-   auto childComponents = pActorComponent->GetChildComponents();
+   auto childComponents = pActorComponent->VGetChildComponents();
    TiXmlElement* pChildComponentNode = pDataNode->NextSiblingElement();
    for( auto actorCompIt : childComponents )
       {

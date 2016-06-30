@@ -13,6 +13,7 @@
  * \note
  */
 #include "btBulletCollisionCommon.h"
+#include "PhysicsAttributes.h"
 
 class btVector3;
 class btTransform;
@@ -49,11 +50,11 @@ struct MaterialData
       }
    };
 
-struct ActorMotionState : public btMotionState 
+struct RenderCompMotionState : public btMotionState 
    {
    Transform m_Transform;
 
-   ActorMotionState( Transform const & transform )
+   RenderCompMotionState( Transform const & transform )
       : m_Transform( transform )
       {
       }
@@ -82,19 +83,19 @@ class IGamePhysics : public ENG_Noncopyable
       virtual void VOnUpdate( const float deltaSeconds ) = 0;
 
       // Initialization of Physics Objects
-      virtual void VAddSphere( float radius, WeakRenderComponentPtr pRenderComp, /*const Mat4x4& initialTransform, */const std::string& densityStr, const std::string& physicsMaterial ) = 0;
-      virtual void VAddBox( const Vec3& dimensions, WeakRenderComponentPtr pRenderComp, /*const Mat4x4& initialTransform, */ const std::string& densityStr, const std::string& physicsMaterial ) = 0;
-      virtual void VAddPointCloud( Vec3 *verts, int numPoints, WeakRenderComponentPtr pRenderComp, /*const Mat4x4& initialTransform, */ const std::string& densityStr, const std::string& physicsMaterial ) = 0;
-      virtual void VRemoveRenderComponent( ActorId id ) = 0;
+      virtual void VAddSphere( float radius, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag ) = 0;
+      virtual void VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag ) = 0;
+      virtual void VAddPointCloud( Vec3 *verts, int numPoints, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag ) = 0;
+      virtual void VRemoveRenderComponent( StrongRenderComponentPtr pRenderComp ) = 0;
 
       // Debugging
       virtual void VRenderDiagnostics() = 0;
 
       // Physics world modifiers
       virtual void VCreateTrigger( WeakActorPtr pGameActor, const Vec3 &pos, const float dim ) = 0;
-      virtual void VApplyForce( const Vec3 &dir, float newtons, ActorId aid ) = 0;
-      virtual void VApplyTorque( const Vec3 &dir, float newtons, ActorId aid ) = 0;
-      virtual bool VKinematicMove( const Transform &trans, ActorId aid ) = 0;
+      virtual void VApplyForce( const Vec3 &dir, float newtons, ActorId actorId ) = 0;
+      virtual void VApplyTorque( const Vec3 &dir, float newtons, ActorId actorId ) = 0;
+      virtual bool VKinematicMove( const Transform &trans, ActorId actorId ) = 0;
 
       // Physics actor states
       virtual void VRotateY( ActorId actorId, float angleRadians, float time ) = 0;
@@ -107,7 +108,7 @@ class IGamePhysics : public ENG_Noncopyable
       virtual void VTranslate( ActorId actorId, const Vec3& vec ) = 0;
 
       virtual void VSetTransform( const ActorId id, const Transform& trans ) = 0;
-      virtual Transform VGetTransform( const ActorId id ) = 0;
+      virtual Transform VGetTransform( ActorId actorId ) = 0;
 
       virtual ~IGamePhysics( void ) {};
       
@@ -128,6 +129,7 @@ template< typename T > void IGamePhysics::RegisterImplementation( void )
 class BulletPhysics : public IGamePhysics
    {
    friend class IGamePhysics;
+   friend class IRenderComponent;
    public:
       
       virtual ~BulletPhysics( );
@@ -137,21 +139,17 @@ class BulletPhysics : public IGamePhysics
       virtual void VOnUpdate( const float deltaSeconds ) override;
 
       // Initialization of Physics Objects
-      virtual void VAddSphere( float radius, WeakRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial ) override;
-      virtual void VAddBox( const Vec3& dimensions, WeakRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial ) override;
+      virtual void VAddSphere( float radius, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag ) override;
+      virtual void VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag ) override;
 
-      /**
-       * @brief declare a group of vertices as a rigid body
-       *
-       * @param  verts Vec3 * verts
-       * @param  numPoints int numPoints
-       * @param  pActor WeakActorPtr pActor
-       * @param  densityStr const std::string & densityStr
-       * @param  physicsMaterial const std::string & physicsMaterial
-       * @return void
-       */
-      virtual void VAddPointCloud( Vec3 *verts, int numPoints, WeakRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial ) override;
-      virtual void VRemoveRenderComponent( WeakRenderComponentPtr pRenderComp ) override;
+      virtual void VAddPointCloud( Vec3 *verts, 
+                                   int numPoints, 
+                                   StrongRenderComponentPtr pRenderComp, 
+                                   const std::string& densityStr, 
+                                   const std::string& physicsMaterial, 
+                                   CollisionId collisionGroup, 
+                                   int collisionFlag ) override;
+      virtual void VRemoveRenderComponent( StrongRenderComponentPtr pRenderComp ) override;
 
       // Debugging
       virtual void VRenderDiagnostics( void ) override;
@@ -166,9 +164,9 @@ class BulletPhysics : public IGamePhysics
        * @return void
        */
        virtual void VCreateTrigger( WeakActorPtr pActor, const Vec3 &pos, const float dim ) override;
-      virtual void VApplyForce( const Vec3 &dir, float newtons, ActorId aid ) override;
-      virtual void VApplyTorque( const Vec3 &dir, float newtons, ActorId aid ) override;
-      virtual bool VKinematicMove( const Transform &trans, ActorId aid ) override;
+      virtual void VApplyForce( const Vec3 &dir, float newtons, ActorId actorId ) override;
+      virtual void VApplyTorque( const Vec3 &dir, float newtons, ActorId actorId ) override;
+      virtual bool VKinematicMove( const Transform &trans, ActorId actorId ) override;
 
       virtual void VRotateY( ActorId actorId, float angleRadians, float time );
       virtual float VGetOrientationY( ActorId actorId );
@@ -181,7 +179,7 @@ class BulletPhysics : public IGamePhysics
 
       virtual void VSetTransform( const ActorId id, const Transform &trans );
 
-      virtual Transform VGetTransform( const ActorId id );
+      virtual Transform VGetTransform( ActorId actorId );
 
    protected:
       BulletPhysics( void );				// [mrmike] This was changed post-press to add event registration!
@@ -189,9 +187,9 @@ class BulletPhysics : public IGamePhysics
       float LookupSpecificGravity( const std::string& densityStr );
       MaterialData LookupMaterialData( const std::string& materialStr );
 
-      btRigidBody * FindBulletRigidBody( WeakRenderComponentPtr pRenderComp ) const;
+      btRigidBody * FindBulletRigidBody( StrongRenderComponentPtr pRenderComp ) const;
 
-      ActorId FindActorID( btRigidBody const * ) const;
+      StrongRenderComponentPtr FindRenderComponent( btRigidBody const * ) const;
 
 
       // helpers for sending events relating to collision pairs
@@ -199,7 +197,7 @@ class BulletPhysics : public IGamePhysics
       void SendCollisionPairRemoveEvent( btRigidBody const * body0, btRigidBody const * body1 );
 
       // common functionality used by VAddSphere, VAddBox, etc
-      void AddShape( WeakRenderComponentPtr pRenderComp, btCollisionShape* shape, float mass, const std::string& physicsMaterial );
+      void AddShape( StrongRenderComponentPtr pRenderComp, btCollisionShape* shape, float mass, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag );
 
       // helper for cleaning up objects
       void RemoveCollisionObject( btCollisionObject * removeMe );
@@ -239,10 +237,10 @@ class BulletPhysics : public IGamePhysics
 
       // keep track of the existing rigid bodies:  To check them for updates
       //   to the actors' positions, and to remove them when their lives are over.
-      typedef std::map< weak_ptr< IRenderComponent >, btRigidBody*> RenderCompToRigidBodyMap;
+      typedef std::unordered_map< shared_ptr< IRenderComponent >, btRigidBody*> RenderCompToRigidBodyMap;
       RenderCompToRigidBodyMap m_RenderCompToRigidBody;
 
       // also keep a map to get the actor id from the btRigidBody*
-      typedef std::map<btRigidBody const *, ActorId> BulletRigidBodyToActorIDMap;
-      BulletRigidBodyToActorIDMap m_RigidBodyToActorId;
+      typedef std::map<btRigidBody const *, shared_ptr< IRenderComponent > > RigidBodyToRenderCompMap;
+      RigidBodyToRenderCompMap m_RigidBodyToRenderComp;
    };

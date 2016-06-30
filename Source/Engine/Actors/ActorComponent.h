@@ -25,7 +25,7 @@ class IActorComponent
    friend class ActorFactory;
    public:
       virtual ~IActorComponent( void ){}
-      virtual ComponentRegisterId VGetId( void ) const = 0;
+      virtual ComponentRegisterId VGetRegisterId( void ) const = 0;
       virtual const std::string& VGetName( ) const = 0;
 
       virtual bool VInit( TiXmlElement* pData ) = 0;
@@ -35,9 +35,11 @@ class IActorComponent
       virtual void Destory( void ) = 0;
       virtual TiXmlElement* VGenerateXML( void ) = 0;
       virtual TiXmlElement* VGenerateOverridesXML( TiXmlElement* pResourceNode ) = 0;
-      virtual const ChildComponents& GetChildComponents( void ) const = 0;
-      virtual const weak_ptr<IActorComponent> GetParentComponent( void ) = 0;
-      virtual ActorComponentId GetActorComponentId( void ) = 0;
+      virtual const ChildComponents& VGetChildComponents( void ) const = 0;
+      virtual WeakActorComponentPtr VGetParentComponent( void ) = 0;
+      virtual ActorComponentId VGetActorComponentId( void ) const = 0;
+      virtual WeakActorPtr VGetOwner( void ) const = 0;
+      virtual WeakActorComponentPtr VGetSelfWeakActorComponentPtr( void ) = 0;
 
    protected:
       virtual void AddChildComponent( weak_ptr<IActorComponent> ) = 0;
@@ -50,13 +52,15 @@ template <typename T>class BaseActorComponent : virtual public IActorComponent
    {
    friend class ActorFactory;
       public:
-      virtual ComponentRegisterId VGetId( void ) const override { return s_ComponentId; };
+      virtual ComponentRegisterId VGetRegisterId( void ) const override { return s_ComponentId; };
       virtual const std::string& VGetName( void ) const override { return s_Name; }
       virtual void VPostInit( void ) override {};
       virtual void VUpdate( const unsigned long deltaMs ) override {};
-      virtual const ChildComponents& GetChildComponents( void ) const override { return m_ChildComponents; };
-      virtual const weak_ptr<IActorComponent> GetParentComponent( void ) override { return m_pParentComponent; }
-      virtual ActorComponentId GetActorComponentId( void ) const override { return m_ActorComponentId; };
+      virtual const ChildComponents& VGetChildComponents( void ) const override { return m_ChildComponents; }
+      virtual WeakActorComponentPtr VGetParentComponent( void ) override { return m_pParentComponent; }
+      virtual ActorComponentId VGetActorComponentId( void ) const override { return m_ActorComponentId; }
+      virtual WeakActorPtr VGetOwner( void ) const override { return m_pOwner; }
+      virtual WeakActorComponentPtr VGetSelfWeakActorComponentPtr( void ) override { return m_pOwner->GetComponent( m_ActorComponentId ); }
 
    public:
       // GUID of this event

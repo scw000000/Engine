@@ -18,6 +18,8 @@
 #include "..\Event\Events.h"
 #include "..\Graphics\MeshSceneNode.h"
 #include "TransformComponent.h"
+#include "..\Physics\PhysicsAttributes.h"
+#include "..\ResourceCache\MeshResource.h"
 
 //
 //RenderComponent::RenderComponent( void )
@@ -136,14 +138,14 @@
 const ComponentRegisterId BaseActorComponent<MeshRenderComponent>::s_ComponentId = 0x7a02ca99;
 const std::string BaseActorComponent<MeshRenderComponent>::s_Name = "MeshRenderComponent";
 
-void MeshRenderComponent::Destory( void )
+void MeshRenderComponent::Destory( void ) 
    {
    BaseRenderComponent::Destory();
    m_pMaterial.reset();
    m_pMeshResource.reset();
    }
 
-MeshRenderComponent::MeshRenderComponent( void ) : m_pMeshResource( ENG_NEW Resource( "" ) ), m_pMaterial( ENG_NEW Material )
+MeshRenderComponent::MeshRenderComponent( void ) : m_pMeshResource( ENG_NEW Resource( "" ) ), m_pMaterial( ENG_NEW Material ), m_PhysicsAttributes( ENG_NEW BulletPhysicsAttributes )
    {
    
    }
@@ -177,10 +179,30 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
    m_pMeshResource->Init( pData->FirstChildElement( "Mesh" ) );
       
    m_pMaterial->Init( pData->FirstChildElement( "Material" ) );
-     
+   
+   TiXmlElement* pPhysicsAttributes = pData->FirstChildElement( "PhysicsAttributes" );
+   if( pPhysicsAttributes )
+      {
+      m_PhysicsAttributes->Vinit( pPhysicsAttributes );
+      }
    return true;
    }
 
+void MeshRenderComponent::VDelegatePostInit( void )
+   {
+   auto pAiScene = MeshResourceLoader::LoadAndReturnScene( *m_pMeshResource );
+   auto pMesh = pAiScene->mMeshes[ 0 ];
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( VGetSelfWeakActorComponentPtr().lock() );
+   ENG_ASSERT( pRenderComp );
+   //std::vector<Vec3> meshVertices( pMesh->mNumVertices, Vec3() );
+   IGamePhysics::GetSingleton().VAddPointCloud( ( Vec3* ) &( pMesh->mVertices[ 0 ] ),
+                                                pMesh->mNumVertices,
+                                                pRenderComp,
+                                                m_PhysicsAttributes->VGetDensity(),
+                                                m_PhysicsAttributes->VGetMaterial(),
+                                                m_PhysicsAttributes->VGetCollisionId(),
+                                                btCollisionObject::CF_STATIC_OBJECT );
+   }
 
 void MeshRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )
    {
@@ -201,4 +223,5 @@ void MeshRenderComponent::VDelegateGenerateOverridesXML( TiXmlElement* pBaseElem
    TiXmlElement* pMaterial = m_pMaterial->GenerateOverridesXML( pResourceNode->FirstChildElement( "Material" ) );
    pBaseElement->LinkEndChild( pMaterial );
    }
+
 

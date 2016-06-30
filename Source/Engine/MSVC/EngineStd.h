@@ -29,6 +29,7 @@
 #include <iostream>
 #include <memory>
 #include <algorithm>
+#include <unordered_map>
 #include <string>
 #include <list>
 #include <vector>

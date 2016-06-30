@@ -77,7 +77,7 @@ TiXmlElement* Actor::BuildComponentXML( StrongActorComponentPtr pComponent )
    TiXmlElement* pCurrLevelNodeData = pComponent->VGenerateXML();
    pCurrLevelNodeData->SetValue( "Data" );
    pCurrLevelNode->LinkEndChild( pCurrLevelNodeData );
-   const ChildComponents& childComponents = pComponent->GetChildComponents();
+   const ChildComponents& childComponents = pComponent->VGetChildComponents();
    for( auto pChildComponent : childComponents )
       {
       auto pStrongChildComponent = pChildComponent.lock();
@@ -104,7 +104,7 @@ TiXmlElement* Actor::GenerateXML( void )
    for ( auto it = m_Components.begin(); it != m_Components.end(); ++it )
       {
       StrongActorComponentPtr pComponent = it->second;
-      StrongActorComponentPtr pParentComponent = pComponent->GetParentComponent().lock();
+      StrongActorComponentPtr pParentComponent = pComponent->VGetParentComponent().lock();
       if( !pParentComponent )
          {
          pRetNode->LinkEndChild( BuildComponentXML( pComponent ) );
@@ -125,7 +125,7 @@ TiXmlElement* Actor::BuildOverridesXML( StrongActorComponentPtr pComponent, TiXm
    pCurrLevelNode->LinkEndChild( pCurrLevelNodeData );
 
    TiXmlElement* pResChildComponentNode = pResDataNode->NextSiblingElement();
-   const ChildComponents& childComponents = pComponent->GetChildComponents();
+   const ChildComponents& childComponents = pComponent->VGetChildComponents();
 
    for( auto pChildComponent : childComponents )
       {
@@ -157,7 +157,7 @@ TiXmlElement* Actor::GenerateOverridesXML( TiXmlElement* pResouce )
    for( auto it = m_Components.begin(); it != m_Components.end(); ++it )
       {
       StrongActorComponentPtr pComponent = it->second;
-      StrongActorComponentPtr pParentComponent = pComponent->GetParentComponent().lock();
+      StrongActorComponentPtr pParentComponent = pComponent->VGetParentComponent().lock();
       if( !pParentComponent )
          {
          TiXmlElement* pComponentNode = BuildOverridesXML( pComponent, pResComponentNode );
@@ -176,7 +176,7 @@ TransformPtr Actor::GetTransformPtr( void )
    ENG_ASSERT( !pComponent.expired() );
    shared_ptr<IRenderComponent> pRootComponent = dynamic_pointer_cast< IRenderComponent >( pComponent.lock() );
    ENG_ASSERT( pRootComponent );
-   return pRootComponent->VGetTransform();
+   return pRootComponent->VGetTransformPtr();
    }
 
 void Actor::AddComponent( StrongActorComponentPtr pComponent )

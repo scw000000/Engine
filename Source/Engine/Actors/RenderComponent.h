@@ -17,6 +17,10 @@
 #include "..\Event\Events.h"
 #include "..\Graphics\MeshSceneNode.h"
 #include "TransformComponent.h"
+#include "..\Physics\Physics.h"
+#include "..\Physics\PhysicsAttributes.h"
+
+class BulletPhysicsAttributes;
 
 #pragma warning( push )
 #pragma warning( disable : 4250 )
@@ -28,6 +32,8 @@ class IRenderComponent : virtual public IActorComponent
       virtual ~IRenderComponent( void ){ }
       virtual shared_ptr<SceneNode> VGetSceneNode( void ) = 0;
       virtual void VSetTransform( const Transform& transform ) = 0;
+      virtual TransformPtr VGetTransformPtr( void ) const = 0;
+      virtual shared_ptr< BulletPhysicsAttributes > VGetPhysicsAttributesPtr( void ) const = 0;
 
    protected:
       virtual void VBuildSceneNode( SceneNode* pParentNode ) = 0;
@@ -38,6 +44,7 @@ class IRenderComponent : virtual public IActorComponent
       * @return bool
       */
       virtual bool VDelegateInit( TiXmlElement* pData ) = 0;
+      virtual void VDelegatePostInit( void ) = 0;
       // factory method to create the appropriate scene node
       // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
       virtual shared_ptr<SceneNode> VCreateSceneNode( void ) = 0;
@@ -55,8 +62,9 @@ template <typename T>class BaseRenderComponent : public IRenderComponent, public
    public:
       BaseRenderComponent( void );
       virtual void Destory( void ) override;
-      virtual TransformPtr VGetTransformPtr( void ) override final { return m_pTransform; }
+      virtual TransformPtr VGetTransformPtr( void ) const override final{ return m_pTransform; }
       virtual void VSetTransform( const Transform& transform ) override final;
+      virtual shared_ptr< BulletPhysicsAttributes > VGetPhysicsAttributesPtr( void ) const override final { return m_pPhysicsAttributes; }
       /**
          * @brief set member variable from xml elements
          *
@@ -66,7 +74,9 @@ template <typename T>class BaseRenderComponent : public IRenderComponent, public
          * @return bool
          */
       virtual bool VInit( TiXmlElement* pData ) override final;
+      virtual bool VDelegateInit( TiXmlElement* pData ) override { return true; }
       virtual void VPostInit( void ) override final;
+      virtual void VDelegatePostInit( void ) {  };
    	//virtual void VOnChanged( void ) override;
       virtual TiXmlElement* VGenerateXML( void ) override final;
       virtual shared_ptr<SceneNode> VGetSceneNode( void ) override final;
@@ -86,21 +96,22 @@ template <typename T>class BaseRenderComponent : public IRenderComponent, public
    protected:
          shared_ptr<SceneNode> m_pSceneNode;
          TransformPtr m_pTransform;
-   
+         shared_ptr< BulletPhysicsAttributes > m_pPhysicsAttributes;
+
    private:
       
    };
 
    
-template < typename T > BaseRenderComponent<T>::BaseRenderComponent( void )
+template < typename T > BaseRenderComponent<T>::BaseRenderComponent( void ) : m_pTransform( ENG_NEW Transform( Transform::g_Identity ) )
    {
-   m_pTransform = TransformPtr( ENG_NEW Transform( Transform::g_Identity ) );
    }
 
 template < typename T > void BaseRenderComponent<T>::Destory( void )
    {
    m_pSceneNode.reset();
    m_pTransform.reset();
+   m_pPhysicsAttributes.reset();
    }
 
 template < typename T > void BaseRenderComponent<T>::VSetTransform( const Transform& transform )
@@ -126,6 +137,7 @@ template < typename T > void BaseRenderComponent<T>::VPostInit( void )
       shared_ptr<Event_New_Render_Component_Root> pEvent( ENG_NEW Event_New_Render_Component_Root( m_pOwner->GetId(), pSceneNode ) );
       IEventManager::GetSingleton()->VTriggerEvent( pEvent ); // process this event immediately
       }
+   VDelegatePostInit();
    }
 
 template < typename T > TiXmlElement* BaseRenderComponent<T>::VGenerateXML( void )
@@ -282,11 +294,13 @@ class MeshRenderComponent : public BaseRenderComponent<MeshRenderComponent>
        */
       virtual shared_ptr<SceneNode> VCreateSceneNode( void ) override; 
       virtual bool VDelegateInit( TiXmlElement* pData ) override;
+      virtual void VDelegatePostInit( void ) override;
       virtual void VDelegateGenerateXML( TiXmlElement* pBaseElement ) override;
       virtual void VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode ) override;
 
    protected:
       MaterialPtr m_pMaterial;
+      shared_ptr< BulletPhysicsAttributes > m_PhysicsAttributes;
       shared_ptr<Resource> m_pMeshResource;
    };
 

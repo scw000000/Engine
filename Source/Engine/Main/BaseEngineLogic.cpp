@@ -77,6 +77,8 @@ BaseEngineLogic::~BaseEngineLogic()
 
 bool BaseEngineLogic::Init()
    {
+   IGamePhysics::RegisterImplementation< BulletPhysics >();
+   IGamePhysics::GetSingleton().VInitialize();
    if( !VLoadLevel( ( g_pApp->m_EngineOptions.m_LevelDirectory + g_pApp->m_EngineOptions.m_Level ).c_str() ))
       {
       ENG_ERROR( "The game failed to load." );
@@ -89,8 +91,7 @@ bool BaseEngineLogic::Init()
 
    shared_ptr<IView> pView( ENG_NEW HumanView( ) );
    VAddView( pView );
-   IGamePhysics::RegisterImplementation< BulletPhysics >();
-   IGamePhysics::GetSingleton().VInitialize();
+   
    return true;  
    }
 
@@ -223,6 +224,9 @@ void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
    {
    unsigned long deltaMs = unsigned long( elapsedTime * 1000.0f );
 	m_Lifetime += elapsedTime;
+
+   IGamePhysics::GetSingleton().VOnUpdate( elapsedTime );
+   IGamePhysics::GetSingleton().VSyncVisibleScene();
 
    if( m_EnableWorldUpdate )
       {

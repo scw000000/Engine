@@ -205,13 +205,13 @@
     <ClCompile Include="..\Utilities\XMLHelper.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\Graphics\Raycast.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Physics\CollisionTable.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
     <ClCompile Include="..\Physics\PhysicsAttributes.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Physics\Raycast.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
   </ItemGroup>
@@ -386,13 +386,13 @@
     <ClInclude Include="..\Utilities\XMLHelper.h">
       <Filter>Utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\Graphics\Raycast.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\Physics\CollisionTable.h">
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\Physics\PhysicsAttributes.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\Raycast.h">
       <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>

@@ -23,6 +23,7 @@
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Event\EventManager.h"
 #include "..\Physics\Physics.h"
+#include "..\Physics\Raycast.h"
 
 void LevelManager::Init( const std::string& levelDir )
    {
@@ -91,7 +92,7 @@ bool BaseEngineLogic::Init()
 
    shared_ptr<IView> pView( ENG_NEW HumanView( ) );
    VAddView( pView );
-   
+
    return true;  
    }
 
@@ -228,6 +229,9 @@ void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
    IGamePhysics::GetSingleton().VOnUpdate( elapsedTime );
    IGamePhysics::GetSingleton().VSyncVisibleScene();
 
+   Point center( g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
+   RayCast raycast( center, 20.f );
+   RayCastManager::GetSingleton().PerformRayCast( raycast );
    if( m_EnableWorldUpdate )
       {
       m_pWrold->OnUpdate( deltaMs );
@@ -346,7 +350,7 @@ void BaseEngineLogic::VOnFileDrop( const char* filePath, const Point& dropLocati
       std::string rootName = pRoot->Value();
       auto pCamera = m_pWrold->GetCamera();
       TransformPtr pTransform( pCamera->VGetProperties().GetTransformPtr() );
-      pTransform->SetPosition( pCamera->GetScreenProjectPoint( 17.f, dropLocation ) );
+    //  pTransform->SetPosition( pCamera->GetScreenProjectPoint( 17.f, dropLocation ) );
       if( !std::strcmp( rootName.c_str(), "ActorClass" ) )
          {
          VCreateActorFromClass( fileRes.m_Name.c_str(), pTransform );

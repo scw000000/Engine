@@ -197,7 +197,7 @@ class CameraNode : public SceneNode
        * @param  screenPosition const Point & screenPosition
        * @return Vec3
        */
-       Vec3 GetScreenProjectPoint( float distance, const Point& screenPosition );
+       void GetScreenProjectPoint( Vec3& start, Vec3& end, const Point& screenPosition, float distance );
 
    protected:
 	   Frustum			m_Frustum;

@@ -194,7 +194,7 @@ void MeshRenderComponent::VDelegatePostInit( void )
    auto pMesh = pAiScene->mMeshes[ 0 ];
    StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( VGetSelfWeakActorComponentPtr().lock() );
    ENG_ASSERT( pRenderComp );
-   //std::vector<Vec3> meshVertices( pMesh->mNumVertices, Vec3() );
+   std::vector<Vec3> meshVertices( pMesh->mNumVertices, Vec3() );
    IGamePhysics::GetSingleton().VAddPointCloud( ( Vec3* ) &( pMesh->mVertices[ 0 ] ),
                                                 pMesh->mNumVertices,
                                                 pRenderComp,

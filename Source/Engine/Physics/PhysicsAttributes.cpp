@@ -18,7 +18,7 @@
 
 BulletPhysicsAttributes::BulletPhysicsAttributes( void )
    {
-   m_CollisionId = 0;
+   m_CollisionId = 1; // Must be selectable by ray test in bullet physics
    m_Acceleration = 0.f;
    m_MaxVelocity = 0.f;
 
@@ -50,6 +50,11 @@ bool BulletPhysicsAttributes::Vinit( TiXmlElement* pData )
    TiXmlElement* pMaterial = pData->FirstChildElement( "PhysicsMaterial" );
    if( pMaterial )
       m_Material = pMaterial->FirstChild()->Value();
+
+   // material
+   TiXmlElement* pCollisionGroup = pData->FirstChildElement( "CollisionGroup" );
+   if( pCollisionGroup )
+      m_CollisionId = CollisionTable::GetSingleton().GetIdFromName( pCollisionGroup->FirstChild()->Value() );
 
    return true;
    }

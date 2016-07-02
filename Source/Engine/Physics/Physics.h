@@ -130,6 +130,7 @@ class BulletPhysics : public IGamePhysics
    {
    friend class IGamePhysics;
    friend class IRenderComponent;
+   friend class RayCastManager;
    public:
       
       virtual ~BulletPhysics( );

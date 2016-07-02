@@ -18,6 +18,7 @@
 #include "btBulletDynamicsCommon.h"
 #include "PhysicsDebugDrawer.h"
 #include "CollisionTable.h"
+#include "Raycast.h"
 
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Actors\TransformComponent.h"
@@ -112,6 +113,8 @@ IGamePhysics& IGamePhysics::GetSingleton( void )
 
 BulletPhysics::BulletPhysics()
    {
+   static RayCastManager s_RayCastManager( this );
+   m_DynamicsWorld = NULL;
    // [mrmike] This was changed post-press to add event registration!
    REGISTER_EVENT( EvtData_PhysTrigger_Enter );
    REGISTER_EVENT( EvtData_PhysTrigger_Leave );
@@ -255,6 +258,7 @@ void BulletPhysics::VSyncVisibleScene( )
 
    // check all the existing actor's bodies for changes. 
    //  If there is a change, send the appropriate event for the game system.
+
    for( auto renderCompIt : m_RenderCompToRigidBody )
       {
       StrongRenderComponentPtr pRenderComp = renderCompIt.first;

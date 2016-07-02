@@ -115,7 +115,6 @@
     <ClCompile Include="..\Graphics\Geometry.cpp" />
     <ClCompile Include="..\Graphics\Light.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
-    <ClCompile Include="..\Graphics\Raycast.cpp" />
     <ClCompile Include="..\Graphics\SkySceneNode.cpp" />
     <ClCompile Include="..\Graphics\TransformStack.cpp" />
     <ClCompile Include="..\Graphics\MeshSceneNode.cpp" />
@@ -144,6 +143,7 @@
     <ClCompile Include="..\Physics\Physics.cpp" />
     <ClCompile Include="..\Physics\PhysicsAttributes.cpp" />
     <ClCompile Include="..\Physics\PhysicsDebugDrawer.cpp" />
+    <ClCompile Include="..\Physics\Raycast.cpp" />
     <ClCompile Include="..\ResourceCache\DevResourceFile.cpp" />
     <ClCompile Include="..\ResourceCache\MeshResource.cpp" />
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp" />
@@ -187,7 +187,6 @@
     <ClInclude Include="..\Graphics\Geometry.h" />
     <ClInclude Include="..\Graphics\Light.h" />
     <ClInclude Include="..\Graphics\Material.h" />
-    <ClInclude Include="..\Graphics\Raycast.h" />
     <ClInclude Include="..\Graphics\SkySceneNode.h" />
     <ClInclude Include="..\Graphics\TransformStack.h" />
     <ClInclude Include="..\Graphics\MeshSceneNode.h" />
@@ -211,6 +210,7 @@
     <ClInclude Include="..\Physics\Physics.h" />
     <ClInclude Include="..\Physics\PhysicsAttributes.h" />
     <ClInclude Include="..\Physics\PhysicsDebugDrawer.h" />
+    <ClInclude Include="..\Physics\Raycast.h" />
     <ClInclude Include="..\ResourceCache\DevResourceFile.h" />
     <ClInclude Include="..\ResourceCache\MeshResource.h" />
     <ClInclude Include="..\ResourceCache\ResourceCache.h" />

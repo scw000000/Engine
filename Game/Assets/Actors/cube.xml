@@ -19,7 +19,8 @@
             </Material>
 			
 			<PhysicsAttributes>
-				<Density>empty</Density>
+				<Density>air</Density>
+				<CollisionGroup>Mesh</CollisionGroup>
 			</PhysicsAttributes>
 			
         </Data>

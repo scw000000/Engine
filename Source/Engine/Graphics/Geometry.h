@@ -49,7 +49,7 @@ class Vec3 : public glm::vec3
 	   Vec3( float _x, float _y, float _z ) : glm::vec3( _x, _y, _z ) { }
       Vec3( double _x, double _y, double _z ) : glm::vec3( _x, _y, _z ) { }
       Vec3( int _x, int _y, int _z ) : glm::vec3( _x, _y, _z ) {}
-     // Vec3( const Vec4 &v4 ) { x = v4.x; y = v4.y; z = v4.z; }
+      inline Vec3( const Vec4 &v4 );
 
       Vec3 operator+( const Vec3& other ) const { return Vec3( this->x + other.x, this->y + other.y, this->z + other.z ); }
       Vec3 operator-( const Vec3& other ) const { return Vec3( this->x - other.x, this->y - other.y, this->z - other.z ); }
@@ -66,12 +66,10 @@ class Vec3 : public glm::vec3
       Vec3& operator/=( float other ) { return ( *this = *this / other ); }
 
       inline float Length(){ return glm::length<float, glm::highp, glm::tvec3>( (*this) ); }
-	   inline Vec3( const class Vec4 &v4 );
 
-      inline Vec3* Normalize()
+      inline void Normalize()
          {
-         (*this) = glm::normalize<float, glm::highp, glm::tvec3>( (*this) );
-         return this; 
+         (*this) = glm::normalize<float, glm::highp, glm::tvec3>( (*this) ); 
          }
       inline float Dot( const Vec3 &b ) const
          {
@@ -118,7 +116,7 @@ class Vec4 : public glm::vec4
       inline float Dot( const Vec4 &b ) { return glm::dot<float, glm::highp, glm::tvec4>( *this, b ); }
    };
 
-inline Vec3::Vec3( const class Vec4 &v4 ) { x = v4.x; y = v4.y; z = v4.z; }
+inline Vec3::Vec3( const Vec4 &v4 ) : glm::vec3( v4.x, v4.y, v4.z ) {}
 
 extern Vec4 g_Up4;
 extern Vec4 g_Right4;

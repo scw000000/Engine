@@ -36,7 +36,6 @@ EngineApp::EngineApp( void )
    m_bQuitRequested = false;
    m_bIsRunning = false;
 
-   m_screenSize = Point(0,0);
    m_pWindow = NULL;
    m_ShutDownEventType = 0;
    m_pEventManager = NULL;
@@ -212,7 +211,6 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 
    SDL_EventState( SDL_DROPFILE, SDL_ENABLE );
 
-	m_screenSize = Point( screenWidth, screenHeight );
    if( m_EngineOptions.m_ShowMouseCursor )
       {
       SDL_ShowCursor( SDL_ENABLE );

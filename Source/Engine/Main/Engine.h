@@ -37,7 +37,7 @@ class EngineApp
       BaseEngineLogic* VCreateLogic();
       HWND GetHwnd( void );      
       HumanView* GetHumanView( void );
-      Point GetScreenSize( void ) const { return m_screenSize; }
+      Point GetScreenSize( void ) const { return m_EngineOptions.m_ScreenSize; }
       SDL_Window* GetWindow() { return m_pWindow; }
       Uint32  GetWindowState( void );
       bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );

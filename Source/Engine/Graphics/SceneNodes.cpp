@@ -356,7 +356,6 @@ void CameraNode::VSetTransform( const Transform& newTransform )
 Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene )
    {
    const Mat4x4& world = pScene->GetTopMatrix();
-	Mat4x4 view = VGetProperties().GetFromWorld();
 	return m_Projection * m_View * world;
    }
 
@@ -382,27 +381,64 @@ int CameraNode::SetViewTransform(  Scene *pScene )
 	return S_OK;
    }
 
-Vec3 CameraNode::GetScreenProjectPoint( float distance, const Point& screenPosition )
+void CameraNode::GetScreenProjectPoint( Vec3& start, Vec3& end, const Point& screenPosition, float distance )
    {
-   TransformPtr pTransform( VGetProperties().GetTransformPtr() );
-   double tanFovOver2 = tan( m_Frustum.m_Fov / 2 );
-   Vec3 nearRight = static_cast< float >( distance * tanFovOver2 * m_Frustum.m_Aspect ) * g_Right;
-   Vec3 nearUp = static_cast< float >( distance * tanFovOver2 ) * g_Up;
+   float revScreenLocX = ( ( float ) screenPosition.GetX() / ( float ) g_pApp->GetScreenSize().GetX() - 0.5f ) * 2.0f;
+   float revScreenLocY = ( ( float ) screenPosition.GetY() / ( float ) g_pApp->GetScreenSize().GetY() - 0.5f ) * 2.0f;
+   // The near plane maps to Z=-1 in Normalized Device Coordinates
+   
+   Mat4x4 invV = m_View.Inverse();
+   Mat4x4 invP = m_Projection.Inverse();
 
-   // These vertives start in upper right and go around clockwise
-   Vec3 virtualScreenLU = ( distance * g_Forward ) - nearRight + nearUp;
-   Vec3 virtualScreenRU = ( distance * g_Forward ) + nearRight + nearUp;
-   Vec3 virtualScreenRD = ( distance * g_Forward ) + nearRight - nearUp;
-   Vec3 virtualScreenLD = ( distance * g_Forward ) - nearRight - nearUp;
+   /*Vec4 rayStart_NDC = Vec4( revScreenLocX, revScreenLocY, -1.0f, 1.0f );
+   Vec4 rayStart_Cam = invP.Xform( rayStart_NDC );
+   rayStart_Cam /= rayStart_Cam.w;
+   Vec4 rayStart_Wor = invV.Xform( rayStart_Cam );
+   rayStart_Wor /= rayStart_Wor.w;
 
-   float screenRatioX = static_cast< float >( screenPosition.x ) / g_pApp->GetScreenSize().GetX();
-   float screenRatioY = static_cast< float >( screenPosition.y ) / g_pApp->GetScreenSize().GetY();
+   Vec4 rayEnd_NDC = Vec4( revScreenLocX, revScreenLocY, 0.0f, 1.0f );
+   Vec4 rayEnd_Cam = invP.Xform( rayEnd_NDC );
+   rayEnd_Cam /= rayEnd_Cam.w;
+   Vec4 rayEnd_Wor = invV.Xform( rayEnd_Cam );
+   rayEnd_Wor /= rayEnd_Wor.w;*/
 
-   Vec3 screenProjXU = Interpolate( screenRatioX, virtualScreenLU, virtualScreenRU );
-   Vec3 screenProjXD = Interpolate( screenRatioX, virtualScreenLD, virtualScreenRD );
-   Vec3 screenProjPoint = Interpolate( screenRatioY, screenProjXU, screenProjXD );
 
-   return VGetProperties().GetTransform().GetToWorld().Xform( screenProjPoint );
+
+   
+   Mat4x4 inv_MP = Mat4x4( m_Projection * m_View ).Inverse();
+
+   Vec4 rayStart_NDC = Vec4( revScreenLocX, revScreenLocY, -1.0f, 1.0f );
+   Vec4 rayStart_Wor = inv_MP.Xform( rayStart_NDC );
+   rayStart_Wor /= rayStart_Wor.w;
+   start = rayStart_Wor;
+
+   Vec4 rayEnd_NDC = Vec4( revScreenLocX, revScreenLocY, 0.0f, 1.0f );
+   Vec4 rayEnd_Wor = inv_MP.Xform( rayEnd_NDC );
+   rayEnd_Wor /= rayEnd_Wor.w;
+   Vec3 dir = rayEnd_Wor - rayStart_Wor;
+   dir.Normalize();
+   end = start + dir * distance;
+   return;
+
+   //TransformPtr pTransform( VGetProperties().GetTransformPtr() );
+   //double tanFovOver2 = tan( m_Frustum.m_Fov / 2 );
+   //Vec3 nearRight = static_cast< float >( distance * tanFovOver2 * m_Frustum.m_Aspect ) * g_Right;
+   //Vec3 nearUp = static_cast< float >( distance * tanFovOver2 ) * g_Up;
+
+   //// These vertives start in upper right and go around clockwise
+   //Vec3 virtualScreenLU = ( distance * g_Forward ) - nearRight + nearUp;
+   //Vec3 virtualScreenRU = ( distance * g_Forward ) + nearRight + nearUp;
+   //Vec3 virtualScreenRD = ( distance * g_Forward ) + nearRight - nearUp;
+   //Vec3 virtualScreenLD = ( distance * g_Forward ) - nearRight - nearUp;
+
+   //float screenRatioX = static_cast< float >( screenPosition.x ) / g_pApp->GetScreenSize().GetX();
+   //float screenRatioY = static_cast< float >( screenPosition.y ) / g_pApp->GetScreenSize().GetY();
+
+   //Vec3 screenProjXU = Interpolate( screenRatioX, virtualScreenLU, virtualScreenRU );
+   //Vec3 screenProjXD = Interpolate( screenRatioX, virtualScreenLD, virtualScreenRD );
+   //Vec3 screenProjPoint = Interpolate( screenRatioY, screenProjXU, screenProjXD );
+
+   //return VGetProperties().GetTransform().GetToWorld().Xform( screenProjPoint );
    }
 
 

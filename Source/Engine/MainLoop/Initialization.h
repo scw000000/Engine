@@ -33,9 +33,13 @@ struct EngineOptions
    public:
       EngineOptions();
 	   ~EngineOptions() { SAFE_DELETE(m_pDoc); }
-      
+      void Init( const char* xmlFileName );
+
+   public:
       // Rendering options
       std::string m_Renderer;
+      bool m_runFullSpeed;
+      Point m_ScreenSize;
 
       bool m_UseDevDir;
       Environment m_Environment;
@@ -48,11 +52,6 @@ struct EngineOptions
 
       // TiXmlElement - look at this to find other options added by the developer
 	   TiXmlDocument *m_pDoc;
-
-	   bool m_runFullSpeed;
-	   Point m_ScreenSize;
-	
-      void Init(const char* xmlFileName);
    };
 
 

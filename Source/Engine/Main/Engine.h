@@ -34,7 +34,7 @@ class EngineApp
       void SingleLoop( void );
 
       BaseEngineLogic* GetGameLogic(void) const { return m_pEngineLogic; }
-      BaseEngineLogic* VCreateLogic();
+      virtual BaseEngineLogic* VCreateLogic();
       HWND GetHwnd( void );      
       HumanView* GetHumanView( void );
       Point GetScreenSize( void ) const { return m_EngineOptions.m_ScreenSize; }

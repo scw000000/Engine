@@ -46,7 +46,7 @@ void EditorController::VOnUpdate( unsigned long deltaMilliseconds )
       }
    if( m_isRotateWhenLButtonDown )
       {
-      if( m_MouseButton[ SDL_BUTTON_LEFT ] )
+      if( m_MouseButton[ SDL_BUTTON_LEFT ] && ( m_MouseShift.x || m_MouseShift.y || m_IsMouseLocked ) )
          {
          m_IsMouseLocked = true;
          g_pApp->SetIsMouseCursorEnable( false );

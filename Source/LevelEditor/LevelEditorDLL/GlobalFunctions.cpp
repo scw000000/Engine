@@ -15,8 +15,8 @@
 #include "EditorStd.h"
 #include "GlobalFunctions.h"
 #include "..\Main\Engine.h"
-
-EngineApp engineApp;
+#include "..\Physics\Raycast.h"
+#include "EditorLogic.h"
 
 int EditorMain( int *pWindow, int screenWidth, int screenHeight )
    {
@@ -138,45 +138,32 @@ void GetActorXML( int *actorXMLAddress, ActorId actorId )
    }
 
 
-//int PickActor( int *hWndPtrAddress )
-//   {
-//   HWND hWnd = ( HWND ) hWndPtrAddress;
-//
-//   POINT ptCursor;
-//   GetCursorPos( &ptCursor );
-//
-//   // Convert the screen coordinates of the mouse cursor into
-//   // coordinates relative to the client window
-//   ScreenToClient( hWnd, &ptCursor );
-//   RayCast rayCast( ptCursor );
-//   EditorLogic* pGame = ( EditorLogic* ) g_pApp->m_pGame;
-//
-//   if( !pGame )
-//      {
-//      return INVALID_ACTOR_ID;
-//      }
-//
-//   shared_ptr<EditorHumanView> pView = pGame->GetHumanView();
-//   if( !pView )
-//      {
-//      return INVALID_ACTOR_ID;
-//      }
-//
-//
-//   // Cast a ray through the scene. The RayCast object contains an array of Intersection
-//   // objects.
-//   pView->GetScene()->Pick( &rayCast );
-//   rayCast.Sort();
-//
-//   // If there are any intersections, get information from the first intersection.
-//   if( !rayCast.m_NumIntersections )
-//      {
-//      return INVALID_ACTOR_ID;
-//      }
-//
-//   Intersection firstIntersection = rayCast.m_IntersectionArray[ 0 ];
-//   return firstIntersection.m_actorId;
-//   }
+int PickActor( void )
+   {
+   Point cursorPos = g_pApp->GetMousePosition();
+
+   EditorLogic* pEditorLogic = dynamic_cast< EditorLogic *>( g_pApp->m_pEngineLogic );
+
+   if( !pEditorLogic )
+      {
+      return INVALID_ACTOR_ID;
+      }
+
+   // Cast a ray through the scene. The RayCast object contains an array of Intersection
+   // objects.
+   RayCast rayCast( cursorPos, 100, 1 );
+   RayCastManager::GetSingleton().PerformRayCast( rayCast );
+
+   // If there are any intersections, get information from the first intersection.
+   if( !rayCast.m_NumIntersections )
+      {
+      ENG_LOG( "Test", "Pick not found" );
+      return INVALID_ACTOR_ID;
+      }
+   Intersection& firstIntersection = ( *rayCast.m_pIntersectionArray )[ 0 ];
+   ENG_LOG( "Test", ToStr( firstIntersection.m_ActorId ) + " Actor picked" );
+   return firstIntersection.m_ActorId;
+   }
 
 //void ModifyActor( BSTR bstrActorModificationXML )
 //   {

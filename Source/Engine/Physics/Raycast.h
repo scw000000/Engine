@@ -26,7 +26,6 @@ class Intersection
       ActorId m_ActorId;				// Which actor was intersected if there was one
       WeakRenderComponentPtr pWeakRenderComp;
       Vec3 m_WorldLoc;				// world location of intersection
-      Vec3 m_ActorLoc;				// actor local coordinates of intersection
       Vec3 m_Normal;					// normal of intersection
 
       bool const operator < ( Intersection const &other ) { return m_Dist < other.m_Dist; }
@@ -39,16 +38,16 @@ void InitIntersection( Intersection &intersection, DWORD faceIndex, FLOAT dist, 
 class RayCast : public ENG_Noncopyable
    {
    public:
-      RayCast( Point point, float distance, unsigned long maxIntersections = 16 );
-      RayCast( const Vec3& start, const Vec3& end, unsigned long maxIntersections = 16 );
-      RayCast( const Vec3& start, const Vec3& dir, float length, unsigned long maxIntersections = 16 );
-      void Sort();
+      RayCast( Point point, float distance, unsigned int maxIntersections = 16 );
+      RayCast( const Vec3& start, const Vec3& end, unsigned int maxIntersections = 16 );
+      RayCast( const Vec3& start, const Vec3& dir, float length, unsigned int maxIntersections = 16 );
+      void Sort( void );
 
    public:
-      unsigned long m_MaxIntersections;
-      unsigned long m_NumIntersections;
-      bool m_bAllHits;			// Whether to just get the first "hit" or all "hits"
-
+      unsigned int m_MaxIntersections;
+      unsigned int m_NumIntersections;
+      bool m_ReturnAllHits;			// Whether to just get the first "hit" or all "hits"
+      bool m_IsSorted;
       Vec3 m_RayEnd;
       Vec3 m_RayStart;
 

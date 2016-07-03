@@ -25,6 +25,9 @@ namespace LevelEditorApp
       [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]
       public unsafe static extern void Shutdown();
 
+      [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]
+      public unsafe static extern int PickActor();
+
       [DllImport( "user32.dll", SetLastError = true )]
       public static extern IntPtr SetParent( IntPtr hWndChild, IntPtr hWndNewParent );
 

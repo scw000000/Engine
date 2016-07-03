@@ -14,7 +14,6 @@ namespace LevelEditorApp
       public static Editor s_Editor;
       public static Thread s_SDLThread;
       public static Thread s_DllRedirectThread;
-      public static ApplicationEventHandler s_EventHandler;
       /// <summary>
       /// The main entry point for the application.
       /// </summary>
@@ -28,8 +27,8 @@ namespace LevelEditorApp
          s_DllRedirectThread = new Thread( s_DllRedirectThreadObject.Run );
 
          s_Editor = new Editor();
-         
-         s_EventHandler = new ApplicationEventHandler();
+
+        // Application.AddMessageFilter( s_Editor.GetMessageHandler() );
         // s_Editor.FormClosing += new FormClosingEventHandler( s_EventHandler.Application_Closing );
          Application.Run( s_Editor );
          Program.s_SDLThread.Join();

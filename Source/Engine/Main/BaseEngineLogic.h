@@ -92,7 +92,7 @@ class BaseEngineLogic : public IEngineLogic
       virtual void VOnUpdate( float time, float elapsedTime ) override;
       virtual void VOnRender( double fTime, float fElapsedTime ) override;
 
-      virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) override;
+      virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) override { }
 
       void AttachProcess(StrongProcessPtr pProcess) { if (m_pProcessManager) {m_pProcessManager->AttachProcess(pProcess);} }
       

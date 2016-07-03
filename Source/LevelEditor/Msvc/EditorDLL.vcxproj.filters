@@ -23,6 +23,8 @@
     <ClInclude Include="..\LevelEditorDLL\GlobalFunctions.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\LevelEditorDLL\EditorLogic.h" />
+    <ClInclude Include="..\LevelEditorDLL\EditorApp.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EditorDLL.cpp">
@@ -35,6 +37,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\LevelEditorDLL\GlobalFunctions.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LevelEditorDLL\EditorLogic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\LevelEditorDLL\EditorApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

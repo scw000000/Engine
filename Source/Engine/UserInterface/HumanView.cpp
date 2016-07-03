@@ -40,6 +40,7 @@ HumanView::HumanView( void )
                         , frustum ) );
 		ENG_ASSERT( m_pWorld && m_pCamera && _T("Out of memory") );     
 		m_pWorld->AddChild( INVALID_ACTOR_ID, m_pCamera );
+      m_pWorld->SetCamera( m_pCamera );
       }
    m_pController.reset( ENG_NEW EditorController( m_pCamera, 0, 0, true ) );
    }

@@ -229,9 +229,6 @@ void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
    IGamePhysics::GetSingleton().VOnUpdate( elapsedTime );
    IGamePhysics::GetSingleton().VSyncVisibleScene();
 
-   Point center( g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
-   RayCast raycast( center, 20.f );
-   RayCastManager::GetSingleton().PerformRayCast( raycast );
    if( m_EnableWorldUpdate )
       {
       m_pWrold->OnUpdate( deltaMs );
@@ -340,25 +337,3 @@ bool BaseEngineLogic::VLoadLevel( const char* levelResource )
    return true;
    }
 
-void BaseEngineLogic::VOnFileDrop( const char* filePath, const Point& dropLocation )
-   {
-   Resource fileRes( filePath );
-  // std::string extension = fileRes.GetExtension();
-   if( WildcardMatch( "*.xml", fileRes.m_Name.c_str() ) )
-      {
-      TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( fileRes );
-      std::string rootName = pRoot->Value();
-      auto pCamera = m_pWrold->GetCamera();
-      TransformPtr pTransform( pCamera->VGetProperties().GetTransformPtr() );
-    //  pTransform->SetPosition( pCamera->GetScreenProjectPoint( 17.f, dropLocation ) );
-      if( !std::strcmp( rootName.c_str(), "ActorClass" ) )
-         {
-         VCreateActorFromClass( fileRes.m_Name.c_str(), pTransform );
-         
-         }
-      else if( !std::strcmp( rootName.c_str(), "ActorOverrides" ) )
-         {
-         VCreateActorFromOverrides( fileRes.m_Name.c_str(), pTransform );
-         }
-      }
-   }

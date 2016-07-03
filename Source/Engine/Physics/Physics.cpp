@@ -30,17 +30,17 @@ IGamePhysics* g_pGamePhysics = NULL;
 
 /////////////////////////////////////////////////////////////////////////////
 // helpers for conversion to and from Bullet's data types
-static btVector3 Vec3_to_btVector3( Vec3 const & vec3 )
+btVector3 Vec3_to_btVector3( Vec3 const & vec3 )
    {
    return btVector3( vec3.x, vec3.y, vec3.z );
    }
 
-static Vec3 btVector3_to_Vec3( btVector3 const & btvec )
+Vec3 btVector3_to_Vec3( btVector3 const & btvec )
    {
    return Vec3( btvec.x( ), btvec.y( ), btvec.z( ) );
    }
 
-static btTransform Transform_to_btTransform( Transform const & trans )
+btTransform Transform_to_btTransform( Transform const & trans )
    {
    // convert from Mat4x4 (GameCode) to btTransform (Bullet)
    btMatrix3x3 bulletRotation;

@@ -40,6 +40,8 @@ namespace LevelEditorApp
 
       private List<String> m_SupportTextPattern;
 
+      private SDL.SDL_EventFilter m_SDLEventFilter;
+
       public Editor()
          {
          InitializeComponent();
@@ -77,6 +79,7 @@ namespace LevelEditorApp
 
          m_UpdateSDLDelegate = new myDelegate( UpdateSDLWindow );
          m_RedirectStringDelegate = new strDelegate( RedirectString );
+
          //InitSDLWindow();
 
          }
@@ -143,12 +146,19 @@ namespace LevelEditorApp
                );
             NativeMethods.SetParent( m_pSDLWindowHandle, this.tabPageEX_World.Handle );
             NativeMethods.ShowWindow( m_pSDLWindowHandle, 1 ); // SHOWNORMAL
+            m_SDLEventFilter = new SDL.SDL_EventFilter( this.SDLEventFilter );
+            SDL.SDL_AddEventWatch( m_SDLEventFilter, new IntPtr() );
             NativeMethods.EditorMain( m_pSDLWindow, this.splitContainer_Mid.Panel1.Width, this.splitContainer_Mid.Panel1.Height );
             }
          catch( Exception e )
             {
             MessageBox.Show( "Error: " + e.ToString() );
             }
+         }
+
+      public void PickActor()
+         {
+         int actorId = NativeMethods.PickActor();
          }
 
       private void UpdateSDLWindow()
@@ -159,6 +169,21 @@ namespace LevelEditorApp
       public void ShutDownSDLWindow()
          {
          NativeMethods.Shutdown();
+         }
+
+      public int SDLEventFilter( IntPtr userData, IntPtr sdlevent ) 
+         {
+         SDL.SDL_Event eventInstance = (SDL.SDL_Event) System.Runtime.InteropServices.Marshal.PtrToStructure( sdlevent, typeof( SDL.SDL_Event ) );
+         switch( eventInstance.type )
+            {
+            case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
+               if( eventInstance.button.button == SDL.SDL_BUTTON_LEFT )
+                  {
+                  PickActor();
+                  }
+               break;
+            };
+         return 1;
          }
 
       private void InitializeAssetTree()

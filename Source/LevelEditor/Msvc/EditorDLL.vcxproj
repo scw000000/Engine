@@ -98,11 +98,15 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\LevelEditorDLL\EditorApp.h" />
+    <ClInclude Include="..\LevelEditorDLL\EditorLogic.h" />
     <ClInclude Include="..\LevelEditorDLL\GlobalFunctions.h" />
     <ClInclude Include="EditorStd.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\LevelEditorDLL\EditorApp.cpp" />
+    <ClCompile Include="..\LevelEditorDLL\EditorLogic.cpp" />
     <ClCompile Include="..\LevelEditorDLL\GlobalFunctions.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">EditorStd.h</PrecompiledHeaderFile>
     </ClCompile>

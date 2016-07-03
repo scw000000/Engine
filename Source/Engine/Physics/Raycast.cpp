@@ -56,39 +56,47 @@ void InitIntersection( Intersection &intersection, DWORD faceIndex, FLOAT dist, 
 
 
 
-RayCast::RayCast( Point point, float distance, unsigned long maxIntersections )
+RayCast::RayCast( Point point, float distance, unsigned int maxIntersections )
    {
    m_MaxIntersections = maxIntersections;
-   m_bAllHits = true;
+   m_ReturnAllHits = true;
    m_NumIntersections = 0;
    m_RayStart = Vec3::g_Zero;
    m_RayEnd = Vec3::g_Zero;
-
-   if( g_pApp->m_pEngineLogic->m_pWrold->GetCamera() )
-      {
-      g_pApp->m_pEngineLogic->m_pWrold->GetCamera()->GetScreenProjectPoint( m_RayStart, m_RayEnd, point, distance );
-      }
-   
+   g_pApp->m_pEngineLogic->m_pWrold->GetCamera()->GetScreenProjectPoint( m_RayStart, m_RayEnd, point, distance );
+   m_IsSorted = false;
    }
 
-RayCast::RayCast( const Vec3& start, const Vec3& end, unsigned long maxIntersections )
+RayCast::RayCast( const Vec3& start, const Vec3& end, unsigned int maxIntersections )
    {
    m_MaxIntersections = maxIntersections;
-   m_bAllHits = true;
+   m_ReturnAllHits = true;
    m_NumIntersections = 0;
    m_RayStart = start;
    m_RayEnd = end;
+   m_IsSorted = false;
    }
 
-RayCast::RayCast( const Vec3& start, const Vec3& dir, float length, unsigned long maxIntersections )
+RayCast::RayCast( const Vec3& start, const Vec3& dir, float length, unsigned int maxIntersections )
    {
    m_MaxIntersections = maxIntersections;
-   m_bAllHits = true;
+   m_ReturnAllHits = true;
    m_NumIntersections = 0;
    m_RayStart = start;
    Vec3 tempDir( dir );
    tempDir.Normalize();
    m_RayEnd = start + tempDir * length;
+   m_IsSorted = false;
+   }
+
+void RayCast::Sort( void )
+   {
+   if( !m_IsSorted )
+      {
+      m_IsSorted = true;
+      std::vector< Intersection >& interscetArray = *m_pIntersectionArray;
+      std::sort( interscetArray.begin(), interscetArray.end() );
+      }
    }
 
 //HRESULT RayCast::Pick( Scene *pScene, ActorId actorId, aiScene* pAiScene )
@@ -302,20 +310,43 @@ RayCastManager& RayCastManager::GetSingleton( void )
 
 bool RayCastManager::PerformRayCast( RayCast& castResult )
    {
-   //btCollisionWorld::AllHitsRayResultCallback rayCallback( castResult->m_vPickRayStart, castResult->m_vPickRayEnd );
-   btCollisionWorld::AllHitsRayResultCallback rayCallback( btVector3( 0, 0, 0 ), btVector3( 0, 0, 20 ) );
+   btVector3 rayStart = Vec3_to_btVector3( castResult.m_RayStart );
+   btVector3 rayEnd = Vec3_to_btVector3( castResult.m_RayEnd );
+   btCollisionWorld::AllHitsRayResultCallback rayCallback( rayStart, rayEnd );
 
-  // btCollisionWorld::ClosestRayResultCallback rayCallback( btVector3( 0, 0, 0 ), btVector3( 0, 0, -20 ) );
-  // rayCallback.needsCollision()
-   if( !m_pBulletPhysics->m_DynamicsWorld )
+   if( !m_pBulletPhysics->m_DynamicsWorld || !g_pApp->m_pEngineLogic->m_pWrold->GetCamera() )
       {
       return false;
       }
-   m_pBulletPhysics->m_DynamicsWorld->rayTest( btVector3( 0, 0, 0 ), btVector3( 0, 0, 20 ), rayCallback );
-   if( rayCallback.hasHit()  )
-      {
-      auto renderComp = m_pBulletPhysics->FindRenderComponent( ( btRigidBody * ) rayCallback.m_collisionObjects[ 0 ] );
 
+   m_pBulletPhysics->m_DynamicsWorld->rayTest( rayStart, rayEnd, rayCallback );
+ 
+   if( rayCallback.hasHit() )
+      {
+      unsigned int hitNum = rayCallback.m_collisionObjects.size();
+      castResult.m_pIntersectionArray.reset( ENG_NEW std::vector< Intersection >( hitNum ) );
+      int size = castResult.m_pIntersectionArray->size();
+      int cap = castResult.m_pIntersectionArray->capacity();
+      for( unsigned long i = 0; i < hitNum; ++i )
+         {
+         btRigidBody * pRigidBody = ( btRigidBody * ) rayCallback.m_collisionObjects[ i ];
+
+         auto pRenderComp = m_pBulletPhysics->FindRenderComponent( pRigidBody );
+         Intersection& currIntersection = ( *castResult.m_pIntersectionArray )[ i ];
+         currIntersection.pWeakRenderComp = pRenderComp;
+         currIntersection.m_ActorId = pRenderComp->VGetOwner().lock()->GetId();
+         currIntersection.m_WorldLoc = btVector3_to_Vec3( rayCallback.m_hitPointWorld[ i ] );
+         currIntersection.m_Normal = btVector3_to_Vec3( rayCallback.m_hitNormalWorld[ i ] );
+         currIntersection.m_Dist = rayCallback.m_hitPointWorld[ i ].distance( rayCallback.m_rayFromWorld );
+         }
+
+      if( castResult.m_MaxIntersections < ( unsigned ) hitNum )
+         {
+         castResult.Sort();
+         castResult.m_pIntersectionArray->resize( std::min( hitNum, castResult.m_MaxIntersections ) );
+         int size = castResult.m_pIntersectionArray->size();
+         }
+      castResult.m_NumIntersections = castResult.m_pIntersectionArray->size();
       }
    return true;
    }

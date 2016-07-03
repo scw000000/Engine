@@ -209,7 +209,11 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       m_pWindow = window;
       }
 
-   SDL_EventState( SDL_DROPFILE, SDL_ENABLE );
+   // Only if execute under editor can engine allow file drop 
+   if( m_EngineOptions.m_Environment == Environment_Editor )
+      {
+      SDL_EventState( SDL_DROPFILE, SDL_ENABLE );
+      }
 
    if( m_EngineOptions.m_ShowMouseCursor )
       {

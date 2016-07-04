@@ -18,5 +18,6 @@
 extern "C" DllExport int EditorMain( int *pWindow, int screenWidth, int screenHeight );
 extern "C" DllExport void SingleLoop( void );
 extern "C" DllExport void Shutdown( void );
+extern "C" DllExport unsigned int GetActorXmlSize( ActorId actorId );
 extern "C" DllExport void GetActorXML( int *actorXMLAddress, ActorId actorId );
-extern "C" DllExport int PickActor( void );
+extern "C" DllExport ActorId PickActor( void );

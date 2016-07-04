@@ -20,6 +20,8 @@ namespace LevelEditorApp
          }
       private bool m_bGridViewModeReadError = false;
       private DataSet m_DataSet;
+      private TextReader m_TextReader;
+      private string m_DataString;
       //private List<System.Windows.Forms.DataGridView> m_XMLGridViews;
       public enum VIEW_MODE { XML, TABLE }
       public VIEW_MODE ViewMode
@@ -44,21 +46,23 @@ namespace LevelEditorApp
          set
             {
             m_sDataFilePath = value;
+            
             LoadDataFile();
             }
          }
 
-      private int m_nDataSetTableIndex = 0;
-      public int DataSetTableIndex
+      public string DataString 
          {
-         get
+         get 
             {
-            return m_nDataSetTableIndex;
+            return m_DataString;
             }
-         set
+         set 
             {
-            SetDataSetTableIndex( value );
+            m_DataString = value;
+            LoadDataString();
             }
+
          }
 
       private int m_nDataTableCount = 0;
@@ -84,27 +88,32 @@ namespace LevelEditorApp
             }
          }
 
+      private void LoadDataSet() 
+         {
+         // Creates a DataSet and loads it with the xml content
+         m_DataSet = new DataSet();
+         m_DataSet.ReadXml( m_TextReader );
+         ///m_DataSet.ReadXml( m_sDataFilePath, XmlReadMode.Auto );
+         m_nDataTableCount = m_DataSet.Tables.Count;
+         // write to XML file
+         //System.IO.StreamWriter xmlSW = new System.IO.StreamWriter( "Customers.xml" );
+         //m_DataSet.WriteXml( xmlSW, XmlWriteMode.IgnoreSchema );
+         //xmlSW.Close();
+         GenerateXMLTreeView();
+         GenerateXMLGrieView();
+         }
+
       private void LoadDataFile()
          {
          m_bGridViewModeReadError = false;
 
          if( ( m_sDataFilePath != string.Empty ) && ( File.Exists( m_sDataFilePath ) == true ) )
             {
-            // Creates a DataSet and loads it with the xml content
             try
                {
-               XmlReader reader = XmlReader.Create( m_sDataFilePath );
-               m_DataSet = new DataSet();
-               m_DataSet.ReadXml( reader );
-               ///m_DataSet.ReadXml( m_sDataFilePath, XmlReadMode.Auto );
-               m_nDataTableCount = m_DataSet.Tables.Count;
-               // write to XML file
-               //System.IO.StreamWriter xmlSW = new System.IO.StreamWriter( "Customers.xml" );
-               //m_DataSet.WriteXml( xmlSW, XmlWriteMode.IgnoreSchema );
-               //xmlSW.Close();
-               GenerateXMLTreeView();
-               GenerateXMLGrieView();
-               //    grdTableView.DataSource = dsXmlFile.Tables[DataSetTableIndex];                    
+               DataString = File.ReadAllText( m_sDataFilePath );
+               //m_TextReader = new StreamReader( m_sDataFilePath );
+               //LoadDataSet();
                }
             catch( Exception e )
                {
@@ -120,14 +129,25 @@ namespace LevelEditorApp
             }
          }
 
-      private void SetDataSetTableIndex( int nTableIndex )
+      private void LoadDataString() 
          {
-         if( nTableIndex >= m_nDataTableCount )
+         m_bGridViewModeReadError = false;
+
+         if( ( m_DataString != string.Empty ) )
             {
-            return;
+            try
+               {
+               m_TextReader = new StringReader( m_DataString );
+               LoadDataSet();
+               }
+            catch( Exception e )
+               {
+               m_bGridViewModeReadError = true;
+               m_nDataTableCount = 0;
+               SetViewMode( VIEW_MODE.XML );
+               MessageBox.Show( "Error: " + e.ToString() );
+               }
             }
-         m_nDataSetTableIndex = nTableIndex;
-         LoadDataFile();
          }
 
       private void addTreeNode( XmlNode xmlNode, TreeNode treeNode )

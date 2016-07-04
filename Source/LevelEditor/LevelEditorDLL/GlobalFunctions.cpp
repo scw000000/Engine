@@ -113,7 +113,7 @@ void Shutdown( void )
 //   }
 
 
-int GetActorXmlSize( ActorId actorId )
+unsigned int GetActorXmlSize( ActorId actorId )
    {
    StrongActorPtr pActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
    if( !pActor )
@@ -138,7 +138,7 @@ void GetActorXML( int *actorXMLAddress, ActorId actorId )
    }
 
 
-int PickActor( void )
+ActorId PickActor( void )
    {
    Point cursorPos = g_pApp->GetMousePosition();
 

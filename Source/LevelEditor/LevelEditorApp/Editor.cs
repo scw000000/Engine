@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
+using System.Runtime.InteropServices;
 using System;
 
 using SDL2;
@@ -38,7 +39,7 @@ namespace LevelEditorApp
       private string m_CurrentDirectory;
       private string m_ProjectDirectory;
 
-      private List<String> m_SupportTextPattern;
+      private List<String> m_SupportEditorPattern;
 
       private SDL.SDL_EventFilter m_SDLEventFilter;
 
@@ -49,13 +50,13 @@ namespace LevelEditorApp
          m_CurrentDirectory = Directory.GetCurrentDirectory();
          m_AssetsDirectory = m_CurrentDirectory + "\\Assets";
 
-         m_SupportTextPattern = new List<string>(){ "*.xml", 
+         m_SupportEditorPattern = new List<string>(){ "*.xml", 
                                                 "*.fragmentshader", 
                                                 "*.vertexshader",
                                                 "*.lua"};
-         for ( int i = 0; i < m_SupportTextPattern.Count; i++)
+         for ( int i = 0; i < m_SupportEditorPattern.Count; i++)
             {
-            m_SupportTextPattern[i] = WildCardToRegular( m_SupportTextPattern[i] );
+            m_SupportEditorPattern[i] = WildCardToRegular( m_SupportEditorPattern[i] );
             }
 
          // Setting all of splitter width in all comtainers
@@ -86,24 +87,32 @@ namespace LevelEditorApp
 
       public void treeView_Assets_NodeMouseClick( object sender, TreeNodeMouseClickEventArgs e )
          {
-         if( isTextBoxSupport( e.Node.Text ) )
+         string filePath = "";
+         TreeNode tempNode = e.Node;
+         while( tempNode != null )
+            {
+            filePath = "\\" + tempNode.Text + filePath;
+            tempNode = tempNode.Parent;
+            }
+         string fileFullPath = m_CurrentDirectory + "\\" + filePath;
+         if( isTextBoxSupport( fileFullPath ) )
             {
             LevelEditorApp.TabPageEX textPage = this.tabCtlEX_MidUp.AddTabPageEx( e.Node.Text, e.Node.Text, true );
-            //   AddTabePage( e.Node.Text, e.Node.Text, this.tabCtlEX_MidUp.Controls, true );
-            String filePath = "";
-            TreeNode tempNode = e.Node;
-            while( tempNode != null )
-               {
-               filePath = "\\" + tempNode.Text + filePath;
-               tempNode = tempNode.Parent;
-               }
-            LevelEditorApp.EditorTextBox textBox = new EditorTextBox( "editorTextBox", m_CurrentDirectory + "\\" + filePath );
+
+            LevelEditorApp.EditorTextBox textBox = new EditorTextBox( "editorTextBox", fileFullPath );
             textBox.Font = new Font( textBox.Font.FontFamily, 18 );
             textPage.Controls.Add( textBox );
             }
          else
             {
-            MessageBox.Show( "This file format is not supported yet.", "Error", MessageBoxButtons.OK );
+            if( File.Exists( fileFullPath ) )
+               {
+               System.Diagnostics.Process.Start( fileFullPath );
+               }
+            else 
+               {
+               MessageBox.Show( "Unknown file", "Error", MessageBoxButtons.OK );
+               }
             }
          }
 
@@ -158,7 +167,21 @@ namespace LevelEditorApp
 
       public void PickActor()
          {
-         int actorId = NativeMethods.PickActor();
+         uint actorId = NativeMethods.PickActor();
+         if( actorId != INVALID_ACTOR_ID )
+            {
+            uint xmlSize = NativeMethods.GetActorXmlSize( actorId );
+            if( xmlSize == 0 )
+               return;
+
+            IntPtr tempArray = Marshal.AllocCoTaskMem( ( (int) xmlSize + 1 ) * sizeof( char ) );
+            NativeMethods.GetActorXML( tempArray, actorId );
+            string actorXml = Marshal.PtrToStringAnsi( tempArray );
+            Console.WriteLine( actorXml );
+            Marshal.FreeCoTaskMem( tempArray );
+            this.xmlControl_ActorXML.DataString = actorXml;
+            
+            }
          }
 
       private void UpdateSDLWindow()
@@ -173,7 +196,7 @@ namespace LevelEditorApp
 
       public int SDLEventFilter( IntPtr userData, IntPtr sdlevent ) 
          {
-         SDL.SDL_Event eventInstance = (SDL.SDL_Event) System.Runtime.InteropServices.Marshal.PtrToStructure( sdlevent, typeof( SDL.SDL_Event ) );
+         SDL.SDL_Event eventInstance = (SDL.SDL_Event) Marshal.PtrToStructure( sdlevent, typeof( SDL.SDL_Event ) );
          switch( eventInstance.type )
             {
             case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
@@ -241,9 +264,9 @@ namespace LevelEditorApp
 
       private bool isTextBoxSupport( string fileName ) 
          {
-         for( int i = 0; i < m_SupportTextPattern.Count; ++i )
+         for( int i = 0; i < m_SupportEditorPattern.Count; ++i )
             {
-            if( Regex.IsMatch( fileName, m_SupportTextPattern[ i ] ) )
+            if( Regex.IsMatch( fileName, m_SupportEditorPattern[ i ] ) )
                {
                return true;
                }

@@ -34,6 +34,9 @@ namespace LevelEditorApp
       [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]
       public unsafe static extern void GetActorXML( IntPtr actorXMLPtrAddress, uint actorId );
 
+      [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]
+      public static extern void ModifyActor( uint actorId, [ MarshalAs( UnmanagedType.BStr )] string lactorModXML );
+
       [DllImport( "user32.dll", SetLastError = true )]
       public static extern IntPtr SetParent( IntPtr hWndChild, IntPtr hWndNewParent );
 

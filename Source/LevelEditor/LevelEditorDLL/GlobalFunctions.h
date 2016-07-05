@@ -12,6 +12,7 @@
  *
  * \note
  */
+#include "wtypes.h"
 
 #define DllExport _declspec(dllexport)
 
@@ -21,3 +22,4 @@ extern "C" DllExport void Shutdown( void );
 extern "C" DllExport unsigned int GetActorXmlSize( ActorId actorId );
 extern "C" DllExport void GetActorXML( int *actorXMLAddress, ActorId actorId );
 extern "C" DllExport ActorId PickActor( void );
+extern "C" DllExport void ModifyActor( ActorId actorId, BSTR bstrActorModificationXML );

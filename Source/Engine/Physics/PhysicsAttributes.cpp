@@ -30,6 +30,7 @@ BulletPhysicsAttributes::BulletPhysicsAttributes( void )
    m_Material = "None";
 
    m_pRigidBody = NULL;
+   m_IsLinkedToPhysicsWorld = false;
    }
 
 bool BulletPhysicsAttributes::Vinit( TiXmlElement* pData )

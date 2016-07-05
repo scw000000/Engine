@@ -80,6 +80,7 @@ class IGamePhysics : public ENG_Noncopyable
       // Initialiazation and Maintenance of the Physics World
       virtual bool VInitialize() = 0;
       virtual void VSyncVisibleScene() = 0;
+      virtual void VSyncRigidBodyToRenderComponent( StrongRenderComponentPtr pRenderComp ) = 0;
       virtual void VOnUpdate( const float deltaSeconds ) = 0;
 
       // Initialization of Physics Objects
@@ -110,6 +111,8 @@ class IGamePhysics : public ENG_Noncopyable
       virtual void VSetTransform( const ActorId id, const Transform& trans ) = 0;
       virtual Transform VGetTransform( ActorId actorId ) = 0;
 
+      virtual void VSetRenderComponentAttribute( StrongRenderComponentPtr pRenderComp, IPhysicsAttributes& pPhysicsAtt ) = 0;
+
       virtual ~IGamePhysics( void ) {};
       
    protected:
@@ -129,7 +132,6 @@ template< typename T > void IGamePhysics::RegisterImplementation( void )
 class BulletPhysics : public IGamePhysics
    {
    friend class IGamePhysics;
-   friend class IRenderComponent;
    friend class RayCastManager;
    public:
       
@@ -137,8 +139,9 @@ class BulletPhysics : public IGamePhysics
       // Initialiazation and Maintenance of the Physics World
       virtual bool VInitialize( ) override;
       virtual void VSyncVisibleScene( ) override;
+      virtual void VSyncRigidBodyToRenderComponent( StrongRenderComponentPtr pRenderComp ) override;
       virtual void VOnUpdate( const float deltaSeconds ) override;
-
+      
       // Initialization of Physics Objects
       virtual void VAddSphere( float radius, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag ) override;
       virtual void VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag ) override;
@@ -154,7 +157,7 @@ class BulletPhysics : public IGamePhysics
 
       // Debugging
       virtual void VRenderDiagnostics( void ) override;
-
+      
       // Physics world modifiers
       /**
        * @brief 
@@ -181,6 +184,7 @@ class BulletPhysics : public IGamePhysics
       virtual void VSetTransform( const ActorId id, const Transform &trans );
 
       virtual Transform VGetTransform( ActorId actorId );
+      virtual void VSetRenderComponentAttribute( StrongRenderComponentPtr pRenderComp, IPhysicsAttributes& physicsAtt ) override;
 
    protected:
       BulletPhysics( void );				// [mrmike] This was changed post-press to add event registration!

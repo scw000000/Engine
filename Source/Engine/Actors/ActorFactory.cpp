@@ -125,6 +125,7 @@ bool ActorFactory::ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides )
          }
 
       }
+
    return true;
 
 	//for ( TiXmlElement* pNode = overrides->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )

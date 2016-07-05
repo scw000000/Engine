@@ -28,6 +28,8 @@ class IPhysicsAttributes
       virtual std::string VGetShpae( void ) const = 0;
       virtual std::string VGetDensity( void ) const = 0;
       virtual std::string VGetMaterial( void ) const = 0;
+      virtual bool VIsLinkedToPhysicsWorld( void ) const = 0;
+      virtual void VSetIsLinkedToPhysicsWorld( bool isLinked ) = 0;
    };
 
 
@@ -42,6 +44,9 @@ class BulletPhysicsAttributes : public IPhysicsAttributes
       virtual std::string VGetShpae( void ) const override { return m_Shape; }
       virtual std::string VGetDensity( void ) const override { return m_Density; }
       virtual std::string VGetMaterial( void ) const override { return m_Material; }
+      btRigidBody* GetBtRigidBody( void ) const { return m_pRigidBody; }
+      virtual bool VIsLinkedToPhysicsWorld( void ) const override { return m_IsLinkedToPhysicsWorld; }
+      virtual void VSetIsLinkedToPhysicsWorld( bool isLinked ) override { m_IsLinkedToPhysicsWorld = isLinked; }
 
    private:
       CollisionId m_CollisionId;
@@ -56,4 +61,5 @@ class BulletPhysicsAttributes : public IPhysicsAttributes
       std::string m_Material;
 
       btRigidBody* m_pRigidBody;
+      bool m_IsLinkedToPhysicsWorld;
    };

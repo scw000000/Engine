@@ -145,7 +145,7 @@ void MeshRenderComponent::Destory( void )
    m_pMeshResource.reset();
    }
 
-MeshRenderComponent::MeshRenderComponent( void ) : m_pMeshResource( ENG_NEW Resource( "" ) ), m_pMaterial( ENG_NEW Material ), m_PhysicsAttributes( ENG_NEW BulletPhysicsAttributes )
+MeshRenderComponent::MeshRenderComponent( void ) : m_pMeshResource( ENG_NEW Resource( "" ) ), m_pMaterial( ENG_NEW Material ), m_pPhysicsAttributes( ENG_NEW BulletPhysicsAttributes )
    {
    
    }
@@ -183,8 +183,17 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
    TiXmlElement* pPhysicsAttributes = pData->FirstChildElement( "PhysicsAttributes" );
    if( pPhysicsAttributes )
       {
-      m_PhysicsAttributes->Vinit( pPhysicsAttributes );
+      m_pPhysicsAttributes->Vinit( pPhysicsAttributes );
       }
+   
+   if( m_pPhysicsAttributes->VIsLinkedToPhysicsWorld() )
+      {
+      StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( VGetSelfWeakActorComponentPtr().lock() );
+      ENG_ASSERT( pRenderComp );
+      IGamePhysics::GetSingleton().VSyncRigidBodyToRenderComponent( pRenderComp );
+      }
+
+
    return true;
    }
 
@@ -198,10 +207,12 @@ void MeshRenderComponent::VDelegatePostInit( void )
    IGamePhysics::GetSingleton().VAddPointCloud( ( Vec3* ) &( pMesh->mVertices[ 0 ] ),
                                                 pMesh->mNumVertices,
                                                 pRenderComp,
-                                                m_PhysicsAttributes->VGetDensity(),
-                                                m_PhysicsAttributes->VGetMaterial(),
-                                                m_PhysicsAttributes->VGetCollisionId(),
-                                                btCollisionObject::CF_STATIC_OBJECT );
+                                                m_pPhysicsAttributes->VGetDensity(),
+                                                m_pPhysicsAttributes->VGetMaterial(),
+                                                m_pPhysicsAttributes->VGetCollisionId(),
+                                                btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_KINEMATIC_OBJECT );
+
+   IGamePhysics::GetSingleton().VSetRenderComponentAttribute( pRenderComp, *m_pPhysicsAttributes );
    }
 
 void MeshRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )

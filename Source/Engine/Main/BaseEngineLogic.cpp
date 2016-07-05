@@ -181,7 +181,7 @@ void BaseEngineLogic::VModifyActor( ActorId actorId, TiXmlElement *overrides )
 	auto findIt = m_Actors.find(actorId);
    if (findIt != m_Actors.end())
       {
-		//m_pActorFactory->ModifyActor( findIt->second, overrides );
+		m_pActorFactory->ModifyActor( findIt->second, overrides );
       }
    }
 

@@ -281,6 +281,20 @@ void BulletPhysics::VSyncVisibleScene( )
       }
    }
 
+void BulletPhysics::VSyncRigidBodyToRenderComponent( StrongRenderComponentPtr pRenderComp )
+   {
+   // get the MotionState.  this object is updated by Bullet.
+   // it's safe to cast the btMotionState to ActorMotionState, because all the bodies in m_ActorIdToRigidBody
+   //   were created through AddShape()
+   ENG_ASSERT( pRenderComp );
+   auto renderCompToBodyIt = m_RenderCompToRigidBody.find( pRenderComp );
+   ENG_ASSERT( renderCompToBodyIt != m_RenderCompToRigidBody.end() );
+   RenderCompMotionState * const renderCompMotionState = static_cast< RenderCompMotionState* >( renderCompToBodyIt->second->getMotionState() );
+
+   TransformPtr pComponentTransform = pRenderComp->VGetTransformPtr();
+   renderCompMotionState->setWorldTransform( Transform_to_btTransform( *pComponentTransform ) );
+   }
+
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::AddShape						- Chapter 17, page 600
 //
@@ -599,6 +613,16 @@ Transform BulletPhysics::VGetTransform( ActorId actorId )
 
    const btTransform& actorTransform = pRigidBody->getCenterOfMassTransform( );
    return btTransform_to_Transform( actorTransform );
+   }
+
+void BulletPhysics::VSetRenderComponentAttribute( StrongRenderComponentPtr pRenderComp, IPhysicsAttributes& physicsAtt )
+   {
+   BulletPhysicsAttributes& bulletPhyAttr = dynamic_cast< BulletPhysicsAttributes& >( physicsAtt );
+
+   btRigidBody * pRigidBody = FindBulletRigidBody( pRenderComp );
+   ENG_ASSERT( pRigidBody );
+   bulletPhyAttr.m_pRigidBody = pRigidBody;
+   bulletPhyAttr.VSetIsLinkedToPhysicsWorld( true );
    }
 
 /////////////////////////////////////////////////////////////////////////////

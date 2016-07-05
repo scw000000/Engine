@@ -95,10 +95,6 @@ namespace LevelEditorApp
          m_DataSet.ReadXml( m_TextReader );
          ///m_DataSet.ReadXml( m_sDataFilePath, XmlReadMode.Auto );
          m_nDataTableCount = m_DataSet.Tables.Count;
-         // write to XML file
-         //System.IO.StreamWriter xmlSW = new System.IO.StreamWriter( "Customers.xml" );
-         //m_DataSet.WriteXml( xmlSW, XmlWriteMode.IgnoreSchema );
-         //xmlSW.Close();
          GenerateXMLTreeView();
          GenerateXMLGrieView();
          }
@@ -279,11 +275,11 @@ namespace LevelEditorApp
             //wait cursor while the nodes populate
             //First, we'll load the Xml document
             XmlDocument xDoc = new XmlDocument();
-            xDoc.Load( m_sDataFilePath );
+            xDoc.LoadXml( m_DataString );
             //Now, clear out the treeview, 
             //and add the first (root) node
             this.xmlTreeView.Nodes.Clear();
-            this.xmlTreeView.Nodes.Add( new TreeNode( xDoc.DocumentElement.Name ) );
+            this.xmlTreeView.Nodes.Add( new TreeNode( xDoc.DocumentElement.Name) );
             TreeNode tNode = new TreeNode();
             tNode = (TreeNode) this.xmlTreeView.Nodes[ 0 ];
             //We make a call to addTreeNode, 
@@ -304,8 +300,29 @@ namespace LevelEditorApp
             }
          }
 
+      void dataGridView_CellEndEdit( object sender, DataGridViewCellEventArgs e )
+         {
+         var dataGridView = sender as System.Windows.Forms.DataGridView;
+         // write to XML file
+         //System.IO.StreamWriter xmlSW = new System.IO.StreamWriter( "Customers.xml" );
+         //m_DataSet.WriteXml( xmlSW, XmlWriteMode.IgnoreSchema );
+         //xmlSW.Close();
+
+         StringWriter sw = new StringWriter();
+         m_DataSet.WriteXml( sw, XmlWriteMode.IgnoreSchema );
+         m_DataString = sw.ToString();
+         Program.s_Editor.ModifyActor( m_DataString );
+         }
+
       private void GenerateXMLGrieView()
          {
+         this.xmlPanel.AutoScroll = true;
+         this.xmlPanel.AutoSize = true;
+         this.xmlPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+         this.xmlPanel.Size = new System.Drawing.Size( 0, 0 );
+         this.xmlPanel.Controls.Clear();
+         this.xmlPanel.RowCount = 0;
+         this.xmlPanel.RowStyles.Clear();
          for( int i = 0; i < m_DataSet.Tables.Count; ++i )
             {
             // Each table represents an unique XML node name
@@ -326,8 +343,9 @@ namespace LevelEditorApp
                System.Windows.Forms.Label label = new System.Windows.Forms.Label();
                label.BackColor = System.Drawing.Color.FromArgb( ( (int) ( ( (byte) ( 120 ) ) ) ), ( (int) ( ( (byte) ( 120 ) ) ) ), ( (int) ( ( (byte) ( 120 ) ) ) ) );
                label.AutoSize = true;
-               label.Anchor = ( (System.Windows.Forms.AnchorStyles) ( ( ( System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left )
-            | System.Windows.Forms.AnchorStyles.Right ) ) );
+               label.Anchor = ( (System.Windows.Forms.AnchorStyles) ( ( System.Windows.Forms.AnchorStyles.Top | 
+                                                                        System.Windows.Forms.AnchorStyles.Left | 
+                                                                        System.Windows.Forms.AnchorStyles.Right ) ) );
                this.xmlPanel.RowCount = this.xmlPanel.RowCount + 1;
                this.xmlPanel.Controls.Add( dataGridView, 1, this.xmlPanel.RowCount - 1 );
                this.xmlPanel.Controls.Add( label, 0, this.xmlPanel.RowCount - 1 );
@@ -383,19 +401,25 @@ namespace LevelEditorApp
                dataGridView.AllowUserToAddRows = false;
                dataGridView.AllowUserToDeleteRows = false;
                dataGridView.AllowUserToResizeRows = false;
+               dataGridView.AllowUserToResizeColumns = false;
+               dataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+               dataGridView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
                dataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
                dataGridView.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
 
                dataGridView.BackgroundColor = System.Drawing.Color.FromArgb( ( (int) ( ( (byte) ( 49 ) ) ) ), ( (int) ( ( (byte) ( 49 ) ) ) ), ( (int) ( ( (byte) ( 49 ) ) ) ) );
+
+
+               int totalHeight = 24 * dataGridView.RowCount + 25;
+
+               //var totalHeight = dataGridView.Rows.GetRowsHeight( DataGridViewElementStates.None );
+               //totalHeight += dataGridView.ColumnHeadersHeight;
                
-               var totalHeight = dataGridView.Rows.GetRowsHeight( DataGridViewElementStates.None );
-               if( dataGridView.Rows.Count > 0 )
-                  {
-                  totalHeight += dataGridView.ColumnHeadersHeight;
-                  }
-               dataGridView.Height = totalHeight;
+               //dataGridView.Height = totalHeight;
                this.xmlPanel.RowStyles.Add( new System.Windows.Forms.RowStyle( System.Windows.Forms.SizeType.Absolute, totalHeight ) );
                dataGridView.CellToolTipTextNeeded += new DataGridViewCellToolTipTextNeededEventHandler( this.dataGridView_CellToolTipTextNeeded );
+               dataGridView.CellEndEdit += new DataGridViewCellEventHandler( this.dataGridView_CellEndEdit );
+
                //     this.xmlPanel.ColumnStyles[ 1 ] = new System.Windows.Forms.ColumnStyle( System.Windows.Forms.SizeType.Absolute, dataGridView.Columns.GetColumnsWidth( DataGridViewElementStates.None ) );
                //Console.WriteLine( "----TABLE : " + m_DataSet.Tables[ i ].TableName );
                //for( int j = 0; j < m_DataSet.Tables[ i ].Rows.Count; ++j )

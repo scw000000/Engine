@@ -17,6 +17,7 @@
 #include "..\Main\Engine.h"
 #include "..\Physics\Raycast.h"
 #include "EditorLogic.h"
+#include "OleAuto.h"
 
 int EditorMain( int *pWindow, int screenWidth, int screenHeight )
    {
@@ -165,18 +166,18 @@ ActorId PickActor( void )
    return firstIntersection.m_ActorId;
    }
 
-//void ModifyActor( BSTR bstrActorModificationXML )
-//   {
-//   std::string actorModificationXML = ws2s( std::wstring( bstrActorModificationXML, SysStringLen( bstrActorModificationXML ) ) );
-//
-//   TiXmlDocument doc;
-//   doc.Parse( actorModificationXML.c_str() );
-//   TiXmlElement* pRoot = doc.RootElement();
-//   if( !pRoot )
-//      return;
-//
-//   g_pApp->m_pGame->VModifyActor( atoi( pRoot->Attribute( "id" ) ), pRoot );
-//   }
+void ModifyActor( ActorId actorId, BSTR bstrActorModificationXML )
+   {
+   std::string actorModificationXML = ws2s( std::wstring( bstrActorModificationXML, SysStringLen( bstrActorModificationXML ) ) );
+
+   TiXmlDocument doc;
+   doc.Parse( actorModificationXML.c_str() );
+   TiXmlElement* pRoot = doc.RootElement();
+   if( !pRoot )
+      return;
+
+   g_pApp->m_pEngineLogic->VModifyActor( actorId, pRoot );
+   }
 
 
 void DestroyActor( ActorId actorId )

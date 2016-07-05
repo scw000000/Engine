@@ -300,7 +300,7 @@ class MeshRenderComponent : public BaseRenderComponent<MeshRenderComponent>
 
    protected:
       MaterialPtr m_pMaterial;
-      shared_ptr< BulletPhysicsAttributes > m_PhysicsAttributes;
+      shared_ptr< BulletPhysicsAttributes > m_pPhysicsAttributes;
       shared_ptr<Resource> m_pMeshResource;
    };
 

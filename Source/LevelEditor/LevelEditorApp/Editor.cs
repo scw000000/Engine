@@ -28,12 +28,13 @@ namespace LevelEditorApp
       public strDelegate m_RedirectStringDelegate;
 
       private List<XmlNode> m_ActorsXmlNodes = new List<XmlNode>();
-      
-      private const int INVALID_ACTOR_ID = 0;
+
+      private const uint INVALID_ACTOR_ID = 0;
+
       private const int m_MaxTabSize = 100;
       private const int m_MinTabSize = 50;
 
-      private int m_SelectedActorId = INVALID_ACTOR_ID;
+      private uint m_SelectedActorId = INVALID_ACTOR_ID;
 
       private string m_AssetsDirectory;
       private string m_CurrentDirectory;
@@ -167,20 +168,27 @@ namespace LevelEditorApp
 
       public void PickActor()
          {
-         uint actorId = NativeMethods.PickActor();
-         if( actorId != INVALID_ACTOR_ID )
+         m_SelectedActorId = NativeMethods.PickActor();
+         if( m_SelectedActorId != INVALID_ACTOR_ID )
             {
-            uint xmlSize = NativeMethods.GetActorXmlSize( actorId );
+            uint xmlSize = NativeMethods.GetActorXmlSize( m_SelectedActorId );
             if( xmlSize == 0 )
                return;
 
             IntPtr tempArray = Marshal.AllocCoTaskMem( ( (int) xmlSize + 1 ) * sizeof( char ) );
-            NativeMethods.GetActorXML( tempArray, actorId );
+            NativeMethods.GetActorXML( tempArray, m_SelectedActorId );
             string actorXml = Marshal.PtrToStringAnsi( tempArray );
             Console.WriteLine( actorXml );
             Marshal.FreeCoTaskMem( tempArray );
-            this.xmlControl_ActorXML.DataString = actorXml;
-            
+            this.xmlControl_ActorXML.DataString = actorXml;    
+            }
+         }
+
+      public void ModifyActor( string actorOrerrides ) 
+         {
+         if( m_SelectedActorId != INVALID_ACTOR_ID )
+            {
+            NativeMethods.ModifyActor( m_SelectedActorId, actorOrerrides );
             }
          }
 

@@ -145,9 +145,9 @@ void MeshRenderComponent::Destory( void )
    m_pMeshResource.reset();
    }
 
-MeshRenderComponent::MeshRenderComponent( void ) : m_pMeshResource( ENG_NEW Resource( "" ) ), m_pMaterial( ENG_NEW Material ), m_pPhysicsAttributes( ENG_NEW BulletPhysicsAttributes )
+MeshRenderComponent::MeshRenderComponent( void ) : m_pMeshResource( ENG_NEW Resource( "" ) ), m_pMaterial( ENG_NEW Material )
    {
-   
+   m_pPhysicsAttributes.reset( ENG_NEW BulletSpherePhysicsAttributes );
    }
 
 // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
@@ -181,18 +181,12 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
    m_pMaterial->Init( pData->FirstChildElement( "Material" ) );
    
    TiXmlElement* pPhysicsAttributes = pData->FirstChildElement( "PhysicsAttributes" );
-   if( pPhysicsAttributes )
+   if( pPhysicsAttributes && m_pPhysicsAttributes )
       {
       m_pPhysicsAttributes->Vinit( pPhysicsAttributes );
       }
    
-   if( m_pPhysicsAttributes->VIsLinkedToPhysicsWorld() )
-      {
-      StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( VGetSelfWeakActorComponentPtr().lock() );
-      ENG_ASSERT( pRenderComp );
-      IGamePhysics::GetSingleton().VSyncRigidBodyToRenderComponent( pRenderComp );
-      }
-
+   m_pPhysicsAttributes->VSetTransform( *m_pTransform );
 
    return true;
    }
@@ -201,9 +195,6 @@ void MeshRenderComponent::VDelegatePostInit( void )
    {
    auto pAiScene = MeshResourceLoader::LoadAndReturnScene( *m_pMeshResource );
    auto pMesh = pAiScene->mMeshes[ 0 ];
-   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( VGetSelfWeakActorComponentPtr().lock() );
-   ENG_ASSERT( pRenderComp );
-   std::vector<Vec3> meshVertices( pMesh->mNumVertices, Vec3() );
    /*IGamePhysics::GetSingleton().VAddPointCloud( ( Vec3* ) &( pMesh->mVertices[ 0 ] ),
                                                 pMesh->mNumVertices,
                                                 pRenderComp,
@@ -211,22 +202,9 @@ void MeshRenderComponent::VDelegatePostInit( void )
                                                 m_pPhysicsAttributes->VGetMaterial(),
                                                 m_pPhysicsAttributes->VGetCollisionId(),
                                                 btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_KINEMATIC_OBJECT );*/
-
-   IGamePhysics::GetSingleton().VAddSphere( this->m_pSceneNode->VGetProperties().GetRadius(),
-                                            pRenderComp,
-                                            m_pPhysicsAttributes->VGetDensity(),
-                                            m_pPhysicsAttributes->VGetMaterial(),
-                                            m_pPhysicsAttributes->VGetCollisionId(),
-                                            btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_KINEMATIC_OBJECT );
-
-   /*  IGamePhysics::GetSingleton().VAddBox( Vec3( this->m_pSceneNode->VGetProperties().GetRadius(), this->m_pSceneNode->VGetProperties().GetRadius(), this->m_pSceneNode->VGetProperties().GetRadius() ),
-        pRenderComp,
-        m_pPhysicsAttributes->VGetDensity(),
-        m_pPhysicsAttributes->VGetMaterial(),
-        m_pPhysicsAttributes->VGetCollisionId(),
-        btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_KINEMATIC_OBJECT );*/
-
-   IGamePhysics::GetSingleton().VSetRenderComponentAttribute( pRenderComp, *m_pPhysicsAttributes );
+   auto pShpereAttr = static_pointer_cast< BulletSpherePhysicsAttributes >( m_pPhysicsAttributes );
+   pShpereAttr->SetRadius( this->m_pSceneNode->VGetProperties().GetRadius() );
+   m_pPhysicsAttributes->VAddRigidBody( VGetSelfStrongRenderCompPtr() );
    }
 
 void MeshRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )

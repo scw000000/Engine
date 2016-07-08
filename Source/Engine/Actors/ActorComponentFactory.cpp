@@ -14,6 +14,12 @@
 
 #include "EngineStd.h"
 #include "ActorComponentFactory.h"
+#include "ActorComponent.h"
+#include "TransformComponent.h"
+#include "RenderComponent.h"
+#include "LightRenderComponent.h"
+#include "SkyRenderComponent.h"
+#include "PhysicsComponent.h"
 
 ActorComponentFactory& ActorComponentFactory::GetSingleton( void )
    {
@@ -56,4 +62,9 @@ ComponentRegisterId ActorComponentFactory::GetIdFromName( const std::string& nam
 
 ActorComponentFactory::ActorComponentFactory( void )
    {
+
+   REGISTER_COMPONENT( MeshRenderComponent );
+   REGISTER_COMPONENT( LightRenderComponent );
+   REGISTER_COMPONENT( SkyRenderComponent );
+   REGISTER_COMPONENT( PhysicsComponent );
    }

@@ -84,9 +84,9 @@ class IGamePhysics : public ENG_Noncopyable
       virtual void VOnUpdate( const float deltaSeconds ) = 0;
 
       // Initialization of Physics Objects
-      virtual void VAddSphere( float radius, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag ) = 0;
-      virtual void VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag ) = 0;
-      virtual void VAddPointCloud( Vec3 *verts, int numPoints, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag ) = 0;
+      virtual void VAddSphere( float radius, StrongRenderComponentPtr pRenderComp ) = 0;
+      virtual void VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pRenderComp ) = 0;
+      virtual void VAddPointCloud( Vec3 *verts, int numPoints, StrongRenderComponentPtr pRenderComp ) = 0;
       virtual void VRemoveRenderComponent( StrongRenderComponentPtr pRenderComp ) = 0;
 
       // Debugging
@@ -111,7 +111,7 @@ class IGamePhysics : public ENG_Noncopyable
       virtual void VSetTransform( const ActorId id, const Transform& trans ) = 0;
       virtual Transform VGetTransform( ActorId actorId ) = 0;
 
-      virtual void VSetRenderComponentAttribute( StrongRenderComponentPtr pRenderComp, IPhysicsAttributes& pPhysicsAtt ) = 0;
+      virtual void VLinkRenderCompAttribute( StrongRenderComponentPtr pRenderComp ) = 0;
 
       virtual ~IGamePhysics( void ) {};
       
@@ -143,16 +143,12 @@ class BulletPhysics : public IGamePhysics
       virtual void VOnUpdate( const float deltaSeconds ) override;
       
       // Initialization of Physics Objects
-      virtual void VAddSphere( float radius, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag ) override;
-      virtual void VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag ) override;
+      virtual void VAddSphere( float radius, StrongRenderComponentPtr pRenderComp ) override;
+      virtual void VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pRenderComp ) override;
 
       virtual void VAddPointCloud( Vec3 *verts, 
                                    int numPoints, 
-                                   StrongRenderComponentPtr pRenderComp, 
-                                   const std::string& densityStr, 
-                                   const std::string& physicsMaterial, 
-                                   CollisionId collisionGroup, 
-                                   int collisionFlag ) override;
+                                   StrongRenderComponentPtr pRenderComp ) override;
       virtual void VRemoveRenderComponent( StrongRenderComponentPtr pRenderComp ) override;
 
       // Debugging
@@ -184,7 +180,7 @@ class BulletPhysics : public IGamePhysics
       virtual void VSetTransform( const ActorId id, const Transform &trans );
 
       virtual Transform VGetTransform( ActorId actorId );
-      virtual void VSetRenderComponentAttribute( StrongRenderComponentPtr pRenderComp, IPhysicsAttributes& physicsAtt ) override;
+      virtual void VLinkRenderCompAttribute( StrongRenderComponentPtr pRenderComp ) override;
 
    protected:
       BulletPhysics( void );				// [mrmike] This was changed post-press to add event registration!
@@ -202,7 +198,7 @@ class BulletPhysics : public IGamePhysics
       void SendCollisionPairRemoveEvent( btRigidBody const * body0, btRigidBody const * body1 );
 
       // common functionality used by VAddSphere, VAddBox, etc
-      void AddShape( StrongRenderComponentPtr pRenderComp, btCollisionShape* shape, float mass, const std::string& physicsMaterial, CollisionId collisionGroup, int collisionFlag );
+      void AddShape( StrongRenderComponentPtr pRenderComp, btCollisionShape* shape, float mass );
 
       // helper for cleaning up objects
       void RemoveCollisionObject( btCollisionObject * removeMe );

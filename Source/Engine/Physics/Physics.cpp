@@ -260,8 +260,10 @@ void BulletPhysics::VSyncVisibleScene( )
       TransformPtr pComponentTransform = pRenderComp->VGetTransformPtr();
       if( pComponentTransform->GetToWorld() != renderCompMotionState->m_Transform.GetToWorld() )
          {
+         Vec3 scale = pComponentTransform->GetScale();
          // Bullet has moved the actor's physics object.  Sync the transform and inform the game an actor has moved
-         *pComponentTransform = Transform( renderCompMotionState->m_Transform );
+         *pComponentTransform = renderCompMotionState->m_Transform;
+         pComponentTransform->SetScale( scale );
          /*shared_ptr<Event_Move_Actor> pEvent( ENG_NEW Event_Move_Actor( id, actorMotionState->m_Transform.GetToWorld() ) );
          IEventManager::GetSingleton()->VQueueEvent( pEvent );*/
          }
@@ -290,15 +292,13 @@ void BulletPhysics::VSyncRigidBodyToRenderComponent( StrongRenderComponentPtr pR
 //
 void BulletPhysics::AddShape( StrongRenderComponentPtr pRenderComp, 
                               btCollisionShape* shape, 
-                              float mass, 
-                              const std::string& physicsMaterial, 
-                              CollisionId collisionGroup, 
-                              int collisionFlag )
+                              float mass )
    {
    ENG_ASSERT( pRenderComp );
 
+   auto pPhysicsAttr = pRenderComp->VGetPhysicsAttributes();
    // lookup the material
-   MaterialData material( LookupMaterialData( physicsMaterial ) );
+   MaterialData material( LookupMaterialData( pPhysicsAttr->VGetMaterial() ) );
 
    // localInertia defines how the object's mass is distributed
    btVector3 localInertia( 0.f, 0.f, 0.f );
@@ -317,13 +317,21 @@ void BulletPhysics::AddShape( StrongRenderComponentPtr pRenderComp,
    rbInfo.m_restitution = material.m_Restitution;
    rbInfo.m_friction = material.m_Friction;
    btRigidBody * const body = new btRigidBody( rbInfo );
-   body->setCollisionFlags( collisionFlag );
+   body->setCollisionFlags( pPhysicsAttr->VGetCollisionFlags() );
+   if( !pPhysicsAttr->VGetIsActive() )
+      {
+      body->setActivationState( 0 );
+      }
+   body->setLinearFactor( Vec3_to_btVector3( pPhysicsAttr->VGetTranslateFactor() ) );
+   body->setAngularFactor( Vec3_to_btVector3( pPhysicsAttr->VGetRotationFactor() ) );
 
-   m_DynamicsWorld->addRigidBody( body, collisionGroup, CollisionTable::GetSingleton().GetCollisionMask( collisionGroup ) );
+   m_DynamicsWorld->addRigidBody( body, pPhysicsAttr->VGetCollisionId(), CollisionTable::GetSingleton().GetCollisionMask( pPhysicsAttr->VGetCollisionId() ) );
 
    // add it to the collection to be checked for changes in VSyncVisibleScene
    m_RenderCompToRigidBody[ pRenderComp ] = body;
    m_RigidBodyToRenderComp[ body ] = pRenderComp;
+
+   VLinkRenderCompAttribute( pRenderComp );
    }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -401,53 +409,44 @@ StrongRenderComponentPtr BulletPhysics::FindRenderComponent( btRigidBody const *
 // BulletPhysics::VAddSphere					- Chapter 17, page 599
 //
 void BulletPhysics::VAddSphere( float radius, 
-                                StrongRenderComponentPtr pRenderComp, 
-                                const std::string& densityStr, 
-                                const std::string& physicsMaterial,
-                                CollisionId collisionGroup,
-                                int collisionFlag )
+                                StrongRenderComponentPtr pRenderComp )
    {
    if( !pRenderComp )
       return;  // FUTURE WORK - Add a call to the error log here
 
    // create the collision body, which specifies the shape of the object
    btSphereShape * const collisionShape = new btSphereShape( radius );
-
+   auto pPhysicsAttr = pRenderComp->VGetPhysicsAttributes();
    // calculate absolute mass from specificGravity
-   float specificGravity = LookupSpecificGravity( densityStr );
+   float specificGravity = LookupSpecificGravity( pPhysicsAttr->VGetDensity() );
    float const volume = ( 4.f / 3.f ) * ENG_PI * radius * radius * radius;
    btScalar const mass = volume * specificGravity;
 
-   AddShape( pRenderComp, /*initialTransform,*/ collisionShape, mass, physicsMaterial, collisionGroup, collisionFlag );
+   AddShape( pRenderComp, /*initialTransform,*/ collisionShape, mass);
    }
 
 /////////////////////////////////////////////////////////////////////////////
 // BulletPhysics::VAddBox
 //
-void BulletPhysics::VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pRenderComp, const std::string& densityStr, const std::string& physicsMaterial, CollisionId collisionGroup,
-                             int collisionFlag )
+void BulletPhysics::VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pRenderComp )
    {
    if( !pRenderComp )
       return;  // FUTURE WORK: Add a call to the error log here
 
    // create the collision body, which specifies the shape of the object
    btBoxShape * const boxShape = new btBoxShape( Vec3_to_btVector3( dimensions ) );
-
+   auto pPhysicsAttr = pRenderComp->VGetPhysicsAttributes();
    // calculate absolute mass from specificGravity
-   float specificGravity = LookupSpecificGravity( densityStr );
+   float specificGravity = LookupSpecificGravity( pPhysicsAttr->VGetDensity() );
    float const volume = dimensions.x * dimensions.y * dimensions.z;
    btScalar const mass = volume * specificGravity;
 
-   AddShape( pRenderComp,/* initialTransform,*/ boxShape, mass, physicsMaterial, collisionGroup, collisionFlag );
+   AddShape( pRenderComp,/* initialTransform,*/ boxShape, mass);
    }
 
 void BulletPhysics::VAddPointCloud( Vec3 *verts, 
                                     int numPoints, 
-                                    StrongRenderComponentPtr pRenderComp, 
-                                    const std::string& densityStr, 
-                                    const std::string& physicsMaterial, 
-                                    CollisionId collisionGroup, 
-                                    int collisionFlag )
+                                    StrongRenderComponentPtr pRenderComp )
    {
    if( !pRenderComp )
       return;  // FUTURE WORK: Add a call to the error log here
@@ -464,11 +463,12 @@ void BulletPhysics::VAddPointCloud( Vec3 *verts,
 
    btVector3 const aabbExtents = aabbMax - aabbMin;
 
-   float specificGravity = LookupSpecificGravity( densityStr );
+   auto pPhysicsAttr = pRenderComp->VGetPhysicsAttributes();
+   float specificGravity = LookupSpecificGravity( pPhysicsAttr->VGetDensity() );
    float const volume = aabbExtents.x( ) * aabbExtents.y( ) * aabbExtents.z( ); // approximate the volume as bounding box
    btScalar const mass = volume * specificGravity;
 
-   AddShape( pRenderComp, shape, mass, physicsMaterial, collisionGroup, collisionFlag );
+   AddShape( pRenderComp, shape, mass);
    }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -605,14 +605,15 @@ Transform BulletPhysics::VGetTransform( ActorId actorId )
    return btTransform_to_Transform( actorTransform );
    }
 
-void BulletPhysics::VSetRenderComponentAttribute( StrongRenderComponentPtr pRenderComp, IPhysicsAttributes& physicsAtt )
+void BulletPhysics::VLinkRenderCompAttribute( StrongRenderComponentPtr pRenderComp )
    {
-   BulletPhysicsAttributes& bulletPhyAttr = dynamic_cast< BulletPhysicsAttributes& >( physicsAtt );
-
+   auto pPhtsicsAttr = pRenderComp->VGetPhysicsAttributes();
+   auto bulletPhyAttr = dynamic_pointer_cast< BulletPhysicsAttributes >( pPhtsicsAttr );
+   ENG_ASSERT( bulletPhyAttr );
    btRigidBody * pRigidBody = FindBulletRigidBody( pRenderComp );
    ENG_ASSERT( pRigidBody );
-   bulletPhyAttr.m_pRigidBody = pRigidBody;
-   bulletPhyAttr.VSetIsLinkedToPhysicsWorld( true );
+   bulletPhyAttr->VSetRigidBody( pRigidBody );
+   bulletPhyAttr->VSetIsLinkedToPhysicsWorld( true );
    }
 
 /////////////////////////////////////////////////////////////////////////////

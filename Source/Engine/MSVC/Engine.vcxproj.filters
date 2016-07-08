@@ -214,6 +214,9 @@
     <ClCompile Include="..\Physics\Raycast.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Actors\PhysicsComponent.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -393,6 +396,9 @@
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\Physics\Raycast.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Actors\PhysicsComponent.h">
       <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>

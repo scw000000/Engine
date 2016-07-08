@@ -96,23 +96,23 @@
     </DensityTable>
 	
 	<CollisionTable>
-		<RayCast>
-			<RayCast collision="yes"/>
-			<Mesh collision="no"/>
-			<Wall collision="no"/>
-		</RayCast>
+		<rayCast>
+			<rayCast collision="yes"/>
+			<mesh collision="no"/>
+			<wall collision="no"/>
+		</rayCast>
 			
-		<Mesh>
-			<RayCast collision="yes"/>
-			<Mesh collision="no"/>
-			<Wall collision="no"/>
-		</Mesh>
+		<mesh>
+			<rayCast collision="yes"/>
+			<mesh collision="no"/>
+			<wall collision="yes"/>
+		</mesh>
 		
-		<Wall>
-			<RayCast collision="yes"/>
-			<Mesh collision="no"/>
-			<Wall collision="yes"/>
-		</Wall>
+		<wall>
+			<rayCast collision="yes"/>
+			<mesh collision="yes"/>
+			<wall collision="yes"/>
+		</wall>
 	</CollisionTable>
 </Physics>
 

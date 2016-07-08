@@ -20,7 +20,11 @@
 			
 			<PhysicsAttributes>
 				<Density>air</Density>
-				<CollisionGroup>Mesh</CollisionGroup>
+				<CollisionGroup>mesh</CollisionGroup>
+				<CollisionFlags
+				staticobject="no"
+				kinematicobject="no"
+				/>
 			</PhysicsAttributes>
 			
         </Data>

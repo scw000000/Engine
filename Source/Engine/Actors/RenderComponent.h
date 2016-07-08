@@ -33,7 +33,9 @@ class IRenderComponent : virtual public IActorComponent
       virtual shared_ptr<SceneNode> VGetSceneNode( void ) = 0;
       virtual void VSetTransform( const Transform& transform ) = 0;
       virtual TransformPtr VGetTransformPtr( void ) const = 0;
-      virtual shared_ptr< BulletPhysicsAttributes > VGetPhysicsAttributesPtr( void ) const = 0;
+      virtual shared_ptr< IPhysicsAttributes > VGetPhysicsAttributes( void ) const = 0;
+      virtual StrongRenderComponentPtr VGetSelfStrongRenderCompPtr( void ) const = 0;
+      //virtual shared_ptr< BulletPhysicsAttributes > VGetPhysicsAttributesPtr( void ) const = 0;
 
    protected:
       virtual void VBuildSceneNode( SceneNode* pParentNode ) = 0;
@@ -63,8 +65,8 @@ template <typename T>class BaseRenderComponent : public IRenderComponent, public
       BaseRenderComponent( void );
       virtual void Destory( void ) override;
       virtual TransformPtr VGetTransformPtr( void ) const override final{ return m_pTransform; }
+      virtual StrongRenderComponentPtr VGetSelfStrongRenderCompPtr( void ) const override;
       virtual void VSetTransform( const Transform& transform ) override final;
-      virtual shared_ptr< BulletPhysicsAttributes > VGetPhysicsAttributesPtr( void ) const override final { return m_pPhysicsAttributes; }
       /**
          * @brief set member variable from xml elements
          *
@@ -81,7 +83,8 @@ template <typename T>class BaseRenderComponent : public IRenderComponent, public
       virtual TiXmlElement* VGenerateXML( void ) override final;
       virtual shared_ptr<SceneNode> VGetSceneNode( void ) override final;
       virtual TiXmlElement* VGenerateOverridesXML( TiXmlElement* pResourceNode ) override final;
-      
+      virtual void VSyncTransform( void );
+      virtual shared_ptr< IPhysicsAttributes > VGetPhysicsAttributes( void ) const override { return m_pPhysicsAttributes; }
 
    protected:
       virtual void VBuildSceneNode( SceneNode* pParentNode ) override final;
@@ -96,7 +99,7 @@ template <typename T>class BaseRenderComponent : public IRenderComponent, public
    protected:
          shared_ptr<SceneNode> m_pSceneNode;
          TransformPtr m_pTransform;
-         shared_ptr< BulletPhysicsAttributes > m_pPhysicsAttributes;
+         shared_ptr< IPhysicsAttributes > m_pPhysicsAttributes;
 
    private:
       
@@ -112,6 +115,14 @@ template < typename T > void BaseRenderComponent<T>::Destory( void )
    m_pSceneNode.reset();
    m_pTransform.reset();
    m_pPhysicsAttributes.reset();
+   }
+
+template < typename T > StrongRenderComponentPtr BaseRenderComponent<T>::VGetSelfStrongRenderCompPtr( void ) const 
+   {
+   auto comp = this->VGetSelfWeakActorComponentPtr().lock();
+   StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( comp );
+   ENG_ASSERT( pRenderComp );
+   return pRenderComp;
    }
 
 template < typename T > void BaseRenderComponent<T>::VSetTransform( const Transform& transform )
@@ -203,6 +214,22 @@ template < typename T > TiXmlElement* BaseRenderComponent<T>::VGenerateOverrides
    VDelegateGenerateOverridesXML( pBaseElement, pResourceNode );
 
    return pBaseElement;
+   }
+
+template < typename T > void BaseRenderComponent<T>::VSyncTransform( void )
+   {
+   if( !m_pPhysicsAttributes )
+      {
+
+      return;
+      }
+
+   if( m_pPhysicsAttributes->VIsLinkedToPhysicsWorld() )
+      {
+      StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( VGetSelfWeakActorComponentPtr().lock() );
+      ENG_ASSERT( pRenderComp );
+      IGamePhysics::GetSingleton().VSyncRigidBodyToRenderComponent( pRenderComp );
+      }
    }
 
 //
@@ -300,7 +327,6 @@ class MeshRenderComponent : public BaseRenderComponent<MeshRenderComponent>
 
    protected:
       MaterialPtr m_pMaterial;
-      shared_ptr< BulletPhysicsAttributes > m_pPhysicsAttributes;
       shared_ptr<Resource> m_pMeshResource;
    };
 

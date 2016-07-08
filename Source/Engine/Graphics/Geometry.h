@@ -59,6 +59,9 @@ class Vec3 : public glm::vec3
       Vec3 operator*( float other ) const { return Vec3( this->x * other, this->y * other, this->z * other ); }
       Vec3 operator/( float other ) const { return Vec3( this->x / other, this->y / other, this->z / other ); }
 
+      Vec3 operator*=( const Vec3& other ) { *this = *this * other; return *this; }
+      Vec3 operator/=( const Vec3& other ) { *this = *this / other; return *this; }
+
       Vec3 operator*( const Vec3& other ) const { return Vec3( this->x * other.x, this->y * other.y, this->z * other.z ); }
       Vec3 operator/( const Vec3& other ) const { return Vec3( this->x / other.x, this->y / other.y, this->z / other.z ); }
 

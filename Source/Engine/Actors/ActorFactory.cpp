@@ -15,21 +15,13 @@
 #include "ActorFactory.h"
 #include "ActorComponentFactory.h"
 #include "Actor.h"
-#include "ActorComponent.h"
 #include "..\ResourceCache\XmlResource.h"
-#include "TransformComponent.h"
-#include "RenderComponent.h"
-#include "LightRenderComponent.h"
-#include "SkyRenderComponent.h"
 
 
 ActorFactory::ActorFactory( void )
    {
    m_LastActorId = INVALID_ACTOR_ID;
 
-   REGISTER_COMPONENT( MeshRenderComponent );
-   REGISTER_COMPONENT( LightRenderComponent );
-   REGISTER_COMPONENT( SkyRenderComponent );
    }
 
 // This version of function is different than the source code

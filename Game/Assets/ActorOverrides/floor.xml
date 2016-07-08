@@ -1,0 +1,18 @@
+<ActorClass>
+    <Data>
+        <ActorClassResource path="actors\floor.xml" />
+    </Data>
+    <PhysicsComponent>
+        <Data>
+            <Transform>
+                <Position />
+                <PitchYawRoll />
+                <Scale />
+            </Transform>
+			
+			<PhysicsAttributes>
+			</PhysicsAttributes>
+			
+        </Data>
+    </PhysicsComponent>
+</ActorClass>

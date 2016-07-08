@@ -39,7 +39,7 @@ class IActorComponent
       virtual WeakActorComponentPtr VGetParentComponent( void ) = 0;
       virtual ActorComponentId VGetActorComponentId( void ) const = 0;
       virtual WeakActorPtr VGetOwner( void ) const = 0;
-      virtual WeakActorComponentPtr VGetSelfWeakActorComponentPtr( void ) = 0;
+      virtual WeakActorComponentPtr VGetSelfWeakActorComponentPtr( void ) const = 0;
 
    protected:
       virtual void AddChildComponent( weak_ptr<IActorComponent> ) = 0;
@@ -60,7 +60,8 @@ template <typename T>class BaseActorComponent : virtual public IActorComponent
       virtual WeakActorComponentPtr VGetParentComponent( void ) override { return m_pParentComponent; }
       virtual ActorComponentId VGetActorComponentId( void ) const override { return m_ActorComponentId; }
       virtual WeakActorPtr VGetOwner( void ) const override { return m_pOwner; }
-      virtual WeakActorComponentPtr VGetSelfWeakActorComponentPtr( void ) override { return m_pOwner->GetComponent( m_ActorComponentId ); }
+      virtual WeakActorComponentPtr VGetSelfWeakActorComponentPtr( void ) const override { 
+         return m_pOwner ? m_pOwner->GetComponent( m_ActorComponentId ) : WeakActorComponentPtr(); }
 
    public:
       // GUID of this event

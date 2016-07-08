@@ -387,7 +387,7 @@ bool Transform::Init( TiXmlElement* pData )
       }
    if( pitchYawRoll.Init( pData->FirstChildElement( "PitchYawRoll" ) ) )
       {
-      SetRotation( pitchYawRoll );
+      SetPitchYawRollDeg( pitchYawRoll );
       }
 
    if( position.Init( pData->FirstChildElement( "Position" ) ) )

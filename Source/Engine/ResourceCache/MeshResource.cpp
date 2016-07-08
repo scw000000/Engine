@@ -51,12 +51,14 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
    shared_ptr< MeshResourceExtraData > extra( ENG_NEW MeshResourceExtraData );
    handle->SetExtraData( extra );
    extra->m_pScene = p_Scene;
+   extra->m_Radius = 0;
    auto pMesh = extra->m_pScene->mMeshes[ 0 ];
    for( unsigned int vertex = 0; vertex < pMesh->mNumVertices; vertex++ )
       {
       auto curSquareLength = pMesh->mVertices[ vertex ].SquareLength();
       extra->m_Radius = std::max( extra->m_Radius, curSquareLength );
       }
+   extra->m_Radius = std::sqrt( extra->m_Radius );
    struct aiMemoryInfo memInfo;
    aiGetMemoryRequirements( p_Scene, &memInfo );
    handle->SetSize( memInfo.total );

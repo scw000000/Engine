@@ -48,6 +48,7 @@ BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer ) : m_pGUIMana
    m_pLevelManager = ENG_NEW LevelManager;
    m_EnableActorUpdate = true;
    m_EnableWorldUpdate = true;
+   m_RenderDiagnostics = true;
    }
 
 BaseEngineLogic::~BaseEngineLogic()
@@ -259,7 +260,16 @@ void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )
       }
    //Render GUI last
    m_pGUIManager->OnRender( fTime, fElapsedTime );
+   VRenderDiagnostics();
    m_pRenderer->VPostRender( );
+   }
+
+void BaseEngineLogic::VRenderDiagnostics( void ) const
+   {
+   if( m_RenderDiagnostics )
+      {
+      IGamePhysics::GetSingleton().VRenderDiagnostics();
+      }
    }
 
 // this function is called by EngineApp::VLoadGame

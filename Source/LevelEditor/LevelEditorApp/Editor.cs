@@ -77,8 +77,6 @@ namespace LevelEditorApp
 
          InitializeAssetTree();
 
-         this.xmlControl_ActorXML.DataFilePath = "D:\\Workspace\\Engine\\Game\\Assets\\Actors\\cube.xml";
-
          m_UpdateSDLDelegate = new myDelegate( UpdateSDLWindow );
          m_RedirectStringDelegate = new strDelegate( RedirectString );
 
@@ -168,9 +166,10 @@ namespace LevelEditorApp
 
       public void PickActor()
          {
-         m_SelectedActorId = NativeMethods.PickActor();
-         if( m_SelectedActorId != INVALID_ACTOR_ID )
+         uint selectedActorId = NativeMethods.PickActor();
+         if( selectedActorId != INVALID_ACTOR_ID && selectedActorId != m_SelectedActorId )
             {
+            m_SelectedActorId = selectedActorId;
             uint xmlSize = NativeMethods.GetActorXmlSize( m_SelectedActorId );
             if( xmlSize == 0 )
                return;
@@ -178,7 +177,6 @@ namespace LevelEditorApp
             IntPtr tempArray = Marshal.AllocCoTaskMem( ( (int) xmlSize + 1 ) * sizeof( char ) );
             NativeMethods.GetActorXML( tempArray, m_SelectedActorId );
             string actorXml = Marshal.PtrToStringAnsi( tempArray );
-            Console.WriteLine( actorXml );
             Marshal.FreeCoTaskMem( tempArray );
             this.xmlControl_ActorXML.DataString = actorXml;    
             }

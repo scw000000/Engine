@@ -156,7 +156,6 @@ void BulletDebugDrawer::drawLine( const btVector3& from, const btVector3& to, co
    {
    shared_ptr<Scene> pScene = g_pApp->m_pEngineLogic->m_pWrold;
    shared_ptr<IRenderer> pRenderer = pScene->GetRenderer( );
-
    Vec3 vec3From, vec3To;
    vec3From.x = from.x( );
    vec3From.y = from.y( );

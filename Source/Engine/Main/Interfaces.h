@@ -118,6 +118,7 @@ class IEngineLogic
       virtual void VSetActorUpdate( bool isUpdatable ) = 0;
       virtual void VSetWorldUpdate( bool isUpdatable ) = 0;
       virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) = 0;
+      virtual void VRenderDiagnostics( void ) const = 0;
    };
 
 typedef std::list<shared_ptr<IView> > ViewList;

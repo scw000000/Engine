@@ -91,6 +91,7 @@ class BaseEngineLogic : public IEngineLogic
        */
       virtual void VOnUpdate( float time, float elapsedTime ) override;
       virtual void VOnRender( double fTime, float fElapsedTime ) override;
+      virtual void VRenderDiagnostics( void ) const override;
 
       virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) override { }
 
@@ -116,7 +117,7 @@ class BaseEngineLogic : public IEngineLogic
 	   ActorMap m_Actors;
 	   ActorId m_LastActorId;
       ActorFactory* m_pActorFactory;
-      
+      bool m_RenderDiagnostics;
 
 	   ViewList m_ViewList;						// views that are attached to our game
      

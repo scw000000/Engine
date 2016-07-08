@@ -44,7 +44,6 @@ btTransform Transform_to_btTransform( Transform const & trans )
    {
    // convert from Mat4x4 (GameCode) to btTransform (Bullet)
    btMatrix3x3 bulletRotation;
-
    Mat4x4 rot = trans.GetRotationMatrix();
 
    for( int row = 0; row < 3; ++row )
@@ -52,19 +51,7 @@ btTransform Transform_to_btTransform( Transform const & trans )
   //    Vec3 vec = rot.GetRow( row );
       memcpy( &bulletRotation[row][0], &rot[row][0], sizeof( Vec3 ) );
       }
-
-   //// copy rotation matrix
-   //for( int row = 0; row < 3; ++row )
-   //   for( int column = 0; column < 3; ++column )
-   //      bulletRotation[row][column] = mat[column][row]; // note the reversed indexing (row/column vs. column/row)
-   ////  this is because Mat4x4s are row-major matrices and
-   ////  btMatrix3x3 are column-major.  This reversed indexing
-   ////  implicitly transposes (flips along the diagonal) 
-   ////  the matrix when it is copied.
-
-   //// copy position
-   //for( int column = 0; column < 3; ++column )
-   //   bulletPosition[column] = mat[3][column];
+  // return btTransform( btQuaternion( quat.x, quat.y, quat.z, quat.w ), Vec3_to_btVector3( trans.GetToWorldPosition() ) );
    return btTransform( bulletRotation, Vec3_to_btVector3( trans.GetToWorldPosition() ) );
    }
 
@@ -289,10 +276,13 @@ void BulletPhysics::VSyncRigidBodyToRenderComponent( StrongRenderComponentPtr pR
    ENG_ASSERT( pRenderComp );
    auto renderCompToBodyIt = m_RenderCompToRigidBody.find( pRenderComp );
    ENG_ASSERT( renderCompToBodyIt != m_RenderCompToRigidBody.end() );
-   RenderCompMotionState * const renderCompMotionState = static_cast< RenderCompMotionState* >( renderCompToBodyIt->second->getMotionState() );
-
    TransformPtr pComponentTransform = pRenderComp->VGetTransformPtr();
-   renderCompMotionState->setWorldTransform( Transform_to_btTransform( *pComponentTransform ) );
+   btTransform newTransform = Transform_to_btTransform( *pComponentTransform );
+
+   renderCompToBodyIt->second->setWorldTransform( newTransform );
+
+   RenderCompMotionState * const renderCompMotionState = static_cast< RenderCompMotionState* >( renderCompToBodyIt->second->getMotionState() );
+   renderCompMotionState->setWorldTransform( newTransform );
    }
 
 /////////////////////////////////////////////////////////////////////////////

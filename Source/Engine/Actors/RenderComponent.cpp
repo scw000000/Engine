@@ -204,13 +204,27 @@ void MeshRenderComponent::VDelegatePostInit( void )
    StrongRenderComponentPtr pRenderComp = dynamic_pointer_cast< IRenderComponent >( VGetSelfWeakActorComponentPtr().lock() );
    ENG_ASSERT( pRenderComp );
    std::vector<Vec3> meshVertices( pMesh->mNumVertices, Vec3() );
-   IGamePhysics::GetSingleton().VAddPointCloud( ( Vec3* ) &( pMesh->mVertices[ 0 ] ),
+   /*IGamePhysics::GetSingleton().VAddPointCloud( ( Vec3* ) &( pMesh->mVertices[ 0 ] ),
                                                 pMesh->mNumVertices,
                                                 pRenderComp,
                                                 m_pPhysicsAttributes->VGetDensity(),
                                                 m_pPhysicsAttributes->VGetMaterial(),
                                                 m_pPhysicsAttributes->VGetCollisionId(),
-                                                btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_KINEMATIC_OBJECT );
+                                                btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_KINEMATIC_OBJECT );*/
+
+   IGamePhysics::GetSingleton().VAddSphere( this->m_pSceneNode->VGetProperties().GetRadius(),
+                                            pRenderComp,
+                                            m_pPhysicsAttributes->VGetDensity(),
+                                            m_pPhysicsAttributes->VGetMaterial(),
+                                            m_pPhysicsAttributes->VGetCollisionId(),
+                                            btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_KINEMATIC_OBJECT );
+
+   /*  IGamePhysics::GetSingleton().VAddBox( Vec3( this->m_pSceneNode->VGetProperties().GetRadius(), this->m_pSceneNode->VGetProperties().GetRadius(), this->m_pSceneNode->VGetProperties().GetRadius() ),
+        pRenderComp,
+        m_pPhysicsAttributes->VGetDensity(),
+        m_pPhysicsAttributes->VGetMaterial(),
+        m_pPhysicsAttributes->VGetCollisionId(),
+        btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_KINEMATIC_OBJECT );*/
 
    IGamePhysics::GetSingleton().VSetRenderComponentAttribute( pRenderComp, *m_pPhysicsAttributes );
    }

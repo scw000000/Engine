@@ -301,11 +301,25 @@ void OpenGLRenderer::SetRenderAlpha( bool isAlpha )
 
 void OpenGLRenderer::VDrawLine( const Vec3& from,const Vec3& to,const Color& color ) const 
    {
-   glLineWidth( 2.5 );
-   glColor3f( color.m_Component.r, color.m_Component.g, color.m_Component.b );
+   shared_ptr<Scene> pScene = g_pApp->m_pEngineLogic->m_pWrold;
 
+   auto camera = pScene->GetCamera();
+   if( !camera )
+      {
+      return;
+      }
+   
+   Vec4 from4( from );
+   Vec4 to4( to );
+   Mat4x4 mvp = ( camera->GetProjection() * camera->GetView() );
+   Vec4 from_Proj = mvp.Xform( from4 );
+   Vec4 to_Proj = mvp.Xform( to4 );
+
+   glLineWidth( 2.5 );
+   
    glBegin( GL_LINES );
-   glVertex3f( from.x, from.y, from.z );
-   glVertex3f( to.x, to.y, to.z );
-   glEnd();   
+   glColor3f( color.m_Component.r, color.m_Component.g, color.m_Component.b );
+   glVertex3f( from_Proj.x / from_Proj.w, from_Proj.y / from_Proj.w, from_Proj.z / from_Proj.w );
+   glVertex3f( to_Proj.x / to_Proj.w, to_Proj.y / to_Proj.w, to_Proj.z / to_Proj.w );
+   glEnd();  
    }

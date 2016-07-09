@@ -19,12 +19,11 @@
             </Material>
 			
 			<PhysicsAttributes>
-				<Density>air</Density>
-				<CollisionGroup>mesh</CollisionGroup>
-				<CollisionFlags
-				staticobject="no"
-				kinematicobject="no"
-				/>
+				<Movement active="yes">
+                    <Translate x="1.000000" y="1.000000" z="1.000000" />
+                    <Rotate x="1.000000" y="1.000000" z="1.000000" />
+                    <Collision density="air" material="None" collisiongroup="mesh" />
+                </Movement>
 			</PhysicsAttributes>
 			
         </Data>

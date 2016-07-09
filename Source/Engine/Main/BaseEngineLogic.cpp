@@ -71,10 +71,11 @@ BaseEngineLogic::~BaseEngineLogic()
       
       XMLHelper::WriteXMLToFile( ( std::string( "Assets\\" ) + it->second->m_ActorResource.GetFileName() ).c_str(), pOverrides );
       it->second->Destroy();
-      //SAFE_DELETE( pOverrides );
+      
+    //  SAFE_DELETE( pOverrides );
       }
    m_Actors.clear();
-
+   IGamePhysics::Shutdown();
    }
 
 bool BaseEngineLogic::Init()

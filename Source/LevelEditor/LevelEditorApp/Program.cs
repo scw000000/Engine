@@ -32,9 +32,9 @@ namespace LevelEditorApp
         // s_Editor.FormClosing += new FormClosingEventHandler( s_EventHandler.Application_Closing );
          Application.Run( s_Editor );
          Program.s_SDLThread.Join();
-         
-         Program.s_Editor.ShutDownSDLWindow();
          s_DllRedirectThread.Join();
+         Program.s_Editor.ShutDownSDLWindow();
+         
          }
       }
    }

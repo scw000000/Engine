@@ -49,7 +49,7 @@ bool Vec3::Init( TiXmlElement* pData )
    return true;
    }
 
-TiXmlElement* Vec3::GernerateXML( void )
+TiXmlElement* Vec3::GernerateXML( void ) const
    {
    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Vector3" );
    pRetNode->SetAttribute( "x", ToStr( x ).c_str() );
@@ -59,7 +59,7 @@ TiXmlElement* Vec3::GernerateXML( void )
    return pRetNode;
    }
 
-TiXmlElement* Vec3::GenerateOverridesXML( TiXmlElement* pResource )
+TiXmlElement* Vec3::GenerateOverridesXML( TiXmlElement* pResource ) const
    {
    TiXmlElement* pRetNode = GernerateXML();
    if( !std::strcmp( pRetNode->Attribute( "x" ), pResource->Attribute( "x" ) ) &&
@@ -403,7 +403,7 @@ bool Transform::Init( TiXmlElement* pData )
    return true;
    }
 
-TiXmlElement* Transform::GenerateXML( void )
+TiXmlElement* Transform::GenerateXML( void ) const
    {
    TiXmlElement* pRetXMLNode = ENG_NEW TiXmlElement( "Transform" );
 
@@ -422,7 +422,7 @@ TiXmlElement* Transform::GenerateXML( void )
    return pRetXMLNode;
    }
 
-TiXmlElement* Transform::GenerateOverridesXML( TiXmlElement* pResourceNode )
+TiXmlElement* Transform::GenerateOverridesXML( TiXmlElement* pResourceNode ) const
    {
    TiXmlElement* pRetXMLNode = ENG_NEW TiXmlElement( "Transform" );
 

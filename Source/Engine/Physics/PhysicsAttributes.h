@@ -22,7 +22,7 @@ class IPhysicsAttributes
    {
    public:
       virtual ~IPhysicsAttributes( void ){ }
-      virtual bool Vinit( TiXmlElement* pData ) = 0;
+      virtual bool VInit( TiXmlElement* pData ) = 0;
       virtual bool VDelegateInit( TiXmlElement* pData ) = 0;
     //  virtual TiXmlElement* VGenerateXML( void ) = 0;
       virtual bool VGetIsActive( void ) const = 0;
@@ -41,7 +41,8 @@ class IPhysicsAttributes
       virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp ) = 0;
       virtual TiXmlElement* VGenerateXML( void ) const = 0;
       virtual void VDelegateGenerateXML( TiXmlElement* pParent ) const = 0;
-
+      virtual TiXmlElement* VGenerateOverridesXML( TiXmlElement* pResourceNode ) const = 0;
+      virtual void VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode ) const = 0;
    };
 
 
@@ -49,9 +50,9 @@ class BulletPhysicsAttributes : public IPhysicsAttributes
    {
    friend class BulletPhysics;
    public:
-      static shared_ptr< IPhysicsAttributes > GetInstanceFromShape( const std::string& shape );
+      static shared_ptr< IPhysicsAttributes > GetInstanceFromShape( TiXmlElement* pData );
       BulletPhysicsAttributes( void );
-      bool Vinit( TiXmlElement* pData ) override;
+      bool VInit( TiXmlElement* pData ) override;
       virtual bool VDelegateInit( TiXmlElement* pData ) override;
       virtual bool VGetIsActive( void ) const override { return m_IsActive; }
       virtual Vec3 VGetTranslateFactor( void ) const override { return m_TransLateFactor; }
@@ -69,6 +70,8 @@ class BulletPhysicsAttributes : public IPhysicsAttributes
       virtual int VGetCollisionFlags( void ) const override { return m_CollisionFlags; }
       virtual TiXmlElement* VGenerateXML( void ) const override;
       virtual void VDelegateGenerateXML( TiXmlElement* pParent ) const override { };
+      virtual TiXmlElement* VGenerateOverridesXML( TiXmlElement* pResourceNode ) const override;
+      virtual void VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode ) const override { };
 
    protected:
       CollisionId m_CollisionId;
@@ -96,6 +99,7 @@ class BulletSpherePhysicsAttributes : public BulletPhysicsAttributes
    public: 
       BulletSpherePhysicsAttributes( void );
       virtual bool VDelegateInit( TiXmlElement* pData ) override;
+      virtual void VDelegateGenerateXML( TiXmlElement* pParent ) const override;
       virtual void VSetScale( const Vec3& scale ) override;
       virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp ) override;
       void SetRadius( float radius ) { m_Radius = radius; }
@@ -109,6 +113,7 @@ class BulletBoxPhysicsAttributes : public BulletPhysicsAttributes
    public:
       BulletBoxPhysicsAttributes( void );
       virtual bool VDelegateInit( TiXmlElement* pData ) override;
+      virtual void VDelegateGenerateXML( TiXmlElement* pParent ) const override;
       virtual void VSetScale( const Vec3& scale ) override;
       virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp ) override;
       void SetSize( const Vec3& size ) { m_Size = size; }

@@ -16,6 +16,14 @@
 class XMLHelper
    {
    public:
+      static void SetAttribute( TiXmlElement* pNode, const char* attr, float value );
+      static void SetAttribute( TiXmlElement* pNode, const char* attr, bool value );
+      static void SetAttribute( TiXmlElement* pNode, Vec3 value );
+      static void GenerateOverride( TiXmlElement* pRetNode, TiXmlElement* pResNode );
       static void WriteXMLToFile( const char* fileName, TiXmlElement* pData );
       static std::string WriteXMLToString( TiXmlElement* pData );
+   
+   private:
+      static int GetChildNodeNum( TiXmlElement* pData );
+      static int GetAttributerNum( TiXmlElement* pData );
    };

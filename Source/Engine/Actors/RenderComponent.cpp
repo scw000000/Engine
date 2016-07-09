@@ -183,7 +183,7 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
    TiXmlElement* pPhysicsAttributes = pData->FirstChildElement( "PhysicsAttributes" );
    if( pPhysicsAttributes && m_pPhysicsAttributes )
       {
-      m_pPhysicsAttributes->Vinit( pPhysicsAttributes );
+      m_pPhysicsAttributes->VInit( pPhysicsAttributes );
       }
    
    m_pPhysicsAttributes->VSetTransform( *m_pTransform );

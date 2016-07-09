@@ -36,26 +36,34 @@ BulletPhysicsAttributes::BulletPhysicsAttributes( void ) : m_TransLateFactor( Ve
    m_CollisionFlags = 0;
    }
 
-shared_ptr< IPhysicsAttributes > BulletPhysicsAttributes::GetInstanceFromShape( const std::string& shape )
+shared_ptr< IPhysicsAttributes > BulletPhysicsAttributes::GetInstanceFromShape( TiXmlElement* pData )
    {
-   if( !shape.compare( "sphere" ) )
-      {
-      return shared_ptr< IPhysicsAttributes >( ENG_NEW BulletSpherePhysicsAttributes() );
-      }
-   else if( !shape.compare( "box" ) )
-      {
-      return shared_ptr< IPhysicsAttributes >( ENG_NEW BulletBoxPhysicsAttributes() );
-      }
-   else
+   TiXmlElement* pShapeNode = pData->FirstChildElement( "ShapeData" );
+
+   if( !pShapeNode ) // first time init
       {
       return shared_ptr< IPhysicsAttributes >();
       }
+   shared_ptr< IPhysicsAttributes > retAttr;
+   std::string shapeName = pShapeNode->Attribute( "shape" );
+   if( !shapeName.compare( "sphere" ) )
+      {
+       retAttr = shared_ptr< IPhysicsAttributes >( ENG_NEW BulletSpherePhysicsAttributes() );
+      }
+   else if( !shapeName.compare( "box" ) )
+      {
+      retAttr = shared_ptr< IPhysicsAttributes >( ENG_NEW BulletBoxPhysicsAttributes() );
+      }
+
+   if( !retAttr || ( retAttr && !retAttr->VInit( pData ) ) ) // not supported shape or Init failed
+      {
+      return shared_ptr< IPhysicsAttributes >();
+      }
+   return retAttr;
    }
 
-bool BulletPhysicsAttributes::Vinit( TiXmlElement* pData )
+bool BulletPhysicsAttributes::VInit( TiXmlElement* pData )
    {
-   // shape
-
    TiXmlElement* pMovement = pData->FirstChildElement( "Movement" );
    if( pMovement )
       {
@@ -70,64 +78,83 @@ bool BulletPhysicsAttributes::Vinit( TiXmlElement* pData )
          {
          m_RotateFactor.Init( pTemp );
          }
+      pTemp = pMovement->FirstChildElement( "Collision" );
+      if( pTemp )
+         {
+         if( pTemp->Attribute( "density" ) )
+            {
+            m_Density = pTemp->Attribute( "density" );
+            }
+         if( pTemp->Attribute( "material" ) )
+            {
+            m_Material = pTemp->Attribute( "material" );
+            }
+         if( pTemp->Attribute( "collisiongroup" ) )
+            {
+            m_CollisionId = CollisionTable::GetSingleton().GetIdFromName( pTemp->Attribute( "collisiongroup" ) );
+            }
+         }
       }
 
    TiXmlElement* pShape = pData->FirstChildElement( "ShapeData" );
    if( pShape )
       {
       m_Shape = pShape->Attribute( "shape" );
+      if( !VDelegateInit( pShape ) )
+         {
+         return false;
+         }
       }
-
-   // density
-   TiXmlElement* pDensity = pData->FirstChildElement( "Density" );
-   if( pDensity )
-      m_Density = pDensity->GetText();
-
-   // material
-   TiXmlElement* pMaterial = pData->FirstChildElement( "PhysicsMaterial" );
-   if( pMaterial )
-      m_Material = pMaterial->GetText();
-
-   // material
-   TiXmlElement* pCollisionGroup = pData->FirstChildElement( "CollisionGroup" );
-   if( pCollisionGroup )
-      m_CollisionId = CollisionTable::GetSingleton().GetIdFromName( pCollisionGroup->GetText() );
-
 
    TiXmlElement* pCollisionFlags = pData->FirstChildElement( "CollisionFlags" );
    bool flagAttr = false;
    if( pCollisionFlags )
       {
-      if( pCollisionFlags->QueryBoolAttribute( "staticobject", &flagAttr ) == TIXML_SUCCESS && flagAttr )
+      TiXmlElement* pFlagSetting = pCollisionFlags->FirstChildElement( "StaticObject" );
+      bool setting = false;
+      if( pFlagSetting && pFlagSetting->QueryBoolAttribute( "enable", &setting ) == TIXML_SUCCESS && setting )
          {
          m_CollisionFlags |= btCollisionObject::CF_STATIC_OBJECT;
          }
-      if( pCollisionFlags->QueryBoolAttribute( "kinematicobject", &flagAttr ) == TIXML_SUCCESS && flagAttr )
+
+      pFlagSetting = pCollisionFlags->FirstChildElement( "KinematicObject" );
+      if( pFlagSetting && pFlagSetting->QueryBoolAttribute( "enable", &setting ) == TIXML_SUCCESS && setting )
          {
          m_CollisionFlags |= btCollisionObject::CF_KINEMATIC_OBJECT;
          }
-      if( pCollisionFlags->QueryBoolAttribute( "nocontactresponse", &flagAttr ) == TIXML_SUCCESS && flagAttr )
+
+      pFlagSetting = pCollisionFlags->FirstChildElement( "NoContactResponse" );
+      if( pFlagSetting && pFlagSetting->QueryBoolAttribute( "enable", &setting ) == TIXML_SUCCESS && setting )
          {
          m_CollisionFlags |= btCollisionObject::CF_NO_CONTACT_RESPONSE;
          }
-      if( pCollisionFlags->QueryBoolAttribute( "custommaterialcallback", &flagAttr ) == TIXML_SUCCESS && flagAttr )
+
+      pFlagSetting = pCollisionFlags->FirstChildElement( "CustomMaterialCallback" );
+      if( pFlagSetting && pFlagSetting->QueryBoolAttribute( "enable", &setting ) == TIXML_SUCCESS && setting )
          {
          m_CollisionFlags |= btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK;
          }
-      if( pCollisionFlags->QueryBoolAttribute( "characterobject", &flagAttr ) == TIXML_SUCCESS && flagAttr )
+
+      pFlagSetting = pCollisionFlags->FirstChildElement( "CharacterObject" );
+      if( pFlagSetting && pFlagSetting->QueryBoolAttribute( "enable", &setting ) == TIXML_SUCCESS && setting )
          {
          m_CollisionFlags |= btCollisionObject::CF_CHARACTER_OBJECT;
          }
-      if( pCollisionFlags->QueryBoolAttribute( "disablervisualizeobject", &flagAttr ) == TIXML_SUCCESS && flagAttr )
+
+      pFlagSetting = pCollisionFlags->FirstChildElement( "DisableVisualizeObject" );
+      if( pFlagSetting && pFlagSetting->QueryBoolAttribute( "enable", &setting ) == TIXML_SUCCESS && setting )
          {
          m_CollisionFlags |= btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT;
          }
-      if( pCollisionFlags->QueryBoolAttribute( "disablespucollisionprocessing", &flagAttr ) == TIXML_SUCCESS && flagAttr )
+
+      pFlagSetting = pCollisionFlags->FirstChildElement( "DisableSpuCollisionProcessing" );
+      if( pFlagSetting && pFlagSetting->QueryBoolAttribute( "enable", &setting ) == TIXML_SUCCESS && setting )
          {
          m_CollisionFlags |= btCollisionObject::CF_DISABLE_SPU_COLLISION_PROCESSING;
          }
       }
-   return VDelegateInit( pData );
+
+   return true;
    }
 
 bool BulletPhysicsAttributes::VDelegateInit( TiXmlElement* pData )
@@ -155,9 +182,65 @@ TiXmlElement* BulletPhysicsAttributes::VGenerateXML( void ) const
    {
    TiXmlElement* pRootNode = ENG_NEW TiXmlElement( "PhysicsAttributes" );
 
+   TiXmlElement* pMovementNode = ENG_NEW TiXmlElement( "Movement" );
+   pRootNode->LinkEndChild( pMovementNode );
+   XMLHelper::SetAttribute( pMovementNode, "active", m_IsActive );
+
+   TiXmlElement* pTranslate = m_TransLateFactor.GernerateXML();
+   pMovementNode->LinkEndChild( pTranslate );
+   pTranslate->SetValue( "Translate" );
+
+   TiXmlElement* pRotate = m_RotateFactor.GernerateXML();
+   pMovementNode->LinkEndChild( pRotate );
+   pRotate->SetValue( "Rotate" );
 
    VDelegateGenerateXML( pRootNode );
+
+   TiXmlElement* pMaterial = ENG_NEW TiXmlElement( "Collision" );
+   pMovementNode->LinkEndChild( pMaterial );
+   pMaterial->SetAttribute( "density", m_Density.c_str() );
+   pMaterial->SetAttribute( "material", m_Material.c_str() );
+   pMaterial->SetAttribute( "collisiongroup", CollisionTable::GetSingleton().GetNameFromId( m_CollisionId ).c_str() );
+
+   TiXmlElement* pCollisionFlags = ENG_NEW TiXmlElement( "CollisionFlags" );
+   pRootNode->LinkEndChild( pCollisionFlags );
+
+   TiXmlElement* pFlagSetting = ENG_NEW TiXmlElement( "StaticObject" );
+   pCollisionFlags->LinkEndChild( pFlagSetting );
+   XMLHelper::SetAttribute( pFlagSetting, "enable", ( m_CollisionFlags & btCollisionObject::CF_STATIC_OBJECT ) != 0 );
+
+   pFlagSetting = ENG_NEW TiXmlElement( "KinematicObject" );
+   pCollisionFlags->LinkEndChild( pFlagSetting );
+   XMLHelper::SetAttribute( pFlagSetting, "enable", ( m_CollisionFlags & btCollisionObject::CF_KINEMATIC_OBJECT ) != 0 );
+
+   pFlagSetting = ENG_NEW TiXmlElement( "NoContactResponse" );
+   pCollisionFlags->LinkEndChild( pFlagSetting );
+   XMLHelper::SetAttribute( pFlagSetting, "enable", ( m_CollisionFlags & btCollisionObject::CF_NO_CONTACT_RESPONSE ) != 0 );
+
+   pFlagSetting = ENG_NEW TiXmlElement( "CustomMaterialCallback" );
+   pCollisionFlags->LinkEndChild( pFlagSetting );
+   XMLHelper::SetAttribute( pFlagSetting, "enable", ( m_CollisionFlags & btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK ) != 0 );
+
+   pFlagSetting = ENG_NEW TiXmlElement( "CharacterObject" );
+   pCollisionFlags->LinkEndChild( pFlagSetting );
+   XMLHelper::SetAttribute( pFlagSetting, "enable", ( m_CollisionFlags & btCollisionObject::CF_CHARACTER_OBJECT ) != 0 );
+
+   pFlagSetting = ENG_NEW TiXmlElement( "DisableVisualizeObject" );
+   pCollisionFlags->LinkEndChild( pFlagSetting );
+   XMLHelper::SetAttribute( pFlagSetting, "enable", ( m_CollisionFlags & btCollisionObject::CF_DISABLE_VISUALIZE_OBJECT ) != 0 );
+
+   pFlagSetting = ENG_NEW TiXmlElement( "DisableSpuCollisionProcessing" );
+   pCollisionFlags->LinkEndChild( pFlagSetting );
+   XMLHelper::SetAttribute( pFlagSetting, "enable", ( m_CollisionFlags & btCollisionObject::CF_DISABLE_SPU_COLLISION_PROCESSING ) != 0 );
+
    return pRootNode;
+   }
+
+TiXmlElement* BulletPhysicsAttributes::VGenerateOverridesXML( TiXmlElement* pResourceNode ) const
+   {
+   auto pBase = VGenerateXML();
+   XMLHelper::GenerateOverride( pBase, pResourceNode ); 
+   return pBase;
    }
 
 BulletSpherePhysicsAttributes::BulletSpherePhysicsAttributes( void )
@@ -167,17 +250,25 @@ BulletSpherePhysicsAttributes::BulletSpherePhysicsAttributes( void )
 
 bool BulletSpherePhysicsAttributes::VDelegateInit( TiXmlElement* pData )
    {
-   TiXmlElement* pShapeData = pData->FirstChildElement( "ShapeData" );
-   if( !pShapeData )
+   std::string shapeName = pData->Attribute( "shape" );
+   if( shapeName.compare( "sphere" ) )
       {
       return false;
       }
-   if( pShapeData->QueryFloatAttribute( "radius", &m_Radius ) != TIXML_SUCCESS || m_Radius <= 0.f )
+   if( pData->QueryFloatAttribute( "radius", &m_Radius ) != TIXML_SUCCESS || m_Radius <= 0.f )
       {
-      m_Radius = 1.f;
+      m_Radius = 1.f;   
       return false;
       }
    return true;
+   }
+
+void BulletSpherePhysicsAttributes::VDelegateGenerateXML( TiXmlElement* pParent ) const
+   {
+   TiXmlElement* pRoot = ENG_NEW TiXmlElement( "ShapeData" );
+   pParent->LinkEndChild( pRoot );
+   pRoot->SetAttribute( "shape", "sphere" );
+   XMLHelper::SetAttribute( pRoot, "radius", m_Radius );
    }
 
 void BulletSpherePhysicsAttributes::VSetScale( const Vec3& scale )
@@ -200,12 +291,12 @@ BulletBoxPhysicsAttributes::BulletBoxPhysicsAttributes( void ) : m_Size( Vec3::g
 
 bool BulletBoxPhysicsAttributes::VDelegateInit( TiXmlElement* pData )
    {
-   TiXmlElement* pShapeData = pData->FirstChildElement( "ShapeData" );
-   if( !pShapeData )
+   std::string shapeName = pData->Attribute( "shape" );
+   if( shapeName.compare( "box" ) )
       {
       return false;
       }
-   m_Size.Init( pShapeData );
+   m_Size.Init( pData );
    if( m_Size.x <= 0.f || m_Size.y <= 0.f || m_Size.z <= 0.f )
       {
       m_Size = Vec3::g_Identity;
@@ -214,9 +305,16 @@ bool BulletBoxPhysicsAttributes::VDelegateInit( TiXmlElement* pData )
    return true;
    }
 
+void BulletBoxPhysicsAttributes::VDelegateGenerateXML( TiXmlElement* pParent ) const
+   {
+   TiXmlElement* pRoot = ENG_NEW TiXmlElement( "ShapeData" );
+   pParent->LinkEndChild( pRoot );
+   pRoot->SetAttribute( "shape", "box" );
+   XMLHelper::SetAttribute( pRoot, m_Size );
+   }
+
 void BulletBoxPhysicsAttributes::VSetScale( const Vec3& scale )
    {
-   ENG_LOG( "Test", ToStr( scale ) );
    auto pBoxShape = dynamic_cast< btBoxShape* >( m_pRigidBody->getCollisionShape() );
    ENG_ASSERT( pBoxShape );
    pBoxShape->setImplicitShapeDimensions( Vec3_to_btVector3( m_Size * scale ) );   

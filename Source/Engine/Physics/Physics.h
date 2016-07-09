@@ -77,6 +77,7 @@ class IGamePhysics : public ENG_Noncopyable
    public:
       template< typename T > static void RegisterImplementation( void );
       static IGamePhysics& GetSingleton( void );
+      static void Shutdown( void );
       // Initialiazation and Maintenance of the Physics World
       virtual bool VInitialize() = 0;
       virtual void VSyncVisibleScene() = 0;
@@ -126,7 +127,8 @@ template< typename T > void IGamePhysics::RegisterImplementation( void )
       ENG_ERROR( "Invalid implementation register" );
       return;
       }
-   static T physicsImp;
+   ENG_NEW T;
+   //static T physicsImp;
    }
 
 class BulletPhysics : public IGamePhysics

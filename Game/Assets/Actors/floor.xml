@@ -9,22 +9,23 @@
                 <PitchYawRoll x="-0.000000" y="0.000000" z="0.000000" />
                 <Scale x="1.000000" y="1.000000" z="1.000000" />
             </Transform>
-			
-			<PhysicsAttributes>
-				<Movement active="no">
-					<Translate x="1.000000" y="0.000000" z="1.000000"/>
-					<Rotate x="1.000000" y="1.000000" z="1.000000"/>
-				</Movement>
-				<ShapeData shape="box" x="3" y="4" z="5"/>
-
-				<Density>air</Density>
-				<CollisionGroup>wall</CollisionGroup>
-				<CollisionFlags
-				staticobject="yes"
-				kinematicobject="yes"
-				/>
-			</PhysicsAttributes>
-			
+            <PhysicsAttributes>
+                <Movement active="no">
+                    <Translate x="1.000000" y="0.000000" z="1.000000" />
+                    <Rotate x="1.000000" y="1.000000" z="1.000000" />
+                    <Collision density="air" material="None" collisiongroup="wall" />
+                </Movement>
+                <ShapeData shape="box" x="3.000000" y="4.000000" z="5.000000" />
+                <CollisionFlags>
+                    <StaticObject enable="yes" />
+                    <KinematicObject enable="yes" />
+                    <NoContactResponse enable="no" />
+                    <CustomMaterialCallback enable="no" />
+                    <CharacterObject enable="no" />
+                    <DisableVisualizeObject enable="no" />
+                    <DisableSpuCollisionProcessing enable="no" />
+                </CollisionFlags>
+            </PhysicsAttributes>
         </Data>
     </PhysicsComponent>
 </ActorClass>

@@ -50,10 +50,6 @@ int EditorMain( int *pWindow, int screenWidth, int screenHeight )
 
    g_pApp->InitInstance( ( SDL_Window* )pWindow, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
 
-  // g_pApp->MainLoop();
-
-  // Logger::Destroy();
-
    return true;
    }
 

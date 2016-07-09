@@ -15,11 +15,82 @@
 #include "EngineStd.h"
 #include "XMLHelper.h"
 
+void XMLHelper::SetAttribute( TiXmlElement* pNode, const char* attr, float value )
+   {
+   pNode->SetAttribute( attr, ToStr( value ).c_str() );
+   }
+
+void XMLHelper::SetAttribute( TiXmlElement* pNode, const char* attr, bool value )
+   {
+   pNode->SetAttribute( attr, value? "yes":"no" );
+   }
+
+void XMLHelper::SetAttribute( TiXmlElement* pNode, Vec3 value )
+   {
+   SetAttribute( pNode, "x", value.x );
+   SetAttribute( pNode, "y", value.y );
+   SetAttribute( pNode, "z", value.z );
+   }
+
+void XMLHelper::GenerateOverride( TiXmlElement* pRetNode, TiXmlElement* pResNode )
+   {
+   if( !pRetNode && !pResNode )
+      {
+      return;
+      }
+   ENG_ASSERT( pRetNode && pResNode );
+   ENG_ASSERT( GetChildNodeNum( pRetNode ) == GetChildNodeNum( pResNode ) );
+   ENG_ASSERT( GetAttributerNum( pRetNode ) == GetAttributerNum( pResNode ) );
+
+   auto retAttr = pRetNode->FirstAttribute();
+   auto resAttr = pResNode->FirstAttribute();
+
+   while( retAttr && resAttr )
+      {
+      ENG_ASSERT( !std::strcmp( retAttr->Name(), resAttr->Name() ) );
+      std::cout << retAttr->Name() << std::endl;
+      std::cout << retAttr->Value() << std::endl;
+      if( !std::strcmp( retAttr->Value(), resAttr->Value() ) )
+         {
+         std::string removeName = retAttr->Name();
+         retAttr = retAttr->Next();
+         resAttr = resAttr->Next();
+         pRetNode->RemoveAttribute( removeName.c_str() );
+         continue;
+         }
+
+      retAttr = retAttr->Next();
+      resAttr = resAttr->Next();
+      }
+   /*for( ; retAttr && resAttr; retAttr = retAttr->Next(), resAttr = resAttr->Next() )
+      {
+      ENG_ASSERT( !std::strcmp( retAttr->Name(), resAttr->Name() ) );
+      std::cout << retAttr->Name() << std::endl;
+      std::cout << retAttr->Value() << std::endl;
+      if( !std::strcmp( retAttr->Value(), resAttr->Value() ) )
+         {
+         pRetNode->RemoveAttribute( retAttr->Name() );
+         }
+      if( !retAttr->Next() )
+         {
+         break;
+         }
+      }*/
+
+   TiXmlElement* retChild = pRetNode->FirstChildElement();
+   TiXmlElement* resChild = pResNode->FirstChildElement();
+   for( ; retChild && resChild; retChild = retChild->NextSiblingElement(), resChild = resChild->NextSiblingElement() )
+      {
+      GenerateOverride( retChild, resChild );
+      }
+   }
+
 void XMLHelper::WriteXMLToFile( const char* fileName, TiXmlElement* pData )
    {
    TiXmlDocument doc;
    doc.LinkEndChild( pData );
    doc.SaveFile( fileName );
+   //doc.Clear();
    }
 
 std::string XMLHelper::WriteXMLToString( TiXmlElement* pData )
@@ -29,4 +100,28 @@ std::string XMLHelper::WriteXMLToString( TiXmlElement* pData )
    TiXmlPrinter printer;
    doc.Accept( &printer );
    return printer.CStr();
+   }
+
+int XMLHelper::GetChildNodeNum( TiXmlElement* pData )
+   {
+   int ret = 0;
+   for( TiXmlElement* child = pData->FirstChildElement(); child; child = child->NextSiblingElement() )
+      {
+      ENG_LOG( "Test", child->Value() );
+      ret++;
+      }
+   ENG_LOG( "Test", ToStr( ret ) );
+   return ret;
+   }
+
+int XMLHelper::GetAttributerNum( TiXmlElement* pData )
+   {
+   
+   int ret = 0;
+   for( auto attr = pData->FirstAttribute(); attr; attr = attr->Next() )
+      {
+      ENG_LOG( "Test", attr->Name() );
+      ret++;
+      }
+   return ret;
    }

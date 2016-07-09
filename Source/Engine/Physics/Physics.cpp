@@ -98,6 +98,11 @@ IGamePhysics& IGamePhysics::GetSingleton( void )
    return *g_pGamePhysics;
    }
 
+void IGamePhysics::Shutdown( void )
+   {
+   SAFE_DELETE( g_pGamePhysics );
+   }
+
 BulletPhysics::BulletPhysics()
    {
    static RayCastManager s_RayCastManager( this );

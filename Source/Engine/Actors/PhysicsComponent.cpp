@@ -36,21 +36,17 @@ bool PhysicsComponent::VDelegateInit( TiXmlElement* pData )
       return false;
       }
    TiXmlElement* pShapeNode = pPhysicsNode->FirstChildElement( "ShapeData" );
-   if( pShapeNode && !m_pPhysicsAttributes ) // first time init
+
+   if( !m_pPhysicsAttributes ) // first time init
       {
-      std::string shape = pShapeNode->FirstAttribute()->Value();
-      if( !shape.compare( "" )  )
+      m_pPhysicsAttributes = BulletPhysicsAttributes::GetInstanceFromShape( pPhysicsNode );
+      if( !m_pPhysicsAttributes )
          {
          return false;
          }
-      m_pPhysicsAttributes = BulletPhysicsAttributes::GetInstanceFromShape( shape );
       }
-   m_pPhysicsAttributes->Vinit( pPhysicsNode );
 
-   if( m_pPhysicsAttributes )
-      {
-      m_pPhysicsAttributes->VSetTransform( *m_pTransform );
-      }
+   m_pPhysicsAttributes->VSetTransform( *m_pTransform );
 
    return true;
    }
@@ -63,10 +59,10 @@ void PhysicsComponent::VDelegatePostInit( void )
 
 void PhysicsComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )
    {
-   pBaseElement->LinkEndChild( ENG_NEW TiXmlElement( "PhysicsAttributes" ) );
+   pBaseElement->LinkEndChild( m_pPhysicsAttributes->VGenerateXML() );
    }
 
 void PhysicsComponent::VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode )
    {
-
+   pBaseElement->LinkEndChild( m_pPhysicsAttributes->VGenerateOverridesXML( pResourceNode->FirstChildElement( "PhysicsAttributes" ) ) );
    }

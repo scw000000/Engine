@@ -84,8 +84,8 @@ class Vec3 : public glm::vec3
          return ( glm::cross<float, glm::highp>( (*this), b ) );
          }
       bool Init( TiXmlElement* pData );
-      TiXmlElement* GernerateXML( void );
-      TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
+      TiXmlElement* GernerateXML( void ) const;
+      TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource ) const;
 
    public:
       static const Vec3 g_Zero;
@@ -618,8 +618,8 @@ class Frustum
        Vec3       GetScale( void ) const { return m_ToWorld.GetScale(); }
        
        bool Init( TiXmlElement* pData );
-       TiXmlElement* GenerateXML( void );
-       TiXmlElement* GenerateOverridesXML( TiXmlElement* pResourceNode );
+       TiXmlElement* GenerateXML( void ) const;
+       TiXmlElement* GenerateOverridesXML( TiXmlElement* pResourceNode ) const;
 
     public:
        const static Transform g_Identity;

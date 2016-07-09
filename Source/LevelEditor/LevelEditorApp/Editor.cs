@@ -325,11 +325,15 @@ namespace LevelEditorApp
 
       private void Editor_FormClosing( object sender, FormClosingEventArgs e )
          {
+         Program.s_DllRedirectThreadObject.RequestStop();
          m_ClientPipe.Dispose();
          m_ServerPipe.Disconnect();
          
+         StreamWriter fileout = new StreamWriter( Console.OpenStandardOutput() );
+         fileout.AutoFlush = true;
+         Console.SetOut( fileout );
+         //Program.s_DllRedirectThread.Join(); 
          Program.s_SDLThreadObject.RequestStop();
-         Program.s_DllRedirectThreadObject.RequestStop();
          }
 
       }

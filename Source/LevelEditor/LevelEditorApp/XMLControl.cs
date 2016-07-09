@@ -129,7 +129,7 @@ namespace LevelEditorApp
          {
          m_bGridViewModeReadError = false;
 
-         if( ( m_DataString != string.Empty ) )
+         if( ( m_DataString != null && m_DataString != string.Empty ) )
             {
             try
                {

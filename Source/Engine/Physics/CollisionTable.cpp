@@ -15,6 +15,8 @@
 #include "EngineStd.h"
 #include "CollisionTable.h"
 
+#define MAX_COLLISION_TYPE_NUM 16
+
 #define BIT(x) ( 1u << ( x ) )
 
 CollisionTable& CollisionTable::GetSingleton( void )
@@ -63,7 +65,7 @@ bool CollisionTable::Init( TiXmlElement* pData )
    return true;
    }
 
-CollisionId CollisionTable::GetIdFromName( const std::string& typeName )
+CollisionId CollisionTable::GetIdFromName( const std::string& typeName ) const
    {
    auto strToIdIt = m_CollisionNameToIdMap.find( typeName );
    if( strToIdIt == m_CollisionNameToIdMap.end() )
@@ -74,7 +76,18 @@ CollisionId CollisionTable::GetIdFromName( const std::string& typeName )
    return strToIdIt->second;
    }
 
-bool CollisionTable::isCollidable( CollisionId id1, CollisionId id2 )
+std::string CollisionTable::GetNameFromId( CollisionId id ) const
+   {
+   auto findIt = m_CollisionIdToNameMap.find( id );
+   if( findIt == m_CollisionIdToNameMap.end() )
+      {
+      ENG_WARNING( "Collision not found" );
+      return "unknown";
+      }
+   return findIt->second;
+   }
+
+bool CollisionTable::isCollidable( CollisionId id1, CollisionId id2 ) const
    {
    auto idToMapIt1 = m_CollisionIdToMaskMap.find( id1 );
    ENG_ASSERT( idToMapIt1 != m_CollisionIdToMaskMap.end() );
@@ -85,7 +98,7 @@ bool CollisionTable::isCollidable( CollisionId id1, CollisionId id2 )
    return ( ( id1 & idToMapIt2->second ) && ( id2 && idToMapIt1->second ) );
    }
 
-CollisionMask CollisionTable::GetCollisionMask( CollisionId id )
+CollisionMask CollisionTable::GetCollisionMask( CollisionId id ) const
    {
    auto colMapIt = m_CollisionIdToMaskMap.find( id );
    if( colMapIt == m_CollisionIdToMaskMap.end() )
@@ -102,12 +115,13 @@ bool CollisionTable::AddCollisionType( const std::string& typeName )
       {
       return true;
       }
-   if( m_CurrMaxBit >= 31 )
+   if( m_CurrMaxBit >= MAX_COLLISION_TYPE_NUM )
       {
-      ENG_ERROR( "Too many collision type; table is full" );
+      ENG_WARNING( "Too many collision types; table is full" );
       return false;
       }
    m_CurrMaxBit++;
    m_CollisionNameToIdMap[ typeName ] = BIT( m_CurrMaxBit );
+   m_CollisionIdToNameMap[ BIT( m_CurrMaxBit ) ] = typeName;
    return true;
    }

@@ -410,6 +410,8 @@ namespace LevelEditorApp
          this.xmlControl_ActorXML.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
          this.xmlControl_ActorXML.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
          this.xmlControl_ActorXML.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+         this.xmlControl_ActorXML.DataFilePath = "";
+         this.xmlControl_ActorXML.DataString = null;
          this.xmlControl_ActorXML.Dock = System.Windows.Forms.DockStyle.Fill;
          this.xmlControl_ActorXML.Location = new System.Drawing.Point(0, 0);
          this.xmlControl_ActorXML.Name = "xmlControl_ActorXML";

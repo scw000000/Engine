@@ -46,24 +46,7 @@ namespace LevelEditorApp
 
       public bool PreFilterMessage( ref Message m )
          {
-         switch( m.Msg )
-            {
-            case WM_LBUTTONDOWN:
-                  {
-                  // If the left mouse button is up, try doing a 
-                  // ray cast to see if it intersects with an actor
-                  if( CheckFakeFocus() )
-                     {
-                     var task = Task.Factory.StartNew( () =>
-                     {
-                    // Console.WriteLine( "start picking" );
-                     Program.s_Editor.PickActor();
-                     } );
-                   //  m_Parent.PickActor();
-                     }
-                  }
-               break;
-            }
+
          return false;
          }
 

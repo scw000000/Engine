@@ -430,7 +430,6 @@ namespace LevelEditorApp
          this.Name = "Editor";
          this.Text = "Form1";
          this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Editor_FormClosing);
-         this.Load += new System.EventHandler(this.Editor_Load);
          this.menuStrip1.ResumeLayout(false);
          this.menuStrip1.PerformLayout();
          this.splitContainer1.Panel1.ResumeLayout(false);

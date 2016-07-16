@@ -35,21 +35,13 @@ namespace LevelEditorApp
                string txt = m_Reader.ReadLine();
                if( !string.IsNullOrEmpty( txt ) )
                   {
-                  var task = Task.Factory.StartNew( () =>
-                     {
-
-                     Program.s_Editor.BeginInvoke( Program.s_Editor.m_RedirectStringDelegate, txt );
-                     } );
-
+                  Program.s_Editor.Invoke( Program.s_Editor.m_RedirectStringDelegate, txt );
                   }
-
                }
             catch( Exception e )
                {
                System.Windows.Forms.MessageBox.Show( e.ToString() );
-               break; // normal disconnect
                }
-            
             }
          return;
          }

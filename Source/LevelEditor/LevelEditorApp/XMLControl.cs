@@ -311,7 +311,7 @@ namespace LevelEditorApp
          StringWriter sw = new StringWriter();
          m_DataSet.WriteXml( sw, XmlWriteMode.IgnoreSchema );
          m_DataString = sw.ToString();
-         Program.s_Editor.ModifyActor( m_DataString );
+         Program.s_Editor.m_SDLThreadWorker.ModifyActor( m_DataString );
          }
 
       private void GenerateXMLGrieView()

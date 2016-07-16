@@ -114,8 +114,12 @@ class IGamePhysics : public ENG_Noncopyable
 
       virtual void VLinkRenderCompAttribute( StrongRenderComponentPtr pRenderComp ) = 0;
 
+      virtual void VDestroyRenderCompDelegate( IEventPtr pEvent ) = 0;
+
       virtual ~IGamePhysics( void ) {};
       
+      virtual void VSetSimulation( bool isOn ) = 0;
+
    protected:
       IGamePhysics( void );
    };
@@ -183,6 +187,8 @@ class BulletPhysics : public IGamePhysics
 
       virtual Transform VGetTransform( ActorId actorId );
       virtual void VLinkRenderCompAttribute( StrongRenderComponentPtr pRenderComp ) override;
+      virtual void VDestroyRenderCompDelegate( IEventPtr pEvent ) override;
+      virtual void VSetSimulation( bool isOn ) override { m_IsSimulating = isOn; };
 
    protected:
       BulletPhysics( void );				// [mrmike] This was changed post-press to add event registration!
@@ -246,4 +252,6 @@ class BulletPhysics : public IGamePhysics
       // also keep a map to get the actor id from the btRigidBody*
       typedef std::map<btRigidBody const *, shared_ptr< IRenderComponent > > RigidBodyToRenderCompMap;
       RigidBodyToRenderCompMap m_RigidBodyToRenderComp;
+
+      bool m_IsSimulating;
    };

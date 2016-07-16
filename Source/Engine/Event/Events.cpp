@@ -27,3 +27,9 @@ const char* BaseEvent<Event_New_Render_Component_Root>::s_pName( "Event_New_Rend
 const EventType BaseEvent<Event_New_Scene_Node>::s_EventType( 0x915c74ec );
 const char* BaseEvent<Event_New_Scene_Node>::s_pName( "Event_New_Scene_Node" );
 
+const EventType BaseEvent<Event_Destory_Render_Component>::s_EventType( 0x57c9dc0b );
+const char* BaseEvent<Event_Destory_Render_Component>::s_pName( "Event_Destory_Render_Component" );
+
+const EventType BaseEvent<Event_Destroy_Scene_Node>::s_EventType( 0x8d0f0cc1 );
+const char* BaseEvent<Event_Destroy_Scene_Node>::s_pName( "Event_Destory_Scene_Node" );
+

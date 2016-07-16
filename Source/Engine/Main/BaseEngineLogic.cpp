@@ -348,3 +348,24 @@ bool BaseEngineLogic::VLoadLevel( const char* levelResource )
    return true;
    }
 
+void BaseEngineLogic::VClearWorld( void )
+   {
+   for( auto it = m_Actors.begin(); it != m_Actors.end(); )
+      {
+      ActorId id = it->first;
+      ++it;
+      VDestroyActor( id );
+      }
+   m_Actors.clear();
+   }
+
+void BaseEngineLogic::VSetSimulation( bool isOn )
+   {
+   IGamePhysics::GetSingleton().VSetSimulation( isOn );
+   }
+
+void BaseEngineLogic::VGameStart( void )
+   {
+   VSetSimulation( true );
+   }
+

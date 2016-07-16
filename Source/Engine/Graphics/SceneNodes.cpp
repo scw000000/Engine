@@ -188,6 +188,9 @@ bool SceneNode::VRemoveChild( ActorId id )
 		ActorId childId = (*it)->VGetProperties().GetActorId();
       if( childId != INVALID_ACTOR_ID && childId == id )
 		   {
+         shared_ptr< IEvent > pEvent( ENG_NEW Event_Destroy_Scene_Node( *it ) );
+         EventManager::GetSingleton()->VTriggerEvent( pEvent );
+         ( *it )->VRemoveChild( id );
 			m_Children.erase( it );	//this can be expensive for vectors
 			return true;
 		   }

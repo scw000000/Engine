@@ -10,6 +10,7 @@ namespace LevelEditorApp
    {
    class TextBoxWritter : TextWriter
       {
+      private int MAX_LINE_NUM = 100;
       TextBox _output = null;
 
       public TextBoxWritter( TextBox output )
@@ -24,6 +25,13 @@ namespace LevelEditorApp
          if( !_output.IsDisposed )
             {
             _output.AppendText( str );
+            if( _output.Lines.Length >= MAX_LINE_NUM + 20)
+               {
+               int numOfLines = _output.Lines.Length - MAX_LINE_NUM; 
+               var lines = this._output.Lines;
+               var newLines = lines.Skip( numOfLines );
+               this._output.Lines = newLines.ToArray();
+               }
             }
          }
 

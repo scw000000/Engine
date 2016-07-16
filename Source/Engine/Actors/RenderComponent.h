@@ -112,6 +112,8 @@ template < typename T > BaseRenderComponent<T>::BaseRenderComponent( void ) : m_
 
 template < typename T > void BaseRenderComponent<T>::Destory( void )
    {
+   shared_ptr<Event_Destory_Render_Component> pEvent( ENG_NEW Event_Destory_Render_Component( VGetSelfStrongRenderCompPtr() ) );
+   IEventManager::GetSingleton()->VTriggerEvent( pEvent );
    m_pSceneNode.reset();
    m_pTransform.reset();
    m_pPhysicsAttributes.reset();

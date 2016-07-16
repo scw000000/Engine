@@ -24,7 +24,7 @@ class IEventManager : public ENG_Noncopyable
       virtual ~IEventManager( void );
       virtual bool VAddListener( const EventListenerDelegate& eventDelegate, const EventType& type ) = 0;
       virtual bool VRemoveListener(  const EventListenerDelegate& eventDelegate, const EventType& type  ) = 0;
-      virtual bool VTriggerEvent( const IEventPtr& pEvent ) const = 0 ;
+      virtual bool VTriggerEvent( IEventPtr pEvent ) const = 0 ;
       virtual bool VQueueEvent( const IEventPtr& pEvent ) = 0;
       virtual bool VAbortEvent( const EventType&type, bool allOFType = false ) = 0;
       virtual bool VUpdate( unsigned long maxMs = kINFINITE ) = 0;
@@ -43,7 +43,7 @@ class EventManager : public IEventManager
       virtual ~EventManager( void );
       virtual bool VAddListener( const EventListenerDelegate& eventDelegate, const EventType& type );
       virtual bool VRemoveListener(  const EventListenerDelegate& eventDelegate, const EventType& type  );
-      virtual bool VTriggerEvent( const IEventPtr& pEvent ) const;
+      virtual bool VTriggerEvent( IEventPtr pEvent ) const;
       virtual bool VQueueEvent( const IEventPtr& pEvent );
       virtual bool VAbortEvent( const EventType&type, bool allOfType = false );
       // This function is called in EngineApp::OnUpdateGame

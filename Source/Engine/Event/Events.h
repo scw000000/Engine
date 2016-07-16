@@ -19,6 +19,7 @@
 class IEvent;
 class SceneNode;
 
+
 typedef unsigned long EventType;
 typedef shared_ptr<IEvent> IEventPtr;
 typedef fastdelegate::FastDelegate1<IEventPtr> EventListenerDelegate;
@@ -160,5 +161,39 @@ class Event_New_Scene_Node : public BaseEvent < Event_New_Scene_Node >
 
    private:
       weak_ptr<SceneNode> m_pSceneNode;
+
+   };
+
+class Event_Destory_Render_Component : public BaseEvent < Event_Destory_Render_Component >
+   {
+
+   public:
+      Event_Destory_Render_Component( void ) {}
+
+      explicit Event_Destory_Render_Component( StrongRenderComponentPtr pRenderComp ) : m_pRenderComp( pRenderComp ) {}
+
+      virtual IEventPtr VCopy( void ) const override { return IEventPtr( ENG_NEW Event_Destory_Render_Component( m_pRenderComp ) ); }
+
+      StrongRenderComponentPtr GetStrongRenderComp( void ) const { return m_pRenderComp; }
+
+   private:
+      StrongRenderComponentPtr m_pRenderComp;
+
+   };
+
+class Event_Destroy_Scene_Node : public BaseEvent < Event_Destroy_Scene_Node >
+   {
+
+   public:
+      Event_Destroy_Scene_Node( void ) {}
+
+      explicit Event_Destroy_Scene_Node( weak_ptr< ISceneNode > pSceneNode ) : m_pSceneNode( pSceneNode ) {}
+
+      virtual IEventPtr VCopy( void ) const override { return IEventPtr( ENG_NEW Event_Destroy_Scene_Node( m_pSceneNode ) ); }
+
+      weak_ptr< ISceneNode > GetSceneNodePtr( void ) const { return m_pSceneNode; }
+
+   private:
+      weak_ptr< ISceneNode > m_pSceneNode;
 
    };

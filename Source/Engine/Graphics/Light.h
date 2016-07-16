@@ -88,13 +88,15 @@ class LightManager
       void CalcLighting( SceneNode *pNode );
 	   int GetActiveLightCount( void ) const { return m_ActiveLights.size(); }
 	   bool AddLightNode( shared_ptr<LightNode> pNewLight );   
-      
+      bool RemoveLightNode( shared_ptr<LightNode> pRemovedLight );
+
       Vec3* GetLightPosWorldSpace( void ) { return m_LightPosWorldSpace; }
       Vec3* GetLightDirection( void ) { return m_LightDir; }
       float* GetLightPower( void ) { return m_LightPower; }
       Color* GetLightColor( void ) { return m_LightColor; }
       Color* GetLightAmbient( void ) { return &m_LightAmbient; }
       void NewSceneNodeDelegate( IEventPtr pEvent );
+      void DestroySceneNodeDelegate( IEventPtr pEvent );
 
    protected:
       Lights	m_Lights;

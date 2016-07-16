@@ -96,8 +96,9 @@ class BaseEngineLogic : public IEngineLogic
       virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) override { }
 
       void AttachProcess(StrongProcessPtr pProcess) { if (m_pProcessManager) {m_pProcessManager->AttachProcess(pProcess);} }
-      
-      
+      virtual void VClearWorld( void ) override;
+      virtual void VSetSimulation( bool isOn ) override;
+      virtual void VGameStart( void ) override;
 
    public:
       shared_ptr<Scene> m_pWrold;

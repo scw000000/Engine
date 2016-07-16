@@ -21,7 +21,6 @@
 ActorFactory::ActorFactory( void )
    {
    m_LastActorId = INVALID_ACTOR_ID;
-
    }
 
 // This version of function is different than the source code

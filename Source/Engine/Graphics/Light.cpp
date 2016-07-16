@@ -102,6 +102,7 @@ LightManager::LightManager( void )
    {
    IEventManager* pEventMgr = IEventManager::GetSingleton();
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &LightManager::NewSceneNodeDelegate ), Event_New_Scene_Node::s_EventType );
+   pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &LightManager::DestroySceneNodeDelegate ), Event_Destroy_Scene_Node::s_EventType );
    }
 
 void LightManager::CalcLighting( Scene *pScene )
@@ -154,6 +155,13 @@ bool LightManager::AddLightNode( shared_ptr<LightNode> pNewLight )
    return true;
    }
 
+bool LightManager::RemoveLightNode( shared_ptr<LightNode> pRemovedLight )
+   {
+   m_ActiveLights.remove( pRemovedLight );
+   m_Lights.remove( pRemovedLight );
+   return true;
+   }
+
 void LightManager::NewSceneNodeDelegate( IEventPtr pEvent )
    {
    shared_ptr< Event_New_Scene_Node > pNewSceneNodeEvt = dynamic_pointer_cast< Event_New_Scene_Node >( pEvent );
@@ -161,5 +169,15 @@ void LightManager::NewSceneNodeDelegate( IEventPtr pEvent )
    if( pLightNode )
       {
       AddLightNode( pLightNode );
+      }
+   }
+
+void LightManager::DestroySceneNodeDelegate( IEventPtr pEvent )
+   {
+   shared_ptr< Event_Destroy_Scene_Node > pDerivedEvt = dynamic_pointer_cast< Event_Destroy_Scene_Node >( pEvent );
+   shared_ptr< LightNode > pLightNode = dynamic_pointer_cast< LightNode >( pDerivedEvt->GetSceneNodePtr().lock() );
+   if( pLightNode )
+      {
+      RemoveLightNode( pLightNode );
       }
    }

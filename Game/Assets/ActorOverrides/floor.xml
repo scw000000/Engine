@@ -1,5 +1,5 @@
 <ActorClass>
-    <Data type="Floor">
+    <Data>
         <ActorClassResource path="actors\floor.xml" />
     </Data>
     <PhysicsComponent>
@@ -13,17 +13,17 @@
                 <Movement>
                     <Translate />
                     <Rotate />
-                    <Collision/>
+                    <Collision />
                 </Movement>
-                <ShapeData/>
+                <ShapeData />
                 <CollisionFlags>
-                    <StaticObject/>
-                    <KinematicObject/>
-                    <NoContactResponse/>
-                    <CustomMaterialCallback>
-                    <CharacterObject/>
-                    <DisableVisualizeObject/>
-                    <DisableSpuCollisionProcessing/>
+                    <StaticObject />
+                    <KinematicObject />
+                    <NoContactResponse />
+                    <CustomMaterialCallback />
+                    <CharacterObject />
+                    <DisableVisualizeObject />
+                    <DisableSpuCollisionProcessing />
                 </CollisionFlags>
             </PhysicsAttributes>
         </Data>

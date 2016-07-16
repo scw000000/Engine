@@ -1,4 +1,4 @@
-<ActorOverrides>
+<ActorClass>
     <Data>
         <ActorClassResource path="actors\cube.xml" />
     </Data>
@@ -29,4 +29,4 @@
             </Data>
         </LightRenderComponent>
     </MeshRenderComponent>
-</ActorOverrides>
+</ActorClass>

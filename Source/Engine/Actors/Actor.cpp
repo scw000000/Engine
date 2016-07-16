@@ -141,33 +141,39 @@ TiXmlElement* Actor::BuildOverridesXML( StrongActorComponentPtr pComponent, TiXm
 
 TiXmlElement* Actor::GenerateOverridesXML( TiXmlElement* pResouce )
    {
-   // Actor element
-   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "ActorOverrides" );
+   TiXmlElement* pRet = GenerateXML();
+   XMLHelper::GenerateOverride( pRet, pResouce );
+   TiXmlElement* actorRes = pRet->FirstChildElement( "Data" )->FirstChildElement( "ActorClassResource" );
+   actorRes->SetAttribute( "path", m_ActorResource.m_Name.c_str() );
+   return pRet;
 
-   TiXmlElement* pDataNode = ENG_NEW TiXmlElement( "Data" );
-   TiXmlElement* pActorResNode = m_ActorResource.GenerateXML();
-   pActorResNode->SetValue( "ActorClassResource" );
-   pDataNode->LinkEndChild( pActorResNode );
-   pRetNode->LinkEndChild( pDataNode );
+   //// Actor element
+   //TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "ActorOverrides" );
 
-   TiXmlElement* pResComponentNode = pResouce->FirstChildElement( "Data" )->NextSiblingElement();
-   
+   //TiXmlElement* pDataNode = ENG_NEW TiXmlElement( "Data" );
+   //TiXmlElement* pActorResNode = m_ActorResource.GenerateXML();
+   //pActorResNode->SetValue( "ActorClassResource" );
+   //pDataNode->LinkEndChild( pActorResNode );
+   //pRetNode->LinkEndChild( pDataNode );
 
-   //Actor components elements
-   for( auto it = m_Components.begin(); it != m_Components.end(); ++it )
-      {
-      StrongActorComponentPtr pComponent = it->second;
-      StrongActorComponentPtr pParentComponent = pComponent->VGetParentComponent().lock();
-      if( !pParentComponent )
-         {
-         TiXmlElement* pComponentNode = BuildOverridesXML( pComponent, pResComponentNode );
-         pRetNode->LinkEndChild( pComponentNode );
-         pResComponentNode = pResComponentNode->NextSiblingElement();
-         }
+   //TiXmlElement* pResComponentNode = pResouce->FirstChildElement( "Data" )->NextSiblingElement();
+   //
 
-      }
+   ////Actor components elements
+   //for( auto it = m_Components.begin(); it != m_Components.end(); ++it )
+   //   {
+   //   StrongActorComponentPtr pComponent = it->second;
+   //   StrongActorComponentPtr pParentComponent = pComponent->VGetParentComponent().lock();
+   //   if( !pParentComponent )
+   //      {
+   //      TiXmlElement* pComponentNode = BuildOverridesXML( pComponent, pResComponentNode );
+   //      pRetNode->LinkEndChild( pComponentNode );
+   //      pResComponentNode = pResComponentNode->NextSiblingElement();
+   //      }
 
-   return pRetNode;
+   //   }
+
+   //return pRetNode;
    }
 
 TransformPtr Actor::GetTransformPtr( void )

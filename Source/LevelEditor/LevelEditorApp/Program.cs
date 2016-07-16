@@ -13,8 +13,7 @@ namespace LevelEditorApp
       public static DllRedirectThreadObject s_DllRedirectThreadObject;
       public static Editor s_Editor;
       public static Thread s_SDLThread;
-      public static Thread s_DllRedirectThread;
-      /// <summary>
+      public static Thread s_DllRedirectThread; /// <summary>
       /// The main entry point for the application.
       /// </summary>
       [STAThread]

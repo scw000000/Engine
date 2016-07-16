@@ -89,7 +89,7 @@ bool EventManager::VRemoveListener( const EventListenerDelegate& eventDelegate, 
    }
 
 // Make all listeners process the event right now instead of add the event into queue
-bool EventManager::VTriggerEvent( const IEventPtr& pEvent ) const
+bool EventManager::VTriggerEvent( IEventPtr pEvent ) const
    {
    auto mapIt = m_EventListeners.find( pEvent->VGetEventType() );
    // corresponding listing list is not exist

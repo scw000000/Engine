@@ -107,6 +107,8 @@ BulletPhysics::BulletPhysics()
    {
    static RayCastManager s_RayCastManager( this );
    m_DynamicsWorld = NULL;
+   IEventManager::GetSingleton()->VAddListener( fastdelegate::MakeDelegate( this, &BulletPhysics::VDestroyRenderCompDelegate), Event_Destory_Render_Component::s_EventType );
+   m_IsSimulating = false;
    // [mrmike] This was changed post-press to add event registration!
    REGISTER_EVENT( EvtData_PhysTrigger_Enter );
    REGISTER_EVENT( EvtData_PhysTrigger_Leave );
@@ -238,7 +240,10 @@ void BulletPhysics::VOnUpdate( float const deltaSeconds )
    //   We pass in 4 as a max number of sub steps.  Bullet will run the simulation
    //   in increments of the fixed timestep until "deltaSeconds" amount of time has
    //   passed, but will only run a maximum of 4 steps this way.
-   m_DynamicsWorld->stepSimulation( deltaSeconds, 4 );
+   if( m_IsSimulating )
+      {
+      m_DynamicsWorld->stepSimulation( deltaSeconds, 4 );
+      }
    }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -619,6 +624,12 @@ void BulletPhysics::VLinkRenderCompAttribute( StrongRenderComponentPtr pRenderCo
    ENG_ASSERT( pRigidBody );
    bulletPhyAttr->VSetRigidBody( pRigidBody );
    bulletPhyAttr->VSetIsLinkedToPhysicsWorld( true );
+   }
+
+void BulletPhysics::VDestroyRenderCompDelegate( IEventPtr pEvent )
+   {
+   shared_ptr<Event_Destory_Render_Component> pDerivedEvent = dynamic_pointer_cast<Event_Destory_Render_Component>( pEvent );
+   VRemoveRenderComponent( pDerivedEvent->GetStrongRenderComp() );
    }
 
 /////////////////////////////////////////////////////////////////////////////

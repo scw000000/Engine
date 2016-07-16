@@ -42,5 +42,10 @@ void EditorLogic::VOnFileDrop( const char* filePath, const Point& dropLocation )
          {
          VCreateActorFromOverrides( fileRes.m_Name.c_str(), pTransform );
          }
+      else if( !std::strcmp( rootName.c_str(), "World" ) )
+         {
+         VClearWorld();
+         VLoadLevel( fileRes.m_Name.c_str() );
+         }
       }
    }

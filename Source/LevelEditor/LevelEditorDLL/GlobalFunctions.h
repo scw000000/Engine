@@ -23,3 +23,5 @@ extern "C" DllExport unsigned int GetActorXmlSize( ActorId actorId );
 extern "C" DllExport void GetActorXML( int *actorXMLAddress, ActorId actorId );
 extern "C" DllExport ActorId PickActor( void );
 extern "C" DllExport void ModifyActor( ActorId actorId, BSTR bstrActorModificationXML );
+extern "C" DllExport void StartAndResumeEngine( void );
+extern "C" DllExport void ReInitWorld( void );

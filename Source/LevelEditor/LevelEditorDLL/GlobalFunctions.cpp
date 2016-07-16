@@ -181,6 +181,23 @@ void DestroyActor( ActorId actorId )
    g_pApp->m_pEngineLogic->VDestroyActor( actorId );
    }
 
+void StartAndResumeEngine( void )
+   {
+   if( g_pApp->m_pEngineLogic->VGetHasStarted() )
+      {
+      g_pApp->m_pEngineLogic->VSetIsRunning( !g_pApp->m_pEngineLogic->VGetIsRunning() );
+      }
+   else
+      {
+      g_pApp->m_pEngineLogic->VGameStart();
+      }
+   }
+
+void ReInitWorld( void )
+   {
+   g_pApp->m_pEngineLogic->ReInitWorld();
+   }
+
 //int GetLevelScriptAdditionsXmlSize()
 //   {
 //   TiXmlDocument *optionsDoc = g_pApp->m_Options.m_pDoc;

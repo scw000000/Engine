@@ -106,7 +106,7 @@ class IEngineLogic
                                                         TransformPtr pTransform,
                                                         ActorId serversActorId ) = 0;
       virtual void VDestroyActor( ActorId actorId ) = 0;
-	   virtual bool VLoadLevel( const char* levelResource ) = 0;
+	   virtual bool VLoadLevel( const std::string& levelResource ) = 0;
 	   //virtual void VSetProxy()=0;				
       virtual int VOnRestore( void ) = 0;
 	   virtual void VOnMsgProc( SDL_Event event ) = 0;
@@ -120,8 +120,11 @@ class IEngineLogic
       virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) = 0;
       virtual void VRenderDiagnostics( void ) const = 0;
       virtual void VClearWorld( void ) = 0;
-      virtual void VSetSimulation( bool isOn ) = 0;
+      virtual void VSetIsRunning( bool isOn ) = 0;
+      virtual bool VGetIsRunning( void ) const = 0;
       virtual void VGameStart( void ) = 0;
+      virtual bool VGetHasStarted( void ) const = 0;
+      virtual void ReInitWorld( void ) = 0;
    };
 
 typedef std::list<shared_ptr<IView> > ViewList;

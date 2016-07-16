@@ -67,6 +67,7 @@ StrongActorPtr ActorFactory::CreateActor( const Resource& classRes, Resource* pO
    if( pOverridesRes )
       {
       TiXmlElement* pOverridesNode = XmlResourceLoader::LoadAndReturnRootXmlElement( *pOverridesRes );
+      pActor->m_pOverridesResource.reset( ENG_NEW Resource( pOverridesRes->m_Name ) );
       // Resource loading failed, return empty pointer
       if( !pOverridesNode )
          {
@@ -97,11 +98,7 @@ StrongActorPtr ActorFactory::CreateActor( const Resource& classRes, Resource* pO
 bool ActorFactory::ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides )
    {
    TiXmlElement* pOverridesComponentNode = overrides->FirstChildElement( "Data" )->NextSiblingElement();
-   /*for( TiXmlElement* pNode = pFirstResComponentNode; pNode; pNode = pNode->NextSiblingElement() )
-      {
 
-      StrongActorComponentPtr pComponent = BuildComponentTree( pNode, pActor, StrongActorComponentPtr() );
-*/
    for( auto it = pActor->m_Components.begin(); it != pActor->m_Components.end(); ++it )
       {
       StrongActorComponentPtr pComponent = it->second;

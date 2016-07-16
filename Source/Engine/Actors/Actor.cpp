@@ -17,8 +17,9 @@
 #include "ActorComponent.h"
 #include "ActorFactory.h"
 
-Actor::Actor( ActorId id ) : m_ActorResource( "Unknown" ), m_OverridesResource( "Unknown" )
+Actor::Actor( ActorId id )
    {
+   m_pActorClassResource.reset( ENG_NEW Resource( "Unknown" ) );
    m_Id = id;
    m_Type = "Unknown";
 
@@ -37,7 +38,7 @@ bool Actor::Init( TiXmlElement* pData )
    ENG_LOG( "Actor", std::string( "Initializing Actor " ) + ToStr( m_Id ) );
 
 	m_Type = pData->Attribute( "type" );
-   m_ActorResource.Init( pData->FirstChildElement( "ActorClassResource" ) );
+   m_pActorClassResource->Init( pData->FirstChildElement( "ActorClassResource" ) );
    //m_OverridesResource.Init( pData->FirstChildElement( "OverridesResource" ) );
    unsigned int rootComponentId = 0;
    return true;
@@ -95,7 +96,7 @@ TiXmlElement* Actor::GenerateXML( void )
    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "ActorClass" );
    TiXmlElement* pDataNode = ENG_NEW TiXmlElement( "Data" );
    pDataNode->SetAttribute( "type", m_Type.c_str() );
-   TiXmlElement* pActorResNode = m_ActorResource.GenerateXML();
+   TiXmlElement* pActorResNode = m_pActorClassResource->GenerateXML();
    pActorResNode->SetValue( "ActorClassResource" );
    pDataNode->LinkEndChild( pActorResNode );
    pRetNode->LinkEndChild( pDataNode );
@@ -144,7 +145,7 @@ TiXmlElement* Actor::GenerateOverridesXML( TiXmlElement* pResouce )
    TiXmlElement* pRet = GenerateXML();
    XMLHelper::GenerateOverride( pRet, pResouce );
    TiXmlElement* actorRes = pRet->FirstChildElement( "Data" )->FirstChildElement( "ActorClassResource" );
-   actorRes->SetAttribute( "path", m_ActorResource.m_Name.c_str() );
+   actorRes->SetAttribute( "path", m_pActorClassResource->m_Name.c_str() );
    return pRet;
 
    //// Actor element

@@ -31,9 +31,6 @@ namespace LevelEditorApp
         private void InitializeComponent()
         {
          this.components = new System.ComponentModel.Container();
-         this.menuStrip1 = new System.Windows.Forms.MenuStrip();
-         this.fIleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-         this.eDITToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          this.splitContainer1 = new System.Windows.Forms.SplitContainer();
          this.splitContainer2 = new System.Windows.Forms.SplitContainer();
          this.splitContainer_Left = new System.Windows.Forms.SplitContainer();
@@ -54,7 +51,11 @@ namespace LevelEditorApp
          this.tabCtlEX_RightDown = new LevelEditorApp.TabControlEX();
          this.tabPageEX_ActorXML = new LevelEditorApp.TabPageEX(this.components);
          this.xmlControl_ActorXML = new LevelEditorApp.XMLControl();
-         this.menuStrip1.SuspendLayout();
+         this.fIleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+         this.eDITToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+         this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+         this.startPauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+         this.sTOPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
          this.splitContainer1.Panel1.SuspendLayout();
          this.splitContainer1.Panel2.SuspendLayout();
@@ -86,31 +87,8 @@ namespace LevelEditorApp
          this.splitContainer_Right.SuspendLayout();
          this.tabCtlEX_RightDown.SuspendLayout();
          this.tabPageEX_ActorXML.SuspendLayout();
+         this.menuStrip1.SuspendLayout();
          this.SuspendLayout();
-         // 
-         // menuStrip1
-         // 
-         this.menuStrip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
-         this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fIleToolStripMenuItem,
-            this.eDITToolStripMenuItem});
-         this.menuStrip1.Location = new System.Drawing.Point(0, 0);
-         this.menuStrip1.Name = "menuStrip1";
-         this.menuStrip1.Size = new System.Drawing.Size(1912, 24);
-         this.menuStrip1.TabIndex = 0;
-         this.menuStrip1.Text = "menuStrip1";
-         // 
-         // fIleToolStripMenuItem
-         // 
-         this.fIleToolStripMenuItem.Name = "fIleToolStripMenuItem";
-         this.fIleToolStripMenuItem.Size = new System.Drawing.Size(41, 20);
-         this.fIleToolStripMenuItem.Text = "FILE";
-         // 
-         // eDITToolStripMenuItem
-         // 
-         this.eDITToolStripMenuItem.Name = "eDITToolStripMenuItem";
-         this.eDITToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
-         this.eDITToolStripMenuItem.Text = "EDIT";
          // 
          // splitContainer1
          // 
@@ -419,6 +397,46 @@ namespace LevelEditorApp
          this.xmlControl_ActorXML.TabIndex = 0;
          this.xmlControl_ActorXML.ViewMode = LevelEditorApp.XMLControl.VIEW_MODE.TABLE;
          // 
+         // fIleToolStripMenuItem
+         // 
+         this.fIleToolStripMenuItem.Name = "fIleToolStripMenuItem";
+         this.fIleToolStripMenuItem.Size = new System.Drawing.Size(41, 20);
+         this.fIleToolStripMenuItem.Text = "FILE";
+         // 
+         // eDITToolStripMenuItem
+         // 
+         this.eDITToolStripMenuItem.Name = "eDITToolStripMenuItem";
+         this.eDITToolStripMenuItem.Size = new System.Drawing.Size(43, 20);
+         this.eDITToolStripMenuItem.Text = "EDIT";
+         // 
+         // menuStrip1
+         // 
+         this.menuStrip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+         this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fIleToolStripMenuItem,
+            this.eDITToolStripMenuItem,
+            this.startPauseToolStripMenuItem,
+            this.sTOPToolStripMenuItem});
+         this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+         this.menuStrip1.Name = "menuStrip1";
+         this.menuStrip1.Size = new System.Drawing.Size(1912, 24);
+         this.menuStrip1.TabIndex = 0;
+         this.menuStrip1.Text = "menuStrip1";
+         // 
+         // startPauseToolStripMenuItem
+         // 
+         this.startPauseToolStripMenuItem.Name = "startPauseToolStripMenuItem";
+         this.startPauseToolStripMenuItem.Size = new System.Drawing.Size(91, 20);
+         this.startPauseToolStripMenuItem.Text = "START/PAUSE";
+         this.startPauseToolStripMenuItem.Click += new System.EventHandler(this.startPauseToolStripMenuItem_Click);
+         // 
+         // sTOPToolStripMenuItem
+         // 
+         this.sTOPToolStripMenuItem.Name = "sTOPToolStripMenuItem";
+         this.sTOPToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+         this.sTOPToolStripMenuItem.Text = "STOP";
+         this.sTOPToolStripMenuItem.Click += new System.EventHandler(this.sTOPToolStripMenuItem_Click);
+         // 
          // Editor
          // 
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -430,8 +448,6 @@ namespace LevelEditorApp
          this.Name = "Editor";
          this.Text = "Form1";
          this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Editor_FormClosing);
-         this.menuStrip1.ResumeLayout(false);
-         this.menuStrip1.PerformLayout();
          this.splitContainer1.Panel1.ResumeLayout(false);
          this.splitContainer1.Panel2.ResumeLayout(false);
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
@@ -466,6 +482,8 @@ namespace LevelEditorApp
          this.tabCtlEX_RightDown.ResumeLayout(false);
          this.tabPageEX_ActorXML.ResumeLayout(false);
          this.tabPageEX_ActorXML.PerformLayout();
+         this.menuStrip1.ResumeLayout(false);
+         this.menuStrip1.PerformLayout();
          this.ResumeLayout(false);
          this.PerformLayout();
 
@@ -473,10 +491,7 @@ namespace LevelEditorApp
 
         #endregion
 
-        private System.Windows.Forms.MenuStrip menuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem fIleToolStripMenuItem;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private System.Windows.Forms.ToolStripMenuItem eDITToolStripMenuItem;
         private System.Windows.Forms.SplitContainer splitContainer2;
         private System.Windows.Forms.SplitContainer splitContainer_Left;
         private System.Windows.Forms.SplitContainer splitContainer_Mid;
@@ -496,6 +511,11 @@ namespace LevelEditorApp
         private LevelEditorApp.XMLControl xmlControl_ActorXML;
         private TextBox textBox1;
         private SplitContainer splitContainer3;
+        private ToolStripMenuItem fIleToolStripMenuItem;
+        private ToolStripMenuItem eDITToolStripMenuItem;
+        private MenuStrip menuStrip1;
+        private ToolStripMenuItem startPauseToolStripMenuItem;
+        private ToolStripMenuItem sTOPToolStripMenuItem;
     }
 }
 

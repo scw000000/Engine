@@ -55,8 +55,8 @@ class Actor
       ActorType m_Type;
       ActorComponents m_Components;
       ActorComponentId m_LastActorComponentId;
-      Resource m_ActorResource; // actor class XML file name
-      Resource m_OverridesResource;
+      shared_ptr< Resource > m_pActorClassResource; // actor class XML file name
+      shared_ptr< Resource > m_pOverridesResource;
    };
 
 //template< class ComponentType > weak_ptr<ComponentType> Actor::GetComponent( const char* name )

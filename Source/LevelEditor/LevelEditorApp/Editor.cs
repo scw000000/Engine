@@ -246,5 +246,15 @@ namespace LevelEditorApp
          m_DllRedirectThread.Join(); 
          }
 
+      private void startPauseToolStripMenuItem_Click( object sender, EventArgs e )
+         {
+         m_SDLThreadWorker.StartAndResumeEngine();
+         }
+
+      private void sTOPToolStripMenuItem_Click( object sender, EventArgs e )
+         {
+         m_SDLThreadWorker.ReInitWorld();
+         }
+
       }
    }

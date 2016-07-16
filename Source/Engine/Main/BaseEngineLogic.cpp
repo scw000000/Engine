@@ -29,6 +29,11 @@ void LevelManager::Init( const std::string& levelDir )
    {
    m_LevelDirectory = levelDir;
    m_Levels = g_pApp->m_pResCache->Match( m_LevelDirectory + "*.xml" );
+   ResetCurrentLevel();
+   }
+
+void LevelManager::ResetCurrentLevel( void )
+   {
    auto levelIt = std::find( m_Levels.begin(), m_Levels.end(), m_LevelDirectory + g_pApp->m_EngineOptions.m_Level );
    ENG_ASSERT( levelIt != m_Levels.end() );
    m_CurrentLevel = levelIt - m_Levels.begin();
@@ -38,6 +43,8 @@ BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer ) : m_pGUIMana
    {
    m_Lifetime = 0.f;
    m_LastActorId = 0;
+   m_HasStarted = false;
+   m_IsRunning = false;
 	m_pProcessManager = ENG_NEW ProcessManager;
    if( pRenderer )
       {
@@ -69,7 +76,7 @@ BaseEngineLogic::~BaseEngineLogic()
       SAFE_DELETE( pResource );
       
       
-      XMLHelper::WriteXMLToFile( ( std::string( "Assets\\" ) + it->second->m_ActorResource.GetFileName() ).c_str(), pOverrides );
+      XMLHelper::WriteXMLToFile( ( std::string( "Assets\\" ) + it->second->m_pActorClassResource->GetFileName() ).c_str(), pOverrides );
       it->second->Destroy();
       
     //  SAFE_DELETE( pOverrides );
@@ -82,13 +89,13 @@ bool BaseEngineLogic::Init()
    {
    IGamePhysics::RegisterImplementation< BulletPhysics >();
    IGamePhysics::GetSingleton().VInitialize();
-   if( !VLoadLevel( ( g_pApp->m_EngineOptions.m_LevelDirectory + g_pApp->m_EngineOptions.m_Level ).c_str() ))
+   m_pLevelManager->Init( g_pApp->m_EngineOptions.m_LevelDirectory );
+   if( !VLoadLevel( ( m_pLevelManager->GetCurrentLevel() ).c_str() ) )
       {
       ENG_ERROR( "The game failed to load." );
       g_pApp->AbortGame( );
       return false;
       }
-   m_pLevelManager->Init( g_pApp->m_EngineOptions.m_LevelDirectory );
    m_pWrold->OnRestore();
    m_pGUIManager->Init( g_pApp->m_EngineOptions.m_GUIDirectory );
 
@@ -275,14 +282,17 @@ void BaseEngineLogic::VRenderDiagnostics( void ) const
 
 // this function is called by EngineApp::VLoadGame
 // LATER: finish implementation
-bool BaseEngineLogic::VLoadLevel( const char* levelResource )
+bool BaseEngineLogic::VLoadLevel( const std::string& levelResource )
    {
-   Resource levelRes( levelResource, g_pApp->m_EngineOptions.m_UseDevDir );
+   g_pApp->m_EngineOptions.m_Level = levelResource.substr( levelResource.find_last_of( "\\" ) + 1 );
+   m_pLevelManager->ResetCurrentLevel();
+
+   Resource levelRes( m_pLevelManager->GetCurrentLevel() );
     // Grab the root XML node
    TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( levelRes );
    if (!pRoot)
       { 
-      ENG_ERROR( "Failed to find level resource file: " + std::string( levelResource ) );
+      ENG_ERROR( "Failed to find level resource file: " + levelResource );
       return false;
       }
 
@@ -350,6 +360,8 @@ bool BaseEngineLogic::VLoadLevel( const char* levelResource )
 
 void BaseEngineLogic::VClearWorld( void )
    {
+   VSetIsRunning( false );
+   m_HasStarted = false;
    for( auto it = m_Actors.begin(); it != m_Actors.end(); )
       {
       ActorId id = it->first;
@@ -359,13 +371,81 @@ void BaseEngineLogic::VClearWorld( void )
    m_Actors.clear();
    }
 
-void BaseEngineLogic::VSetSimulation( bool isOn )
+void BaseEngineLogic::VSetIsRunning( bool isOn )
    {
+   m_IsRunning = isOn;
    IGamePhysics::GetSingleton().VSetSimulation( isOn );
    }
 
 void BaseEngineLogic::VGameStart( void )
    {
-   VSetSimulation( true );
+   m_HasStarted = true;
+   VSetIsRunning( true );
+   }
+
+void BaseEngineLogic::ReInitWorld( void )
+   {
+   Resource levelRes( ( m_pLevelManager->GetCurrentLevel() ).c_str() );
+   // Grab the root XML node
+   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( levelRes );
+   if( !pRoot )
+      {
+      ENG_ERROR( "Failed to find level resource file: " + levelRes.m_Name );
+      //return false;
+      }
+
+   // pre and post load scripts
+   const char* preLoadScript = NULL;
+   const char* postLoadScript = NULL;
+
+   // parse the pre & post script attributes
+   TiXmlElement* pScriptElement = pRoot->FirstChildElement( "Script" );
+   if( pScriptElement )
+      {
+      preLoadScript = pScriptElement->Attribute( "preLoad" );
+      postLoadScript = pScriptElement->Attribute( "postLoad" );
+      }
+
+   // load the pre-load script if there is one
+   if( preLoadScript )
+      {
+      Resource resource( preLoadScript );
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );  // this actually loads the XML file from the zip file
+      }
+
+   for( auto actorIt : m_Actors )
+      {
+      TiXmlElement* pActorData = XmlResourceLoader::LoadAndReturnRootXmlElement( actorIt.second->m_pActorClassResource->m_Name );
+      m_pActorFactory->ModifyActor( actorIt.second, pActorData );
+      if( actorIt.second->m_pOverridesResource )
+         {
+         pActorData = XmlResourceLoader::LoadAndReturnRootXmlElement( actorIt.second->m_pOverridesResource->m_Name );
+         m_pActorFactory->ModifyActor( actorIt.second, pActorData );
+         }
+      }
+
+   // initialize all human views
+   for( auto it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
+      {
+      shared_ptr<IView> pView = *it;
+      if( pView->VGetType() == View_Human )
+         {
+         shared_ptr<HumanView> pHumanView = static_pointer_cast< HumanView, IView >( pView );
+         //pHumanView->LoadLevel( pRoot );
+         }
+      }
+
+   // register script events from the engine
+   //   [mrmike] this was moved to the constructor post-press, since this function can be called when new levels are loaded by the game or editor
+   // RegisterEngineScriptEventImps();
+
+   // load the post-load script if there is one
+   if( postLoadScript )
+      {
+      Resource resource( postLoadScript );
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );  // this actually loads the XML file from the zip file
+      }
+
+   //return true;
    }
 

@@ -39,6 +39,7 @@ class LevelManager
       const std::vector<Level> &GetLevels( ) const { return m_Levels; }
       Level GetCurrentLevel( ) const { return m_Levels[m_CurrentLevel]; }
       void Init( const std::string& levelDir );
+      void ResetCurrentLevel( void );
 
    protected:
       std::string m_LevelDirectory;
@@ -74,7 +75,7 @@ class BaseEngineLogic : public IEngineLogic
       virtual void VMoveActor( ActorId id, Mat4x4 const &mat) override {}
       virtual void VSetActorUpdate( bool isUpdatable ) override;
 
-      virtual bool VLoadLevel( const char* levelResource ) override;
+      virtual bool VLoadLevel( const std::string& levelResource ) override;
       virtual int VOnRestore( void ) override;
       
       virtual void VOnMsgProc( SDL_Event event ) override;
@@ -97,8 +98,11 @@ class BaseEngineLogic : public IEngineLogic
 
       void AttachProcess(StrongProcessPtr pProcess) { if (m_pProcessManager) {m_pProcessManager->AttachProcess(pProcess);} }
       virtual void VClearWorld( void ) override;
-      virtual void VSetSimulation( bool isOn ) override;
+      virtual void VSetIsRunning( bool isOn ) override;
+      virtual bool VGetIsRunning( void ) const override { return m_IsRunning; }
       virtual void VGameStart( void ) override;
+      virtual bool VGetHasStarted( void ) const override { return m_HasStarted; };
+      virtual void ReInitWorld( void ) override;
 
    public:
       shared_ptr<Scene> m_pWrold;
@@ -108,19 +112,20 @@ class BaseEngineLogic : public IEngineLogic
    protected: 
 	   
    protected:
-      float m_Lifetime;
+	   ActorId m_LastActorId;
+	   ActorMap m_Actors;
+	   ViewList m_ViewList;						// views that are attached to our game
+
+      //GCCRandom m_random;								// our RNG
+      ActorFactory* m_pActorFactory;
+      ProcessManager* m_pProcessManager;				// a game logic entity
       bool m_EnableActorUpdate;
       bool m_EnableWorldUpdate;
-      shared_ptr<IRenderer> m_pRenderer;
-      ProcessManager* m_pProcessManager;				// a game logic entity
-	   
-      //GCCRandom m_random;								// our RNG
-	   ActorMap m_Actors;
-	   ActorId m_LastActorId;
-      ActorFactory* m_pActorFactory;
       bool m_RenderDiagnostics;
-
-	   ViewList m_ViewList;						// views that are attached to our game
+      bool m_HasStarted;
+      bool m_IsRunning;
+      float m_Lifetime;
+      shared_ptr<IRenderer> m_pRenderer;
      
 
    };

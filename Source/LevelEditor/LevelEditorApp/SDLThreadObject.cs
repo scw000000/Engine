@@ -12,6 +12,16 @@ namespace LevelEditorApp
    {
    public class SDLThreadObject
       {
+
+      [DllImport( "user32.dll", SetLastError = true )]
+      public static extern IntPtr SetParent( IntPtr hWndChild, IntPtr hWndNewParent );
+
+      [DllImport( "user32.dll" )]
+      public static extern bool SetWindowPos( IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags );
+
+      [DllImport( "user32.dll" )]
+      public static extern int ShowWindow( IntPtr hwnd, int nCmdShow );
+
       IntPtr m_WindowHandle;
       IntPtr m_TabHandle;
       int m_Width;
@@ -48,7 +58,7 @@ namespace LevelEditorApp
             SDL.SDL_SysWMinfo info = new SDL.SDL_SysWMinfo();
             SDL.SDL_GetWindowWMInfo( m_pSDLWindow, ref info );
             m_pSDLWindowHandle = info.info.win.window;
-            NativeMethods.SetWindowPos(
+            SetWindowPos(
                m_pSDLWindowHandle,
                m_WindowHandle,
                0,
@@ -57,8 +67,8 @@ namespace LevelEditorApp
                0,
                0x0401 // NOSIZE | SHOWWINDOW 
                );
-            NativeMethods.SetParent( m_pSDLWindowHandle, m_TabHandle );
-            NativeMethods.ShowWindow( m_pSDLWindowHandle, 1 ); // SHOWNORMAL
+            SetParent( m_pSDLWindowHandle, m_TabHandle );
+            ShowWindow( m_pSDLWindowHandle, 1 ); // SHOWNORMAL
             m_SDLEventFilter = new SDL.SDL_EventFilter( this.SDLEventFilter );
             SDL.SDL_AddEventWatch( m_SDLEventFilter, new IntPtr() );
             NativeMethods.EditorMain( m_pSDLWindow, m_Width, m_Height );
@@ -67,6 +77,20 @@ namespace LevelEditorApp
             {
             MessageBox.Show( "Error: " + e.ToString() );
             }
+         }
+
+      public void StartAndResumeEngine() 
+         {
+         NativeMethods.StartAndResumeEngine();
+         }
+
+       public delegate void myDelegate();
+       myDelegate ReInitDelegate = new myDelegate( NativeMethods.ReInitWorld );
+
+      
+      public void ReInitWorld() 
+         {
+         NativeMethods.ReInitWorld();
          }
 
       public void ModifyActor( string actorOrerrides )

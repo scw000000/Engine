@@ -9,12 +9,13 @@ namespace LevelEditorApp
    public class ActorData
       {
       private bool m_IsDirty;
-      
+      private uint m_ActorId;
 
-      public ActorData( string data ) 
+      public ActorData( string data, uint actorId ) 
          {
          m_IsDirty = false;
          m_Data = data;
+         m_ActorId = actorId;
          }
 
       private string m_Data;
@@ -31,6 +32,15 @@ namespace LevelEditorApp
                m_Data = value;
                m_IsDirty = true;
                }
+            }
+         }
+
+      public void SaveToFile() 
+         {
+         if( m_IsDirty )
+            {
+            NativeMethods.SaveActor( m_ActorId );
+            m_IsDirty = false;
             }
          }
 

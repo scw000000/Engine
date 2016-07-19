@@ -46,6 +46,12 @@ namespace LevelEditorApp
       [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]
       public static extern void SaveAllActors();
 
+      [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]
+      public static extern void SaveActor( uint actorId );
+
+      [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]
+      public static extern uint CreateActor( [MarshalAs( UnmanagedType.BStr )] string lactorModXML );
+
       [DllImport( "coredll.dll" )]
       public static extern bool SetForegroundWindow( IntPtr hWnd );
       }

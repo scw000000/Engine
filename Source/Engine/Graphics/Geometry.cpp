@@ -23,30 +23,15 @@ const Transform Transform::g_Identity( Vec3::g_Zero, Vec3::g_Identity, Quaternio
 
 bool Vec3::Init( TiXmlElement* pData )
    {
-   float rX = 0;
-   float rY = 0;
-   float rZ = 0;
    if( !pData )
       {
       return false;
       }
-   if( TIXML_SUCCESS != pData->QueryFloatAttribute( "x", &rX ) )
-      {
-      return false;
-      }
-   if( TIXML_SUCCESS != pData->QueryFloatAttribute( "y", &rY ) )
-      {
-      return false;
-      }
-   if( TIXML_SUCCESS != pData->QueryFloatAttribute( "z", &rZ ) )
-      {
-      return false;
-      }
-   
-   x = rX;
-   y = rY;
-   z = rZ;
-   return true;
+   bool success = ( TIXML_SUCCESS == pData->QueryFloatAttribute( "x", &x ) )
+      | ( TIXML_SUCCESS == pData->QueryFloatAttribute( "y", &y ) )
+      | ( TIXML_SUCCESS == pData->QueryFloatAttribute( "z", &z ) );
+
+   return success;
    }
 
 TiXmlElement* Vec3::GernerateXML( void ) const
@@ -234,37 +219,15 @@ bool Color::operator != ( const Color& color ) const
 
  bool Color::Init( TiXmlElement* pData )
     {
-    float r;
-    float g;
-    float b;
-    float a;
-
     if( !pData )
        {
        return false;
        }
-    if( TIXML_SUCCESS != pData->QueryFloatAttribute( "r", &r ) )
-       {
-       return false;
-       }
-    if( TIXML_SUCCESS != pData->QueryFloatAttribute( "g", &g ) )
-       {
-       return false;
-       }
-    if( TIXML_SUCCESS != pData->QueryFloatAttribute( "b", &b ) )
-       {
-       return false;
-       }
-    if( TIXML_SUCCESS != pData->QueryFloatAttribute( "a", &a ) )
-       {
-       return false;
-       }
-
-    m_Component.r = r;
-    m_Component.g = g;
-    m_Component.b = b;
-    m_Component.a = a;
-    return true;
+    bool success = ( TIXML_SUCCESS == pData->QueryFloatAttribute( "r", &m_Component.r ) )
+       | ( TIXML_SUCCESS == pData->QueryFloatAttribute( "g", &m_Component.g ) )
+       | ( TIXML_SUCCESS == pData->QueryFloatAttribute( "b", &m_Component.b ) )
+       | ( TIXML_SUCCESS == pData->QueryFloatAttribute( "a", &m_Component.a ) );
+    return success;
     }
 
  TiXmlElement* Color::GenerateXML( void )

@@ -4,14 +4,15 @@
     level geometry.-->
 
     <StaticActors>
-	<Actor actoroverridsresource="actoroverrides\cube.xml" />
 	
+	
+		<Actor actoroverridsresource="actoroverrides\cube.xml" />
 		<Actor actoroverridsresource="actoroverrides\cube2.xml" />
-		
 		<Actor actoroverridsresource="actoroverrides\cube3.xml" />
 		<Actor actoroverridsresource="actoroverrides\cube4.xml" />
 		<Actor actoroverridsresource="actoroverrides\sky.xml" /> 
 		<Actor actoroverridsresource="actoroverrides\floor.xml" /> 
+		
     </StaticActors>
 
 </World>

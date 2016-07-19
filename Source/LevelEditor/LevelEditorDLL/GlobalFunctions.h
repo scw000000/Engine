@@ -19,6 +19,7 @@
 extern "C" DllExport int EditorMain( int *pWindow, int screenWidth, int screenHeight );
 extern "C" DllExport void SingleLoop( void );
 extern "C" DllExport void Shutdown( void );
+extern "C" DllExport ActorId CreateActor( BSTR classFilePath );
 extern "C" DllExport unsigned int GetActorXmlSize( ActorId actorId );
 extern "C" DllExport void GetActorXML( int *actorXMLAddress, ActorId actorId );
 extern "C" DllExport ActorId PickActor( void );
@@ -26,3 +27,4 @@ extern "C" DllExport void ModifyActor( ActorId actorId, BSTR bstrActorModificati
 extern "C" DllExport void StartAndResumeEngine( void );
 extern "C" DllExport void StopEngine( void );
 extern "C" DllExport void SaveAllActors( void );
+extern "C" DllExport void SaveActor( ActorId actorId );

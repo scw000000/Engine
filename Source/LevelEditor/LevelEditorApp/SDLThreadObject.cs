@@ -5,9 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.IO;
+using System.Xml;
 
 using SDL2;
-
 namespace LevelEditorApp
    {
    public class SDLThreadObject
@@ -72,8 +73,9 @@ namespace LevelEditorApp
                );
             SetParent( m_pSDLWindowHandle, m_TabHandle );
             ShowWindow( m_pSDLWindowHandle, 1 ); // SHOWNORMAL
+            SDL.SDL_EventState( SDL.SDL_EventType.SDL_DROPFILE, SDL.SDL_ENABLE );
             m_SDLEventFilter = new SDL.SDL_EventFilter( this.SDLEventFilter );
-            SDL.SDL_AddEventWatch( m_SDLEventFilter, new IntPtr() );
+            SDL.SDL_SetEventFilter( m_SDLEventFilter, new IntPtr() );
             NativeMethods.EditorMain( m_pSDLWindow, m_Width, m_Height );
             }
          catch( Exception e )
@@ -108,7 +110,7 @@ namespace LevelEditorApp
          ModifyActor( m_SelectedActorId, actorOrerrides );
          }
 
-      public void ModifyActor( uint acotrId, string actorOrerrides )
+      public void ModifyActor( uint acotrId, string actorOrerrides ) // It must have been clicked before modified, so just modify its data
          {
          if( acotrId != INVALID_ACTOR_ID )
             {
@@ -123,19 +125,11 @@ namespace LevelEditorApp
          if( selectedActorId != INVALID_ACTOR_ID )
             {
             m_SelectedActorId = selectedActorId;
-            uint xmlSize = NativeMethods.GetActorXmlSize( m_SelectedActorId );
-            if( xmlSize == 0 )
-               {
-               return;
-               }
-            IntPtr tempArray = Marshal.AllocCoTaskMem( ( (int) xmlSize + 1 ) * sizeof( char ) );
-            NativeMethods.GetActorXML( tempArray, m_SelectedActorId );
-            string actorXml = Marshal.PtrToStringAnsi( tempArray );
-            Marshal.FreeCoTaskMem( tempArray );
+            string actorXml = GetActorXml( m_SelectedActorId );
 
             if( !m_ActorData.ContainsKey( m_SelectedActorId ) ) // never clicked before, must also never be modified
                {
-               m_ActorData.Add( m_SelectedActorId, new ActorData( actorXml ) );
+               m_ActorData.Add( m_SelectedActorId, new ActorData( actorXml, m_SelectedActorId ) );
                }
             
             Program.s_Editor.BeginInvoke( Program.s_Editor.m_SetActorDataStringDelegate, actorXml );
@@ -146,7 +140,10 @@ namespace LevelEditorApp
 
       public void SaveAllActors() 
          {
-         NativeMethods.SaveAllActors();
+         foreach( var actorDataPair in m_ActorData )
+            {
+            actorDataPair.Value.SaveToFile();
+            }
          }
 
       public int SDLEventFilter( IntPtr userData, IntPtr sdlevent )
@@ -160,6 +157,10 @@ namespace LevelEditorApp
                   PickActor();
                   }
                break;
+            case SDL.SDL_EventType.SDL_DROPFILE:
+               string filePath = Marshal.PtrToStringAnsi( eventInstance.drop.file );
+               OnFileDrop( filePath );
+               return 0;
             };
          return 1;
          }
@@ -185,6 +186,43 @@ namespace LevelEditorApp
       public bool IsAlive() 
          {
          return m_ShouldLoop;
+         }
+
+      private string GetActorXml( uint actorId ) 
+         {
+         if( actorId != INVALID_ACTOR_ID )
+            {
+            uint xmlSize = NativeMethods.GetActorXmlSize( actorId );
+            if( xmlSize == 0 )
+               {
+               return "";
+               }
+            IntPtr tempArray = Marshal.AllocCoTaskMem( ( (int) xmlSize + 1 ) * sizeof( char ) );
+            NativeMethods.GetActorXML( tempArray, actorId );
+            string actorXml = Marshal.PtrToStringAnsi( tempArray );
+            Marshal.FreeCoTaskMem( tempArray );
+            return actorXml;
+            }
+         return "";
+         }
+
+      private void OnFileDrop( string filePath ) 
+         {
+         XmlDocument doc = new XmlDocument();
+         doc.Load( Program.s_Editor.m_AssetsDirectory + filePath );
+         string rootNodeName = doc.FirstChild.Name;
+         if( rootNodeName.Equals( "ActorClass" ) )
+            {
+            uint newActorId = NativeMethods.CreateActor( filePath );
+            if( newActorId != INVALID_ACTOR_ID )
+               {
+               m_ActorData.Add( newActorId, new ActorData( GetActorXml( newActorId ), newActorId ) );
+               }
+            }
+         else if( rootNodeName.Equals( "World" ) )
+            {
+            }
+
          }
       }
 

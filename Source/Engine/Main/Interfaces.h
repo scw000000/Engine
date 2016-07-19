@@ -95,14 +95,19 @@ class IView
       virtual void VOnAttach( ViewId vid ) = 0;
    };
 
+class Resource;
+
 class IEngineLogic
    {
    public:
    	virtual WeakActorPtr VGetActor( ActorId id ) = 0;
-      virtual StrongActorPtr VCreateActorFromOverrides( const char* overrides,
+      virtual StrongActorPtr VCreateActor( const Resource& actorRes,
                                            TransformPtr pTransform,
                                            ActorId serversActorId ) = 0;
-      virtual StrongActorPtr VCreateActorFromClass( const char* classFilePath,
+      virtual StrongActorPtr VCreateActorFromOverrides( const Resource& overridesRes,
+                                           TransformPtr pTransform,
+                                           ActorId serversActorId ) = 0;
+      virtual StrongActorPtr VCreateActorFromClass( const Resource& actorClassRes,
                                                         TransformPtr pTransform,
                                                         ActorId serversActorId ) = 0;
       virtual void VDestroyActor( ActorId actorId ) = 0;
@@ -125,6 +130,7 @@ class IEngineLogic
       virtual void VSetIsSimulating( bool isOn ) = 0;
       virtual void VGameStart( void ) = 0;
       virtual void VSaveAllActors() = 0;
+      virtual void VSaveActor( ActorId id ) = 0;
    };
 
 typedef std::list<shared_ptr<IView> > ViewList;

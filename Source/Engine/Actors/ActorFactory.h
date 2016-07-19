@@ -21,7 +21,7 @@ class ActorFactory
    public:
       ActorFactory( void );
       StrongActorPtr CreateActor( const Resource& classRes,
-                                  Resource* pOverridesRes,
+                                  const Resource* pOverridesRes,
                                   TransformPtr pInitialTransform = NULL, 
                                   ActorId serversActorId = INVALID_ACTOR_ID );
       bool ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides );

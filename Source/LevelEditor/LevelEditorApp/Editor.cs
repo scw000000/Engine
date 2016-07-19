@@ -34,7 +34,7 @@ namespace LevelEditorApp
       private const int m_MaxTabSize = 100;
       private const int m_MinTabSize = 50;
 
-      private string m_AssetsDirectory;
+      public string m_AssetsDirectory;
       private string m_CurrentDirectory;
       private string m_ProjectDirectory;
 
@@ -51,7 +51,7 @@ namespace LevelEditorApp
          InitializeComponent();
          this.WindowState = FormWindowState.Maximized;
          m_CurrentDirectory = Directory.GetCurrentDirectory();
-         m_AssetsDirectory = m_CurrentDirectory + "\\Assets";
+         m_AssetsDirectory = m_CurrentDirectory + "\\Assets\\";
 
          m_SupportEditorPattern = new List<string>(){ "*.xml", 
                                                 "*.fragmentshader", 

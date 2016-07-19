@@ -36,12 +36,12 @@ void EditorLogic::VOnFileDrop( const char* filePath, const Point& dropLocation )
       pTransform->SetPosition( projEnd );
       if( !std::strcmp( rootName.c_str(), "ActorClass" ) )
          {
-         VCreateActorFromClass( fileRes.m_Name.c_str(), pTransform );
+         VCreateActor( fileRes, pTransform );
 
          }
       else if( !std::strcmp( rootName.c_str(), "ActorOverrides" ) )
          {
-         VCreateActorFromOverrides( fileRes.m_Name.c_str(), pTransform );
+         VCreateActor( fileRes, pTransform );
          }
       else if( !std::strcmp( rootName.c_str(), "World" ) )
          {
@@ -55,14 +55,33 @@ void EditorLogic::VSaveAllActors()
    {
    for( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
       {
-      TiXmlElement* pResource = XmlResourceLoader::LoadAndReturnRootXmlElement( *it->second->m_pActorClassResource );
-      TiXmlElement* pOverrides = it->second->GenerateOverridesXML( pResource );
+      VSaveActor( it->first );
+      //TiXmlElement* pResource = XmlResourceLoader::LoadAndReturnRootXmlElement( *it->second->m_pActorClassResource );
+      //TiXmlElement* pOverrides = it->second->GenerateOverridesXML( pResource );
 
-      if( it->second->m_pOverridesResource ) // this actor is not drag-drop generated
-         {
-         XMLHelper::WriteXMLToFile( ( std::string( "Assets\\" ) + it->second->m_pOverridesResource->m_Name ).c_str(), pOverrides );
-         }
+      //if( it->second->m_pOverridesResource ) // this actor is not drag-drop generated
+      //   {
+      //   XMLHelper::WriteXMLToFile( ( std::string( "Assets\\" ) + it->second->m_pOverridesResource->m_Name ).c_str(), pOverrides );
+      //   }
+      }
+   }
 
+void EditorLogic::VSaveActor( ActorId id )
+   {
+   auto actorIt = m_Actors.find( id );
+   if( actorIt == m_Actors.end() )
+      {
+      return;
+      }
+   TiXmlElement* pResource = XmlResourceLoader::LoadAndReturnRootXmlElement( *actorIt->second->m_pActorClassResource );
+   TiXmlElement* pOverrides = actorIt->second->GenerateOverridesXML( pResource );
+
+   if( actorIt->second->m_pOverridesResource ) // this actor is not drag-drop generated
+      {
+      XMLHelper::WriteXMLToFile( ( std::string( "Assets\\" ) + actorIt->second->m_pOverridesResource->m_Name ).c_str(), pOverrides );
+      }
+   else
+      {
       
       }
    }

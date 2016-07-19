@@ -1,4 +1,4 @@
-<ActorClass>
+<ActorOverrides>
     <Data>
         <ActorClassResource path="actors\sky.xml" />
     </Data>
@@ -13,4 +13,4 @@
             <Texture />
         </Data>
     </SkyRenderComponent>
-</ActorClass>
+</ActorOverrides>

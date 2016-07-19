@@ -25,7 +25,7 @@ ActorFactory::ActorFactory( void )
 
 // This version of function is different than the source code
 // Including function arguments LATER: modify it and let it consistant
-StrongActorPtr ActorFactory::CreateActor( const Resource& classRes, Resource* pOverridesRes, TransformPtr pInitialTransform, ActorId serversActorId )
+StrongActorPtr ActorFactory::CreateActor( const Resource& classRes, const Resource* pOverridesRes, TransformPtr pInitialTransform /*= NULL*/, ActorId serversActorId /*= INVALID_ACTOR_ID */ )
    {  
    TiXmlElement* pActorClassNode = XmlResourceLoader::LoadAndReturnRootXmlElement( classRes );
    

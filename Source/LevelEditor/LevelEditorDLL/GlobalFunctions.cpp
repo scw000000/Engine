@@ -64,6 +64,20 @@ void Shutdown( void )
    Logger::Destroy();
    }
 
+ActorId CreateActor( BSTR classFilePath )
+   {
+   std::string classFile = ws2s( std::wstring( classFilePath, SysStringLen( classFilePath ) ) );
+   g_pApp->SetWindowFocus();
+   Resource classRes( classFile );
+   TransformPtr pTransform( g_pApp->m_pEngineLogic->m_pWrold->GetCamera()->VGetProperties().GetTransformPtr() );
+   Vec3 projStart;
+   Vec3 projEnd;
+   g_pApp->m_pEngineLogic->m_pWrold->GetCamera()->GetScreenProjectPoint( projStart, projEnd, g_pApp->GetMousePosition(), 17.f );
+   pTransform->SetPosition( projEnd );
+   auto actorPtr = g_pApp->m_pEngineLogic->VCreateActor( classFile, pTransform );
+   return actorPtr ? actorPtr->GetId(): INVALID_ACTOR_ID;
+   }
+
 
 //   FUTURE WORK: This should return a bool specifying if the level was successfully opened.
 //
@@ -194,6 +208,11 @@ void StopEngine( void )
 void SaveAllActors( void )
    {
    g_pApp->m_pEngineLogic->VSaveAllActors();
+   }
+
+void SaveActor( ActorId actorId )
+   {
+   g_pApp->m_pEngineLogic->VSaveActor( actorId );
    }
 
 //int GetLevelScriptAdditionsXmlSize()

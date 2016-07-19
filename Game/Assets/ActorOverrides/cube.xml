@@ -1,11 +1,11 @@
-<ActorClass>
+<ActorOverrides>
     <Data>
         <ActorClassResource path="actors\cube.xml" />
     </Data>
     <MeshRenderComponent>
         <Data>
             <Transform>
-                <Position />
+                <Position x="3.140000" y="5.000000" />
                 <PitchYawRoll />
                 <Scale />
             </Transform>
@@ -29,4 +29,4 @@
             </Data>
         </LightRenderComponent>
     </MeshRenderComponent>
-</ActorClass>
+</ActorOverrides>

@@ -117,10 +117,40 @@ void BaseEngineLogic::VAddView( shared_ptr<IView> pView )
 	pView->VOnRestore(); 
    }
 
-StrongActorPtr BaseEngineLogic::VCreateActorFromOverrides( const char* overrides, TransformPtr pTransform, ActorId serversActorId )
+StrongActorPtr BaseEngineLogic::VCreateActor( const Resource& actorRes, TransformPtr pTransform, ActorId serversActorId )
    {
    ENG_ASSERT( m_pActorFactory );
-   Resource overridesRes( overrides );
+   Resource actorClassRes = actorRes;
+   const Resource* pActorOverridesRes = NULL;
+   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( actorRes );
+   std::string rootName = pRoot->Value();
+
+   if( !std::strcmp( rootName.c_str(), "ActorOverrides" ) ) // If this file is overrides file, find the actor class res
+      {
+      TiXmlHandle actorClassResHandle = XmlResourceLoader::LoadAndReturnRootXmlElement( actorRes );
+      TiXmlElement* pActorClassReshNode = actorClassResHandle.FirstChild( "Data" ).FirstChild( "ActorClassResource" ).ToElement();
+      ENG_ASSERT( pActorClassReshNode );
+      actorClassRes = Resource( pActorClassReshNode->Attribute( "path" ) );
+      pActorOverridesRes = &actorRes;
+      }
+
+   StrongActorPtr pActor = m_pActorFactory->CreateActor( actorClassRes, pActorOverridesRes, pTransform );
+   if( pActor )
+       {
+       // Insert into actor map
+       m_Actors.insert( std::make_pair( pActor->GetId(), pActor ) );
+       return pActor;
+       }
+    else
+       {
+       // FUTURE WORK: Log error: couldn't create actor
+       return StrongActorPtr();
+       }
+   }
+
+StrongActorPtr BaseEngineLogic::VCreateActorFromOverrides( const Resource& overridesRes, TransformPtr pTransform /*= NULL*/, ActorId serversActorId /*= INVALID_ACTOR_ID */ )
+   {
+   ENG_ASSERT( m_pActorFactory );
    TiXmlHandle actorClassResHandle = XmlResourceLoader::LoadAndReturnRootXmlElement( overridesRes );
    TiXmlElement* pActorClassReshNode = actorClassResHandle.FirstChild( "Data" ).FirstChild( "ActorClassResource" ).ToElement();
    ENG_ASSERT( pActorClassReshNode );
@@ -140,12 +170,9 @@ StrongActorPtr BaseEngineLogic::VCreateActorFromOverrides( const char* overrides
       }
    }
 
-StrongActorPtr BaseEngineLogic::VCreateActorFromClass( const char* classFilePath, TransformPtr pTransform, ActorId serversActorId )
+StrongActorPtr BaseEngineLogic::VCreateActorFromClass( const Resource& actorClassRes, TransformPtr pTransform /*= NULL*/, ActorId serversActorId /*= INVALID_ACTOR_ID */ )
    {
    ENG_ASSERT( m_pActorFactory );
-
-   Resource actorClassRes( classFilePath );
-
    StrongActorPtr pActor = m_pActorFactory->CreateActor( actorClassRes, NULL, pTransform );
    if( pActor )
       {
@@ -324,11 +351,13 @@ bool BaseEngineLogic::VLoadLevel( const std::string& levelResource )
       {
       for ( TiXmlElement* pNode = pActorsNode->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
          {
-         const char* actorResource = pNode->Attribute( "actoroverridsresource" );
-
-			StrongActorPtr pActor = VCreateActorFromOverrides( actorResource );
+         std::string overridesPath = pNode->Attribute( "actoroverridsresource" );
+         Resource overridesResource( overridesPath );
+         StrongActorPtr pActor = VCreateActor( overridesResource );
+       //  StrongActorPtr pActor = VCreateActorFromOverrides( overridesResource );
 			if ( pActor )
 			   {
+            //std::cout << XMLHelper::WriteXMLToString( pActor->GenerateXML() ).c_str() << std::endl;
 				// fire an event letting everyone else know that we created a new actor
 			//	shared_ptr<EvtData_New_Actor> pNewActorEvent( ENG_NEW EvtData_New_Actor(pActor->GetId()));
 			//	IEventManager::Get()->VQueueEvent(pNewActorEvent);

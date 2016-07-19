@@ -147,6 +147,7 @@ TiXmlElement* Actor::GenerateOverridesXML( TiXmlElement* pResource )
 
    TiXmlElement* actorRes = pRet->FirstChildElement( "Data" )->FirstChildElement( "ActorClassResource" );
    actorRes->SetAttribute( "path", m_pActorClassResource->m_Name.c_str() );
+   pRet->SetValue( "ActorOverrides" );
    return pRet;
 
    //// Actor element

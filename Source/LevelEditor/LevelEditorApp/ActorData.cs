@@ -11,9 +11,9 @@ namespace LevelEditorApp
       private bool m_IsDirty;
       private uint m_ActorId;
 
-      public ActorData( string data, uint actorId ) 
+      public ActorData( string data, uint actorId, bool isDirty ) 
          {
-         m_IsDirty = false;
+         m_IsDirty = isDirty;
          m_Data = data;
          m_ActorId = actorId;
          }

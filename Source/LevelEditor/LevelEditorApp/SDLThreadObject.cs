@@ -129,7 +129,7 @@ namespace LevelEditorApp
 
             if( !m_ActorData.ContainsKey( m_SelectedActorId ) ) // never clicked before, must also never be modified
                {
-               m_ActorData.Add( m_SelectedActorId, new ActorData( actorXml, m_SelectedActorId ) );
+               m_ActorData.Add( m_SelectedActorId, new ActorData( actorXml, m_SelectedActorId, false ) );
                }
             
             Program.s_Editor.BeginInvoke( Program.s_Editor.m_SetActorDataStringDelegate, actorXml );
@@ -216,7 +216,7 @@ namespace LevelEditorApp
             uint newActorId = NativeMethods.CreateActor( filePath );
             if( newActorId != INVALID_ACTOR_ID )
                {
-               m_ActorData.Add( newActorId, new ActorData( GetActorXml( newActorId ), newActorId ) );
+               m_ActorData.Add( newActorId, new ActorData( GetActorXml( newActorId ), newActorId, true ) );
                }
             }
          else if( rootNodeName.Equals( "World" ) )

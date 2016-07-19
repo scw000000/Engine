@@ -16,6 +16,7 @@
 #include "EditorLogic.h"
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Utilities\XMLHelper.h"
+#include <sstream>  
 
 EditorLogic::EditorLogic( shared_ptr<IRenderer> pRenderer ) : BaseEngineLogic( pRenderer )
    {
@@ -56,13 +57,6 @@ void EditorLogic::VSaveAllActors()
    for( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
       {
       VSaveActor( it->first );
-      //TiXmlElement* pResource = XmlResourceLoader::LoadAndReturnRootXmlElement( *it->second->m_pActorClassResource );
-      //TiXmlElement* pOverrides = it->second->GenerateOverridesXML( pResource );
-
-      //if( it->second->m_pOverridesResource ) // this actor is not drag-drop generated
-      //   {
-      //   XMLHelper::WriteXMLToFile( ( std::string( "Assets\\" ) + it->second->m_pOverridesResource->m_Name ).c_str(), pOverrides );
-      //   }
       }
    }
 
@@ -82,6 +76,9 @@ void EditorLogic::VSaveActor( ActorId id )
       }
    else
       {
-      
+      std::string fileName = actorIt->second->m_pActorClassResource->GetFileName();
+      std::stringstream ss;
+      ss << "Assets\\ActorOverrides\\" << fileName.substr( 0, fileName.find_last_of( "." ) ) << actorIt->second->GetId() << ".xml";
+      XMLHelper::WriteXMLToFile( ss.str().c_str(), pOverrides );
       }
    }

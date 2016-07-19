@@ -41,7 +41,10 @@ namespace LevelEditorApp
       public static extern void StartAndResumeEngine();
 
       [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]
-      public static extern void ReInitWorld();
+      public static extern void StopEngine();
+
+      [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]
+      public static extern void SaveAllActors();
 
       [DllImport( "coredll.dll" )]
       public static extern bool SetForegroundWindow( IntPtr hWnd );

@@ -21,6 +21,7 @@ class Actor
    {
    friend class ActorFactory;
    friend class BaseEngineLogic;
+   friend class EditorLogic;
  //  typedef std::map< ComponentId, StrongActorComponentPtr > ActorComponents;
    typedef std::map< ActorComponentId, StrongActorComponentPtr > ActorComponents;
 
@@ -36,7 +37,7 @@ class Actor
       TiXmlElement* BuildComponentXML( StrongActorComponentPtr pComponent );
       TiXmlElement* GenerateXML( void );
       TiXmlElement* BuildOverridesXML( StrongActorComponentPtr pComponent, TiXmlElement* pResouce );
-      TiXmlElement* GenerateOverridesXML( TiXmlElement* pResouce );
+      TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
 
       ActorId GetId( void ) const { return m_Id; }
       TransformPtr GetTransformPtr( void );

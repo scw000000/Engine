@@ -64,6 +64,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ActorData.cs" />
     <Compile Include="DllRedirectThreadObject.cs" />
     <Compile Include="EditorTextBox.cs">
       <SubType>Component</SubType>

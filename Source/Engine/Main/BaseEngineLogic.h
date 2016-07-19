@@ -19,16 +19,12 @@
 
 class ActorFactory;
 
-enum BaseGameState
+enum BaseEngineState
    {
-   BGS_Invalid,
-	BGS_Initializing,
-	BGS_MainMenu,
-	BGS_WaitingForPlayers,
-	BGS_LoadingGameEnvironment,
-	BGS_WaitingForPlayersToLoadEnvironment,
-	BGS_SpawningPlayersActors,
-	BGS_Running
+   BES_Invalid,
+   BES_Ready,
+   BES_Pause,
+   BES_Running
    };
 
 typedef std::string Level;
@@ -98,11 +94,11 @@ class BaseEngineLogic : public IEngineLogic
 
       void AttachProcess(StrongProcessPtr pProcess) { if (m_pProcessManager) {m_pProcessManager->AttachProcess(pProcess);} }
       virtual void VClearWorld( void ) override;
-      virtual void VSetIsRunning( bool isOn ) override;
-      virtual bool VGetIsRunning( void ) const override { return m_IsRunning; }
+      virtual void VStartAndPause( void ) override;
+      virtual void VStop( void ) override;
+      virtual void VSetIsSimulating( bool isOn ) override;
       virtual void VGameStart( void ) override;
-      virtual bool VGetHasStarted( void ) const override { return m_HasStarted; };
-      virtual void ReInitWorld( void ) override;
+      virtual void VSaveAllActors() override {};
 
    public:
       shared_ptr<Scene> m_pWrold;
@@ -110,7 +106,9 @@ class BaseEngineLogic : public IEngineLogic
       LevelManager* m_pLevelManager;
 
    protected: 
-	   
+      void ReInitWorld( void );
+      void SetNextEngineState( BaseEngineState nxtState );
+
    protected:
 	   ActorId m_LastActorId;
 	   ActorMap m_Actors;
@@ -123,10 +121,9 @@ class BaseEngineLogic : public IEngineLogic
       bool m_EnableWorldUpdate;
       bool m_RenderDiagnostics;
       bool m_HasStarted;
-      bool m_IsRunning;
       float m_Lifetime;
       shared_ptr<IRenderer> m_pRenderer;
-     
+      BaseEngineState m_EngineState;
 
    };
 

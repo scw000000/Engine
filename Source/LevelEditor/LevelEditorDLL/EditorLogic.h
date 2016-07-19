@@ -18,5 +18,5 @@ class EditorLogic : public BaseEngineLogic
    public:
       EditorLogic( shared_ptr<IRenderer> pRenderer );
       virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) override;
-   
+      virtual void VSaveAllActors() override;
    };

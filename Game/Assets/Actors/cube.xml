@@ -18,14 +18,6 @@
                 <Ambient r="0.200000" g="0.200000" b="0.200000" a="1.000000" />
             </Material>
 			
-			<PhysicsAttributes>
-				<Movement active="yes">
-                    <Translate x="1.000000" y="1.000000" z="1.000000" />
-                    <Rotate x="1.000000" y="1.000000" z="1.000000" />
-                    <Collision density="air" material="None" collisiongroup="mesh" />
-                </Movement>
-			</PhysicsAttributes>
-			
         </Data>
         <LightRenderComponent>
             <Data>

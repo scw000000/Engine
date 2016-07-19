@@ -40,7 +40,6 @@ namespace LevelEditorApp
 
       private List<String> m_SupportEditorPattern;
 
-
       [System.Runtime.InteropServices.DllImport( "Kernel32.dll", SetLastError = true )]
       public static extern int SetStdHandle( int device, IntPtr handle );
 
@@ -253,7 +252,13 @@ namespace LevelEditorApp
 
       private void sTOPToolStripMenuItem_Click( object sender, EventArgs e )
          {
-         m_SDLThreadWorker.ReInitWorld();
+         m_SDLThreadWorker.StopEngine();
+         }
+
+      private void sAVEALLToolStripMenuItem_Click( object sender, EventArgs e )
+         {
+         m_SDLThreadWorker.StopEngine();
+         m_SDLThreadWorker.SaveAllActors();
          }
 
       }

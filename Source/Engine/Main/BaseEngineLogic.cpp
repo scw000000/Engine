@@ -44,7 +44,6 @@ BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer ) : m_pGUIMana
    m_Lifetime = 0.f;
    m_LastActorId = 0;
    m_HasStarted = false;
-   m_IsRunning = false;
 	m_pProcessManager = ENG_NEW ProcessManager;
    if( pRenderer )
       {
@@ -56,6 +55,7 @@ BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer ) : m_pGUIMana
    m_EnableActorUpdate = true;
    m_EnableWorldUpdate = true;
    m_RenderDiagnostics = true;
+   m_EngineState = BES_Invalid;
    }
 
 BaseEngineLogic::~BaseEngineLogic()
@@ -71,6 +71,9 @@ BaseEngineLogic::~BaseEngineLogic()
     // destroy all actors
    for ( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
       {
+      shared_ptr< Resource > m_pActorClassResource; // actor class XML file name
+      shared_ptr< Resource > m_pOverridesResource;
+
       TiXmlElement* pResource = it->second->GenerateXML();
       TiXmlElement* pOverrides = it->second->GenerateOverridesXML( pResource );
       SAFE_DELETE( pResource );
@@ -101,7 +104,7 @@ bool BaseEngineLogic::Init()
 
    shared_ptr<IView> pView( ENG_NEW HumanView( ) );
    VAddView( pView );
-
+   SetNextEngineState( BES_Ready );
    return true;  
    }
 
@@ -360,7 +363,7 @@ bool BaseEngineLogic::VLoadLevel( const std::string& levelResource )
 
 void BaseEngineLogic::VClearWorld( void )
    {
-   VSetIsRunning( false );
+   VSetIsSimulating( false );
    m_HasStarted = false;
    for( auto it = m_Actors.begin(); it != m_Actors.end(); )
       {
@@ -371,16 +374,55 @@ void BaseEngineLogic::VClearWorld( void )
    m_Actors.clear();
    }
 
-void BaseEngineLogic::VSetIsRunning( bool isOn )
+void BaseEngineLogic::VStartAndPause( void ) 
    {
-   m_IsRunning = isOn;
+   switch( m_EngineState )
+      {
+      case BES_Invalid:
+         break;
+      case BES_Ready:
+         SetNextEngineState( BES_Running );
+         VGameStart();
+         VSetIsSimulating( true );
+         break;
+      case BES_Running:
+         SetNextEngineState( BES_Pause );
+         VSetIsSimulating( false );
+         break;
+      case BES_Pause:
+         SetNextEngineState( BES_Running );
+         VSetIsSimulating( true );
+         break;
+      };
+   }
+
+void BaseEngineLogic::VStop( void ) 
+   {
+   switch( m_EngineState )
+      {
+      case BES_Invalid:
+         break;
+      case BES_Ready:
+         break;
+      case BES_Running:
+      case BES_Pause:
+         SetNextEngineState( BES_Ready );
+         VSetIsSimulating( false );
+         ReInitWorld();
+         break;
+      };
+   }
+
+void BaseEngineLogic::VSetIsSimulating( bool isOn )
+   {
+
    IGamePhysics::GetSingleton().VSetSimulation( isOn );
    }
 
 void BaseEngineLogic::VGameStart( void )
    {
-   m_HasStarted = true;
-   VSetIsRunning( true );
+   //TODO: send game start event
+   
    }
 
 void BaseEngineLogic::ReInitWorld( void )
@@ -449,3 +491,7 @@ void BaseEngineLogic::ReInitWorld( void )
    //return true;
    }
 
+void BaseEngineLogic::SetNextEngineState( BaseEngineState nxtState )
+   {
+   m_EngineState = nxtState;
+   }

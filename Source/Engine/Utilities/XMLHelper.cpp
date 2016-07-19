@@ -49,8 +49,6 @@ void XMLHelper::GenerateOverride( TiXmlElement* pRetNode, TiXmlElement* pResNode
    while( retAttr && resAttr )
       {
       ENG_ASSERT( !std::strcmp( retAttr->Name(), resAttr->Name() ) );
-      std::cout << retAttr->Name() << std::endl;
-      std::cout << retAttr->Value() << std::endl;
       if( !std::strcmp( retAttr->Value(), resAttr->Value() ) )
          {
          std::string removeName = retAttr->Name();
@@ -77,7 +75,6 @@ void XMLHelper::WriteXMLToFile( const char* fileName, TiXmlElement* pData )
    TiXmlDocument doc;
    doc.LinkEndChild( pData );
    doc.SaveFile( fileName );
-   //doc.Clear();
    }
 
 std::string XMLHelper::WriteXMLToString( TiXmlElement* pData )

@@ -56,6 +56,7 @@ namespace LevelEditorApp
          this.menuStrip1 = new System.Windows.Forms.MenuStrip();
          this.startPauseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          this.sTOPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+         this.sAVEALLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
          ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
          this.splitContainer1.Panel1.SuspendLayout();
          this.splitContainer1.Panel2.SuspendLayout();
@@ -395,7 +396,6 @@ namespace LevelEditorApp
          this.xmlControl_ActorXML.Name = "xmlControl_ActorXML";
          this.xmlControl_ActorXML.Size = new System.Drawing.Size(150, 599);
          this.xmlControl_ActorXML.TabIndex = 0;
-         this.xmlControl_ActorXML.ViewMode = LevelEditorApp.XMLControl.VIEW_MODE.TABLE;
          // 
          // fIleToolStripMenuItem
          // 
@@ -416,7 +416,8 @@ namespace LevelEditorApp
             this.fIleToolStripMenuItem,
             this.eDITToolStripMenuItem,
             this.startPauseToolStripMenuItem,
-            this.sTOPToolStripMenuItem});
+            this.sTOPToolStripMenuItem,
+            this.sAVEALLToolStripMenuItem});
          this.menuStrip1.Location = new System.Drawing.Point(0, 0);
          this.menuStrip1.Name = "menuStrip1";
          this.menuStrip1.Size = new System.Drawing.Size(1912, 24);
@@ -436,6 +437,13 @@ namespace LevelEditorApp
          this.sTOPToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
          this.sTOPToolStripMenuItem.Text = "STOP";
          this.sTOPToolStripMenuItem.Click += new System.EventHandler(this.sTOPToolStripMenuItem_Click);
+         // 
+         // sAVEALLToolStripMenuItem
+         // 
+         this.sAVEALLToolStripMenuItem.Name = "sAVEALLToolStripMenuItem";
+         this.sAVEALLToolStripMenuItem.Size = new System.Drawing.Size(71, 20);
+         this.sAVEALLToolStripMenuItem.Text = "SAVE ALL";
+         this.sAVEALLToolStripMenuItem.Click += new System.EventHandler(this.sAVEALLToolStripMenuItem_Click);
          // 
          // Editor
          // 
@@ -516,6 +524,7 @@ namespace LevelEditorApp
         private MenuStrip menuStrip1;
         private ToolStripMenuItem startPauseToolStripMenuItem;
         private ToolStripMenuItem sTOPToolStripMenuItem;
+        private ToolStripMenuItem sAVEALLToolStripMenuItem;
     }
 }
 

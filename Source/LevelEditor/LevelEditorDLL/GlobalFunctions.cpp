@@ -183,19 +183,17 @@ void DestroyActor( ActorId actorId )
 
 void StartAndResumeEngine( void )
    {
-   if( g_pApp->m_pEngineLogic->VGetHasStarted() )
-      {
-      g_pApp->m_pEngineLogic->VSetIsRunning( !g_pApp->m_pEngineLogic->VGetIsRunning() );
-      }
-   else
-      {
-      g_pApp->m_pEngineLogic->VGameStart();
-      }
+   g_pApp->m_pEngineLogic->VStartAndPause();
    }
 
-void ReInitWorld( void )
+void StopEngine( void )
    {
-   g_pApp->m_pEngineLogic->ReInitWorld();
+   g_pApp->m_pEngineLogic->VStop();
+   }
+
+void SaveAllActors( void )
+   {
+   g_pApp->m_pEngineLogic->VSaveAllActors();
    }
 
 //int GetLevelScriptAdditionsXmlSize()

@@ -140,10 +140,11 @@ TiXmlElement* Actor::BuildOverridesXML( StrongActorComponentPtr pComponent, TiXm
    return pCurrLevelNode;
    }
 
-TiXmlElement* Actor::GenerateOverridesXML( TiXmlElement* pResouce )
+TiXmlElement* Actor::GenerateOverridesXML( TiXmlElement* pResource )
    {
    TiXmlElement* pRet = GenerateXML();
-   XMLHelper::GenerateOverride( pRet, pResouce );
+   XMLHelper::GenerateOverride( pRet, pResource );
+
    TiXmlElement* actorRes = pRet->FirstChildElement( "Data" )->FirstChildElement( "ActorClassResource" );
    actorRes->SetAttribute( "path", m_pActorClassResource->m_Name.c_str() );
    return pRet;

@@ -120,11 +120,11 @@ class IEngineLogic
       virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) = 0;
       virtual void VRenderDiagnostics( void ) const = 0;
       virtual void VClearWorld( void ) = 0;
-      virtual void VSetIsRunning( bool isOn ) = 0;
-      virtual bool VGetIsRunning( void ) const = 0;
+      virtual void VStartAndPause( void ) = 0;
+      virtual void VStop( void ) = 0;
+      virtual void VSetIsSimulating( bool isOn ) = 0;
       virtual void VGameStart( void ) = 0;
-      virtual bool VGetHasStarted( void ) const = 0;
-      virtual void ReInitWorld( void ) = 0;
+      virtual void VSaveAllActors() = 0;
    };
 
 typedef std::list<shared_ptr<IView> > ViewList;

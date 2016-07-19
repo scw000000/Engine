@@ -29,13 +29,6 @@ bool LightProperties::Init( TiXmlElement* pData )
       {
       return false;
       }
-   
-   //TiXmlElement* pDiffuseNode = pData->FirstChildElement( "Diffuse" );
-   //if( pDiffuseNode )
-   //   {
-   //   
-   //  // m_Diffuse = BaseRenderComponent::LoadColor( pDiffuseNode );
-   //   }
    if( TIXML_SUCCESS != pData->QueryFloatAttribute( "power", &m_Power ) )
       {
       return false;

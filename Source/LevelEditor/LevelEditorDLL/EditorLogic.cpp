@@ -15,6 +15,7 @@
 #include "EditorStd.h"
 #include "EditorLogic.h"
 #include "..\ResourceCache\XmlResource.h"
+#include "..\Utilities\XMLHelper.h"
 
 EditorLogic::EditorLogic( shared_ptr<IRenderer> pRenderer ) : BaseEngineLogic( pRenderer )
    {
@@ -47,5 +48,21 @@ void EditorLogic::VOnFileDrop( const char* filePath, const Point& dropLocation )
          VClearWorld();
          VLoadLevel( fileRes.m_Name.c_str() );
          }
+      }
+   }
+
+void EditorLogic::VSaveAllActors() 
+   {
+   for( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
+      {
+      TiXmlElement* pResource = XmlResourceLoader::LoadAndReturnRootXmlElement( *it->second->m_pActorClassResource );
+      TiXmlElement* pOverrides = it->second->GenerateOverridesXML( pResource );
+
+      if( it->second->m_pOverridesResource ) // this actor is not drag-drop generated
+         {
+         XMLHelper::WriteXMLToFile( ( std::string( "Assets\\" ) + it->second->m_pOverridesResource->m_Name ).c_str(), pOverrides );
+         }
+
+      
       }
    }

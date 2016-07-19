@@ -16,26 +16,11 @@ namespace LevelEditorApp
       public XMLControl()
          {
          InitializeComponent();
-         SetViewMode( VIEW_MODE.TABLE );
          }
       private bool m_bGridViewModeReadError = false;
       private DataSet m_DataSet;
       private TextReader m_TextReader;
-      private string m_DataString;
-      //private List<System.Windows.Forms.DataGridView> m_XMLGridViews;
-      public enum VIEW_MODE { XML, TABLE }
-      public VIEW_MODE ViewMode
-         {
-         get
-            {
-            return ( !this.xmlPanel.Visible ? VIEW_MODE.XML : VIEW_MODE.TABLE );
-            }
-         set
-            {
-            SetViewMode( value );
-            }
-         }
-
+     
       private string m_sDataFilePath = string.Empty;
       public string DataFilePath
          {
@@ -51,6 +36,7 @@ namespace LevelEditorApp
             }
          }
 
+      private string m_DataString;
       public string DataString 
          {
          get 
@@ -71,32 +57,26 @@ namespace LevelEditorApp
          get { return m_nDataTableCount; }
          }
 
-      private void SetViewMode( VIEW_MODE mode )
-         {
-         if( m_bGridViewModeReadError == true )
-            {
-            mode = VIEW_MODE.XML;
-            }
-
-         if( mode == VIEW_MODE.XML )
-            {
-            xmlPanel.Visible = false;
-            }
-         else
-            {
-            xmlPanel.Visible = true;
-            }
-         }
-
       private void LoadDataSet() 
          {
+         DataSet newDataset = new DataSet();
          // Creates a DataSet and loads it with the xml content
-         m_DataSet = new DataSet();
-         m_DataSet.ReadXml( m_TextReader );
+         newDataset.ReadXml( m_TextReader );
+         bool isSameStructure = ( m_DataSet == null)? false: IsSameDataSetStructure( newDataset );
+         m_DataSet = newDataset;
+         if( !isSameStructure )
+            {
+            GenerateXMLTreeView();
+            GenerateXMLGridView();
+            }
          ///m_DataSet.ReadXml( m_sDataFilePath, XmlReadMode.Auto );
          m_nDataTableCount = m_DataSet.Tables.Count;
+         }
+
+      private void ReGenerateView() 
+         {
          GenerateXMLTreeView();
-         GenerateXMLGrieView();
+         GenerateXMLGridView();
          }
 
       private void LoadDataFile()
@@ -108,14 +88,11 @@ namespace LevelEditorApp
             try
                {
                DataString = File.ReadAllText( m_sDataFilePath );
-               //m_TextReader = new StreamReader( m_sDataFilePath );
-               //LoadDataSet();
                }
             catch( Exception e )
                {
                m_bGridViewModeReadError = true;
                m_nDataTableCount = 0;
-               SetViewMode( VIEW_MODE.XML );
                MessageBox.Show( "Error: " + e.ToString() );
                }
             }
@@ -135,17 +112,16 @@ namespace LevelEditorApp
                {
                m_TextReader = new StringReader( m_DataString );
                LoadDataSet();
+               ReGenerateView();
                }
             catch( Exception e )
                {
                m_bGridViewModeReadError = true;
                m_nDataTableCount = 0;
-               SetViewMode( VIEW_MODE.XML );
                MessageBox.Show( "Error: " + e.ToString() );
                }
             }
          }
-
       private void addTreeNode( XmlNode xmlNode, TreeNode treeNode )
          {
          XmlNode xNode;
@@ -314,7 +290,7 @@ namespace LevelEditorApp
          Program.s_Editor.m_SDLThreadWorker.ModifyActor( m_DataString );
          }
 
-      private void GenerateXMLGrieView()
+      private void GenerateXMLGridView()
          {
          this.xmlPanel.AutoScroll = true;
          this.xmlPanel.AutoSize = true;
@@ -486,20 +462,44 @@ namespace LevelEditorApp
 
             //   }
             }
-
-
          }
 
-      private void button1_MouseClick( object sender, MouseEventArgs e )
+      private bool IsSameDataSetStructure( DataSet other )
          {
-         if( ViewMode == VIEW_MODE.XML )
+         if( m_DataSet.Tables.Count != other.Tables.Count )
             {
-            SetViewMode( VIEW_MODE.TABLE );
+            return false;
             }
-         else
+         for( int table = 0; table < m_DataSet.Tables.Count; ++table )
             {
-            SetViewMode( VIEW_MODE.XML );
+            if( !m_DataSet.Tables[table].TableName.Equals( other.Tables[table].TableName ) )
+               {
+               return false;
+               }
+            if( m_DataSet.Tables[table].Rows.Count != other.Tables[table].Rows.Count  )
+               {
+               return false;
+               }
+            for( int row = 0; row < m_DataSet.Tables[ table ].Rows.Count; ++row )
+               {
+               if( m_DataSet.Tables[table].Rows[ row ].Table.Columns.Count != other.Tables[table].Rows[ row ].Table.Columns.Count )
+                  {
+                  return false;
+                  }
+               for( int col = 0; col < m_DataSet.Tables[ table ].Rows[ row ].Table.Columns.Count; ++col )
+                  {
+                  if( !m_DataSet.Tables[ table ].Rows[ row ].Table.Columns[ col ].DataType.Name.Equals( other.Tables[ table ].Rows[ row ].Table.Columns[ col ].DataType.Name ) )
+                     {
+                     return false;
+                     }
+                  if( !m_DataSet.Tables[ table ].Rows[ row ].Table.Columns[ col ].ColumnName.Equals( other.Tables[ table ].Rows[ row ].Table.Columns[ col ].ColumnName ) )
+                     {
+                     return false;
+                     }
+                  }
+               }
             }
+         return true;
          }
       }
    }

@@ -35,6 +35,8 @@ namespace LevelEditorApp
       private const uint INVALID_ACTOR_ID = 0;
       private uint m_SelectedActorId = INVALID_ACTOR_ID;
 
+      private Dictionary<uint, ActorData> m_ActorData;
+
       public SDLThreadObject( IntPtr windowHandle, IntPtr tabHandle, int width, int height ) 
          {
          m_WindowHandle = windowHandle;
@@ -42,6 +44,7 @@ namespace LevelEditorApp
          m_Width = width;
          m_Height = height;
          m_ShouldLoop = true;
+         m_ActorData = new Dictionary<uint, ActorData>();
          }
 
       public void InitSDLWindow( )
@@ -84,39 +87,66 @@ namespace LevelEditorApp
          NativeMethods.StartAndResumeEngine();
          }
 
-       public delegate void myDelegate();
-       myDelegate ReInitDelegate = new myDelegate( NativeMethods.ReInitWorld );
+      public delegate void myDelegate();
+      myDelegate ReInitDelegate = new myDelegate( NativeMethods.StopEngine );
 
       
-      public void ReInitWorld() 
+      public void StopEngine() 
          {
-         NativeMethods.ReInitWorld();
+         NativeMethods.StopEngine();
+         foreach( var actorData in m_ActorData )
+            {
+            if( actorData.Value.IsDirty() )
+               {
+               ModifyActor( actorData.Key, actorData.Value.data );
+               }
+            }
          }
 
       public void ModifyActor( string actorOrerrides )
          {
-         if( m_SelectedActorId != INVALID_ACTOR_ID )
+         ModifyActor( m_SelectedActorId, actorOrerrides );
+         }
+
+      public void ModifyActor( uint acotrId, string actorOrerrides )
+         {
+         if( acotrId != INVALID_ACTOR_ID )
             {
-            NativeMethods.ModifyActor( m_SelectedActorId, actorOrerrides );
+            NativeMethods.ModifyActor( acotrId, actorOrerrides );
+            m_ActorData[ acotrId ].data = actorOrerrides;
             }
          }
 
       public void PickActor()
          {
          uint selectedActorId = NativeMethods.PickActor();
-         if( selectedActorId != INVALID_ACTOR_ID && selectedActorId != m_SelectedActorId )
+         if( selectedActorId != INVALID_ACTOR_ID )
             {
             m_SelectedActorId = selectedActorId;
             uint xmlSize = NativeMethods.GetActorXmlSize( m_SelectedActorId );
             if( xmlSize == 0 )
+               {
                return;
-
+               }
             IntPtr tempArray = Marshal.AllocCoTaskMem( ( (int) xmlSize + 1 ) * sizeof( char ) );
             NativeMethods.GetActorXML( tempArray, m_SelectedActorId );
             string actorXml = Marshal.PtrToStringAnsi( tempArray );
             Marshal.FreeCoTaskMem( tempArray );
+
+            if( !m_ActorData.ContainsKey( m_SelectedActorId ) ) // never clicked before, must also never be modified
+               {
+               m_ActorData.Add( m_SelectedActorId, new ActorData( actorXml ) );
+               }
+            
             Program.s_Editor.BeginInvoke( Program.s_Editor.m_SetActorDataStringDelegate, actorXml );
             }
+         }
+
+     // myDelegate SaveDelegate = new myDelegate( NativeMethods.SaveAllActors );
+
+      public void SaveAllActors() 
+         {
+         NativeMethods.SaveAllActors();
          }
 
       public int SDLEventFilter( IntPtr userData, IntPtr sdlevent )

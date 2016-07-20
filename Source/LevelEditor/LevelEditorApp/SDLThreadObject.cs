@@ -138,12 +138,13 @@ namespace LevelEditorApp
 
      // myDelegate SaveDelegate = new myDelegate( NativeMethods.SaveAllActors );
 
-      public void SaveAllActors() 
+      public void SaveAll() 
          {
          foreach( var actorDataPair in m_ActorData )
             {
             actorDataPair.Value.SaveToFile();
             }
+         NativeMethods.SaveWorld();
          }
 
       public int SDLEventFilter( IntPtr userData, IntPtr sdlevent )

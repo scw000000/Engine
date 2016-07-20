@@ -28,3 +28,4 @@ extern "C" DllExport void StartAndResumeEngine( void );
 extern "C" DllExport void StopEngine( void );
 extern "C" DllExport void SaveAllActors( void );
 extern "C" DllExport void SaveActor( ActorId actorId );
+extern "C" DllExport void SaveWorld( void );

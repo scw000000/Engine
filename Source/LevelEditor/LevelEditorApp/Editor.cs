@@ -258,7 +258,7 @@ namespace LevelEditorApp
       private void sAVEALLToolStripMenuItem_Click( object sender, EventArgs e )
          {
          m_SDLThreadWorker.StopEngine();
-         m_SDLThreadWorker.SaveAllActors();
+         m_SDLThreadWorker.SaveAll();
          }
 
       }

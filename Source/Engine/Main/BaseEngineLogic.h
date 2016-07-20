@@ -33,14 +33,14 @@ class LevelManager
    {
    public:
       const std::vector<Level> &GetLevels( ) const { return m_Levels; }
-      Level GetCurrentLevel( ) const { return m_Levels[m_CurrentLevel]; }
+      Level GetCurrentLevel() const { return pCurrentLevelRes->m_Name; }
       void Init( const std::string& levelDir );
       void ResetCurrentLevel( void );
 
    protected:
       std::string m_LevelDirectory;
       std::vector<Level> m_Levels;
-      int m_CurrentLevel;
+      shared_ptr<Resource> pCurrentLevelRes;
    };
 
 typedef std::map<ActorId, StrongActorPtr> ActorMap;
@@ -110,6 +110,8 @@ class BaseEngineLogic : public IEngineLogic
       virtual void VGameStart( void ) override;
       virtual void VSaveAllActors() override {}
       virtual void VSaveActor( ActorId id ) override { }
+      TiXmlElement* VGenerateXML( void ) override { return NULL; };
+      virtual void VSaveWorld( void ) override {  };
 
    public:
       shared_ptr<Scene> m_pWrold;

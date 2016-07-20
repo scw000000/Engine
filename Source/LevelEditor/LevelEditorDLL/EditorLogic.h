@@ -20,4 +20,6 @@ class EditorLogic : public BaseEngineLogic
       virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) override;
       virtual void VSaveAllActors() override;
       virtual void VSaveActor( ActorId id ) override;
+      virtual TiXmlElement* VGenerateXML( void ) override;
+      virtual void VSaveWorld( void ) override;
    };

@@ -215,6 +215,11 @@ void SaveActor( ActorId actorId )
    g_pApp->m_pEngineLogic->VSaveActor( actorId );
    }
 
+void SaveWorld( void )
+   {
+   g_pApp->m_pEngineLogic->VSaveWorld();
+   }
+
 //int GetLevelScriptAdditionsXmlSize()
 //   {
 //   TiXmlDocument *optionsDoc = g_pApp->m_Options.m_pDoc;

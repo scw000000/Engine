@@ -36,7 +36,7 @@ void LevelManager::ResetCurrentLevel( void )
    {
    auto levelIt = std::find( m_Levels.begin(), m_Levels.end(), m_LevelDirectory + g_pApp->m_EngineOptions.m_Level );
    ENG_ASSERT( levelIt != m_Levels.end() );
-   m_CurrentLevel = levelIt - m_Levels.begin();
+   pCurrentLevelRes.reset( ENG_NEW Resource( *levelIt ) );
    }
 
 BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer ) : m_pGUIManager( ENG_NEW GUIManager )

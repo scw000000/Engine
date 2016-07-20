@@ -131,7 +131,9 @@ class IEngineLogic
       virtual void VGameStart( void ) = 0;
       virtual void VSaveAllActors() = 0;
       virtual void VSaveActor( ActorId id ) = 0;
-   };
+      virtual TiXmlElement* VGenerateXML( void ) = 0;
+      virtual void VSaveWorld( void ) = 0;
+   };  
 
 typedef std::list<shared_ptr<IView> > ViewList;
 

@@ -5,7 +5,7 @@
     <MeshRenderComponent>
         <Data>
             <Transform>
-                <Position />
+                <Position x="0.000000" />
                 <PitchYawRoll />
                 <Scale />
             </Transform>

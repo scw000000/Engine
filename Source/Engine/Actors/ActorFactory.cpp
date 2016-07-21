@@ -67,7 +67,7 @@ StrongActorPtr ActorFactory::CreateActor( const Resource& classRes, const Resour
    if( pOverridesRes )
       {
       TiXmlElement* pOverridesNode = XmlResourceLoader::LoadAndReturnRootXmlElement( *pOverridesRes );
-      pActor->m_pOverridesResource.reset( ENG_NEW Resource( pOverridesRes->m_Name ) );
+      pActor->m_pActorInstanceResource.reset( ENG_NEW Resource( pOverridesRes->m_Name ) );
       // Resource loading failed, return empty pointer
       if( !pOverridesNode )
          {

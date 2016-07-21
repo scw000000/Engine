@@ -79,8 +79,8 @@ int main( int argc, char *argv[] )
    Logger::Init( "logging.xml" );
 
    g_pApp->m_EngineOptions.Init( "EngineOptions.xml" );
-
-   g_pApp->InitInstance( 0, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
+   Point screenSize = g_pApp->m_EngineOptions.GetScreenSize();
+   g_pApp->InitInstance( 0, screenSize.x, screenSize.y );
    //Vec3 t1 = Vec3( 1.0f, 1.0f, 1.0f );
    //Vec3 s1 = Vec3( 41.0f, 21.0f, 51.0f );
    //Quaternion r1 = Quaternion( Vec3( 155.f, 45.f ,32.f ) );

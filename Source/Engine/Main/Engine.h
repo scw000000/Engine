@@ -37,7 +37,7 @@ class EngineApp
       virtual BaseEngineLogic* VCreateLogic();
       HWND GetHwnd( void );      
       HumanView* GetHumanView( void );
-      Point GetScreenSize( void ) const { return m_EngineOptions.m_ScreenSize; }
+      Point GetScreenSize( void ) const { return m_EngineOptions.GetScreenSize(); }
       SDL_Window* GetWindow() { return m_pWindow; }
       Uint32  GetWindowState( void );
       bool InitInstance( SDL_Window* window, int screenWidth, int screenHeight );
@@ -61,7 +61,7 @@ class EngineApp
        void ResetMousePosition( void );
 
    public:
-      struct EngineOptions m_EngineOptions;
+      EngineOptions m_EngineOptions;
       TCHAR m_saveGameDirectory[MAX_PATH];
       BaseEngineLogic *m_pEngineLogic;
       ResourceCache *m_pResCache;

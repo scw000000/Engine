@@ -28,7 +28,7 @@ EngineOptions::EngineOptions()
    m_UseDevDir = false;
    m_Renderer = "OpenGL";   
    m_Environment = Environment::Environment_Unknown;
-	m_runFullSpeed = false;
+	m_RunFullSpeed = false;
 	m_ScreenSize = Point( 1024, 768 );
 	m_pDoc = NULL;
    m_ShowMouseCursor = true;
@@ -81,7 +81,7 @@ void EngineOptions::Init( const char* xmlFileName )
 			if ( pNode->Attribute( "RunFullSpeed" ) )
 			   {
 				attribute = pNode->Attribute( "RunFullSpeed" );
-				m_runFullSpeed = ( attribute == "yes" ) ? true : false;
+				m_RunFullSpeed = ( attribute == "yes" ) ? true : false;
 			   }
 
 		   }
@@ -106,18 +106,22 @@ void EngineOptions::Init( const char* xmlFileName )
             {
             m_LevelDirectory = pNode->Attribute( "LevelDirectory" );
             }
+         if( pNode->Attribute( "ActorInstanceDirectory" ) )
+            {
+            m_ActorInstanceDirectory = pNode->Attribute( "ActorInstanceDirectory" );
+            }
          }
 
       pNode = pRoot->FirstChildElement("User"); 
       if( pNode )
          {
-         if( pNode->Attribute( "Level" ) )
-            {
-            m_Level = pNode->Attribute( "Level" );
-            }
          if( pNode->Attribute( "Layout" ) )
             {
             m_Layout = pNode->Attribute( "Layout" );
+            }
+         if( pNode->Attribute( "LevelInstanceDirectory" ) )
+            {
+            m_LevelInstanceDirectory = pNode->Attribute( "LevelInstanceDirectory" );
             }
          }
          if( pNode->Attribute( "ShowMouseCursor" ) )

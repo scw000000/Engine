@@ -49,7 +49,7 @@ int BulletDebugDrawer::getDebugMode( ) const
 
 void BulletDebugDrawer::ReadOptions( )
    {
-   TiXmlDocument *optionsDoc = g_pApp->m_EngineOptions.m_pDoc;
+   TiXmlDocument *optionsDoc = g_pApp->m_EngineOptions.GetEngineOptionDoc();
    TiXmlElement *pRoot = optionsDoc->RootElement( );
    if( !pRoot )
       return;

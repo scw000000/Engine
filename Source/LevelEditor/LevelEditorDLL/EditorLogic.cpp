@@ -41,14 +41,14 @@ void EditorLogic::VOnFileDrop( const char* filePath, const Point& dropLocation )
          VCreateActor( fileRes, pTransform );
 
          }
-      else if( !std::strcmp( rootName.c_str(), "ActorOverrides" ) )
+      else if( !std::strcmp( rootName.c_str(), "ActorInstance" ) )
          {
          VCreateActor( fileRes, pTransform );
          }
       else if( !std::strcmp( rootName.c_str(), "World" ) )
          {
          VClearWorld();
-         VLoadLevel( fileRes.m_Name.c_str() );
+        // VLoadLevel( fileRes.m_Name.c_str() );
          }
       }
    }
@@ -71,9 +71,9 @@ void EditorLogic::VSaveActor( ActorId id )
    TiXmlElement* pResource = XmlResourceLoader::LoadAndReturnRootXmlElement( *actorIt->second->m_pActorClassResource );
    TiXmlElement* pOverrides = actorIt->second->GenerateOverridesXML( pResource );
 
-   if( actorIt->second->m_pOverridesResource ) // this actor is not drag-drop generated
+   if( actorIt->second->m_pActorInstanceResource ) // this actor is not drag-drop generated
       {
-      XMLHelper::WriteXMLToFile( ( std::string( "Assets\\" ) + actorIt->second->m_pOverridesResource->m_Name ).c_str(), pOverrides );
+      XMLHelper::WriteXMLToFile( ( std::string( "Assets\\" ) + actorIt->second->m_pActorInstanceResource->m_Name ).c_str(), pOverrides );
       }
    else
       {
@@ -87,7 +87,7 @@ void EditorLogic::VSaveActor( ActorId id )
    ENG_LOG( "System", ss.str().c_str() );
    }
 
-TiXmlElement* EditorLogic::VGenerateXML(void)
+TiXmlElement* EditorLogic::VGenerateWorldXML(void)
    {
    TiXmlElement* pRet = ENG_NEW TiXmlElement( "World" );
   
@@ -96,11 +96,11 @@ TiXmlElement* EditorLogic::VGenerateXML(void)
 
    for( auto actorIt : m_Actors )
       {
-      if( actorIt.second->m_pOverridesResource )
+      if( actorIt.second->m_pActorInstanceResource )
          {
          TiXmlElement* pActor = ENG_NEW TiXmlElement( "Actor" );
          pStaicActors->LinkEndChild( pActor );
-         pActor->SetAttribute( "actoroverridsresource", actorIt.second->m_pOverridesResource->m_Name.c_str() );
+         pActor->SetAttribute( "actorinstance", actorIt.second->m_pActorInstanceResource->m_Name.c_str() );
          }
       }
    return pRet;
@@ -108,7 +108,7 @@ TiXmlElement* EditorLogic::VGenerateXML(void)
 
 void EditorLogic::VSaveWorld( void )
    {
-   TiXmlElement* pWorld = VGenerateXML();
+   TiXmlElement* pWorld = VGenerateWorldXML();
    std::stringstream ss;
    ss << "Assets\\" << m_pLevelManager->GetCurrentLevel();
    XMLHelper::WriteXMLToFile( ss.str().c_str(), pWorld );

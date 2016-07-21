@@ -39,7 +39,6 @@ bool Actor::Init( TiXmlElement* pData )
 
 	m_Type = pData->Attribute( "type" );
    m_pActorClassResource->Init( pData->FirstChildElement( "ActorClassResource" ) );
-   //m_OverridesResource.Init( pData->FirstChildElement( "OverridesResource" ) );
    unsigned int rootComponentId = 0;
    return true;
    }
@@ -147,7 +146,7 @@ TiXmlElement* Actor::GenerateOverridesXML( TiXmlElement* pResource )
 
    TiXmlElement* actorRes = pRet->FirstChildElement( "Data" )->FirstChildElement( "ActorClassResource" );
    actorRes->SetAttribute( "path", m_pActorClassResource->m_Name.c_str() );
-   pRet->SetValue( "ActorOverrides" );
+   pRet->SetValue( "ActorInstance" );
    return pRet;
 
    //// Actor element

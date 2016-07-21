@@ -45,10 +45,9 @@ int EditorMain( int *pWindow, int screenWidth, int screenHeight )
    Logger::Init( "logging.xml" );
 
    g_pApp->m_EngineOptions.Init( "EditorOptions.xml" );
-   g_pApp->m_EngineOptions.m_ScreenSize.x = screenWidth;
-   g_pApp->m_EngineOptions.m_ScreenSize.y = screenHeight;
+   g_pApp->m_EngineOptions.SetScreenSize( Point( screenWidth, screenHeight ) );
 
-   g_pApp->InitInstance( ( SDL_Window* )pWindow, g_pApp->m_EngineOptions.m_ScreenSize.x, g_pApp->m_EngineOptions.m_ScreenSize.y );
+   g_pApp->InitInstance( ( SDL_Window* ) pWindow, g_pApp->m_EngineOptions.GetScreenSize().x, g_pApp->m_EngineOptions.GetScreenSize().y );
 
    return true;
    }

@@ -1,0 +1,30 @@
+    <Data>
+        <ActorClassResource path="actors\cube.xml" />
+    </Data>
+    <MeshRenderComponent>
+        <Data>
+            <Transform>
+                <Position x="3.140000" y="5.000000" />
+                <PitchYawRoll />
+                <Scale />
+            </Transform>
+            <Mesh />
+            <Material>
+                <Texture />
+                <Diffuse />
+                <Ambient />
+            </Material>
+        </Data>
+        <LightRenderComponent>
+            <Data>
+                <Transform>
+                    <Position />
+                    <PitchYawRoll />
+                    <Scale />
+                </Transform>
+                <Light>
+                    <Diffuse />
+                </Light>
+            </Data>
+        </LightRenderComponent>
+    </MeshRenderComponent>

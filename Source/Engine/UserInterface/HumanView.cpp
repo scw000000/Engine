@@ -26,13 +26,14 @@ HumanView::HumanView( void )
    {
 	m_pProcessManager = ENG_NEW ProcessManager;
 	m_ViewId = gc_InvalidGameViewId;
-   AttachLayout( shared_ptr<UserInterface>( ENG_NEW UserInterface( Resource( g_pApp->m_EngineOptions.m_Layout, true ) ) ) );
+   AttachLayout( shared_ptr<UserInterface>( ENG_NEW UserInterface( Resource( g_pApp->m_EngineOptions.GetGUILayoutFieName(), true ) ) ) );
 
    if ( g_pApp->m_pEngineLogic->m_pWrold )
 	   {
       m_pWorld = g_pApp->m_pEngineLogic->m_pWrold;
 		Frustum frustum;
-		frustum.Init( ENG_PI/4.0f, g_pApp->m_EngineOptions.m_ScreenSize.x / g_pApp->m_EngineOptions.m_ScreenSize.y, 0.1f, 2000.0f );
+      Point screenSize = g_pApp->m_EngineOptions.GetScreenSize();
+      frustum.Init( ENG_PI / 4.0f, screenSize.x / screenSize.y, 0.1f, 2000.0f );
       
       m_pCamera.reset( ENG_NEW CameraNode( Vec3(0.0f, 0.0f, 0.0f), // position in World Space
 								Vec3( 0.0f, 0.0f, 1.0f), // look target

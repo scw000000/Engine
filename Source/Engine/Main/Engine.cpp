@@ -120,7 +120,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //  Initialize ResCache, all assets are within a zip file
    //--------------------------------- 
    IResourceFile *pFile = NULL;
-   if( m_EngineOptions.m_UseDevDir )
+   if( m_EngineOptions.GetIsUsingDevDirectory() )
       {
       pFile = ENG_NEW DevResourceFile( DevResourceFile::Editor );
       }
@@ -210,12 +210,12 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       }
 
    // Only if execute under editor can engine allow file drop 
-   if( m_EngineOptions.m_Environment == Environment_Editor )
+   if( m_EngineOptions.GetEngineEnvironment() == Environment_Editor )
       {
       SDL_EventState( SDL_DROPFILE, SDL_ENABLE );
       }
 
-   if( m_EngineOptions.m_ShowMouseCursor )
+   if( m_EngineOptions.GetShowMouseCursor() )
       {
       SDL_ShowCursor( SDL_ENABLE );
       }
@@ -458,7 +458,7 @@ bool EngineApp::LoadStrings( std::string language )
 	std::string languageFile = "Strings\\";
 	languageFile += language;
 	languageFile += ".xml";
-   Resource languageRes( languageFile, g_pApp->m_EngineOptions.m_UseDevDir );
+   Resource languageRes( languageFile, g_pApp->m_EngineOptions.GetIsUsingDevDirectory() );
    TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( languageRes );
 	// load failed
    if ( !pRoot )

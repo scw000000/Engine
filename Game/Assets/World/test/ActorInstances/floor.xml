@@ -1,0 +1,31 @@
+<ActorInstance>
+    <Data>
+        <ActorClassResource path="actors\floor.xml" />
+    </Data>
+    <PhysicsComponent>
+        <Data>
+            <Transform>
+                <Position />
+                <PitchYawRoll />
+                <Scale />
+            </Transform>
+            <PhysicsAttributes>
+                <Movement>
+                    <Translate />
+                    <Rotate />
+                    <Collision />
+                </Movement>
+                <ShapeData />
+                <CollisionFlags>
+                    <StaticObject />
+                    <KinematicObject />
+                    <NoContactResponse />
+                    <CustomMaterialCallback />
+                    <CharacterObject />
+                    <DisableVisualizeObject />
+                    <DisableSpuCollisionProcessing />
+                </CollisionFlags>
+            </PhysicsAttributes>
+        </Data>
+    </PhysicsComponent>
+</ActorInstance>

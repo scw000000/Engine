@@ -111,7 +111,7 @@ class IEngineLogic
                                                         TransformPtr pTransform,
                                                         ActorId serversActorId ) = 0;
       virtual void VDestroyActor( ActorId actorId ) = 0;
-	   virtual bool VLoadLevel( const std::string& levelResource ) = 0;
+	   virtual bool VLoadLevel( void ) = 0;
 	   //virtual void VSetProxy()=0;				
       virtual int VOnRestore( void ) = 0;
 	   virtual void VOnMsgProc( SDL_Event event ) = 0;
@@ -131,7 +131,7 @@ class IEngineLogic
       virtual void VGameStart( void ) = 0;
       virtual void VSaveAllActors() = 0;
       virtual void VSaveActor( ActorId id ) = 0;
-      virtual TiXmlElement* VGenerateXML( void ) = 0;
+      virtual TiXmlElement* VGenerateWorldXML( void ) = 0;
       virtual void VSaveWorld( void ) = 0;
    };  
 

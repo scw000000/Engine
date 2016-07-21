@@ -1,0 +1,16 @@
+<ActorInstance>
+    <Data>
+        <ActorClassResource path="actors\sky.xml" />
+    </Data>
+    <SkyRenderComponent>
+        <Data>
+            <Transform>
+                <Position />
+                <PitchYawRoll />
+                <Scale />
+            </Transform>
+            <Mesh />
+            <Texture />
+        </Data>
+    </SkyRenderComponent>
+</ActorInstance>

@@ -34,11 +34,9 @@ class LevelManager
    public:
       const std::vector<Level> &GetLevels( ) const { return m_Levels; }
       Level GetCurrentLevel() const { return pCurrentLevelRes->m_Name; }
-      void Init( const std::string& levelDir );
-      void ResetCurrentLevel( void );
+      void Init( void );
 
    protected:
-      std::string m_LevelDirectory;
       std::vector<Level> m_Levels;
       shared_ptr<Resource> pCurrentLevelRes;
    };
@@ -81,7 +79,7 @@ class BaseEngineLogic : public IEngineLogic
       virtual void VMoveActor( ActorId id, Mat4x4 const &mat) override {}
       virtual void VSetActorUpdate( bool isUpdatable ) override;
 
-      virtual bool VLoadLevel( const std::string& levelResource ) override;
+      virtual bool VLoadLevel( void ) override;
       virtual int VOnRestore( void ) override;
       
       virtual void VOnMsgProc( SDL_Event event ) override;
@@ -110,7 +108,7 @@ class BaseEngineLogic : public IEngineLogic
       virtual void VGameStart( void ) override;
       virtual void VSaveAllActors() override {}
       virtual void VSaveActor( ActorId id ) override { }
-      TiXmlElement* VGenerateXML( void ) override { return NULL; };
+      TiXmlElement* VGenerateWorldXML( void ) override { return NULL; };
       virtual void VSaveWorld( void ) override {  };
 
    public:

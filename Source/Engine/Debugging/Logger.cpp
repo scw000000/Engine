@@ -305,7 +305,7 @@ void LogMgr::OutputFinalBufferToLogs(const string& finalBuffer, unsigned char fl
    if( ( flags & LOGFLAG_WRITE_TO_DEBUGGER ) > 0 ) // debugger output window
       {  
       ::OutputDebugStringA( finalBuffer.c_str() );
-      if( g_pApp->m_EngineOptions.m_Environment == Environment::Environment_Editor )
+      if( g_pApp->m_EngineOptions.GetEngineEnvironment() == Environment::Environment_Editor )
          {
          std::cout << finalBuffer << std::endl;
          }

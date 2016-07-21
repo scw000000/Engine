@@ -39,16 +39,12 @@ void EditorLogic::VOnFileDrop( const char* filePath, const Point& dropLocation )
       if( !std::strcmp( rootName.c_str(), "ActorClass" ) )
          {
          VCreateActor( fileRes, pTransform );
-
-         }
-      else if( !std::strcmp( rootName.c_str(), "ActorInstance" ) )
-         {
-         VCreateActor( fileRes, pTransform );
          }
       else if( !std::strcmp( rootName.c_str(), "World" ) )
          {
          VClearWorld();
-        // VLoadLevel( fileRes.m_Name.c_str() );
+         std::string newLevelInstanceDir = fileRes.GetFileName();
+         VLoadLevel();
          }
       }
    }
@@ -79,7 +75,7 @@ void EditorLogic::VSaveActor( ActorId id )
       {
       std::string fileName = actorIt->second->m_pActorClassResource->GetFileName();
       std::stringstream ss;
-      ss << "Assets\\ActorOverrides\\" << fileName.substr( 0, fileName.find_last_of( "." ) ) << actorIt->second->GetId() << ".xml";
+      ss << "Assets\\" << g_pApp->m_EngineOptions.GetFullActorInstanceDirectory() << fileName.substr( 0, fileName.find_last_of( "." ) ) << actorIt->second->GetId() << ".xml";
       XMLHelper::WriteXMLToFile( ss.str().c_str(), pOverrides );
       }
    std::stringstream ss;
@@ -100,7 +96,7 @@ TiXmlElement* EditorLogic::VGenerateWorldXML(void)
          {
          TiXmlElement* pActor = ENG_NEW TiXmlElement( "Actor" );
          pStaicActors->LinkEndChild( pActor );
-         pActor->SetAttribute( "actorinstance", actorIt.second->m_pActorInstanceResource->m_Name.c_str() );
+         pActor->SetAttribute( "actorinstance", actorIt.second->m_pActorInstanceResource->GetFileName().c_str() );
          }
       }
    return pRet;

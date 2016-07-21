@@ -63,6 +63,20 @@ void Shutdown( void )
    Logger::Destroy();
    }
 
+void LoadLevel( BSTR levelPath )
+   {
+   std::string levelFilePath = ws2s( std::wstring( levelPath, SysStringLen( levelPath ) ) );
+
+   auto rightBound = levelFilePath.find_last_of( "\\" ) + 1;
+   std::string temp = levelFilePath.substr( 0, levelFilePath.find_last_of( "\\" ) ); // remove string after last "\\"
+   auto leftBound = temp.find_last_of( "\\" ) + 1;// find the index of second last "\\" + 1
+   std::string levelInstanceDir = levelFilePath.substr( leftBound, rightBound - leftBound );
+   
+   g_pApp->m_pEngineLogic->VClearWorld();
+   g_pApp->m_EngineOptions.SetLevelInstanceDirectory( levelInstanceDir );
+   g_pApp->m_pEngineLogic->VLoadLevel();
+   }
+
 ActorId CreateActor( BSTR classFilePath )
    {
    std::string classFile = ws2s( std::wstring( classFilePath, SysStringLen( classFilePath ) ) );

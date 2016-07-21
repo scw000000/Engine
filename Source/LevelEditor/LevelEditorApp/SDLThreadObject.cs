@@ -222,6 +222,7 @@ namespace LevelEditorApp
             }
          else if( rootNodeName.Equals( "World" ) )
             {
+            NativeMethods.LoadLevel( filePath );
             }
 
          }

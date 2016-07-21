@@ -1,3 +1,4 @@
+<ActorInstance>
     <Data>
         <ActorClassResource path="actors\cube.xml" />
     </Data>
@@ -28,3 +29,4 @@
             </Data>
         </LightRenderComponent>
     </MeshRenderComponent>
+</ActorInstance>

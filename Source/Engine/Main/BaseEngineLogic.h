@@ -32,12 +32,10 @@ typedef std::string Level;
 class LevelManager 
    {
    public:
-      const std::vector<Level> &GetLevels( ) const { return m_Levels; }
       Level GetCurrentLevel() const { return pCurrentLevelRes->m_Name; }
       void Init( void );
 
    protected:
-      std::vector<Level> m_Levels;
       shared_ptr<Resource> pCurrentLevelRes;
    };
 
@@ -60,12 +58,6 @@ class BaseEngineLogic : public IEngineLogic
       virtual StrongActorPtr VCreateActor( const Resource& actorRes,
                                            TransformPtr pTransform = NULL,
                                            ActorId serversActorId = INVALID_ACTOR_ID ) override;
-      virtual StrongActorPtr VCreateActorFromOverrides( const Resource& overridesRes,
-                                                        TransformPtr pTransform = NULL,
-                                                        ActorId serversActorId = INVALID_ACTOR_ID ) override;
-      virtual StrongActorPtr VCreateActorFromClass( const Resource& actorClassRes,
-                                                    TransformPtr pTransform = NULL,
-                                                    ActorId serversActorId = INVALID_ACTOR_ID ) override;
 
       //virtual StrongActorPtr VCreateActorFromOverrides( const Resource& overrides,
       //                                     TransformPtr pTransform = NULL,

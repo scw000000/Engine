@@ -25,6 +25,7 @@ class ActorFactory
                                   TransformPtr pInitialTransform = NULL, 
                                   ActorId serversActorId = INVALID_ACTOR_ID );
       bool ModifyActor( StrongActorPtr pActor, TiXmlElement* overrides );
+      void ClearActorId( void ) { m_LastActorId = INVALID_ACTOR_ID; }
 
    protected:
       StrongActorComponentPtr CreateComponent( const std::string& componentName, TiXmlElement* pData );

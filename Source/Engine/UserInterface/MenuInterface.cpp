@@ -40,14 +40,14 @@ void MenuInterface::VInit( void )
       }
    ENG_ASSERT( m_pLevelList && m_pStartButton );
 
-   auto levels = g_pApp->m_pEngineLogic->m_pLevelManager->GetLevels();
+   /*auto levels = g_pApp->m_pEngineLogic->m_pLevelManager->GetLevels();
    for( auto lv : levels )
-      {
-      CEGUI::ListboxTextItem* it = ENG_NEW CEGUI::ListboxTextItem( lv.c_str() );
-      it->setSelectionColours( CEGUI::Colour( 1.0f, 0.0f, 0.0f ) );
-      it->setSelectionBrushImage( "GlossySerpentFHD/ListboxSelectionBrush" );
-      m_pLevelList->addItem( it );
-      }
+   {
+   CEGUI::ListboxTextItem* it = ENG_NEW CEGUI::ListboxTextItem( lv.c_str() );
+   it->setSelectionColours( CEGUI::Colour( 1.0f, 0.0f, 0.0f ) );
+   it->setSelectionBrushImage( "GlossySerpentFHD/ListboxSelectionBrush" );
+   m_pLevelList->addItem( it );
+   }*/
 
    m_pStartButton->subscribeEvent( CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber( &MenuInterface::StartLevel, this ) );
  //  CEGUI::ListboxTextItem* it = ENG_NEW CEGUI::ListboxTextItem( "ddddd" );

@@ -1,6 +1,7 @@
 <EditorOptions>
   <Graphics Renderer="OpenGL" RunFullSpeed="no" />
   <Sound SfxVolume="100" MusicVolume="100"/>
+  <ResCache UseDevelopmentDirectories="yes" AssetsDirectory=".\Assets\" GUIDirectory="Assets/GUI/" LevelDirectory="world\" ActorInstanceDirectory="ActorInstances\"/> 
   <User Environment="editor" Layout="Empty.layout" ShowMouseCursor="yes" LevelInstanceDirectory="test\"/>
   <PhysicsDebug DrawWireFrame="yes" DrawContactPoints="yes" />
 </EditorOptions>

@@ -104,12 +104,6 @@ class IEngineLogic
       virtual StrongActorPtr VCreateActor( const Resource& actorRes,
                                            TransformPtr pTransform,
                                            ActorId serversActorId ) = 0;
-      virtual StrongActorPtr VCreateActorFromOverrides( const Resource& overridesRes,
-                                           TransformPtr pTransform,
-                                           ActorId serversActorId ) = 0;
-      virtual StrongActorPtr VCreateActorFromClass( const Resource& actorClassRes,
-                                                        TransformPtr pTransform,
-                                                        ActorId serversActorId ) = 0;
       virtual void VDestroyActor( ActorId actorId ) = 0;
 	   virtual bool VLoadLevel( void ) = 0;
 	   //virtual void VSetProxy()=0;				

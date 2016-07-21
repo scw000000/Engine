@@ -26,6 +26,9 @@ namespace LevelEditorApp
       public unsafe static extern void Shutdown();
 
       [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]
+      public unsafe static extern void LoadLevel( [MarshalAs( UnmanagedType.BStr )] string levelPath );
+
+      [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]
       public unsafe static extern uint PickActor();
 
       [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]

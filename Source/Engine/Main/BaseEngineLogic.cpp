@@ -25,18 +25,11 @@
 #include "..\Physics\Physics.h"
 #include "..\Physics\Raycast.h"
 
-void LevelManager::Init( const std::string& levelDir )
+void LevelManager::Init(void)
    {
-   m_LevelDirectory = levelDir;
-   m_Levels = g_pApp->m_pResCache->Match( m_LevelDirectory + "*.xml" );
-   ResetCurrentLevel();
-   }
-
-void LevelManager::ResetCurrentLevel( void )
-   {
-   auto levelIt = std::find( m_Levels.begin(), m_Levels.end(), m_LevelDirectory + g_pApp->m_EngineOptions.m_Level );
-   ENG_ASSERT( levelIt != m_Levels.end() );
-   pCurrentLevelRes.reset( ENG_NEW Resource( *levelIt ) );
+   auto currentLevel = g_pApp->m_pResCache->Match( g_pApp->m_EngineOptions.GetFullLevelDirectory() + "level.xml" );
+   ENG_ASSERT( currentLevel.size() );
+   pCurrentLevelRes.reset( ENG_NEW Resource( currentLevel[0] ) );
    }
 
 BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer ) : m_pGUIManager( ENG_NEW GUIManager )
@@ -71,18 +64,7 @@ BaseEngineLogic::~BaseEngineLogic()
     // destroy all actors
    for ( auto it = m_Actors.begin(); it != m_Actors.end(); ++it )
       {
-      shared_ptr< Resource > m_pActorClassResource; // actor class XML file name
-      shared_ptr< Resource > m_pOverridesResource;
-
-      TiXmlElement* pResource = it->second->GenerateXML();
-      TiXmlElement* pOverrides = it->second->GenerateOverridesXML( pResource );
-      SAFE_DELETE( pResource );
-      
-      
-      XMLHelper::WriteXMLToFile( ( std::string( "Assets\\" ) + it->second->m_pActorClassResource->GetFileName() ).c_str(), pOverrides );
       it->second->Destroy();
-      
-    //  SAFE_DELETE( pOverrides );
       }
    m_Actors.clear();
    IGamePhysics::Shutdown();
@@ -92,15 +74,15 @@ bool BaseEngineLogic::Init()
    {
    IGamePhysics::RegisterImplementation< BulletPhysics >();
    IGamePhysics::GetSingleton().VInitialize();
-   m_pLevelManager->Init( g_pApp->m_EngineOptions.m_LevelDirectory );
-   if( !VLoadLevel( ( m_pLevelManager->GetCurrentLevel() ).c_str() ) )
+   m_pLevelManager->Init();
+   if( !VLoadLevel() )
       {
       ENG_ERROR( "The game failed to load." );
       g_pApp->AbortGame( );
       return false;
       }
    m_pWrold->OnRestore();
-   m_pGUIManager->Init( g_pApp->m_EngineOptions.m_GUIDirectory );
+   m_pGUIManager->Init( g_pApp->m_EngineOptions.GetGUIDirectory() );
 
    shared_ptr<IView> pView( ENG_NEW HumanView( ) );
    VAddView( pView );
@@ -125,7 +107,7 @@ StrongActorPtr BaseEngineLogic::VCreateActor( const Resource& actorRes, Transfor
    TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( actorRes );
    std::string rootName = pRoot->Value();
 
-   if( !std::strcmp( rootName.c_str(), "ActorOverrides" ) ) // If this file is overrides file, find the actor class res
+   if( !std::strcmp( rootName.c_str(), "ActorInstance" ) ) // If this file is overrides file, find the actor class res
       {
       TiXmlHandle actorClassResHandle = XmlResourceLoader::LoadAndReturnRootXmlElement( actorRes );
       TiXmlElement* pActorClassReshNode = actorClassResHandle.FirstChild( "Data" ).FirstChild( "ActorClassResource" ).ToElement();
@@ -146,45 +128,6 @@ StrongActorPtr BaseEngineLogic::VCreateActor( const Resource& actorRes, Transfor
        // FUTURE WORK: Log error: couldn't create actor
        return StrongActorPtr();
        }
-   }
-
-StrongActorPtr BaseEngineLogic::VCreateActorFromOverrides( const Resource& overridesRes, TransformPtr pTransform /*= NULL*/, ActorId serversActorId /*= INVALID_ACTOR_ID */ )
-   {
-   ENG_ASSERT( m_pActorFactory );
-   TiXmlHandle actorClassResHandle = XmlResourceLoader::LoadAndReturnRootXmlElement( overridesRes );
-   TiXmlElement* pActorClassReshNode = actorClassResHandle.FirstChild( "Data" ).FirstChild( "ActorClassResource" ).ToElement();
-   ENG_ASSERT( pActorClassReshNode );
-   Resource actorClassRes( pActorClassReshNode->Attribute( "path" ) );
-
-   StrongActorPtr pActor = m_pActorFactory->CreateActor( actorClassRes, &overridesRes, pTransform );
-   if ( pActor )
-      {
-      // Insert into actor map
-      m_Actors.insert( std::make_pair(pActor->GetId(), pActor) );
-      return pActor;
-      }
-   else
-      {
-      // FUTURE WORK: Log error: couldn't create actor
-      return StrongActorPtr();
-      }
-   }
-
-StrongActorPtr BaseEngineLogic::VCreateActorFromClass( const Resource& actorClassRes, TransformPtr pTransform /*= NULL*/, ActorId serversActorId /*= INVALID_ACTOR_ID */ )
-   {
-   ENG_ASSERT( m_pActorFactory );
-   StrongActorPtr pActor = m_pActorFactory->CreateActor( actorClassRes, NULL, pTransform );
-   if( pActor )
-      {
-      // Insert into actor map
-      m_Actors.insert( std::make_pair( pActor->GetId(), pActor ) );
-      return pActor;
-      }
-   else
-      {
-      // FUTURE WORK: Log error: couldn't create actor
-      return StrongActorPtr();
-      }
    }
 
 void BaseEngineLogic::VDestroyActor( ActorId actorId )
@@ -312,17 +255,16 @@ void BaseEngineLogic::VRenderDiagnostics( void ) const
 
 // this function is called by EngineApp::VLoadGame
 // LATER: finish implementation
-bool BaseEngineLogic::VLoadLevel( const std::string& levelResource )
+bool BaseEngineLogic::VLoadLevel()
    {
-   g_pApp->m_EngineOptions.m_Level = levelResource.substr( levelResource.find_last_of( "\\" ) + 1 );
-   m_pLevelManager->ResetCurrentLevel();
+   m_pLevelManager->Init();
 
    Resource levelRes( m_pLevelManager->GetCurrentLevel() );
     // Grab the root XML node
    TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( levelRes );
    if (!pRoot)
       { 
-      ENG_ERROR( "Failed to find level resource file: " + levelResource );
+      ENG_ERROR( "Failed to find level resource file: " + levelRes.m_Name );
       return false;
       }
 
@@ -351,8 +293,8 @@ bool BaseEngineLogic::VLoadLevel( const std::string& levelResource )
       {
       for ( TiXmlElement* pNode = pActorsNode->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
          {
-         std::string overridesPath = pNode->Attribute( "actoroverridsresource" );
-         Resource overridesResource( overridesPath );
+         std::string actorFileName = pNode->Attribute( "actorinstance" );
+         Resource overridesResource( g_pApp->m_EngineOptions.GetFullActorInstanceDirectory() + actorFileName );
          StrongActorPtr pActor = VCreateActor( overridesResource );
        //  StrongActorPtr pActor = VCreateActorFromOverrides( overridesResource );
 			if ( pActor )
@@ -401,6 +343,7 @@ void BaseEngineLogic::VClearWorld( void )
       VDestroyActor( id );
       }
    m_Actors.clear();
+   m_pActorFactory->ClearActorId();
    }
 
 void BaseEngineLogic::VStartAndPause( void ) 
@@ -488,9 +431,9 @@ void BaseEngineLogic::ReInitWorld( void )
       {
       TiXmlElement* pActorData = XmlResourceLoader::LoadAndReturnRootXmlElement( actorIt.second->m_pActorClassResource->m_Name );
       m_pActorFactory->ModifyActor( actorIt.second, pActorData );
-      if( actorIt.second->m_pOverridesResource )
+      if( actorIt.second->m_pActorInstanceResource )
          {
-         pActorData = XmlResourceLoader::LoadAndReturnRootXmlElement( actorIt.second->m_pOverridesResource->m_Name );
+         pActorData = XmlResourceLoader::LoadAndReturnRootXmlElement( actorIt.second->m_pActorInstanceResource->m_Name );
          m_pActorFactory->ModifyActor( actorIt.second, pActorData );
          }
       }

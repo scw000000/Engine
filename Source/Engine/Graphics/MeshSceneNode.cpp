@@ -76,29 +76,6 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_VertexShader.ReleaseShader( m_Program );
    m_FragmentShader.ReleaseShader( m_Program );
 
- //  GLint result = GL_FALSE;
- //  if( !m_Program )
- //     {
- //     m_Program = glCreateProgram();
- //     result =  glGetError();
- //     if( result != GL_NO_ERROR )
- //        {
- //        return result;
- //        } 
- //     }
-
- //  // Link the program
-	//glAttachShader( m_Program, m_VertexShader.GetVertexShader() );
-	//glAttachShader( m_Program, m_FragmentShader.GetFragmentShader() );
-	//glLinkProgram( m_Program );
-
- //  
- //  int infoLogLength;
-	//// Check the program
-	//glGetProgramiv( m_Program, GL_LINK_STATUS, &result );
-	//glGetProgramiv( m_Program, GL_INFO_LOG_LENGTH, &infoLogLength );
-
-
    OpenGLRenderer::LoadTexture( &m_Texture, m_Props.GetMaterialPtr()->GetTextureResource() );
 
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
@@ -108,12 +85,44 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    SetRadius( pMeshExtra->m_Radius );
    OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &m_UVBuffer, &m_IndexBuffer, &m_NormalBuffer, pMeshExtra->m_pScene );
 
-   
+   // 1st attribute buffer : vertices
+   glBindBuffer( GL_ARRAY_BUFFER, m_VerTexBuffer );
+   glEnableVertexAttribArray( 0 );
+   glVertexAttribPointer(
+      0,                  // attribute
+      3,                  // size
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      ( void* ) 0            // array buffer offset
+      );
+
+   // 2nd attribute buffer : UVs
+   glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
+   glEnableVertexAttribArray( 1 );
+   glVertexAttribPointer(
+      1,                                // attribute
+      2,                                // size
+      GL_FLOAT,                         // type
+      GL_FALSE,                         // normalized?
+      0,                                // stride
+      ( void* ) 0                          // array buffer offset
+      );
+
+   glBindBuffer( GL_ARRAY_BUFFER, m_NormalBuffer );
+   glEnableVertexAttribArray( 2 );
+   glVertexAttribPointer(
+      2,                  // attribute
+      3,                  // size
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      ( void* ) 0            // array buffer offset
+      );
 
    m_MVPMatrix          = glGetUniformLocation( m_Program, "MVP" );
    m_TextureUni         = glGetUniformLocation( m_Program, "myTextureSampler" );
   
-
    m_ToWorldMatrix      = glGetUniformLocation( m_Program, "M" );
    m_LightPosWorldSpace = glGetUniformLocation( m_Program, "LightPosition_WorldSpace" );
    m_LigthDirection     = glGetUniformLocation( m_Program, "LighDirection" );
@@ -127,8 +136,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_MaterialDiffuse    = glGetUniformLocation( m_Program, "MaterialDiffuse" );
    m_MaterialAmbient    = glGetUniformLocation( m_Program, "MaterialAmbient" );
 
-
-   // resore all of its children
+   // restore all of its children
 	SceneNode::VOnRestore( pScene );
 
 	return S_OK;
@@ -147,7 +155,6 @@ int MeshSceneNode::VRender( Scene *pScene )
    // 1-> how many matrix, GL_FALSE->should transpose or not
 	glUniformMatrix4fv( m_MVPMatrix, 1, GL_FALSE, &mWorldViewProjection[0][0]);
 
-   
    glUniformMatrix4fv( m_ToWorldMatrix, 1, GL_FALSE, &pScene->GetTopMatrix()[0][0] );
 
    auto pLightManager = pScene->GetLightManagerPtr();
@@ -164,52 +171,12 @@ int MeshSceneNode::VRender( Scene *pScene )
    
    glUniform4fv( m_MaterialDiffuse, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse( ) );
    glUniform3fv( m_MaterialAmbient, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient( ) );
-   
-
 
 	// Bind our texture in Texture Unit 0
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, m_Texture );
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
-	glUniform1i( m_TextureUni, 0);
-
-		// 1rst attribute buffer : vertices
-	glEnableVertexAttribArray( 0 );
-	glBindBuffer( GL_ARRAY_BUFFER, m_VerTexBuffer );
-	glVertexAttribPointer(
-			0,                  // attribute
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-	);
-   
-	// 2nd attribute buffer : UVs
-	glEnableVertexAttribArray( 1 );
-	glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
-	glVertexAttribPointer(
-			1,                                // attribute
-			2,                                // size
-			GL_FLOAT,                         // type
-			GL_FALSE,                         // normalized?
-			0,                                // stride
-			(void*)0                          // array buffer offset
-		);
-
-   glEnableVertexAttribArray( 2 );
-   glBindBuffer( GL_ARRAY_BUFFER, m_NormalBuffer );
-   glVertexAttribPointer(
-      2,                  // attribute
-      3,                  // size
-      GL_FLOAT,           // type
-      GL_FALSE,           // normalized?
-      0,                  // stride
-      ( void* ) 0            // array buffer offset
-      );    
-
-   // Index buffer
-   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer );
+   glUniform1i( m_TextureUni, 0);
 
    // Draw the triangles !
    glDrawElements(
@@ -219,9 +186,7 @@ int MeshSceneNode::VRender( Scene *pScene )
       ( void* ) 0           // element array buffer offset
       );
 
-   glDisableVertexAttribArray( 0 );
-   glDisableVertexAttribArray( 1 );
-   glDisableVertexAttribArray( 2 );
+   glBindVertexArray( 0 );
 
    return S_OK;
    }

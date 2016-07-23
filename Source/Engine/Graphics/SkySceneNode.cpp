@@ -71,6 +71,30 @@ int SkySceneNode::VOnRestore( Scene *pScene )
 
    OpenGLRenderer::LoadMesh( &m_VertexBuffer, &m_UVBuffer, &m_IndexBuffer, NULL, pMeshExtra->m_pScene );
 
+   // 1rst attribute buffer : vertices
+   glEnableVertexAttribArray( 0 );
+   glBindBuffer( GL_ARRAY_BUFFER, m_VertexBuffer );
+   glVertexAttribPointer(
+      0,                  // attribute
+      3,                  // size
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      ( void* ) 0            // array buffer offset
+      );
+
+   // 2nd attribute buffer : UVs
+   glEnableVertexAttribArray( 1 );
+   glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
+   glVertexAttribPointer(
+      1,                                // attribute
+      2,                                // size
+      GL_FLOAT,                         // type
+      GL_FALSE,                         // normalized?
+      0,                                // stride
+      ( void* ) 0                          // array buffer offset
+      );
+
    m_MVPMatrix          = glGetUniformLocation( m_Program, "MVP" );
    m_TextureUni         = glGetUniformLocation( m_Program, "myTextureSampler" );
 
@@ -101,30 +125,6 @@ int SkySceneNode::VRender( Scene *pScene )
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
 	glUniform1i( m_TextureUni, 0);
 
-		// 1rst attribute buffer : vertices
-	glEnableVertexAttribArray( 0 );
-	glBindBuffer( GL_ARRAY_BUFFER, m_VertexBuffer );
-	glVertexAttribPointer(
-			0,                  // attribute
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
-	);
-   
-	// 2nd attribute buffer : UVs
-	glEnableVertexAttribArray( 1 );
-	glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
-	glVertexAttribPointer(
-			1,                                // attribute
-			2,                                // size
-			GL_FLOAT,                         // type
-			GL_FALSE,                         // normalized?
-			0,                                // stride
-			(void*)0                          // array buffer offset
-		);
-
    // Force the Mesh to reload to getting vertex number
    //auto pAiScene = MeshResourceLoader::LoadAndReturnScene( &*m_pMeshResource );
       
@@ -143,8 +143,7 @@ int SkySceneNode::VRender( Scene *pScene )
       ( void* ) 0           // element array buffer offset
       );
 
-	glDisableVertexAttribArray( 0 );
-	glDisableVertexAttribArray( 1 );
+   glBindVertexArray( 0 );
 
    return S_OK;
    }

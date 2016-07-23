@@ -17,7 +17,7 @@
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
 
-const char* MESH_LOADER_PATTERNS[] = { "*.obj" };
+const char* MESH_LOADER_PATTERNS[] = { "*.obj", "*.fbx" };
 
 shared_ptr<IResourceLoader> CreateMeshResourceLoader()
    {

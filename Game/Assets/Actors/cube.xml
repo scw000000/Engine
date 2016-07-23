@@ -10,7 +10,7 @@
                 <Scale x="1.000000" y="1.000000" z="1.000000" />
             </Transform>
             
-			<Mesh path="art\cube.obj" />
+			<Mesh path="art\Beta.fbx" />
             
 			<Material>
                 <Texture path="art\cube.jpg" />

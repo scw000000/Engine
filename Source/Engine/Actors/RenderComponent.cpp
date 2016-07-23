@@ -195,13 +195,7 @@ void MeshRenderComponent::VDelegatePostInit( void )
    {
    auto pAiScene = MeshResourceLoader::LoadAndReturnScene( *m_pMeshResource );
    auto pMesh = pAiScene->mMeshes[ 0 ];
-   /*IGamePhysics::GetSingleton().VAddPointCloud( ( Vec3* ) &( pMesh->mVertices[ 0 ] ),
-                                                pMesh->mNumVertices,
-                                                pRenderComp,
-                                                m_pPhysicsAttributes->VGetDensity(),
-                                                m_pPhysicsAttributes->VGetMaterial(),
-                                                m_pPhysicsAttributes->VGetCollisionId(),
-                                                btCollisionObject::CF_STATIC_OBJECT | btCollisionObject::CF_KINEMATIC_OBJECT );*/
+
    auto pShpereAttr = static_pointer_cast< BulletSpherePhysicsAttributes >( m_pPhysicsAttributes );
    pShpereAttr->SetRadius( this->m_pSceneNode->VGetProperties().GetRadius() );
    m_pPhysicsAttributes->VAddRigidBody( VGetSelfStrongRenderCompPtr() );

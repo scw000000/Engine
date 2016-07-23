@@ -23,13 +23,14 @@ class MeshResourceExtraData : public IResourceExtraData
 	friend class SdkMeshResourceLoader;
 
    public:
-      MeshResourceExtraData() : m_pScene( NULL ) { m_Radius = 0.f; };
+      MeshResourceExtraData() : m_pScene( NULL ) { m_Radius = 0.f; m_NumVertices = 0; };
 	   virtual ~MeshResourceExtraData() { aiReleaseImport( m_pScene ); }
 	   virtual std::string VToString() { return "MeshResourceExtraData"; }
 
    public:
       const struct aiScene* m_pScene;
       float m_Radius;
+      unsigned int m_NumVertices;
    };
 
 

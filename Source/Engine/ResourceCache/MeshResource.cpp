@@ -39,28 +39,34 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
    {
    const char* p_Msg = NULL;
    //aiProcessPreset_TargetRealtime_Quality // aiProcess_JoinIdenticalVertices
-   const struct aiScene *p_Scene = aiImportFileFromMemory( rawBuffer, 
+   const struct aiScene *p_AiScene = aiImportFileFromMemory( rawBuffer, 
                                                            rawSize, 
                                                            aiProcessPreset_TargetRealtime_Quality | aiProcess_Triangulate | aiProcess_SortByPType, 
                                                            p_Msg );
-   if( !p_Scene )
+   if( !p_AiScene )
       {
       ENG_ERROR( p_Msg );
       return false;
       }
    shared_ptr< MeshResourceExtraData > extra( ENG_NEW MeshResourceExtraData );
    handle->SetExtraData( extra );
-   extra->m_pScene = p_Scene;
+   extra->m_pScene = p_AiScene;
    extra->m_Radius = 0;
-   auto pMesh = extra->m_pScene->mMeshes[ 0 ];
-   for( unsigned int vertex = 0; vertex < pMesh->mNumVertices; vertex++ )
+
+   for( unsigned int meshIdx = 0; meshIdx < p_AiScene->mNumMeshes; ++meshIdx )
       {
-      auto curSquareLength = pMesh->mVertices[ vertex ].SquareLength();
-      extra->m_Radius = std::max( extra->m_Radius, curSquareLength );
+      auto pMesh = p_AiScene->mMeshes[ meshIdx ];
+      extra->m_NumVertices += pMesh->mNumVertices;
+      for( unsigned int vertex = 0; vertex < pMesh->mNumVertices; vertex++ )
+         {    
+         auto curSquareLength = pMesh->mVertices[ vertex ].SquareLength();
+         extra->m_Radius = std::max( extra->m_Radius, curSquareLength );
+         }
       }
+
    extra->m_Radius = std::sqrt( extra->m_Radius );
    struct aiMemoryInfo memInfo;
-   aiGetMemoryRequirements( p_Scene, &memInfo );
+   aiGetMemoryRequirements( p_AiScene, &memInfo );
    handle->SetSize( memInfo.total );
    return true;
    }

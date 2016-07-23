@@ -39,8 +39,8 @@ class OpenGLRenderer : public IRenderer
 	   //virtual void VCalcLighting( Lights *lights, int maximumLights ) override;
 
       static void LoadTexture( GLuint* textureId, const Resource& pTextureResource );
-      static void LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint* pIndexBuffer, GLuint* pNormalBuffer, const aiScene* pAiScene );
-	   
+      static void LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint* pIndexBuffer, GLuint* pNormalBuffer, shared_ptr<ResHandle> pMeshResHandle );
+      static void LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMeshResHandle );
       //virtual shared_ptr<IRenderState> VPrepareAlphaPass( void )=0;
 	   //virtual shared_ptr<IRenderState> VPrepareSkyBoxPass( void )=0;
       
@@ -54,4 +54,20 @@ class OpenGLRenderer : public IRenderer
 
    private:
       static GLuint CompileShader( const GLchar* const* pSrcData, const GLuint shaderID );
+
+      struct VertexToBoneMapping
+         {
+         #define NUM_BONES_PER_VEREX 4
+            public:
+            unsigned int m_BoneIDs[ NUM_BONES_PER_VEREX ];
+            float m_BoneWeights[ NUM_BONES_PER_VEREX ];
+
+            VertexToBoneMapping( void )
+               {
+               ENG_ZERO_MEM( m_BoneIDs );
+               ENG_ZERO_MEM( m_BoneWeights );
+               };
+
+            void AddBoneData( unsigned int boneID, float boneWeight );
+         };
    };

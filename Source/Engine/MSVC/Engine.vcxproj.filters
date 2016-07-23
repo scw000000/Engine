@@ -217,6 +217,9 @@
     <ClCompile Include="..\Actors\PhysicsComponent.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
+    <ClCompile Include="..\Graphics\SkeletalMeshSceneNode.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -400,6 +403,9 @@
     </ClInclude>
     <ClInclude Include="..\Actors\PhysicsComponent.h">
       <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SkeletalMeshSceneNode.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

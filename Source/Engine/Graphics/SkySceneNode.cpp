@@ -67,9 +67,9 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
-   m_VerticesCount = pMeshExtra->m_pScene->mMeshes[ 0 ]->mNumFaces * 3;
+   m_VerticesCount = pMeshExtra->m_NumVertexIndex;
 
-   OpenGLRenderer::LoadMesh( &m_VertexBuffer, &m_UVBuffer, &m_IndexBuffer, NULL, pMeshExtra->m_pScene );
+   OpenGLRenderer::LoadMesh( &m_VertexBuffer, &m_UVBuffer, &m_IndexBuffer, NULL, pMeshResHandle );
 
    // 1rst attribute buffer : vertices
    glEnableVertexAttribArray( 0 );
@@ -118,20 +118,12 @@ int SkySceneNode::VRender( Scene *pScene )
    // 1-> how many matrix, GL_FALSE->should transpose or not
 	glUniformMatrix4fv( m_MVPMatrix, 1, GL_FALSE, &mWorldViewProjection[0][0]);
   
-
 	// Bind our texture in Texture Unit 0
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, m_Texture );
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
 	glUniform1i( m_TextureUni, 0);
-
-   // Force the Mesh to reload to getting vertex number
-   //auto pAiScene = MeshResourceLoader::LoadAndReturnScene( &*m_pMeshResource );
-      
-	//// Draw the triangle !
- //  // Beware of vertex numbers, I may have to use index buffer
-	//glDrawArrays( GL_TRIANGLES, 0, pAiScene->mMeshes[0]->mNumVertices );
-
+  
    // Index buffer
    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer );
 

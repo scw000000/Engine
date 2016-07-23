@@ -110,128 +110,86 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
 
    auto pAiScene = pMeshExtra->m_pScene;
 
-   /*glGenBuffers( 1, pVertexBuffer );
-   glBindBuffer( GL_ARRAY_BUFFER, *pVertexBuffer );
-   for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
-      {
-      auto pMesh = pAiScene->mMeshes[ meshIdx ];
-      glBufferSubData( GL_ARRAY_BUFFER, 0, pMesh->mNumVertices * sizeof( aiVector3t<float> ), &pMesh->mVertices[ 0 ] );
-      
-      }
-*/
-
-   auto pMesh = pAiScene->mMeshes[ 0 ];
-
    glGenBuffers( 1, pVertexBuffer );
    glBindBuffer( GL_ARRAY_BUFFER, *pVertexBuffer );
-   glBufferData( GL_ARRAY_BUFFER,
-                 pMesh->mNumVertices * sizeof( aiVector3t<float> ),
-                 &pMesh->mVertices[ 0 ],
-                 GL_STATIC_DRAW );
-
-   // UV coordinates loaded in assimp is 3-dimensions
-   // But GLSL expect 2-dimension coordinates
-   // So we have to translate them
-   aiVector2t<float> *uvVertices = NULL;
+   glBufferData( GL_ARRAY_BUFFER, pMeshExtra->m_NumVertices * sizeof( aiVector3t<float> ), NULL, GL_STATIC_DRAW );
 
    if( pUvBuffer )
       {
-      uvVertices = ENG_NEW aiVector2t<float>[ pMesh->mNumVertices ];
       glGenBuffers( 1, pUvBuffer );
-      for( unsigned int vertex = 0; vertex < pMesh->mNumVertices; vertex++ )
-         {
-         memcpy( &uvVertices[ vertex ], &pMesh->mTextureCoords[ 0 ][ vertex ], sizeof( aiVector2t<float> ) );
-         }
       glBindBuffer( GL_ARRAY_BUFFER, *pUvBuffer );
-      glBufferData( GL_ARRAY_BUFFER,
-                    pMesh->mNumVertices * sizeof( aiVector2t<float> ),
-                    &uvVertices[ 0 ],
-                    GL_STATIC_DRAW );
-      SAFE_DELETE_ARRAY( uvVertices );
+      glBufferData( GL_ARRAY_BUFFER, pMeshExtra->m_NumVertices * sizeof( aiVector2t<float> ), NULL, GL_STATIC_DRAW );
       }
 
    if( pNormalBuffer )
       {
       glGenBuffers( 1, pNormalBuffer );
       glBindBuffer( GL_ARRAY_BUFFER, *pNormalBuffer );
-      glBufferData( GL_ARRAY_BUFFER,
-                    pMesh->mNumVertices * sizeof( aiVector3t<float> ),
-                    &pMesh->mNormals[ 0 ],
-                    GL_STATIC_DRAW );
-
+      glBufferData( GL_ARRAY_BUFFER, pMeshExtra->m_NumVertices * sizeof( aiVector3t<float> ), NULL, GL_STATIC_DRAW );
       }
 
    if( pIndexBuffer )
       {
-      std::vector<unsigned int> indexes( pMesh->mNumFaces * 3, 0 );
-      for( unsigned int t = 0; t < pMesh->mNumFaces; ++t )
-         {
-         const aiFace& face = pMesh->mFaces[ t ];
-         ENG_ASSERT( face.mNumIndices == 3 && "Warning: Mesh face with not exactly 3 indices, ignoring this primitive." );
-         indexes[ t * 3 + 0 ] = face.mIndices[ 0 ];
-         indexes[ t * 3 + 1 ] = face.mIndices[ 1 ];
-         indexes[ t * 3 + 2 ] = face.mIndices[ 2 ];
-         }
       glGenBuffers( 1, pIndexBuffer );
       glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, *pIndexBuffer );
-      glBufferData( GL_ELEMENT_ARRAY_BUFFER,
-                    indexes.size() * sizeof( unsigned int ),
-                    &indexes[ 0 ],
-                    GL_STATIC_DRAW );
+      glBufferData( GL_ELEMENT_ARRAY_BUFFER, pMeshExtra->m_NumVertexIndex * sizeof( unsigned int ), NULL, GL_STATIC_DRAW );
       }
-   /*
-     for( unsigned int n = 0; n < pAiScene->mNumMeshes; ++n )
-     {
-     const struct aiMesh* mesh = pAiScene->mMeshes[n];
 
-     if( mesh->mNormals == NULL )
-     {
-     glDisable( GL_LIGHTING );
-     }
-     else
-     {
-     glEnable( GL_LIGHTING );
-     }
+   unsigned int verticesStrideNum = 0;
+   unsigned int faceStrideNum = 0;
+   for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
+      {
+      auto pMesh = pAiScene->mMeshes[ meshIdx ];
 
-     for( unsigned int t = 0; t < mesh->mNumFaces; ++t )
-     {
+      glBindBuffer( GL_ARRAY_BUFFER, *pVertexBuffer );
+      glBufferSubData( GL_ARRAY_BUFFER, 
+                       verticesStrideNum * sizeof( aiVector3t<float> ), 
+                       pMesh->mNumVertices * sizeof( aiVector3t<float> ),
+                       &pMesh->mVertices[ 0 ] );
+      
+      if( pUvBuffer )
+         {
+         aiVector2t<float> *uvVertices = NULL;
+         uvVertices = ENG_NEW aiVector2t<float>[ pMesh->mNumVertices ];
+         for( unsigned int vertex = 0; vertex < pMesh->mNumVertices; vertex++ )
+            {
+            memcpy( &uvVertices[ vertex ], &pMesh->mTextureCoords[ 0 ][ vertex ], sizeof( aiVector2t<float> ) );
+            }
+         glBindBuffer( GL_ARRAY_BUFFER, *pUvBuffer );
+         glBufferSubData( GL_ARRAY_BUFFER, 
+                          verticesStrideNum * sizeof( aiVector2t<float> ), 
+                          pMesh->mNumVertices * sizeof( aiVector2t<float> ), 
+                          &uvVertices[ 0 ] );
+         SAFE_DELETE_ARRAY( uvVertices );
+         }
 
-     auto face = &mesh->mFaces[t];
-     GLenum face_mode;
-     std::cout << "face: " << face->mNumIndices << "prime " << mesh->mPrimitiveTypes << std::endl;
-     switch( face->mNumIndices )
-     {
-     case 1: face_mode = GL_POINTS; break;
-     case 2: face_mode = GL_LINES; break;
-     case 3: face_mode = GL_TRIANGLES; break;
-     default: face_mode = GL_POLYGON; break;
-     }
+      if( pNormalBuffer )
+         {
+         glBindBuffer( GL_ARRAY_BUFFER, *pNormalBuffer );
+         glBufferSubData( GL_ARRAY_BUFFER, 
+                          verticesStrideNum * sizeof( aiVector3t<float> ), 
+                          pMesh->mNumVertices * sizeof( aiVector3t<float> ), 
+                          &pMesh->mNormals[ 0 ]);
+         }
 
-     for( unsigned int i = 0; i < face->mNumIndices; i++ )
-     {
-     int index = face->mIndices[i];
-     auto vertex = mesh->mVertices[index];
-     Vec3 vec( vertex.x, vertex.y, vertex.z );
-     std::cout << "index " << index << ToStr( vec ) << std::endl;
-     }
-     std::cout << std::endl;
-     }
-     }
+      if( pIndexBuffer )
+         {
+         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, *pIndexBuffer );
+         for( unsigned int faceIdx = 0; faceIdx < pMesh->mNumFaces; ++faceIdx )
+            {
+            const aiFace& face = pMesh->mFaces[ faceIdx ];
+            ENG_ASSERT( face.mNumIndices == 3 && "Warning: Mesh face with not exactly 3 indices, ignoring this primitive." );
+            glBufferSubData( GL_ELEMENT_ARRAY_BUFFER,
+                             faceStrideNum * sizeof( unsigned int ),
+                             face.mNumIndices  * sizeof( unsigned int ),
+                             &face.mIndices[ 0 ] );
+ 
+            faceStrideNum += face.mNumIndices;
+            }
+         }
 
-     std::cout << "index num :" << pAiScene->mMeshes[0]->mNumVertices << std::endl;
-     for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
-     {
-     for( unsigned int vertexIdx = 0; vertexIdx < pAiScene->mMeshes[meshIdx]->mNumVertices; ++vertexIdx )
-     {
-     auto vertex = pAiScene->mMeshes[meshIdx]->mVertices[vertexIdx];
-     Vec3 vec( vertex.x, vertex.y, vertex.z );
-     std::cout << "vertex : " << vertexIdx << std::endl;
-     std::cout << ToStr( vec ) << std::endl;
-     auto vertexCord = pAiScene->mMeshes[meshIdx]->mTextureCoords[0][vertexIdx];
-     Vec3 vecC( vertexCord.x, vertexCord.y, vertexCord.z );
-     std::cout << ToStr( vecC ) << std::endl << std::endl;
-     }
-     }*/
+      verticesStrideNum += pMesh->mNumVertices;
+      }
    }
 
 void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMeshResHandle )

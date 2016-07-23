@@ -57,10 +57,15 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
       {
       auto pMesh = p_AiScene->mMeshes[ meshIdx ];
       extra->m_NumVertices += pMesh->mNumVertices;
-      for( unsigned int vertex = 0; vertex < pMesh->mNumVertices; vertex++ )
+      for( unsigned int vertexId = 0; vertexId < pMesh->mNumVertices; ++vertexId )
          {    
-         auto curSquareLength = pMesh->mVertices[ vertex ].SquareLength();
+         auto curSquareLength = pMesh->mVertices[ vertexId ].SquareLength();
          extra->m_Radius = std::max( extra->m_Radius, curSquareLength );
+         }
+
+      for( unsigned int faceId = 0; faceId < pMesh->mNumFaces; ++faceId )
+         {
+         extra->m_NumVertexIndex += pMesh->mFaces[ faceId ].mNumIndices;
          }
       }
 

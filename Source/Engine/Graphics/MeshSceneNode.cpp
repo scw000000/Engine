@@ -81,9 +81,9 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
-   m_VerticesCount = pMeshExtra->m_pScene->mMeshes[ 0 ]->mNumFaces * 3;
+   m_VerticesCount = pMeshExtra->m_NumVertexIndex;
    SetRadius( pMeshExtra->m_Radius );
-   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &m_UVBuffer, &m_IndexBuffer, &m_NormalBuffer, pMeshExtra->m_pScene );
+   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &m_UVBuffer, &m_IndexBuffer, &m_NormalBuffer, pMeshResHandle );
 
    // 1st attribute buffer : vertices
    glBindBuffer( GL_ARRAY_BUFFER, m_VerTexBuffer );

@@ -227,7 +227,7 @@ void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMesh
    glGenBuffers( 1, pBoneBuffer );
    glBindBuffer( GL_ARRAY_BUFFER, *pBoneBuffer );
    glBufferData( GL_ARRAY_BUFFER,
-                 vertexToBoneMappings.size() * sizeof( VertexToBoneMapping ),
+                 vertexToBoneMappings.size() * sizeof( vertexToBoneMappings[0] ),
                  &vertexToBoneMappings[ 0 ],
                  GL_STATIC_DRAW );
    }

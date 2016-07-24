@@ -18,6 +18,9 @@
 #include "OpenGLRenderer.h"
 #include "..\ResourceCache\MeshResource.h"
 
+#define VERTEX_LOCATION    0
+#define UV_LOCATION        1
+
 const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureVertexShader.vertexshader";
 const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureFragmentShader.fragmentshader";
 
@@ -31,14 +34,14 @@ SkySceneNode::SkySceneNode(
    m_IsActive( true )
    {
    m_Program = 0;
-   m_VertexBuffer = 0;
-   m_UVBuffer = 0;
-   m_IndexBuffer = 0;
+
+   ENG_ZERO_MEM( m_Buffers );
+
    m_MVPMatrix = 0;
    m_Texture = 0;
    m_TextureUni = 0;
-   m_VertexArray = 0;
-   m_VerticesCount = 0;
+   m_VertexArrayObj = 0;
+   m_VerticesIndexCount = 0;
    }
 
 SkySceneNode::~SkySceneNode( void )
@@ -50,8 +53,8 @@ SkySceneNode::~SkySceneNode( void )
 int SkySceneNode::VOnRestore( Scene *pScene )
    {
    ReleaseResource();
-   glGenVertexArrays( 1, &m_VertexArray );
-   glBindVertexArray( m_VertexArray );
+   glGenVertexArrays( 1, &m_VertexArrayObj );
+   glBindVertexArray( m_VertexArrayObj );
 
    m_VertexShader.OnRestore( pScene );
    m_FragmentShader.OnRestore( pScene );
@@ -67,15 +70,15 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
-   m_VerticesCount = pMeshExtra->m_NumVertexIndex;
+   m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
 
-   OpenGLRenderer::LoadMesh( &m_VertexBuffer, &m_UVBuffer, &m_IndexBuffer, NULL, pMeshResHandle );
+   OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], NULL, pMeshResHandle );
 
    // 1rst attribute buffer : vertices
-   glEnableVertexAttribArray( 0 );
-   glBindBuffer( GL_ARRAY_BUFFER, m_VertexBuffer );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
+   glEnableVertexAttribArray( VERTEX_LOCATION );
    glVertexAttribPointer(
-      0,                  // attribute
+      VERTEX_LOCATION,                  // attribute
       3,                  // size
       GL_FLOAT,           // type
       GL_FALSE,           // normalized?
@@ -84,10 +87,10 @@ int SkySceneNode::VOnRestore( Scene *pScene )
       );
 
    // 2nd attribute buffer : UVs
-   glEnableVertexAttribArray( 1 );
-   glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
+   glEnableVertexAttribArray( UV_LOCATION );
    glVertexAttribPointer(
-      1,                                // attribute
+      UV_LOCATION,                                // attribute
       2,                                // size
       GL_FLOAT,                         // type
       GL_FALSE,                         // normalized?
@@ -98,8 +101,7 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    m_MVPMatrix          = glGetUniformLocation( m_Program, "MVP" );
    m_TextureUni         = glGetUniformLocation( m_Program, "myTextureSampler" );
 
-
-   // resore all of its children
+   // restore all of its children
 	SceneNode::VOnRestore( pScene );
 
 	return S_OK;
@@ -109,7 +111,7 @@ int SkySceneNode::VRender( Scene *pScene )
    {
 	// Use our shader
 	glUseProgram( m_Program );
-   glBindVertexArray( m_VertexArray );
+   glBindVertexArray( m_VertexArrayObj );
 
    // Get the projection & view matrix from the camera class
 	Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
@@ -125,12 +127,12 @@ int SkySceneNode::VRender( Scene *pScene )
 	glUniform1i( m_TextureUni, 0);
   
    // Index buffer
-   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer );
+   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ Index_Buffer ] );
 
    // Draw the triangles !
    glDrawElements(
       GL_TRIANGLES,      // mode
-      m_VerticesCount,    // count
+      m_VerticesIndexCount,    // count
       GL_UNSIGNED_INT,   // type
       ( void* ) 0           // element array buffer offset
       );
@@ -142,28 +144,14 @@ int SkySceneNode::VRender( Scene *pScene )
 
 void SkySceneNode::ReleaseResource( void )
    {
-   if( m_VertexArray )
+   if( m_VertexArrayObj )
       {
-      glDeleteVertexArrays( 1, &m_VertexArray );
-      m_VertexArray = 0;
-      }
-   if( m_VertexBuffer )
-      {
-      glDeleteBuffers( 1, &m_VertexBuffer );
-      m_VertexBuffer = 0;
+      glDeleteVertexArrays( 1, &m_VertexArrayObj );
+      m_VertexArrayObj = 0;
       }
 
-   if( m_UVBuffer )
-      {
-      glDeleteBuffers( 1, &m_UVBuffer );
-      m_UVBuffer = 0;
-      }
-
-   if( m_IndexBuffer )
-      {
-      glDeleteBuffers( 1, &m_IndexBuffer );
-      m_IndexBuffer = 0;
-      }
+   glDeleteBuffers( ENG_ARRAY_SIZE_IN_ELEMENTS( m_Buffers ), &m_Buffers[ 0 ] );
+   ENG_ZERO_MEM( m_Buffers );
 
    if( m_TextureUni )
       {

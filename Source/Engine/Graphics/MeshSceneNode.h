@@ -26,7 +26,7 @@ class MeshSceneNode : public SceneNode
                      RenderPass renderPass,  
                      TransformPtr pTransform );
       ~MeshSceneNode( void );
-	   virtual int VOnRestore( Scene *pScene ) override; ;
+	   virtual int VOnRestore( Scene *pScene ) override;
 	   virtual int VOnLostDevice( Scene *pScene ) override { return S_OK; }
       // This function is called by Scene
       // bref: load constant buffers for material, light, etc in shaders
@@ -38,29 +38,35 @@ class MeshSceneNode : public SceneNode
 	    * @return int
 	    */
 	    virtual int VRender( Scene *pScene )  override;
-	   //virtual int VPick(Scene *pScene, RayCast *pRayCast);
       GLuint GetProgram( void ) { return m_Program; };
 
    protected:
       void ReleaseResource( void );
 
    protected:
-	   GLuint            m_Program;
-      GLuint            m_VerTexBuffer;
-      GLuint            m_UVBuffer;
+      shared_ptr<Resource>	 m_pMeshResource;
+      
+      GLuint            m_Program;
+      VertexShader		m_VertexShader;
+      FragmentShader		m_FragmentShader;
 
-      GLuint            m_IndexBuffer;
+      GLuint            m_VertexArrayObj;
+
+      enum VB_TYPES
+         {
+         Vertex_Buffer,
+         UV_Buffer, 
+         Normal_Buffer,
+         Index_Buffer, 
+         Num_Buffers
+         };
+
+      GLuint            m_Buffers[ Num_Buffers ];
 
       GLuint            m_MVPMatrix;
       GLuint            m_Texture;
       GLuint            m_TextureUni;
-      GLuint            m_VertexArray;
-      shared_ptr<Resource>	 m_pMeshResource;
-    //  MaterialPtr       m_pMaterial;
-	   VertexShader		m_VertexShader;
-	   FragmentShader		m_FragmentShader;
-
-      GLuint            m_NormalBuffer;
+      
       GLuint            m_ToWorldMatrix;
       GLuint            m_LightPosWorldSpace;
       GLuint            m_LigthDirection;
@@ -74,6 +80,5 @@ class MeshSceneNode : public SceneNode
       GLuint            m_MaterialAmbient;
       GLuint            m_MaterialDiffuse;
 
-      unsigned long     m_VerticesCount;
-	//float CalcBoundingSphere(CDXUTSDKMesh *mesh11);			// this was added post press.
+      unsigned long     m_VerticesIndexCount;
    };

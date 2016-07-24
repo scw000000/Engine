@@ -52,19 +52,25 @@ class SkySceneNode : public SceneNode
       bool					   m_IsActive;
 
 	   GLuint               m_Program;
-      GLuint               m_VertexBuffer;
-      GLuint               m_UVBuffer;
-      GLuint               m_IndexBuffer;
+      VertexShader		   m_VertexShader;
+      FragmentShader		   m_FragmentShader;
+
+      GLuint               m_VertexArrayObj;
+      enum VB_TYPES
+         {
+         Vertex_Buffer,
+         UV_Buffer,
+         Index_Buffer,
+         Num_Buffers
+         };
+      GLuint            m_Buffers[ Num_Buffers ];
+
       GLuint               m_MVPMatrix;
       GLuint               m_Texture;
       GLuint               m_TextureUni;
-      GLuint               m_VertexArray;
+      
       shared_ptr<Resource> m_pTextureResource;
       shared_ptr<Resource> m_pMeshResource;
-	   VertexShader		   m_VertexShader;
-	   FragmentShader		   m_FragmentShader;
-
-      unsigned long     m_VerticesCount;
-
-	//float CalcBoundingSphere(CDXUTSDKMesh *mesh11);			// this was added post press.
+	   
+      unsigned long     m_VerticesIndexCount;
    };

@@ -18,6 +18,10 @@
 #include "..\ResourceCache\TextureResource.h"
 #include "OpenGLRenderer.h"
 
+#define VERTEX_LOCATION    0
+#define UV_LOCATION        1
+#define NORMAL_LOCATION    2
+
 const char* const VERTEX_SHADER_FILE_NAME = "Effects\\BasicVertexShader.vertexshader";
 const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\BasicFragmentShader.fragmentshader";
 
@@ -30,17 +34,13 @@ MeshSceneNode::MeshSceneNode(
    m_FragmentShader( FRAGMENT_SHADER_FILE_NAME )
    {
    m_Program = 0;
-   m_VerTexBuffer = 0;
-   m_UVBuffer = 0;
 
-   m_IndexBuffer = 0;
+   ENG_ZERO_MEM( m_Buffers );
 
    m_MVPMatrix = 0;
    m_Texture = 0;
    m_TextureUni = 0;
-   m_VertexArray = 0;
-
-   m_NormalBuffer = 0;
+   m_VertexArrayObj = 0;
 
    m_ToWorldMatrix = 0;
    m_LightPosWorldSpace = 0;
@@ -52,7 +52,7 @@ MeshSceneNode::MeshSceneNode(
    m_MaterialAmbient = 0;
    m_MaterialDiffuse = 0;
 
-   m_VerticesCount = 0;
+   m_VerticesIndexCount = 0;
    }
 
 MeshSceneNode::~MeshSceneNode( void )
@@ -65,8 +65,8 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    {
    ReleaseResource();
 
-	glGenVertexArrays( 1, &m_VertexArray );
-	glBindVertexArray( m_VertexArray );
+	glGenVertexArrays( 1, &m_VertexArrayObj );
+	glBindVertexArray( m_VertexArrayObj );
 
    m_VertexShader.OnRestore( pScene );
    m_FragmentShader.OnRestore( pScene );
@@ -81,15 +81,15 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
-   m_VerticesCount = pMeshExtra->m_NumVertexIndex;
+   m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
    SetRadius( pMeshExtra->m_Radius );
-   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &m_UVBuffer, &m_IndexBuffer, &m_NormalBuffer, pMeshResHandle );
+   OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
 
    // 1st attribute buffer : vertices
-   glBindBuffer( GL_ARRAY_BUFFER, m_VerTexBuffer );
-   glEnableVertexAttribArray( 0 );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
+   glEnableVertexAttribArray( VERTEX_LOCATION );
    glVertexAttribPointer(
-      0,                  // attribute
+      VERTEX_LOCATION,                  // attribute
       3,                  // size
       GL_FLOAT,           // type
       GL_FALSE,           // normalized?
@@ -98,10 +98,10 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       );
 
    // 2nd attribute buffer : UVs
-   glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
-   glEnableVertexAttribArray( 1 );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
+   glEnableVertexAttribArray( UV_LOCATION );
    glVertexAttribPointer(
-      1,                                // attribute
+      UV_LOCATION,                                // attribute
       2,                                // size
       GL_FLOAT,                         // type
       GL_FALSE,                         // normalized?
@@ -109,10 +109,10 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       ( void* ) 0                          // array buffer offset
       );
 
-   glBindBuffer( GL_ARRAY_BUFFER, m_NormalBuffer );
-   glEnableVertexAttribArray( 2 );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Normal_Buffer ] );
+   glEnableVertexAttribArray( NORMAL_LOCATION );
    glVertexAttribPointer(
-      2,                  // attribute
+      NORMAL_LOCATION,                  // attribute
       3,                  // size
       GL_FLOAT,           // type
       GL_FALSE,           // normalized?
@@ -146,7 +146,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    {
 	// Use our shader
 	glUseProgram( m_Program );
-   glBindVertexArray( m_VertexArray );
+   glBindVertexArray( m_VertexArrayObj );
 
    // Get the projection & view matrix from the camera class
 	Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
@@ -181,7 +181,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    // Draw the triangles !
    glDrawElements(
       GL_TRIANGLES,      // mode
-      m_VerticesCount,    // count
+      m_VerticesIndexCount,    // count
       GL_UNSIGNED_INT,   // type
       ( void* ) 0           // element array buffer offset
       );
@@ -193,35 +193,14 @@ int MeshSceneNode::VRender( Scene *pScene )
 
 void MeshSceneNode::ReleaseResource( void )
    {
-   if( m_VertexArray )
+   if( m_VertexArrayObj )
       {
-      glDeleteVertexArrays( 1, &m_VertexArray );
-      m_VertexArray = 0;
+      glDeleteVertexArrays( 1, &m_VertexArrayObj );
+      m_VertexArrayObj = 0;
       }
 
-   if( m_VerTexBuffer )
-      {
-      glDeleteBuffers( 1, &m_VerTexBuffer );
-      m_VerTexBuffer = 0;
-      }
-
-   if( m_UVBuffer )
-      {
-      glDeleteBuffers( 1, &m_UVBuffer );
-      m_UVBuffer = 0;
-      }
-
-   if( m_IndexBuffer )
-      {
-      glDeleteBuffers( 1, &m_IndexBuffer );
-      m_IndexBuffer = 0;
-      }
-
-   if( m_NormalBuffer )
-      {
-      glDeleteBuffers( 1, &m_NormalBuffer );
-      m_NormalBuffer = 0;
-      }
+   glDeleteBuffers( ENG_ARRAY_SIZE_IN_ELEMENTS( m_Buffers ), &m_Buffers[ 0 ] );
+   ENG_ZERO_MEM( m_Buffers );
 
    if( m_TextureUni )
       {

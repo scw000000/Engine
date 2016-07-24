@@ -2,14 +2,14 @@
     <Data>
         <ActorClassResource path="actors\cube.xml" />
     </Data>
-    <MeshRenderComponent>
+    <SkeletalMeshRenderComponent>
         <Data>
             <Transform>
                 <Position x="3.140000" y="5.000000" />
                 <PitchYawRoll />
                 <Scale />
             </Transform>
-            <Mesh />
+            <SkeletalMesh />
             <Material>
                 <Texture />
                 <Diffuse />
@@ -28,5 +28,5 @@
                 </Light>
             </Data>
         </LightRenderComponent>
-    </MeshRenderComponent>
+    </SkeletalMeshRenderComponent>
 </ActorOverrides>

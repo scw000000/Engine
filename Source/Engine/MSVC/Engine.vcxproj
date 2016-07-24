@@ -103,6 +103,7 @@
     <ClCompile Include="..\Actors\MeshRenderComponent.cpp" />
     <ClCompile Include="..\Actors\PhysicsComponent.cpp" />
     <ClCompile Include="..\Actors\RenderComponent.cpp" />
+    <ClCompile Include="..\Actors\SkeletalMeshRenderComponent.cpp" />
     <ClCompile Include="..\Actors\SkyRenderComponent.cpp" />
     <ClCompile Include="..\Actors\TransformComponent.cpp" />
     <ClCompile Include="..\Controller\Controller.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="..\Actors\MeshRenderComponent.h" />
     <ClInclude Include="..\Actors\PhysicsComponent.h" />
     <ClInclude Include="..\Actors\RenderComponent.h" />
+    <ClInclude Include="..\Actors\SkeletalMeshRenderComponent.h" />
     <ClInclude Include="..\Actors\SkyRenderComponent.h" />
     <ClInclude Include="..\Actors\TransformComponent.h" />
     <ClInclude Include="..\Controller\Controller.h" />

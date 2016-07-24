@@ -20,6 +20,7 @@
 #include "SkyRenderComponent.h"
 #include "PhysicsComponent.h"
 #include "MeshRenderComponent.h"
+#include "SkeletalMeshRenderComponent.h"
 
 ActorComponentFactory& ActorComponentFactory::GetSingleton( void )
    {
@@ -63,6 +64,7 @@ ComponentRegisterId ActorComponentFactory::GetIdFromName( const std::string& nam
 ActorComponentFactory::ActorComponentFactory( void )
    {
    REGISTER_COMPONENT( MeshRenderComponent );
+   REGISTER_COMPONENT( SkeletalMeshRenderComponent );
    REGISTER_COMPONENT( LightRenderComponent );
    REGISTER_COMPONENT( SkyRenderComponent );
    REGISTER_COMPONENT( PhysicsComponent );

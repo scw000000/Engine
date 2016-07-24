@@ -127,10 +127,20 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Bone_Buffer ] );
 
    glEnableVertexAttribArray( BONE_ID_LOCATION );
-   glVertexAttribIPointer( BONE_ID_LOCATION, NUM_BONES_PER_VEREX, GL_UNSIGNED_INT, sizeof( OpenGLRenderer::VertexToBoneMapping ), ( const GLvoid* ) 0 );
+   glVertexAttribIPointer( 
+      BONE_ID_LOCATION, 
+      NUM_BONES_PER_VEREX, 
+      GL_UNSIGNED_INT, 
+      sizeof( OpenGLRenderer::VertexToBoneMapping ), 
+      ( const GLvoid* ) 0 );
 
    glEnableVertexAttribArray( BONE_WEIGHT_LOCATION );
-   glVertexAttribPointer( BONE_WEIGHT_LOCATION, NUM_BONES_PER_VEREX, GL_FLOAT, GL_FALSE, sizeof( OpenGLRenderer::VertexToBoneMapping ), ( const GLvoid* ) ( sizeof( unsigned int ) * NUM_BONES_PER_VEREX ) );
+   glVertexAttribPointer( 
+      BONE_WEIGHT_LOCATION, 
+      NUM_BONES_PER_VEREX, 
+      GL_FLOAT, GL_FALSE, 
+      sizeof( OpenGLRenderer::VertexToBoneMapping ), 
+      ( const GLvoid* ) ( sizeof( unsigned int ) * NUM_BONES_PER_VEREX ) );
 
    m_MVPMatrix = glGetUniformLocation( m_Program, "MVP" );
    m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler" );

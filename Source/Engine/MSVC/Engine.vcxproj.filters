@@ -223,6 +223,7 @@
     <ClCompile Include="..\Actors\MeshRenderComponent.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
+    <ClCompile Include="..\Actors\SkeletalMeshRenderComponent.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -411,6 +412,9 @@
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\Actors\MeshRenderComponent.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Actors\SkeletalMeshRenderComponent.h">
       <Filter>Actors</Filter>
     </ClInclude>
   </ItemGroup>

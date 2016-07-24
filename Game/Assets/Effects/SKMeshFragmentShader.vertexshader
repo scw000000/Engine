@@ -1,0 +1,73 @@
+#version 330 core
+
+// Input vertex data, different for all executions of this shader.
+layout(location = 0) in vec3 VertexPosition_Modelspace;
+layout(location = 1) in vec2 VertexUV;
+layout(location = 2) in vec3 VertexNormal_Modelspace;
+layout(location = 3) in uvec4 BoneIDs;
+layout(location = 4) in vec4 Weights;
+
+// Output data ; will be interpolated for each fragment.
+out vec2 UV;
+out vec4 TotalDiffuseColor;
+out vec3 TotalSpecularColor;
+
+// Values that stay constant for the whole mesh.
+uniform mat4 	MVP;
+uniform mat4 	M;
+
+uniform vec3 	LightPosition_WorldSpace[8];
+uniform vec3 	LighDirection[8];
+uniform vec3	LightColor[8];
+uniform float   LightPower[8];
+uniform vec3 	LightAmbient;
+uniform int     LightNumber;
+
+uniform vec3	EyeDirection_WorldSpace;
+
+uniform vec4 	MaterialDiffuse;
+uniform vec3	MaterialAmbient;
+
+
+void main()
+	{
+
+	// Output position of the vertex, in clip space : MVP * position
+	gl_Position =  MVP * vec4( VertexPosition_Modelspace, 1 );
+	
+	vec3 vecPosition_Worldspace = ( M * vec4( VertexPosition_Modelspace, 1 ) ).xyz;
+	vec3 vecNormal_WorldSpace = normalize( ( M * vec4( VertexNormal_Modelspace, 0 ) ).xyz );
+	vec3 reflection;
+	float cosAlpha;
+	float dotProduct;
+	float dist;
+	TotalDiffuseColor.rgb = vec3( 0, 0, 0 );
+	TotalSpecularColor = vec3( 0, 0, 0 );
+		
+	for( int i = 0; i < LightNumber; ++i )
+		{
+		dotProduct = max( 0, dot( vecNormal_WorldSpace, -LighDirection[i] ) );
+		dist = distance( vecPosition_Worldspace, LightPosition_WorldSpace[i] );
+		
+		// Direction in which the triangle reflects the light
+		reflection = reflect ( LighDirection[i], vecNormal_WorldSpace );
+		// Cosine of the angle between the Eye vector and the Reflect vector,
+		// clamped to 0
+		//  - Looking into the reflection -> 1
+		//  - Looking elsewhere -> < 1
+		cosAlpha = clamp( dot( -EyeDirection_WorldSpace, reflection ), 0, 1 );
+		
+		float temp = LightPower[i] / ( dist * dist );
+		TotalDiffuseColor.rgb +=  LightColor[i] * temp * dotProduct;
+		TotalSpecularColor +=  vec3( 0.3, 0.3, 0.3 ) * LightColor[i] * temp * pow( cosAlpha,5 );
+		}
+
+	//TotalDiffuseColor = MaterialAmbient * LightAmbient + MaterialDiffuse.rgb * TotalDiffuseColor;
+	TotalDiffuseColor.rgb = LightAmbient + TotalDiffuseColor.rgb;
+	
+	TotalDiffuseColor.a = MaterialDiffuse.a;
+	
+	// UV of the vertex. No special space for this one.
+	UV = VertexUV;
+	}
+

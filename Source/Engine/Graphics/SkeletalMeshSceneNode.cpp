@@ -18,29 +18,31 @@
 #include "..\ResourceCache\TextureResource.h"
 #include "OpenGLRenderer.h"
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\BasicVertexShader.vertexshader";
-const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\BasicFragmentShader.fragmentshader";
+#define VERTEX_LOCATION    0
+#define UV_LOCATION        1
+#define NORMAL_LOCATION    2
+#define BONE_ID_LOCATION    3
+#define BONE_WEIGHT_LOCATION    4
+
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\SKMeshFragmentShader.vertexshader";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\SKMeshFragmentShader.fragmentshader";
 
 SkeletalMeshSceneNode::SkeletalMeshSceneNode(
    const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, MaterialPtr pMaterial, RenderPass renderPass, TransformPtr pTransform )
    : SceneNode( actorId, pRenderComponent, renderPass, pTransform, pMaterial ),
-   m_pSkeletalMeshResource( pMeshResouce ),
+   m_pMeshResource( pMeshResouce ),
    // m_pMaterial(  ),
    m_VertexShader( VERTEX_SHADER_FILE_NAME ),
    m_FragmentShader( FRAGMENT_SHADER_FILE_NAME )
    {
    m_Program = 0;
-   m_VerTexBuffer = 0;
-   m_UVBuffer = 0;
 
-   m_IndexBuffer = 0;
+   ENG_ZERO_MEM( m_Buffers );
 
    m_MVPMatrix = 0;
    m_Texture = 0;
    m_TextureUni = 0;
-   m_VertexArray = 0;
-
-   m_NormalBuffer = 0;
+   m_VertexArrayObj = 0;
 
    m_ToWorldMatrix = 0;
    m_LightPosWorldSpace = 0;
@@ -65,8 +67,8 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    {
    ReleaseResource();
 
-   glGenVertexArrays( 1, &m_VertexArray );
-   glBindVertexArray( m_VertexArray );
+   glGenVertexArrays( 1, &m_VertexArrayObj );
+   glBindVertexArray( m_VertexArrayObj );
 
    m_VertexShader.OnRestore( pScene );
    m_FragmentShader.OnRestore( pScene );
@@ -78,47 +80,57 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
 
    OpenGLRenderer::LoadTexture( &m_Texture, m_Props.GetMaterialPtr()->GetTextureResource() );
 
-   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pSkeletalMeshResource );
+   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
    m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
    SetRadius( pMeshExtra->m_Radius );
-   OpenGLRenderer::LoadMesh( &m_VerTexBuffer, &m_UVBuffer, &m_IndexBuffer, &m_NormalBuffer, pMeshResHandle );
+   OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
+   OpenGLRenderer::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
+   
 
    // 1st attribute buffer : vertices
-   glBindBuffer( GL_ARRAY_BUFFER, m_VerTexBuffer );
-   glEnableVertexAttribArray( 0 );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
+   glEnableVertexAttribArray( VERTEX_LOCATION );
    glVertexAttribPointer(
-      0,                  // attribute
+      VERTEX_LOCATION,                  // attribute
       3,                  // size
       GL_FLOAT,           // type
       GL_FALSE,           // normalized?
       0,                  // stride
-      ( void* ) 0            // array buffer offset
+      ( const GLvoid* ) 0            // array buffer offset
       );
 
    // 2nd attribute buffer : UVs
-   glBindBuffer( GL_ARRAY_BUFFER, m_UVBuffer );
-   glEnableVertexAttribArray( 1 );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
+   glEnableVertexAttribArray( UV_LOCATION );
    glVertexAttribPointer(
-      1,                                // attribute
+      UV_LOCATION,                                // attribute
       2,                                // size
       GL_FLOAT,                         // type
       GL_FALSE,                         // normalized?
       0,                                // stride
-      ( void* ) 0                          // array buffer offset
+      ( const GLvoid* ) 0                          // array buffer offset
       );
 
-   glBindBuffer( GL_ARRAY_BUFFER, m_NormalBuffer );
-   glEnableVertexAttribArray( 2 );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Normal_Buffer ] );
+   glEnableVertexAttribArray( NORMAL_LOCATION );
    glVertexAttribPointer(
-      2,                  // attribute
+      NORMAL_LOCATION,                  // attribute
       3,                  // size
       GL_FLOAT,           // type
       GL_FALSE,           // normalized?
       0,                  // stride
-      ( void* ) 0            // array buffer offset
+      ( const GLvoid* ) 0            // array buffer offset
       );
+
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Bone_Buffer ] );
+
+   glEnableVertexAttribArray( BONE_ID_LOCATION );
+   glVertexAttribIPointer( BONE_ID_LOCATION, NUM_BONES_PER_VEREX, GL_UNSIGNED_INT, sizeof( OpenGLRenderer::VertexToBoneMapping ), ( const GLvoid* ) 0 );
+
+   glEnableVertexAttribArray( BONE_WEIGHT_LOCATION );
+   glVertexAttribPointer( BONE_WEIGHT_LOCATION, NUM_BONES_PER_VEREX, GL_FLOAT, GL_FALSE, sizeof( OpenGLRenderer::VertexToBoneMapping ), ( const GLvoid* ) ( sizeof( unsigned int ) * NUM_BONES_PER_VEREX ) );
 
    m_MVPMatrix = glGetUniformLocation( m_Program, "MVP" );
    m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler" );
@@ -146,7 +158,7 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
    {
    // Use our shader
    glUseProgram( m_Program );
-   glBindVertexArray( m_VertexArray );
+   glBindVertexArray( m_VertexArrayObj );
 
    // Get the projection & view matrix from the camera class
    Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
@@ -193,35 +205,14 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
 
 void SkeletalMeshSceneNode::ReleaseResource( void )
    {
-   if( m_VertexArray )
+   if( m_VertexArrayObj )
       {
-      glDeleteVertexArrays( 1, &m_VertexArray );
-      m_VertexArray = 0;
+      glDeleteVertexArrays( 1, &m_VertexArrayObj );
+      m_VertexArrayObj = 0;
       }
 
-   if( m_VerTexBuffer )
-      {
-      glDeleteBuffers( 1, &m_VerTexBuffer );
-      m_VerTexBuffer = 0;
-      }
-
-   if( m_UVBuffer )
-      {
-      glDeleteBuffers( 1, &m_UVBuffer );
-      m_UVBuffer = 0;
-      }
-
-   if( m_IndexBuffer )
-      {
-      glDeleteBuffers( 1, &m_IndexBuffer );
-      m_IndexBuffer = 0;
-      }
-
-   if( m_NormalBuffer )
-      {
-      glDeleteBuffers( 1, &m_NormalBuffer );
-      m_NormalBuffer = 0;
-      }
+   glDeleteBuffers( ENG_ARRAY_SIZE_IN_ELEMENTS( m_Buffers ), &m_Buffers[ 0 ] );
+   ENG_ZERO_MEM( m_Buffers );
 
    if( m_TextureUni )
       {

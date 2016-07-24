@@ -135,7 +135,7 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
       glBufferData( GL_ELEMENT_ARRAY_BUFFER, pMeshExtra->m_NumVertexIndex * sizeof( unsigned int ), NULL, GL_STATIC_DRAW );
       }
 
-   unsigned int verticesStrideNum = 0;
+   unsigned int verticesIndexOffset = 0;
    std::vector< unsigned int > indexBuffer;
    if( pIndexBuffer )
       {
@@ -147,7 +147,7 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
 
       glBindBuffer( GL_ARRAY_BUFFER, *pVertexBuffer );
       glBufferSubData( GL_ARRAY_BUFFER,
-                       verticesStrideNum * sizeof( aiVector3t<float> ),
+                       verticesIndexOffset * sizeof( aiVector3t<float> ),
                        pMesh->mNumVertices * sizeof( aiVector3t<float> ),
                        &pMesh->mVertices[ 0 ] );
       
@@ -161,7 +161,7 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
             }
          glBindBuffer( GL_ARRAY_BUFFER, *pUvBuffer );
          glBufferSubData( GL_ARRAY_BUFFER, 
-                          verticesStrideNum * sizeof( aiVector2t<float> ), 
+                          verticesIndexOffset * sizeof( aiVector2t<float> ), 
                           pMesh->mNumVertices * sizeof( aiVector2t<float> ), 
                           &uvVertices[ 0 ] );
          SAFE_DELETE_ARRAY( uvVertices );
@@ -171,7 +171,7 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
          {
          glBindBuffer( GL_ARRAY_BUFFER, *pNormalBuffer );
          glBufferSubData( GL_ARRAY_BUFFER, 
-                          verticesStrideNum * sizeof( aiVector3t<float> ), 
+                          verticesIndexOffset * sizeof( aiVector3t<float> ), 
                           pMesh->mNumVertices * sizeof( aiVector3t<float> ), 
                           &pMesh->mNormals[ 0 ]);
          }
@@ -182,13 +182,13 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
             {
             const aiFace& face = pMesh->mFaces[ faceIdx ];
             ENG_ASSERT( face.mNumIndices == 3 && "Warning: Mesh face with not exactly 3 indices, ignoring this primitive." );
-            indexBuffer.push_back( face.mIndices[ 0 ] + verticesStrideNum );
-            indexBuffer.push_back( face.mIndices[ 1 ] + verticesStrideNum );
-            indexBuffer.push_back( face.mIndices[ 2 ] + verticesStrideNum );
+            indexBuffer.push_back( face.mIndices[ 0 ] + verticesIndexOffset );
+            indexBuffer.push_back( face.mIndices[ 1 ] + verticesIndexOffset );
+            indexBuffer.push_back( face.mIndices[ 2 ] + verticesIndexOffset );
             }
          }
 
-      verticesStrideNum += pMesh->mNumVertices;
+      verticesIndexOffset += pMesh->mNumVertices;
       }
    if( pIndexBuffer )
       {
@@ -205,8 +205,8 @@ void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMesh
    ENG_ASSERT( pBoneBuffer && pMeshResHandle );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
    auto pAiScene = pMeshExtra->m_pScene;
-   unsigned int vertexIdStride = 0;
-   unsigned int boneIdStride = 0;
+   unsigned int vertexIdOffest = 0;
+   unsigned int boneIdOffset = 0;
    std::vector< OpenGLRenderer::VertexToBoneMapping > vertexToBoneMappings( pMeshExtra->m_NumVertices );
    for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
       {
@@ -217,11 +217,11 @@ void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMesh
          for( unsigned int weightIdx = 0; weightIdx < pBone->mNumWeights; weightIdx++ )
             {
             const aiVertexWeight& boneWeight = pBone->mWeights[ weightIdx ];
-            vertexToBoneMappings[ vertexIdStride + boneWeight.mVertexId ].AddBoneData( boneIdStride + boneIdx, boneWeight.mWeight );
+            vertexToBoneMappings[ vertexIdOffest + boneWeight.mVertexId ].AddBoneData( boneIdOffset + boneIdx, boneWeight.mWeight );
             }
          }
-      vertexIdStride += pMesh->mNumVertices;
-      boneIdStride += pMesh->mNumBones;
+      vertexIdOffest += pMesh->mNumVertices;
+      boneIdOffset += pMesh->mNumBones;
       }
 
    glGenBuffers( 1, pBoneBuffer );

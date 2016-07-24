@@ -16,10 +16,10 @@
 
 class SkeletalMeshSceneNode : public SceneNode
    {
-      public:
+   public:
       SkeletalMeshSceneNode( const ActorId actorId,
                      IRenderComponent* pRenderComponent,
-                     shared_ptr<Resource> pSkMeshResouce,
+                     shared_ptr<Resource> pMeshResouce,
                      MaterialPtr pMaterial,
                      RenderPass renderPass,
                      TransformPtr pTransform );
@@ -38,26 +38,34 @@ class SkeletalMeshSceneNode : public SceneNode
       virtual int VRender( Scene *pScene )  override;
       GLuint GetProgram( void ) { return m_Program; };
 
-      protected:
+   protected:
       void ReleaseResource( void );
 
-      protected:
-      GLuint            m_Program;
-      GLuint            m_VerTexBuffer;
-      GLuint            m_UVBuffer;
+   protected:
+      shared_ptr<Resource>	 m_pMeshResource;
 
-      GLuint            m_IndexBuffer;
+      GLuint            m_Program;
+      VertexShader		m_VertexShader;
+      FragmentShader		m_FragmentShader;
+
+      GLuint            m_VertexArrayObj;
+
+      enum VB_TYPES
+         {
+         Vertex_Buffer,
+         UV_Buffer,
+         Normal_Buffer,
+         Bone_Buffer,
+         Index_Buffer,
+         Num_Buffers
+         };
+
+      GLuint            m_Buffers[ Num_Buffers ];
 
       GLuint            m_MVPMatrix;
       GLuint            m_Texture;
       GLuint            m_TextureUni;
-      GLuint            m_VertexArray;
-      shared_ptr<Resource>	 m_pSkeletalMeshResource;
-      //  MaterialPtr       m_pMaterial;
-      VertexShader		m_VertexShader;
-      FragmentShader		m_FragmentShader;
 
-      GLuint            m_NormalBuffer;
       GLuint            m_ToWorldMatrix;
       GLuint            m_LightPosWorldSpace;
       GLuint            m_LigthDirection;
@@ -72,5 +80,4 @@ class SkeletalMeshSceneNode : public SceneNode
       GLuint            m_MaterialDiffuse;
 
       unsigned long     m_VerticesIndexCount;
-      //float CalcBoundingSphere(CDXUTSDKMesh *mesh11);			// this was added post press.
    };

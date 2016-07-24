@@ -14,7 +14,6 @@
 
 #include "EngineStd.h"
 #include "LightRenderComponent.h"
-#include "TransformComponent.h"
 #include "..\Graphics\Light.h"
 
 //const char* LightRenderComponent::g_Name = "LightRenderComponent";

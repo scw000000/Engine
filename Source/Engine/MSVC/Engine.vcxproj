@@ -100,6 +100,7 @@
     <ClCompile Include="..\Actors\ActorComponentFactory.cpp" />
     <ClCompile Include="..\Actors\ActorFactory.cpp" />
     <ClCompile Include="..\Actors\LightRenderComponent.cpp" />
+    <ClCompile Include="..\Actors\MeshRenderComponent.cpp" />
     <ClCompile Include="..\Actors\PhysicsComponent.cpp" />
     <ClCompile Include="..\Actors\RenderComponent.cpp" />
     <ClCompile Include="..\Actors\SkyRenderComponent.cpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="..\Actors\ActorComponentFactory.h" />
     <ClInclude Include="..\Actors\ActorFactory.h" />
     <ClInclude Include="..\Actors\LightRenderComponent.h" />
+    <ClInclude Include="..\Actors\MeshRenderComponent.h" />
     <ClInclude Include="..\Actors\PhysicsComponent.h" />
     <ClInclude Include="..\Actors\RenderComponent.h" />
     <ClInclude Include="..\Actors\SkyRenderComponent.h" />

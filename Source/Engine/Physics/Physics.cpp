@@ -21,7 +21,6 @@
 #include "Raycast.h"
 
 #include "..\ResourceCache\XmlResource.h"
-#include "..\Actors\TransformComponent.h"
 #include "..\Event\Events.h"
 #include "..\Event\PhysicsEvents.h"
 #include "..\Event\EventManager.h"

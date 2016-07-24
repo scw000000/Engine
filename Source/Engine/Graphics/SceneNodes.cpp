@@ -16,7 +16,6 @@
 #include "SceneNodes.h"
 #include "Scene.h"
 #include "..\Actors\ActorComponent.h"
-#include "..\Actors\TransformComponent.h"
 #include "..\Actors\RenderComponent.h"
 
 SceneNodeProperties::SceneNodeProperties( void ) : m_pTransform( ENG_NEW Transform() ), m_pMaterial()

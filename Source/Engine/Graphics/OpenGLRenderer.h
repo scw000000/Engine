@@ -25,6 +25,7 @@ struct aiScene;
  */
 class OpenGLRenderer : public IRenderer
    {
+   friend class SkeletalMeshSceneNode;
    public:
       OpenGLRenderer( void );
       ~OpenGLRenderer( void );

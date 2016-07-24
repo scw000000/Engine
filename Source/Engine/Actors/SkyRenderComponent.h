@@ -1,3 +1,4 @@
+#pragma once
 /*!
  * \file SkyRenderComponent.h
  * \date 2016/05/03 16:54

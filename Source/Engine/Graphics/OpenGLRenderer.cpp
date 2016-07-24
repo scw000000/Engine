@@ -136,14 +136,18 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
       }
 
    unsigned int verticesStrideNum = 0;
-   unsigned int faceStrideNum = 0;
+   std::vector< unsigned int > indexBuffer;
+   if( pIndexBuffer )
+      {
+      indexBuffer.reserve( pMeshExtra->m_NumVertexIndex );
+      }
    for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
       {
       auto pMesh = pAiScene->mMeshes[ meshIdx ];
 
       glBindBuffer( GL_ARRAY_BUFFER, *pVertexBuffer );
-      glBufferSubData( GL_ARRAY_BUFFER, 
-                       verticesStrideNum * sizeof( aiVector3t<float> ), 
+      glBufferSubData( GL_ARRAY_BUFFER,
+                       verticesStrideNum * sizeof( aiVector3t<float> ),
                        pMesh->mNumVertices * sizeof( aiVector3t<float> ),
                        &pMesh->mVertices[ 0 ] );
       
@@ -174,21 +178,25 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
 
       if( pIndexBuffer )
          {
-         glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, *pIndexBuffer );
          for( unsigned int faceIdx = 0; faceIdx < pMesh->mNumFaces; ++faceIdx )
             {
             const aiFace& face = pMesh->mFaces[ faceIdx ];
             ENG_ASSERT( face.mNumIndices == 3 && "Warning: Mesh face with not exactly 3 indices, ignoring this primitive." );
-            glBufferSubData( GL_ELEMENT_ARRAY_BUFFER,
-                             faceStrideNum * sizeof( unsigned int ),
-                             face.mNumIndices  * sizeof( unsigned int ),
-                             &face.mIndices[ 0 ] );
- 
-            faceStrideNum += face.mNumIndices;
+            indexBuffer.push_back( face.mIndices[ 0 ] + verticesStrideNum );
+            indexBuffer.push_back( face.mIndices[ 1 ] + verticesStrideNum );
+            indexBuffer.push_back( face.mIndices[ 2 ] + verticesStrideNum );
             }
          }
 
       verticesStrideNum += pMesh->mNumVertices;
+      }
+   if( pIndexBuffer )
+      {
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, *pIndexBuffer );
+      glBufferSubData( GL_ELEMENT_ARRAY_BUFFER,
+                       0,
+                       indexBuffer.size() * sizeof( indexBuffer[ 0 ] ),
+                       &indexBuffer[ 0 ] );
       }
    }
 

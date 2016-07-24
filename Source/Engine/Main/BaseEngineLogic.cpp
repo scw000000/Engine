@@ -75,13 +75,13 @@ bool BaseEngineLogic::Init()
    IGamePhysics::RegisterImplementation< BulletPhysics >();
    IGamePhysics::GetSingleton().VInitialize();
    m_pLevelManager->Init();
+   m_pWrold->OnRestore();
    if( !VLoadLevel() )
       {
       ENG_ERROR( "The game failed to load." );
       g_pApp->AbortGame( );
       return false;
       }
-   m_pWrold->OnRestore();
    m_pGUIManager->Init( g_pApp->m_EngineOptions.GetGUIDirectory() );
 
    shared_ptr<IView> pView( ENG_NEW HumanView( ) );

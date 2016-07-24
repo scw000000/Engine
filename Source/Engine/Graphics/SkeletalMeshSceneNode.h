@@ -18,8 +18,12 @@
 class BoneData
    {
    public:
+      BoneData( const Transform& transform ) { m_BoneOffset = transform;  }
+      
+   public:
       Transform m_FinalTransform;
-
+      Transform m_BoneOffset;
+   
    private:
    };
 

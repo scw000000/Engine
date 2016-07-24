@@ -27,6 +27,17 @@
 const char* const VERTEX_SHADER_FILE_NAME = "Effects\\SKMeshFragmentShader.vertexshader";
 const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\SKMeshFragmentShader.fragmentshader";
 
+Vec3 aiVector3DToVec3( const aiVector3D& aiVector )
+   {
+   return Vec3( aiVector.x, aiVector.y, aiVector.z );
+   }
+
+Quaternion aiQuateronionToQuat( const aiQuaternion& aiQuat )
+   {
+   return Quaternion( aiQuat.w, aiQuat.x, aiQuat.y, aiQuat.z );
+   }
+
+
 SkeletalMeshSceneNode::SkeletalMeshSceneNode(
    const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, MaterialPtr pMaterial, RenderPass renderPass, TransformPtr pTransform )
    : SceneNode( actorId, pRenderComponent, renderPass, pTransform, pMaterial ),
@@ -273,7 +284,7 @@ void SkeletalMeshSceneNode::LoadBones( shared_ptr<MeshResourceExtraData> pMeshEx
          auto pBone = pMesh->mBones[ boneIdx ];
          if( m_BoneMappingData.find( pBone->mName.C_Str() ) == m_BoneMappingData.end() )
             {
-            m_BoneMappingData[ pBone->mName.C_Str() ] = BoneData();
+            m_BoneMappingData[ pBone->mName.C_Str() ] = BoneData( meshIdx, boneIdx );
             }
          }
       }
@@ -283,42 +294,37 @@ void SkeletalMeshSceneNode::UpdateAnimationBones( float aiAnimTicks, aiAnimation
    {
    std::string nodeName( pAiNode->mName.C_Str() );
 
-   Matrix4f NodeTransformation( pAiNode->mTransformation );
+   Transform nodeTransform( pAiNode->mTransformation );
    // find the corresponding aiNodeAnim of this node
    // each aiAnimation has multiple channels, which should map to a aiNode
-   const aiNodeAnim* pNodeAnim = FindNodeAnim( pAnimation, NodeName );
+   const aiNodeAnim* pNodeAnim = FindNodeAnim( nodeName, pAnimation );
 
    if( pNodeAnim )
       {
       // Interpolate scaling and generate scaling transformation matrix
-      aiVector3D scale = CalcInterpolatedScaling( aiAnimTicks, pNodeAnim );
-      Matrix4f ScalingM;
-      ScalingM.InitScaleTransform( scale.x, scale.y, scale.z );
+      Vec3 scale = aiVector3DToVec3( CalcInterpolatedScaling( aiAnimTicks, pNodeAnim ) );
 
       // Interpolate rotation and generate rotation transformation matrix
-      aiQuaternion quaternion = CalcInterpolatedRotation( aiAnimTicks, pNodeAnim );
-      Matrix4f RotationM = Matrix4f( quaternion.GetMatrix() );
+      Quaternion quat = aiQuateronionToQuat( CalcInterpolatedRotation( aiAnimTicks, pNodeAnim ) );
 
       // Interpolate translation and generate translation transformation matrix
-      aiVector3D translation = CalcInterpolatedPosition( aiAnimTicks, pNodeAnim );
-      Matrix4f TranslationM;
-      TranslationM.InitTranslationTransform( translation.x, translation.y, translation.z );
-
+      Vec3 translation = aiVector3DToVec3( CalcInterpolatedPosition( aiAnimTicks, pNodeAnim ) );
+     
       // Combine the above transformations
-      NodeTransformation = TranslationM * RotationM * ScalingM;
+      nodeTransform = Transform( translation, scale, quat );
       }
 
-   Matrix4f GlobalTransformation = parentTransfrom * NodeTransformation;
+   Transform globalTransform = parentTransfrom * nodeTransform;
 
    if( m_BoneMapping.find( NodeName ) != m_BoneMapping.end() )
       {
       uint BoneIndex = m_BoneMapping[ NodeName ];
-      m_BoneInfo[ BoneIndex ].FinalTransformation = m_GlobalInverseTransform * GlobalTransformation * m_BoneInfo[ BoneIndex ].BoneOffset;
+      m_BoneInfo[ BoneIndex ].FinalTransformation = m_GlobalInverseTransform * globalTransform * m_BoneInfo[ BoneIndex ].BoneOffset;
       }
 
    for( unsigned int i = 0; i < pAiNode->mNumChildren; i++ )
       {
-      UpdateAnimationBones( aiAnimTicks, pAnimation, pAiNode->mChildren[ i ], GlobalTransformation );
+      UpdateAnimationBones( aiAnimTicks, pAnimation, pAiNode->mChildren[ i ], globalTransforma );
       }
    }
 

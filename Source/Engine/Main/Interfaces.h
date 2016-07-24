@@ -260,7 +260,7 @@ class ISceneNode
 	   virtual void VSetTransformPtr( TransformPtr pNewTransform ) = 0;
       virtual void VSetTransform( const Transform& newTransform ) = 0;
 
-	   virtual int VOnUpdate( Scene *pScene, const unsigned long deltaMs ) = 0;
+	   virtual int VOnUpdate( Scene *pScene, unsigned long deltaMs ) = 0;
 	   virtual int VOnRestore( Scene *pScene ) = 0;
 
 	   virtual int VPreRender( Scene *pScene ) = 0;
@@ -279,8 +279,6 @@ class ISceneNode
 
       virtual void VSetParentNode( ISceneNode* pParent ) = 0;
       virtual ISceneNode* VGetParentNode( void ) = 0;
-
-//	   virtual int VPick( Scene *pScene, RayCast *pRayCast ) = 0;
    };
 
 class IScriptManager

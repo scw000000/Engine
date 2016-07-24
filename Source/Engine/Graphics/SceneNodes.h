@@ -100,7 +100,7 @@ class SceneNode : public ISceneNode
       virtual void VSetTransform( const Transform& newTransform ) override;
 
 	   virtual int VOnRestore( Scene *pScene ) override;
-	   virtual int VOnUpdate( Scene *, const unsigned long elapsedMs ) override;
+      virtual int VOnUpdate( Scene *pScene, unsigned long elapsedMs ) override;
 
 	   virtual int VPreRender( Scene *pScene ) override;
 	   virtual bool VIsVisible( Scene *pScene ) override;

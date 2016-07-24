@@ -57,7 +57,7 @@ class GLLightNode : public LightNode
       {}
 
       virtual int VOnRestore( Scene *pScene ) override { return S_OK; } ;
-      virtual int VOnUpdate( Scene *, const unsigned long deltaMs ) override;
+      virtual int VOnUpdate( Scene *, unsigned long deltaMs ) override;
    };
 
 

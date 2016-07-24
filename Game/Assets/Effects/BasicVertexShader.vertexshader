@@ -14,10 +14,12 @@ out vec3 TotalSpecularColor;
 uniform mat4 	MVP;
 uniform mat4 	M;
 
-uniform vec3 	LightPosition_WorldSpace[8];
-uniform vec3 	LighDirection[8];
-uniform vec3	LightColor[8];
-uniform float   LightPower[8];
+const int MAXIMUM_LIGHTS_SUPPORTED = 8;
+
+uniform vec3 	LightPosition_WorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
+uniform vec3 	LighDirection[ MAXIMUM_LIGHTS_SUPPORTED ];
+uniform vec3	LightColor[ MAXIMUM_LIGHTS_SUPPORTED ];
+uniform float   LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
 uniform vec3 	LightAmbient;
 uniform int     LightNumber;
 

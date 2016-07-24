@@ -57,6 +57,7 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
       {
       auto pMesh = p_AiScene->mMeshes[ meshIdx ];
       extra->m_NumVertices += pMesh->mNumVertices;
+      extra->m_NumBones += pMesh->mNumBones;
       for( unsigned int vertexId = 0; vertexId < pMesh->mNumVertices; ++vertexId )
          {    
          auto curSquareLength = pMesh->mVertices[ vertexId ].SquareLength();

@@ -96,7 +96,7 @@ int SceneNode::VOnRestore( Scene *pScene )
    return S_OK;
    }
 
-int SceneNode::VOnUpdate( Scene* pScene, const unsigned long deltaMs )
+int SceneNode::VOnUpdate( Scene* pScene, unsigned long deltaMs )
    {
    for( auto it : m_Children )
       {

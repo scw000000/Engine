@@ -14,6 +14,22 @@
  */
 #include "Shaders.h"
 
+
+class BoneData
+   {
+   public:
+      Transform m_FinalTransform;
+
+   private:
+   };
+
+typedef std::unordered_map< std::string, BoneData > BoneMappingData;
+
+class MeshResourceExtraData;
+
+struct aiAnimation;
+struct aiNodeAnim;
+
 class SkeletalMeshSceneNode : public SceneNode
    {
    public:
@@ -26,20 +42,25 @@ class SkeletalMeshSceneNode : public SceneNode
       ~SkeletalMeshSceneNode( void );
       virtual int VOnRestore( Scene *pScene ) override;
       virtual int VOnLostDevice( Scene *pScene ) override { return S_OK; }
-      // This function is called by Scene
-      // bref: load constant buffers for material, light, etc in shaders
-      // load vertex buffer & index buffer and make draw call
-      /**
-      * @brief
-      *
-      * @param  pScene Scene * pScene
-      * @return int
-      */
+
       virtual int VRender( Scene *pScene )  override;
+      virtual int VOnUpdate( Scene *pScene, unsigned long elapsedMs ) override;
+      
+
       GLuint GetProgram( void ) { return m_Program; };
 
    protected:
       void ReleaseResource( void );
+      void LoadBones( shared_ptr<MeshResourceExtraData> pMeshExtra );
+      void UpdateAnimationBones( float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const Transform& parentTransfrom );
+      aiAnimation* FindAnimation( const std::string& animationName, const aiScene* pAiScene ) const;
+      aiNodeAnim* FindNodeAnim( const std::string& boneName, const aiAnimation* pAnimation ) const;
+      unsigned int FindPosition( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
+      unsigned int FindRotation( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
+      unsigned int FindScaling( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
+      aiVector3D CalcInterpolatedPosition( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
+      aiQuaternion CalcInterpolatedRotation( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
+      aiVector3D CalcInterpolatedScaling( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
 
    protected:
       shared_ptr<Resource>	 m_pMeshResource;
@@ -80,4 +101,7 @@ class SkeletalMeshSceneNode : public SceneNode
       GLuint            m_MaterialDiffuse;
 
       unsigned long     m_VerticesIndexCount;
+
+      BoneMappingData m_BoneMappingData;
+      std::string      m_CurrentAnimation;
    };

@@ -96,7 +96,10 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
 
    m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
    SetRadius( pMeshExtra->m_Radius );
-   LoadBones( pMeshExtra );
+
+   /*LoadBones( pMeshExtra );*/
+
+   m_BoneAnimationData.resize( pMeshExtra->m_NumBones );
 
    OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
    OpenGLRenderer::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
@@ -240,15 +243,26 @@ int SkeletalMeshSceneNode::VOnUpdate( Scene * pScene, unsigned long elapsedMs )
       // If the time is larger than the animation, mod it
       float aiAnimTicks = fmod( aiTimeInTicks, ( float ) pAnimation->mDuration );
 
-      UpdateAnimationBones( aiAnimTicks, pAnimation, pAiScene->mRootNode, pScene->GetTopTransform() );
+      UpdateAnimationBones( pMeshExtra, aiAnimTicks, pAnimation, pAiScene->mRootNode, pScene->GetTopTransform() );
       }
    // for updates its children
    SceneNode::VOnUpdate( pScene, elapsedMs );
    return S_OK;
    }
 
+//void SkeletalMeshSceneNode::LoadBones( shared_ptr<MeshResourceExtraData> pMeshExtra )
+//   {
+//   
+//   for( auto boneDataIt : pMeshExtra->m_BoneMappingData )
+//      {
+//      m_BoneAnimationData[ boneDataIt.second.m_BoneId ] 
+//      }
+//   }
+
 void SkeletalMeshSceneNode::ReleaseResource( void )
    {
+   m_BoneAnimationData.clear();
+
    if( m_VertexArrayObj )
       {
       glDeleteVertexArrays( 1, &m_VertexArrayObj );
@@ -271,30 +285,11 @@ void SkeletalMeshSceneNode::ReleaseResource( void )
       }
    }
 
-void SkeletalMeshSceneNode::LoadBones( shared_ptr<MeshResourceExtraData> pMeshExtra )
-   {
-   auto pAiScene = pMeshExtra->m_pScene;
-   
-   m_BoneMappingData.reserve( pMeshExtra->m_NumBones );
-   for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
-      {
-      auto pMesh = pAiScene->mMeshes[ meshIdx ];
-      for( unsigned int boneIdx = 0; boneIdx < pMesh->mNumBones; ++boneIdx )
-         {
-         auto pBone = pMesh->mBones[ boneIdx ];
-         if( m_BoneMappingData.find( pBone->mName.C_Str() ) == m_BoneMappingData.end() )
-            {
-            m_BoneMappingData[ pBone->mName.C_Str() ] = BoneData( meshIdx, boneIdx );
-            }
-         }
-      }
-   }
-
-void SkeletalMeshSceneNode::UpdateAnimationBones( float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const Transform& parentTransfrom )
+void SkeletalMeshSceneNode::UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const Transform& parentTransfrom )
    {
    std::string nodeName( pAiNode->mName.C_Str() );
 
-   Transform nodeTransform( pAiNode->mTransformation );
+   Transform nodeTransform;
    // find the corresponding aiNodeAnim of this node
    // each aiAnimation has multiple channels, which should map to a aiNode
    const aiNodeAnim* pNodeAnim = FindNodeAnim( nodeName, pAnimation );
@@ -313,18 +308,22 @@ void SkeletalMeshSceneNode::UpdateAnimationBones( float aiAnimTicks, aiAnimation
       // Combine the above transformations
       nodeTransform = Transform( translation, scale, quat );
       }
-
-   Transform globalTransform = parentTransfrom * nodeTransform;
-
-   if( m_BoneMapping.find( NodeName ) != m_BoneMapping.end() )
+   else
       {
-      uint BoneIndex = m_BoneMapping[ NodeName ];
-      m_BoneInfo[ BoneIndex ].FinalTransformation = m_GlobalInverseTransform * globalTransform * m_BoneInfo[ BoneIndex ].BoneOffset;
+      nodeTransform = aiMat4x4ToTransform( pAiNode->mTransformation );
+      }
+
+   Transform boneGlobalAniTransform = parentTransfrom * nodeTransform;
+   BoneMappingData& boneMappingData = pMeshExtra->m_BoneMappingData;
+   if( boneMappingData.find( nodeName ) != boneMappingData.end() )
+      {
+      BoneData& boneData = boneMappingData[ nodeName ];
+      m_BoneAnimationData[ boneData.m_BoneId ].m_AnimationTransform = /*m_GlobalInverseTransform **/ boneGlobalAniTransform * boneData.m_BoneOffset;
       }
 
    for( unsigned int i = 0; i < pAiNode->mNumChildren; i++ )
       {
-      UpdateAnimationBones( aiAnimTicks, pAnimation, pAiNode->mChildren[ i ], globalTransforma );
+      UpdateAnimationBones( pMeshExtra, aiAnimTicks, pAnimation, pAiNode->mChildren[ i ], boneGlobalAniTransform );
       }
    }
 
@@ -445,8 +444,7 @@ aiVector3D SkeletalMeshSceneNode::CalcInterpolatedScaling( float AnimationTime, 
    aiVector3D ret;
    if( pNodeAnim->mNumScalingKeys == 1 )
       {
-      ret = pNodeAnim->mScalingKeys[ 0 ].mValue;
-      return;
+      return pNodeAnim->mScalingKeys[ 0 ].mValue;
       }
    // find the last key frame that its time is smaller than specified animation time
    unsigned int ScalingIndex = FindScaling( AnimationTime, pNodeAnim );

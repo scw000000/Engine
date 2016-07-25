@@ -213,6 +213,7 @@ class Mat4x4 : public glm::mat4
       inline Vec3 GetToWorldPosition( void ) const { return Vec3( (*this)[3] ); }
       
       inline Vec4 GetRow( const int index ) const { return Vec4( (*this)[index] ); }
+      inline void SetRow( const int index, const Vec4& newRow ) { ( *this )[ index ] = newRow; }
       inline Vec4 GetCol( const int index ) const { return Vec4( glm::row( *this, index ) ); }
 
       // Get Scale from each column's length

@@ -15,20 +15,6 @@
 #include "Shaders.h"
 
 
-class BoneData
-   {
-   public:
-      BoneData( const Transform& transform ) { m_BoneOffset = transform;  }
-      
-   public:
-      Transform m_FinalTransform;
-      Transform m_BoneOffset;
-   
-   private:
-   };
-
-typedef std::unordered_map< std::string, BoneData > BoneMappingData;
-
 class MeshResourceExtraData;
 
 struct aiAnimation;
@@ -55,8 +41,8 @@ class SkeletalMeshSceneNode : public SceneNode
 
    protected:
       void ReleaseResource( void );
-      void LoadBones( shared_ptr<MeshResourceExtraData> pMeshExtra );
-      void UpdateAnimationBones( float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const Transform& parentTransfrom );
+      /*void LoadBones( shared_ptr<MeshResourceExtraData> pMeshExtra );*/
+      void UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const Transform& parentTransfrom );
       aiAnimation* FindAnimation( const std::string& animationName, const aiScene* pAiScene ) const;
       aiNodeAnim* FindNodeAnim( const std::string& boneName, const aiAnimation* pAnimation ) const;
       unsigned int FindPosition( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
@@ -106,6 +92,13 @@ class SkeletalMeshSceneNode : public SceneNode
 
       unsigned long     m_VerticesIndexCount;
 
-      BoneMappingData m_BoneMappingData;
       std::string      m_CurrentAnimation;
+
+      class BoneAnimationData
+         {
+         public:
+            Transform m_AnimationTransform;
+         };
+
+      std::vector< BoneAnimationData > m_BoneAnimationData;
    };

@@ -12,6 +12,7 @@
  *
  * \note
  */
+#include "..\ResourceCache\MeshResource.h"
 
 struct aiScene;
 
@@ -59,8 +60,8 @@ class OpenGLRenderer : public IRenderer
       struct VertexToBoneMapping
          {
          #define NUM_BONES_PER_VEREX 4
-            public:
-            unsigned int m_BoneIDs[ NUM_BONES_PER_VEREX ];
+         public:
+            BoneId m_BoneIDs[ NUM_BONES_PER_VEREX ];
             float m_BoneWeights[ NUM_BONES_PER_VEREX ];
 
             VertexToBoneMapping( void )
@@ -69,6 +70,6 @@ class OpenGLRenderer : public IRenderer
                ENG_ZERO_MEM( m_BoneWeights );
                };
 
-            void AddBoneData( unsigned int boneID, float boneWeight );
+            void AddBoneData( BoneId boneID, float boneWeight );
          };
    };

@@ -18,9 +18,25 @@
 
 struct aiScene;
 
+extern Transform aiMat4x4ToTransform( const aiMatrix4x4& aiMat44 );
+typedef unsigned int BoneId;
+
+class BoneData
+   {
+   public:
+      BoneData( const Transform& transform, BoneId id ) { m_BoneOffset = transform;  m_BoneId = id; }
+
+   public:
+      Transform m_BoneOffset;
+      BoneId m_BoneId;
+   private:
+   };
+
+typedef std::unordered_map< std::string, BoneData > BoneMappingData;
+
 class MeshResourceExtraData : public IResourceExtraData
    {
-	friend class SdkMeshResourceLoader;
+   friend class MeshResourceLoader;
 
    public:
       MeshResourceExtraData() : m_pScene( NULL ) { m_Radius = 0.f; m_NumVertices = 0; m_NumVertexIndex = 0; m_NumBones = 0; };
@@ -33,6 +49,10 @@ class MeshResourceExtraData : public IResourceExtraData
       unsigned int m_NumVertices;
       unsigned int m_NumVertexIndex;
       unsigned int m_NumBones;
+      BoneMappingData m_BoneMappingData;
+
+   protected:
+      void LoadBones( void );
    };
 
 

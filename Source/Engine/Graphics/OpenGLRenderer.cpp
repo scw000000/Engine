@@ -12,7 +12,7 @@
 #include "..\ResourceCache\TextureResource.h"
 #include "..\ResourceCache\MeshResource.h"
 
-void OpenGLRenderer::VertexToBoneMapping::AddBoneData( unsigned int boneID, float boneWeight )
+void OpenGLRenderer::VertexToBoneMapping::AddBoneData( BoneId boneID, float boneWeight )
    {
    for( unsigned i = 0; i < NUM_BONES_PER_VEREX; i++ )
       {
@@ -214,10 +214,12 @@ void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMesh
       for( unsigned int boneIdx = 0; boneIdx < pMesh->mNumBones; boneIdx++ )
          {
          auto pBone = pMesh->mBones[ boneIdx ];
+         ENG_ASSERT( pMeshExtra->m_BoneMappingData.find( pBone->mName.C_Str() ) != pMeshExtra->m_BoneMappingData.end() );
+         BoneId boneId = pMeshExtra->m_BoneMappingData[ pBone->mName.C_Str() ].m_BoneId;
          for( unsigned int weightIdx = 0; weightIdx < pBone->mNumWeights; weightIdx++ )
             {
             const aiVertexWeight& boneWeight = pBone->mWeights[ weightIdx ];
-            vertexToBoneMappings[ vertexIdOffest + boneWeight.mVertexId ].AddBoneData( boneIdOffset + boneIdx, boneWeight.mWeight );
+            vertexToBoneMappings[ vertexIdOffest + boneWeight.mVertexId ].AddBoneData( boneId, boneWeight.mWeight );
             }
          }
       vertexIdOffest += pMesh->mNumVertices;

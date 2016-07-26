@@ -59,10 +59,9 @@ class OpenGLRenderer : public IRenderer
 
       struct VertexToBoneMapping
          {
-         #define NUM_BONES_PER_VEREX 4
          public:
-            BoneId m_BoneIDs[ NUM_BONES_PER_VEREX ];
-            float m_BoneWeights[ NUM_BONES_PER_VEREX ];
+            BoneId m_BoneIDs[ MAXIMUM_BONES_PER_VEREX ];
+            float m_BoneWeights[ MAXIMUM_BONES_PER_VEREX ];
 
             VertexToBoneMapping( void )
                {

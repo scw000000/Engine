@@ -30,14 +30,24 @@ uniform vec3	EyeDirection_WorldSpace;
 uniform vec4 	MaterialDiffuse;
 uniform vec3	MaterialAmbient;
 
+const int MAXIMUM_BONES_PER_ACTOR = 100;
+
+uniform mat4    BoneTransform[ MAXIMUM_BONES_PER_ACTOR ];
 
 void main()
 	{
-
-	// Output position of the vertex, in clip space : MVP * position
-	gl_Position =  MVP * vec4( VertexPosition_Modelspace, 1 );
+	mat4 boneMat = BoneTransform[BoneIDs[0]] * Weights[0];
+    boneMat     += BoneTransform[BoneIDs[1]] * Weights[1];
+    boneMat     += BoneTransform[BoneIDs[2]] * Weights[2];
+    boneMat     += BoneTransform[BoneIDs[3]] * Weights[3];
 	
-	vec3 vecPosition_Worldspace = ( M * vec4( VertexPosition_Modelspace, 1 ) ).xyz;
+	// Output position of the vertex, in clip space : MVP * position
+	vec4 VertexAniPosition_ModelSpace = boneMat * vec4( VertexPosition_Modelspace, 1 );
+	gl_Position =  MVP * VertexAniPosition_ModelSpace;
+	
+	//gl_Position =  MVP * vec4( VertexPosition_Modelspace, 1 );
+	
+	vec3 vecPosition_Worldspace = ( M * VertexAniPosition_ModelSpace ).xyz;
 	vec3 vecNormal_WorldSpace = normalize( ( M * vec4( VertexNormal_Modelspace, 0 ) ).xyz );
 	vec3 reflection;
 	float cosAlpha;

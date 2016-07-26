@@ -9,7 +9,7 @@
                 <PitchYawRoll />
                 <Scale />
             </Transform>
-            <SkeletalMesh path="art\beta.fbx" />
+            <SkeletalMesh />
             <Material>
                 <Texture />
                 <Diffuse />

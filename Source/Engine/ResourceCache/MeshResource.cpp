@@ -19,20 +19,24 @@
 
 const char* MESH_LOADER_PATTERNS[] = { "*.obj", "*.fbx" };
 
-Transform aiMat4x4ToTransform( const aiMatrix4x4& aiMat44 )
+BoneData::BoneData( const Mat4x4& offset, BoneId id )
+   {
+   m_BoneOffset = offset;  m_BoneId = id;
+   }
+
+extern Mat4x4 aiMat4x4ToMat4( aiMatrix4x4 aiMat44 )
    {
    Mat4x4 toWorld;
-   toWorld.SetRow( 0, Vec4( aiMat44.a1, aiMat44.a2, aiMat44.a3, aiMat44.a4 ) );
-   toWorld.SetRow( 1, Vec4( aiMat44.b1, aiMat44.b2, aiMat44.b3, aiMat44.b4 ) );
-   toWorld.SetRow( 2, Vec4( aiMat44.c1, aiMat44.c2, aiMat44.c3, aiMat44.c4 ) );
-   toWorld.SetRow( 3, Vec4( aiMat44.d1, aiMat44.d2, aiMat44.d3, aiMat44.d4 ) );
+   toWorld.SetRow( 0, Vec4( aiMat44.a1, aiMat44.b1, aiMat44.c1, aiMat44.d1 ) );
+   toWorld.SetRow( 1, Vec4( aiMat44.a2, aiMat44.b2, aiMat44.c2, aiMat44.d2 ) );
+   toWorld.SetRow( 2, Vec4( aiMat44.a3, aiMat44.b3, aiMat44.c3, aiMat44.d3 ) );
+   toWorld.SetRow( 3, Vec4( aiMat44.a4, aiMat44.b4, aiMat44.c4, aiMat44.d4 ) );
 
-   return Transform( toWorld );
+   return toWorld;
    }
 
 void MeshResourceExtraData::LoadBones( void )
    {
-   m_BoneMappingData.reserve( m_NumBones );
    BoneId currentBoneId = 0;
    for( unsigned int meshIdx = 0; meshIdx < m_pScene->mNumMeshes; ++meshIdx )
       {
@@ -40,14 +44,16 @@ void MeshResourceExtraData::LoadBones( void )
       for( unsigned int boneIdx = 0; boneIdx < pMesh->mNumBones; ++boneIdx )
          {
          auto pBone = pMesh->mBones[ boneIdx ];
-         if( m_BoneMappingData.find( pBone->mName.C_Str() ) == m_BoneMappingData.end() )
+         std::string boneName = pBone->mName.C_Str();
+         if( m_BoneMappingData.find( boneName ) == m_BoneMappingData.end() )
             {
-            m_BoneMappingData[ pBone->mName.C_Str() ] = BoneData( aiMat4x4ToTransform( pBone->mOffsetMatrix ), currentBoneId );
+            m_BoneMappingData[ boneName ] = BoneData( aiMat4x4ToMat4( pBone->mOffsetMatrix ), currentBoneId );
             ++currentBoneId;
             }
          }
       }
    m_NumBones = currentBoneId;
+   ENG_ASSERT( m_NumBones <= MAXIMUM_BONES_PER_ACTOR );
    }
 
 shared_ptr<IResourceLoader> CreateMeshResourceLoader()
@@ -72,7 +78,7 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
    //aiProcessPreset_TargetRealtime_Quality // aiProcess_JoinIdenticalVertices
    const struct aiScene *p_AiScene = aiImportFileFromMemory( rawBuffer, 
                                                            rawSize, 
-                                                           aiProcessPreset_TargetRealtime_Quality | aiProcess_Triangulate | aiProcess_SortByPType, 
+                                                           aiProcess_Triangulate | aiProcess_LimitBoneWeights/*| aiProcessPreset_TargetRealtime_Quality | aiProcess_SortByPType*/,
                                                            p_Msg );
    if( !p_AiScene )
       {
@@ -87,7 +93,6 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
       {
       auto pMesh = p_AiScene->mMeshes[ meshIdx ];
       extra->m_NumVertices += pMesh->mNumVertices;
-      extra->m_NumBones += pMesh->mNumBones; // warning: this number is not a correct number; bones may be redundant between meshes
       for( unsigned int vertexId = 0; vertexId < pMesh->mNumVertices; ++vertexId )
          {    
          auto curSquareLength = pMesh->mVertices[ vertexId ].SquareLength();
@@ -100,6 +105,9 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
          }
       }
    extra->LoadBones();
+   extra->m_GlobalInverseTransform = aiMat4x4ToMat4( p_AiScene->mRootNode->mTransformation );
+   extra->m_GlobalInverseTransform.Inverse();
+
    extra->m_Radius = std::sqrt( extra->m_Radius );
    struct aiMemoryInfo memInfo;
    aiGetMemoryRequirements( p_AiScene, &memInfo );

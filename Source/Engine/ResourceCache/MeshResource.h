@@ -16,18 +16,22 @@
 #include <assimp/cimport.h>
 #include <assimp/scene.h>
 
+#define MAXIMUM_BONES_PER_ACTOR 100
+#define MAXIMUM_BONES_PER_VEREX 4
+
 struct aiScene;
 
-extern Transform aiMat4x4ToTransform( const aiMatrix4x4& aiMat44 );
+extern Mat4x4 aiMat4x4ToMat4( aiMatrix4x4 aiMat44 );
 typedef unsigned int BoneId;
 
 class BoneData
    {
    public:
-      BoneData( const Transform& transform, BoneId id ) { m_BoneOffset = transform;  m_BoneId = id; }
+      BoneData( void ) {}
+      BoneData( const Mat4x4& offset, BoneId id );
 
    public:
-      Transform m_BoneOffset;
+      Mat4x4 m_BoneOffset;
       BoneId m_BoneId;
    private:
    };
@@ -50,6 +54,7 @@ class MeshResourceExtraData : public IResourceExtraData
       unsigned int m_NumVertexIndex;
       unsigned int m_NumBones;
       BoneMappingData m_BoneMappingData;
+      Mat4x4  m_GlobalInverseTransform;
 
    protected:
       void LoadBones( void );

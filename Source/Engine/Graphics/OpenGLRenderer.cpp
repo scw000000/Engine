@@ -14,7 +14,7 @@
 
 void OpenGLRenderer::VertexToBoneMapping::AddBoneData( BoneId boneID, float boneWeight )
    {
-   for( unsigned i = 0; i < NUM_BONES_PER_VEREX; i++ )
+   for( unsigned i = 0; i < MAXIMUM_BONES_PER_VEREX; i++ )
       {
       if( m_BoneWeights[ i ] == 0.0 )
          {
@@ -206,7 +206,6 @@ void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMesh
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
    auto pAiScene = pMeshExtra->m_pScene;
    unsigned int vertexIdOffest = 0;
-   unsigned int boneIdOffset = 0;
    std::vector< OpenGLRenderer::VertexToBoneMapping > vertexToBoneMappings( pMeshExtra->m_NumVertices );
    for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
       {
@@ -223,9 +222,8 @@ void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMesh
             }
          }
       vertexIdOffest += pMesh->mNumVertices;
-      boneIdOffset += pMesh->mNumBones;
       }
-
+   ENG_ASSERT( vertexIdOffest == pMeshExtra->m_NumVertices );
    glGenBuffers( 1, pBoneBuffer );
    glBindBuffer( GL_ARRAY_BUFFER, *pBoneBuffer );
    glBufferData( GL_ARRAY_BUFFER,

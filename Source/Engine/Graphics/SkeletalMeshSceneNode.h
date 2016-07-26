@@ -42,15 +42,15 @@ class SkeletalMeshSceneNode : public SceneNode
    protected:
       void ReleaseResource( void );
       /*void LoadBones( shared_ptr<MeshResourceExtraData> pMeshExtra );*/
-      void UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const Transform& parentTransfrom );
+      void UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const Mat4x4& parentTransfrom );
       aiAnimation* FindAnimation( const std::string& animationName, const aiScene* pAiScene ) const;
       aiNodeAnim* FindNodeAnim( const std::string& boneName, const aiAnimation* pAnimation ) const;
-      unsigned int FindPosition( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
-      unsigned int FindRotation( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
-      unsigned int FindScaling( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
-      aiVector3D CalcInterpolatedPosition( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
-      aiQuaternion CalcInterpolatedRotation( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
-      aiVector3D CalcInterpolatedScaling( float AnimationTime, const aiNodeAnim* pNodeAnim ) const;
+      unsigned int FindPosition( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const;
+      unsigned int FindRotation( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const;
+      unsigned int FindScaling( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const;
+      aiVector3D CalcInterpolatedPosition( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const;
+      aiQuaternion CalcInterpolatedRotation( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const;
+      aiVector3D CalcInterpolatedScaling( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const;
 
    protected:
       shared_ptr<Resource>	 m_pMeshResource;
@@ -90,6 +90,8 @@ class SkeletalMeshSceneNode : public SceneNode
       GLuint            m_MaterialAmbient;
       GLuint            m_MaterialDiffuse;
 
+      GLuint            m_BoneTransform;
+
       unsigned long     m_VerticesIndexCount;
 
       std::string      m_CurrentAnimation;
@@ -97,7 +99,7 @@ class SkeletalMeshSceneNode : public SceneNode
       class BoneAnimationData
          {
          public:
-            Transform m_AnimationTransform;
+            Mat4x4 m_AnimationTransform;
          };
 
       std::vector< BoneAnimationData > m_BoneAnimationData;

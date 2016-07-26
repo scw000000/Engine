@@ -10,7 +10,7 @@
                 <Scale x="0.050000" y="0.050000" z="0.050000" />
             </Transform>
             
-			<SkeletalMesh path="art\Beta.fbx" />
+			<SkeletalMesh path="art\running.fbx" />
             
 			<Material>
                 <Texture path="art\cube.jpg" />

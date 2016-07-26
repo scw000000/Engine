@@ -50,6 +50,7 @@ SkeletalMeshSceneNode::SkeletalMeshSceneNode(
 
    ENG_ZERO_MEM( m_Buffers );
 
+   m_BoneTransform = 0;
    m_MVPMatrix = 0;
    m_Texture = 0;
    m_TextureUni = 0;
@@ -97,6 +98,7 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
    SetRadius( pMeshExtra->m_Radius );
 
+   m_CurrentAnimation = pMeshExtra->m_pScene->mAnimations[ 0 ]->mName.C_Str();
    /*LoadBones( pMeshExtra );*/
 
    m_BoneAnimationData.resize( pMeshExtra->m_NumBones );
@@ -144,7 +146,7 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    glEnableVertexAttribArray( BONE_ID_LOCATION );
    glVertexAttribIPointer( 
       BONE_ID_LOCATION, 
-      NUM_BONES_PER_VEREX, 
+      MAXIMUM_BONES_PER_VEREX,
       GL_UNSIGNED_INT, 
       sizeof( OpenGLRenderer::VertexToBoneMapping ), 
       ( const GLvoid* ) 0 );
@@ -152,10 +154,10 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    glEnableVertexAttribArray( BONE_WEIGHT_LOCATION );
    glVertexAttribPointer( 
       BONE_WEIGHT_LOCATION, 
-      NUM_BONES_PER_VEREX, 
+      MAXIMUM_BONES_PER_VEREX,
       GL_FLOAT, GL_FALSE, 
       sizeof( OpenGLRenderer::VertexToBoneMapping ), 
-      ( const GLvoid* ) ( sizeof( unsigned int ) * NUM_BONES_PER_VEREX ) );
+      ( const GLvoid* ) ( sizeof( unsigned int ) * MAXIMUM_BONES_PER_VEREX ) );
 
    m_MVPMatrix = glGetUniformLocation( m_Program, "MVP" );
    m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler" );
@@ -172,6 +174,8 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
 
    m_MaterialDiffuse = glGetUniformLocation( m_Program, "MaterialDiffuse" );
    m_MaterialAmbient = glGetUniformLocation( m_Program, "MaterialAmbient" );
+
+   m_BoneTransform = glGetUniformLocation( m_Program, "BoneTransform" );
 
    // restore all of its children
    SceneNode::VOnRestore( pScene );
@@ -209,6 +213,9 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
    glUniform4fv( m_MaterialDiffuse, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse() );
    glUniform3fv( m_MaterialAmbient, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient() );
 
+
+   glUniformMatrix4fv( m_BoneTransform, m_BoneAnimationData.size(), GL_FALSE, &( m_BoneAnimationData[ 0 ].m_AnimationTransform[ 0 ][ 0 ] ) );
+
    // Bind our texture in Texture Unit 0
    glActiveTexture( GL_TEXTURE0 );
    glBindTexture( GL_TEXTURE_2D, m_Texture );
@@ -234,6 +241,7 @@ int SkeletalMeshSceneNode::VOnUpdate( Scene * pScene, unsigned long elapsedMs )
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
    auto pAiScene = pMeshExtra->m_pScene;
    auto pAnimation = FindAnimation( m_CurrentAnimation, pMeshExtra->m_pScene );
+   static float aiAnimTicks = 0.f;
    if( pAnimation )
       {
       // The unit of the tick in this animation data
@@ -241,9 +249,9 @@ int SkeletalMeshSceneNode::VOnUpdate( Scene * pScene, unsigned long elapsedMs )
       // how many ticks have passed 
       float aiTimeInTicks = (float) elapsedMs * aiTicksPerSecond / 1000.f;
       // If the time is larger than the animation, mod it
-      float aiAnimTicks = fmod( aiTimeInTicks, ( float ) pAnimation->mDuration );
+      aiAnimTicks = fmod( aiAnimTicks + aiTimeInTicks, ( float ) pAnimation->mDuration );
 
-      UpdateAnimationBones( pMeshExtra, aiAnimTicks, pAnimation, pAiScene->mRootNode, pScene->GetTopTransform() );
+      UpdateAnimationBones( pMeshExtra, aiAnimTicks, pAnimation, pAiScene->mRootNode, pMeshExtra->m_GlobalInverseTransform );
       }
    // for updates its children
    SceneNode::VOnUpdate( pScene, elapsedMs );
@@ -285,35 +293,26 @@ void SkeletalMeshSceneNode::ReleaseResource( void )
       }
    }
 
-void SkeletalMeshSceneNode::UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const Transform& parentTransfrom )
+void SkeletalMeshSceneNode::UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const Mat4x4& parentTransfrom )
    {
    std::string nodeName( pAiNode->mName.C_Str() );
 
-   Transform nodeTransform;
+   Mat4x4 nodeTransform;
    // find the corresponding aiNodeAnim of this node
    // each aiAnimation has multiple channels, which should map to a aiNode
    const aiNodeAnim* pNodeAnim = FindNodeAnim( nodeName, pAnimation );
 
    if( pNodeAnim )
       {
-      // Interpolate scaling and generate scaling transformation matrix
-      Vec3 scale = aiVector3DToVec3( CalcInterpolatedScaling( aiAnimTicks, pNodeAnim ) );
-
-      // Interpolate rotation and generate rotation transformation matrix
-      Quaternion quat = aiQuateronionToQuat( CalcInterpolatedRotation( aiAnimTicks, pNodeAnim ) );
-
-      // Interpolate translation and generate translation transformation matrix
-      Vec3 translation = aiVector3DToVec3( CalcInterpolatedPosition( aiAnimTicks, pNodeAnim ) );
-     
-      // Combine the above transformations
-      nodeTransform = Transform( translation, scale, quat );
+      aiMatrix4x4 transform( CalcInterpolatedScaling( aiAnimTicks, pNodeAnim ), CalcInterpolatedRotation( aiAnimTicks, pNodeAnim ), CalcInterpolatedPosition( aiAnimTicks, pNodeAnim ) );
+      nodeTransform = aiMat4x4ToMat4( transform );
       }
    else
       {
-      nodeTransform = aiMat4x4ToTransform( pAiNode->mTransformation );
+      nodeTransform = aiMat4x4ToMat4( pAiNode->mTransformation );
       }
 
-   Transform boneGlobalAniTransform = parentTransfrom * nodeTransform;
+   Mat4x4 boneGlobalAniTransform = parentTransfrom * nodeTransform;
    BoneMappingData& boneMappingData = pMeshExtra->m_BoneMappingData;
    if( boneMappingData.find( nodeName ) != boneMappingData.end() )
       {
@@ -328,11 +327,11 @@ void SkeletalMeshSceneNode::UpdateAnimationBones( shared_ptr<MeshResourceExtraDa
    }
 
 
-unsigned int SkeletalMeshSceneNode::FindPosition( float AnimationTime, const aiNodeAnim* pNodeAnim ) const
+unsigned int SkeletalMeshSceneNode::FindPosition( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const
    {
    for( unsigned int i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++ )
       {
-      if( AnimationTime < ( float ) pNodeAnim->mPositionKeys[ i + 1 ].mTime )
+      if( aiAnimTicks < ( float ) pNodeAnim->mPositionKeys[ i + 1 ].mTime )
          {
          return i;
          }
@@ -342,13 +341,13 @@ unsigned int SkeletalMeshSceneNode::FindPosition( float AnimationTime, const aiN
    }
 
 
-unsigned int SkeletalMeshSceneNode::FindRotation( float AnimationTime, const aiNodeAnim* pNodeAnim ) const
+unsigned int SkeletalMeshSceneNode::FindRotation( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const
    {
    ENG_ASSERT( pNodeAnim->mNumRotationKeys > 0 );
 
    for( unsigned int i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++ )
       {
-      if( AnimationTime < ( float ) pNodeAnim->mRotationKeys[ i + 1 ].mTime )
+      if( aiAnimTicks < ( float ) pNodeAnim->mRotationKeys[ i + 1 ].mTime )
          {
          return i;
          }
@@ -358,13 +357,13 @@ unsigned int SkeletalMeshSceneNode::FindRotation( float AnimationTime, const aiN
    }
 
 
-unsigned int SkeletalMeshSceneNode::FindScaling( float AnimationTime, const aiNodeAnim* pNodeAnim ) const
+unsigned int SkeletalMeshSceneNode::FindScaling( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const
    {
    ENG_ASSERT( pNodeAnim->mNumScalingKeys > 0 );
 
    for( unsigned int i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++ )
       {
-      if( AnimationTime < ( float ) pNodeAnim->mScalingKeys[ i + 1 ].mTime )
+      if( aiAnimTicks < ( float ) pNodeAnim->mScalingKeys[ i + 1 ].mTime )
          {
          return i;
          }
@@ -397,41 +396,39 @@ aiNodeAnim* SkeletalMeshSceneNode::FindNodeAnim( const std::string& boneName, co
    return NULL;
    }
 
-aiVector3D SkeletalMeshSceneNode::CalcInterpolatedPosition( float AnimationTime, const aiNodeAnim* pNodeAnim ) const
+aiVector3D SkeletalMeshSceneNode::CalcInterpolatedPosition( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const
    {
    if( pNodeAnim->mNumPositionKeys == 1 )
       {
       return pNodeAnim->mPositionKeys[ 0 ].mValue;
       }
-
-   unsigned int PositionIndex = FindPosition( AnimationTime, pNodeAnim );
-   unsigned int NextPositionIndex = ( PositionIndex + 1 );
-   ENG_ASSERT( NextPositionIndex < pNodeAnim->mNumPositionKeys );
-   float deltaTime = ( float ) ( pNodeAnim->mPositionKeys[ NextPositionIndex ].mTime - pNodeAnim->mPositionKeys[ PositionIndex ].mTime );
-   float factor = ( AnimationTime - ( float ) pNodeAnim->mPositionKeys[ PositionIndex ].mTime ) / deltaTime;
+   unsigned int positionIdx = FindPosition( aiAnimTicks, pNodeAnim );
+   unsigned int nxtPositionIdx = ( positionIdx + 1 );
+   ENG_ASSERT( nxtPositionIdx < pNodeAnim->mNumPositionKeys );
+   float deltaTime = ( float ) ( pNodeAnim->mPositionKeys[ nxtPositionIdx ].mTime - pNodeAnim->mPositionKeys[ positionIdx ].mTime );
+   float factor = ( aiAnimTicks - ( float ) pNodeAnim->mPositionKeys[ positionIdx ].mTime ) / deltaTime;
    ENG_ASSERT( factor >= 0.0f && factor <= 1.0f );
-   const aiVector3D& start = pNodeAnim->mPositionKeys[ PositionIndex ].mValue;
-   const aiVector3D& end = pNodeAnim->mPositionKeys[ NextPositionIndex ].mValue;
+   const aiVector3D& start = pNodeAnim->mPositionKeys[ positionIdx ].mValue;
+   const aiVector3D& end = pNodeAnim->mPositionKeys[ nxtPositionIdx ].mValue;
    return ( 1 - factor ) * start + factor * end;
    }
 
 
-aiQuaternion SkeletalMeshSceneNode::CalcInterpolatedRotation( float AnimationTime, const aiNodeAnim* pNodeAnim ) const
+aiQuaternion SkeletalMeshSceneNode::CalcInterpolatedRotation( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const
    {
    // we need at least two values to interpolate...
    if( pNodeAnim->mNumRotationKeys == 1 )
       {
       return pNodeAnim->mRotationKeys[ 0 ].mValue;
       }
-
-   unsigned int RotationIndex = FindRotation( AnimationTime, pNodeAnim );
-   unsigned int NextRotationIndex = ( RotationIndex + 1 );
-   ENG_ASSERT( NextRotationIndex < pNodeAnim->mNumRotationKeys );
-   float deltaTime = ( float ) ( pNodeAnim->mRotationKeys[ NextRotationIndex ].mTime - pNodeAnim->mRotationKeys[ RotationIndex ].mTime );
-   float factor = ( AnimationTime - ( float ) pNodeAnim->mRotationKeys[ RotationIndex ].mTime ) / deltaTime;
+   unsigned int rotationIdx = FindRotation( aiAnimTicks, pNodeAnim );
+   unsigned int nxtRotationIdx = ( rotationIdx + 1 );
+   ENG_ASSERT( nxtRotationIdx < pNodeAnim->mNumRotationKeys );
+   float deltaTime = ( float ) ( pNodeAnim->mRotationKeys[ nxtRotationIdx ].mTime - pNodeAnim->mRotationKeys[ rotationIdx ].mTime );
+   float factor = ( aiAnimTicks - ( float ) pNodeAnim->mRotationKeys[ rotationIdx ].mTime ) / deltaTime;
    ENG_ASSERT( factor >= 0.0f && factor <= 1.0f );
-   const aiQuaternion& startRotationQ = pNodeAnim->mRotationKeys[ RotationIndex ].mValue;
-   const aiQuaternion& endRotationQ = pNodeAnim->mRotationKeys[ NextRotationIndex ].mValue;
+   const aiQuaternion& startRotationQ = pNodeAnim->mRotationKeys[ rotationIdx ].mValue;
+   const aiQuaternion& endRotationQ = pNodeAnim->mRotationKeys[ nxtRotationIdx ].mValue;
    aiQuaternion ret;
    aiQuaternion::Interpolate( ret, startRotationQ, endRotationQ, factor );
    ret.Normalize();
@@ -439,22 +436,21 @@ aiQuaternion SkeletalMeshSceneNode::CalcInterpolatedRotation( float AnimationTim
    }
 
 
-aiVector3D SkeletalMeshSceneNode::CalcInterpolatedScaling( float AnimationTime, const aiNodeAnim* pNodeAnim ) const
+aiVector3D SkeletalMeshSceneNode::CalcInterpolatedScaling( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const
    {
-   aiVector3D ret;
    if( pNodeAnim->mNumScalingKeys == 1 )
       {
       return pNodeAnim->mScalingKeys[ 0 ].mValue;
       }
    // find the last key frame that its time is smaller than specified animation time
-   unsigned int ScalingIndex = FindScaling( AnimationTime, pNodeAnim );
-   unsigned int NextScalingIndex = ( ScalingIndex + 1 );
-   ENG_ASSERT( NextScalingIndex < pNodeAnim->mNumScalingKeys );
+   unsigned int scaleIdx = FindScaling( aiAnimTicks, pNodeAnim );
+   unsigned int nxtScaleIdx = ( scaleIdx + 1 );
+   ENG_ASSERT( nxtScaleIdx < pNodeAnim->mNumScalingKeys );
    // time between these two key frames
-   float deltaTime = ( float ) ( pNodeAnim->mScalingKeys[ NextScalingIndex ].mTime - pNodeAnim->mScalingKeys[ ScalingIndex ].mTime );
-   float factor = ( AnimationTime - ( float ) pNodeAnim->mScalingKeys[ ScalingIndex ].mTime ) / deltaTime;
+   float deltaTime = ( float ) ( pNodeAnim->mScalingKeys[ nxtScaleIdx ].mTime - pNodeAnim->mScalingKeys[ scaleIdx ].mTime );
+   float factor = ( aiAnimTicks - ( float ) pNodeAnim->mScalingKeys[ scaleIdx ].mTime ) / deltaTime;
    ENG_ASSERT( factor >= 0.0f && factor <= 1.0f );
-   const aiVector3D& start = pNodeAnim->mScalingKeys[ ScalingIndex ].mValue;
-   const aiVector3D& end = pNodeAnim->mScalingKeys[ NextScalingIndex ].mValue;
+   const aiVector3D& start = pNodeAnim->mScalingKeys[ scaleIdx ].mValue;
+   const aiVector3D& end = pNodeAnim->mScalingKeys[ nxtScaleIdx ].mValue;
    return ( 1 - factor ) * start + factor * end;
    }

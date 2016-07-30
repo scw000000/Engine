@@ -28,12 +28,13 @@ class BoneData
    {
    public:
       BoneData( void ) {}
-      BoneData( const Mat4x4& offset, BoneId id );
+      BoneData( const aiMatrix4x4& offset, BoneId id );
 
    public:
-      Mat4x4 m_BoneOffset;
+      // transform vertices from model space to bone space
+      aiMatrix4x4 m_BoneOffset;
       BoneId m_BoneId;
-   private:
+      private:
    };
 
 typedef std::unordered_map< std::string, BoneData > BoneMappingData;
@@ -54,7 +55,7 @@ class MeshResourceExtraData : public IResourceExtraData
       unsigned int m_NumVertexIndex;
       unsigned int m_NumBones;
       BoneMappingData m_BoneMappingData;
-      Mat4x4  m_GlobalInverseTransform;
+      aiMatrix4x4  m_GlobalInverseTransform;
 
    protected:
       void LoadBones( void );

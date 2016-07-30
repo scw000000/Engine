@@ -214,7 +214,7 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
    glUniform3fv( m_MaterialAmbient, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient() );
 
 
-   glUniformMatrix4fv( m_BoneTransform, m_BoneAnimationData.size(), GL_FALSE, &( m_BoneAnimationData[ 0 ].m_AnimationTransform[ 0 ][ 0 ] ) );
+   glUniformMatrix4fv( m_BoneTransform, m_BoneAnimationData.size(), GL_TRUE, &( m_BoneAnimationData[ 0 ].m_AnimationTransform[ 0 ][ 0 ] ) );
 
    // Bind our texture in Texture Unit 0
    glActiveTexture( GL_TEXTURE0 );
@@ -293,36 +293,36 @@ void SkeletalMeshSceneNode::ReleaseResource( void )
       }
    }
 
-void SkeletalMeshSceneNode::UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const Mat4x4& parentTransfrom )
+void SkeletalMeshSceneNode::UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const aiMatrix4x4& parentTransfrom )
    {
    std::string nodeName( pAiNode->mName.C_Str() );
 
-   Mat4x4 nodeTransform;
+   aiMatrix4x4 localBonePoseTransform;
    // find the corresponding aiNodeAnim of this node
-   // each aiAnimation has multiple channels, which should map to a aiNode
+   // each aiAnimation has multiple channels, which should map to a aiNode( bone )
    const aiNodeAnim* pNodeAnim = FindNodeAnim( nodeName, pAnimation );
 
    if( pNodeAnim )
       {
-      aiMatrix4x4 transform( CalcInterpolatedScaling( aiAnimTicks, pNodeAnim ), CalcInterpolatedRotation( aiAnimTicks, pNodeAnim ), CalcInterpolatedPosition( aiAnimTicks, pNodeAnim ) );
-      nodeTransform = aiMat4x4ToMat4( transform );
+      localBonePoseTransform = aiMatrix4x4( CalcInterpolatedScaling( aiAnimTicks, pNodeAnim ), CalcInterpolatedRotation( aiAnimTicks, pNodeAnim ), CalcInterpolatedPosition( aiAnimTicks, pNodeAnim ) );
       }
    else
       {
-      nodeTransform = aiMat4x4ToMat4( pAiNode->mTransformation );
+      // cannot find animation data, use T pose transform instead
+      localBonePoseTransform = pAiNode->mTransformation; 
       }
 
-   Mat4x4 boneGlobalAniTransform = parentTransfrom * nodeTransform;
+   aiMatrix4x4 globalBonePoseTransform = parentTransfrom * localBonePoseTransform;
    BoneMappingData& boneMappingData = pMeshExtra->m_BoneMappingData;
    if( boneMappingData.find( nodeName ) != boneMappingData.end() )
       {
       BoneData& boneData = boneMappingData[ nodeName ];
-      m_BoneAnimationData[ boneData.m_BoneId ].m_AnimationTransform = /*m_GlobalInverseTransform **/ boneGlobalAniTransform * boneData.m_BoneOffset;
+      m_BoneAnimationData[ boneData.m_BoneId ].m_AnimationTransform = globalBonePoseTransform * boneData.m_BoneOffset;
       }
 
-   for( unsigned int i = 0; i < pAiNode->mNumChildren; i++ )
+   for( unsigned int i = 0; i < pAiNode->mNumChildren; ++i )
       {
-      UpdateAnimationBones( pMeshExtra, aiAnimTicks, pAnimation, pAiNode->mChildren[ i ], boneGlobalAniTransform );
+      UpdateAnimationBones( pMeshExtra, aiAnimTicks, pAnimation, pAiNode->mChildren[ i ], globalBonePoseTransform );
       }
    }
 

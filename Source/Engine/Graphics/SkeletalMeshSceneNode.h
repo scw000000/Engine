@@ -42,7 +42,7 @@ class SkeletalMeshSceneNode : public SceneNode
    protected:
       void ReleaseResource( void );
       /*void LoadBones( shared_ptr<MeshResourceExtraData> pMeshExtra );*/
-      void UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const Mat4x4& parentTransfrom );
+      void UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const aiMatrix4x4& parentTransfrom );
       aiAnimation* FindAnimation( const std::string& animationName, const aiScene* pAiScene ) const;
       aiNodeAnim* FindNodeAnim( const std::string& boneName, const aiAnimation* pAnimation ) const;
       unsigned int FindPosition( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const;
@@ -99,7 +99,7 @@ class SkeletalMeshSceneNode : public SceneNode
       class BoneAnimationData
          {
          public:
-            Mat4x4 m_AnimationTransform;
+            aiMatrix4x4 m_AnimationTransform;
          };
 
       std::vector< BoneAnimationData > m_BoneAnimationData;

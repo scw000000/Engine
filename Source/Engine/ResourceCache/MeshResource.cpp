@@ -19,7 +19,7 @@
 
 const char* MESH_LOADER_PATTERNS[] = { "*.obj", "*.fbx" };
 
-BoneData::BoneData( const Mat4x4& offset, BoneId id )
+BoneData::BoneData( const aiMatrix4x4& offset, BoneId id )
    {
    m_BoneOffset = offset;  m_BoneId = id;
    }
@@ -47,7 +47,7 @@ void MeshResourceExtraData::LoadBones( void )
          std::string boneName = pBone->mName.C_Str();
          if( m_BoneMappingData.find( boneName ) == m_BoneMappingData.end() )
             {
-            m_BoneMappingData[ boneName ] = BoneData( aiMat4x4ToMat4( pBone->mOffsetMatrix ), currentBoneId );
+            m_BoneMappingData[ boneName ] = BoneData( pBone->mOffsetMatrix, currentBoneId );
             ++currentBoneId;
             }
          }
@@ -105,7 +105,7 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
          }
       }
    extra->LoadBones();
-   extra->m_GlobalInverseTransform = aiMat4x4ToMat4( p_AiScene->mRootNode->mTransformation );
+   extra->m_GlobalInverseTransform = p_AiScene->mRootNode->mTransformation;
    extra->m_GlobalInverseTransform.Inverse();
 
    extra->m_Radius = std::sqrt( extra->m_Radius );

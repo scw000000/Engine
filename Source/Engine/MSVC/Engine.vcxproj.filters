@@ -43,6 +43,9 @@
     <Filter Include="MainLoop">
       <UniqueIdentifier>{6c556e95-fcea-4a86-a54f-b96455f9673f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Animation">
+      <UniqueIdentifier>{cda0ca72-5e0c-430b-9f63-76a9021baa77}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
@@ -223,7 +226,21 @@
     <ClCompile Include="..\Actors\MeshRenderComponent.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
-    <ClCompile Include="..\Actors\SkeletalMeshRenderComponent.cpp" />
+    <ClCompile Include="..\Animation\AnimationManager.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Animation\AnimationNode.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Animation\AnimationState.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Animation\BoneTransform.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Actors\SkeletalMeshRenderComponent.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -416,6 +433,18 @@
     </ClInclude>
     <ClInclude Include="..\Actors\SkeletalMeshRenderComponent.h">
       <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Animation\AnimationManager.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Animation\AnimationNode.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Animation\AnimationState.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Animation\BoneTransform.h">
+      <Filter>Animation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

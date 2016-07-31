@@ -56,6 +56,18 @@ void MeshResourceExtraData::LoadBones( void )
    ENG_ASSERT( m_NumBones <= MAXIMUM_BONES_PER_ACTOR );
    }
 
+aiAnimation* MeshResourceExtraData::FindAnimation( const std::string& animationName ) const
+   {
+   for( unsigned int animIdx = 0; animIdx < m_pScene->mNumAnimations; ++animIdx )
+      {
+      if( !std::strcmp( animationName.c_str(), m_pScene->mAnimations[ animIdx ]->mName.C_Str() ) )
+         {
+         return m_pScene->mAnimations[ animIdx ];
+         }
+      }
+   return NULL;
+   }
+
 shared_ptr<IResourceLoader> CreateMeshResourceLoader()
    {
    return shared_ptr<IResourceLoader>( ENG_NEW MeshResourceLoader() );

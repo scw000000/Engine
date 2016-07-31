@@ -289,3 +289,22 @@ class IScriptManager
       virtual void VExecuteFile( const char* resource ) = 0;
       virtual void VExecuteString( const char* str ) = 0;
    };
+
+class BoneTransform;
+
+class IAnimationNode
+   {
+   public:
+      virtual ~IAnimationNode( void ) {}
+      virtual void VUpdate( unsigned long elapsedMs ) = 0;
+      virtual void VSetTimePosition( float timePos ) = 0;
+      virtual float VGetTimePosition( void ) const = 0;
+      virtual void VAddTimeOffset( float offset ) = 0;
+      virtual void VSetPlayBackRate( float newRate ) = 0;
+      virtual float VGetPlayBackRate( void ) const = 0;
+      virtual void VSetIsRunning( bool isRunning ) = 0;
+      virtual bool VGetIsRunning( void ) const = 0;
+      virtual void VSetShouldLoop( bool shouldLoop ) = 0;
+      virtual bool VGetShouldLoop( void ) const = 0;
+      virtual BoneTransform VGetLocalBoneTransform( const std::string& boneName ) const = 0;
+   };

@@ -106,6 +106,10 @@
     <ClCompile Include="..\Actors\SkeletalMeshRenderComponent.cpp" />
     <ClCompile Include="..\Actors\SkyRenderComponent.cpp" />
     <ClCompile Include="..\Actors\TransformComponent.cpp" />
+    <ClCompile Include="..\Animation\AnimationManager.cpp" />
+    <ClCompile Include="..\Animation\AnimationNode.cpp" />
+    <ClCompile Include="..\Animation\AnimationState.cpp" />
+    <ClCompile Include="..\Animation\BoneTransform.cpp" />
     <ClCompile Include="..\Controller\Controller.cpp" />
     <ClCompile Include="..\Controller\EditorController.cpp" />
     <ClCompile Include="..\Controller\MovementController.cpp" />
@@ -182,6 +186,10 @@
     <ClInclude Include="..\Actors\SkeletalMeshRenderComponent.h" />
     <ClInclude Include="..\Actors\SkyRenderComponent.h" />
     <ClInclude Include="..\Actors\TransformComponent.h" />
+    <ClInclude Include="..\Animation\AnimationManager.h" />
+    <ClInclude Include="..\Animation\AnimationNode.h" />
+    <ClInclude Include="..\Animation\AnimationState.h" />
+    <ClInclude Include="..\Animation\BoneTransform.h" />
     <ClInclude Include="..\Controller\Controller.h" />
     <ClInclude Include="..\Controller\EditorController.h" />
     <ClInclude Include="..\Controller\MovementController.h" />

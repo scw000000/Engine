@@ -47,6 +47,7 @@ class MeshResourceExtraData : public IResourceExtraData
       MeshResourceExtraData() : m_pScene( NULL ) { m_Radius = 0.f; m_NumVertices = 0; m_NumVertexIndex = 0; m_NumBones = 0; };
 	   virtual ~MeshResourceExtraData() { aiReleaseImport( m_pScene ); }
 	   virtual std::string VToString() { return "MeshResourceExtraData"; }
+      aiAnimation* FindAnimation( const std::string& animationName ) const;
 
    public:
       const struct aiScene* m_pScene;

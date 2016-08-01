@@ -16,80 +16,68 @@
 #include "AnimationNode.h"
 #include "BoneTransform.h"
 
-AnimationClipNode::AnimationClipNode( shared_ptr< MeshResourceExtraData > pMeshExtra, const std::string& clipName ) : m_pMeshExtraData( pMeshExtra )
+BaseAnimationNode::BaseAnimationNode( void )
    {
-   ENG_ASSERT( pMeshExtra );
-   m_pAnimation = m_pMeshExtraData->FindAnimation( clipName );
-   m_AiTicksPerMs = ( float ) ( m_pAnimation->mTicksPerSecond != 0 ? m_pAnimation->mTicksPerSecond : 25.f ) / 1000.f;
-   ENG_ASSERT( m_pAnimation );
    m_PlaybackRate = 1.f;
-   m_TimePosition = 0.f ;
+   m_TimePosition = 0.f;
+   m_DurationInMs = 1.f;
    m_IsRunning = false;
-   m_ShouldLoop = true;
+   m_LoopCount = 0;
    }
 
-void AnimationClipNode::VUpdate( unsigned long elapsedMs ) 
-   {
-   VAddTimeOffset( elapsedMs );
-   // If the time is larger than the animation, mod it
-   aiAnimTicks = fmod( aiAnimTicks + aiTimeInTicks, ( float ) pAnimation->mDuration );
-
-   UpdateAnimationBones( pMeshExtra, aiAnimTicks, pAnimation, pAiScene->mRootNode, pMeshExtra->m_GlobalInverseTransform );
-      
-   }
-
-void AnimationClipNode::VSetTimePosition( float timePos ) 
+void BaseAnimationNode::VSetTimePosition( float timePos ) 
    { 
    m_TimePosition = std::max( 0.f, std::min( 1.0f, timePos ) );
    }
 
-float AnimationClipNode::VGetTimePosition( void ) const
+float BaseAnimationNode::VGetTimePosition( void ) const
    {
    return m_TimePosition;
    }
 
-void AnimationClipNode::VAddTimeOffset( float offset )
+void BaseAnimationNode::VAddTimeOffset( float offset )
    {
-   if()
+   if( !m_LoopCount ) // infinite loop
       {
+      VSetTimePosition( fmod( m_TimePosition + offset, m_DurationInMs ) );
       }
    else
       {
-    
+      VSetTimePosition( fmod( std::max( 0.f, std::min( m_DurationInMs * m_LoopCount, m_TimePosition + offset ) ), m_DurationInMs ) );
       }
    }
 
-void AnimationClipNode::VSetPlayBackRate( float newRate )
+void BaseAnimationNode::VSetPlayBackRate( float newRate )
    {
    m_PlaybackRate = newRate;
    }
 
-float AnimationClipNode::VGetPlayBackRate( void ) const 
+float BaseAnimationNode::VGetPlayBackRate( void ) const 
    {
    return m_PlaybackRate;
    }
 
-void AnimationClipNode::VSetIsRunning( bool isRunning ) 
+void BaseAnimationNode::VSetIsRunning( bool isRunning ) 
    {
    m_IsRunning = isRunning;
    }
 
-bool AnimationClipNode::VGetIsRunning( void ) const 
+bool BaseAnimationNode::VGetIsRunning( void ) const 
    {
    return m_IsRunning;
    }
 
-void AnimationClipNode::VSetShouldLoop( bool shouldLoop ) 
+void BaseAnimationNode::VSetShouldLoop( bool shouldLoop ) 
    {
-   m_ShouldLoop = shouldLoop;
+   m_LoopCount = shouldLoop ? 0: 1;
    }
 
-bool AnimationClipNode::VGetShouldLoop( void ) const 
+bool BaseAnimationNode::VGetShouldLoop( void ) const 
    {
-   return m_ShouldLoop;
+   return m_LoopCount == 0;
    }
 
-BoneTransform AnimationClipNode::VGetLocalBoneTransform( const std::string& boneName ) const
+void BaseAnimationNode::VSetLoopCount( unsigned int count )
    {
-   return BoneTransform();
+   m_LoopCount = count;
    }

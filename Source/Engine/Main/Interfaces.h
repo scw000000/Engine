@@ -290,7 +290,8 @@ class IScriptManager
       virtual void VExecuteString( const char* str ) = 0;
    };
 
-class BoneTransform;
+struct BoneTransform;
+typedef unsigned int BoneId;
 
 class IAnimationNode
    {
@@ -306,5 +307,6 @@ class IAnimationNode
       virtual bool VGetIsRunning( void ) const = 0;
       virtual void VSetShouldLoop( bool shouldLoop ) = 0;
       virtual bool VGetShouldLoop( void ) const = 0;
-      virtual BoneTransform VGetLocalBoneTransform( const std::string& boneName ) const = 0;
+      virtual void VSetLoopCount( unsigned int count ) = 0;
+      virtual bool VGetLocalBoneTransform( BoneTransform& boneTransform, BoneId boneId ) const = 0;
    };

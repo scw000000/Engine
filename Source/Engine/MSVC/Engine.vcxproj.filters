@@ -241,6 +241,9 @@
     <ClCompile Include="..\Actors\SkeletalMeshRenderComponent.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
+    <ClCompile Include="..\Animation\AnimationClipNode.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -444,6 +447,9 @@
       <Filter>Animation</Filter>
     </ClInclude>
     <ClInclude Include="..\Animation\BoneTransform.h">
+      <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Animation\AnimationClipNode.h">
       <Filter>Animation</Filter>
     </ClInclude>
   </ItemGroup>

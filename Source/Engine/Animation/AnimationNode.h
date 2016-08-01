@@ -1,3 +1,4 @@
+#pragma once
 /*!
  * \file AnimationNode.h
  * \date 2016/07/30 21:42
@@ -14,13 +15,20 @@
 class MeshResourceExtraData;
 struct aiAnimation;
 
-class AnimationClipNode : public IAnimationNode
+class BaseAnimationNode : public IAnimationNode
    {
    public:
-      AnimationClipNode( shared_ptr< MeshResourceExtraData > pMeshExtra, const std::string& clipName );
+      BaseAnimationNode( void );
       virtual void VUpdate( unsigned long elapsedMs ) override;
       virtual void VSetTimePosition( float timePos ) override;
       virtual float VGetTimePosition( void ) const override;
+
+      /**
+       * @brief take the scaled offset as input and set time position to 0 ~ 1
+       *
+       * @param float offset
+       * @return void
+       */
       virtual void VAddTimeOffset( float offset ) override;
       virtual void VSetPlayBackRate( float newRate ) override;
       virtual float VGetPlayBackRate( void ) const override;
@@ -28,17 +36,14 @@ class AnimationClipNode : public IAnimationNode
       virtual bool VGetIsRunning( void ) const override;
       virtual void VSetShouldLoop( bool shouldLoop ) override;
       virtual bool VGetShouldLoop( void ) const override;
-      virtual BoneTransform VGetLocalBoneTransform( const std::string& boneName ) const override;
+      virtual void VSetLoopCount( unsigned int count ) override;
 
-   private:
-      shared_ptr< MeshResourceExtraData > m_pMeshExtraData;
-      float m_AiTicksPerMs;
+   protected:
       float m_PlaybackRate;
       float m_TimePosition;
+      float m_DurationInMs;
       bool m_IsRunning;
-      bool m_ShouldLoop;
-      
-      std::string m_ClipName;
-      aiAnimation* m_pAnimation;
+      unsigned int m_LoopCount;
    };
+
 

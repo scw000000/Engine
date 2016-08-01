@@ -1,3 +1,4 @@
+#pragma once
 /*!
  * \file BoneTransform.h
  * \date 2016/07/30 22:17

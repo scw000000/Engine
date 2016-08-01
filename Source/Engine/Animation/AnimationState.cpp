@@ -49,17 +49,24 @@ void AnimationState::UpdatetGlobalBoneTransform( aiNode* pAiNode, const aiMatrix
    {
    std::string nodeName( pAiNode->mName.C_Str() );
 
-   auto localBoneTransform = m_pRootAnimNode->VGetLocalBoneTransform( nodeName );
-
-   aiMatrix4x4 localBonePoseTransform( localBoneTransform.m_Scale, localBoneTransform.m_Rotation, localBoneTransform.m_Translation );
+   BoneTransform localBoneTransform;
+   auto boneMappingDataIt = m_pMeshExtraData->m_BoneMappingData.find( nodeName );
+   BoneMappingData& boneMappingData = m_pMeshExtraData->m_BoneMappingData;
+   ENG_ASSERT( boneMappingDataIt != m_pMeshExtraData->m_BoneMappingData.end() );
+   BoneData& boneData = boneMappingDataIt->second;
+   
+   aiMatrix4x4 localBonePoseTransform;
+   if( m_pRootAnimNode->VGetLocalBoneTransform( localBoneTransform, boneData.m_BoneId ) )
+      {
+      localBonePoseTransform = aiMatrix4x4( localBoneTransform.m_Scale, localBoneTransform.m_Rotation, localBoneTransform.m_Translation );
+      }
+   else
+      {
+      localBonePoseTransform = pAiNode->mTransformation;
+      }
 
    aiMatrix4x4 globalBonePoseTransform = parentTransfrom * localBonePoseTransform;
-   BoneMappingData& boneMappingData = m_pMeshExtraData->m_BoneMappingData;
-   if( boneMappingData.find( nodeName ) != boneMappingData.end() )
-      {
-      BoneData& boneData = boneMappingData[ nodeName ];
-      m_GlobalBoneTransform[ boneData.m_BoneId ] = globalBonePoseTransform * boneData.m_BoneOffset;
-      }
+   m_GlobalBoneTransform[ boneData.m_BoneId ] = globalBonePoseTransform * boneData.m_BoneOffset;
 
    for( unsigned int i = 0; i < pAiNode->mNumChildren; ++i )
       {

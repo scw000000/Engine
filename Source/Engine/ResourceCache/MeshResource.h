@@ -22,7 +22,6 @@
 struct aiScene;
 
 extern Mat4x4 aiMat4x4ToMat4( aiMatrix4x4 aiMat44 );
-typedef unsigned int BoneId;
 
 class BoneData
    {

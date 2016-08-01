@@ -1,3 +1,4 @@
+#pragma once
 /*!
  * \file AnimationManager.h
  * \date 2016/07/30 21:31
@@ -15,10 +16,24 @@
 class IAnimationManager
    {
    public:
-      IAnimationManager( void );
-      virtual ~IAnimationManager( void );
+      virtual ~IAnimationManager( void ) { };
+      virtual void VSetRunning( bool isRunning ) = 0;
+      virtual void VUpdate( unsigned long elapsedMs ) = 0;
 
-      virtual void Update( unsigned long elapsedMs ) = 0;
-      private:
+   private:
+      
+   };
 
+class AnimationState;
+
+class AnimationManager : public IAnimationManager
+   {
+   public:
+      
+      virtual void VSetRunning( bool isRunning ) override;
+      virtual void VUpdate( unsigned long elapsedMs ) override;
+
+   private:
+      bool isRunning;
+      std::list< shared_ptr< AnimationState > > m_AnimationStates;
    };

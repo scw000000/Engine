@@ -16,24 +16,24 @@
 #include "AnimationClipNode.h"
 #include "BoneTransform.h"
 
-AnimationClipNode::AnimationClipNode( shared_ptr< MeshResourceExtraData > pMeshExtra, const std::string& clipName )
-   {
-   ENG_ASSERT( pMeshExtra );
-   m_pAnimation = m_pMeshExtraData->FindAnimation( clipName );
-   ENG_ASSERT( m_pAnimation );
-   m_AiTicksPerMs = ( float ) ( m_pAnimation->mTicksPerSecond != 0 ? m_pAnimation->mTicksPerSecond : 25.f ) / 1000.f;
-   m_DurationInMs = ( float ) 1000.0 * m_pAnimation->mDuration / m_pAnimation->mTicksPerSecond;
-
-   for( unsigned int nodeIdx = 0; nodeIdx < m_pAnimation->mNumChannels; ++nodeIdx )
-      {
-      auto BoneDataIt = pMeshExtra->m_BoneMappingData.find( m_pAnimation->mChannels[ nodeIdx ]->mNodeName.C_Str() );
-      if( BoneDataIt != pMeshExtra->m_BoneMappingData.end() )
-         {
-         m_BoneIdToNodeAnimMapping[ BoneDataIt->second.m_BoneId ] = m_pAnimation->mChannels[ nodeIdx ];
-         }
-      }
-   m_CurrentAiTicks = 0.f;
-   }
+//AnimationClipNode::AnimationClipNode( shared_ptr< MeshResourceExtraData > pMeshExtra, const std::string& clipName )
+//   {
+//   ENG_ASSERT( pMeshExtra );
+//   m_pAnimation = m_pMeshExtraData->FindAnimation( clipName );
+//   ENG_ASSERT( m_pAnimation );
+//   m_AiTicksPerMs = ( float ) ( m_pAnimation->mTicksPerSecond != 0 ? m_pAnimation->mTicksPerSecond : 25.f ) / 1000.f;
+//   m_DurationInMs = ( float ) 1000.0 * m_pAnimation->mDuration / m_pAnimation->mTicksPerSecond;
+//
+//   for( unsigned int nodeIdx = 0; nodeIdx < m_pAnimation->mNumChannels; ++nodeIdx )
+//      {
+//      auto BoneDataIt = pMeshExtra->m_BoneMappingData.find( m_pAnimation->mChannels[ nodeIdx ]->mNodeName.C_Str() );
+//      if( BoneDataIt == pMeshExtra->m_BoneMappingData.end() )
+//         {
+//         m_BoneIdToNodeAnimMapping[ BoneDataIt->second.m_BoneId ] = m_pAnimation->mChannels[ nodeIdx ];
+//         }
+//      }
+//   m_CurrentAiTicks = 0.f;
+//   }
 
 void AnimationClipNode::VUpdate( unsigned long elapsedMs )
    {
@@ -57,7 +57,7 @@ bool AnimationClipNode::VGetLocalBoneTransform( BoneTransform& boneTransform, Bo
 void AnimationClipNode::VSetTimePosition( float timePos )
    {
    BaseAnimationNode::VSetTimePosition( timePos );
-   m_CurrentAiTicks = m_TimePosition * m_pAnimation->mDuration;
+   m_CurrentAiTicks = m_TimePosition * ( float ) m_pAnimation->mDuration;
    }
 
 aiNodeAnim* AnimationClipNode::FindNodeAnim( BoneId boneId ) const

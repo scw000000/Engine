@@ -145,7 +145,7 @@ template < typename T > void BaseRenderComponent<T>::VPostInit( void )
    if( m_pParentComponent.expired() )
       {
       shared_ptr<SceneNode> pSceneNode( VGetSceneNode() );
-      shared_ptr<Event_New_Render_Component_Root> pEvent( ENG_NEW Event_New_Render_Component_Root( m_pOwner->GetId(), pSceneNode ) );
+      shared_ptr<Event_New_Render_Root_Component> pEvent( ENG_NEW Event_New_Render_Root_Component( m_pOwner->GetId(), pSceneNode ) );
       IEventManager::GetSingleton()->VTriggerEvent( pEvent ); // process this event immediately
       }
    VDelegatePostInit();

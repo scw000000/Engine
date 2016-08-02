@@ -44,8 +44,6 @@ template <typename T>class BaseEvent : virtual public IEvent
    {
    public:
       explicit BaseEvent( const float timeStamp = 0.0f ) : m_TimeStamp( timeStamp ) {  };
-      
-      virtual ~BaseEvent( void ) { }
 
       virtual EventType VGetEventType( void ) const override { return s_EventType; };
 
@@ -124,15 +122,15 @@ public:
       Mat4x4 m_Matrix;
    };
 
-class Event_New_Render_Component_Root : public BaseEvent<Event_New_Render_Component_Root>
+class Event_New_Render_Root_Component : public BaseEvent<Event_New_Render_Root_Component>
    {
 
    public:
-      Event_New_Render_Component_Root( void ) { m_ActorId = INVALID_ACTOR_ID; }
+      Event_New_Render_Root_Component( void ) { m_ActorId = INVALID_ACTOR_ID; }
 
-      explicit Event_New_Render_Component_Root( ActorId actorId, weak_ptr<SceneNode> pSceneNode ) : m_ActorId( actorId ), m_pSceneNode( pSceneNode ) {}
+      explicit Event_New_Render_Root_Component( ActorId actorId, weak_ptr<SceneNode> pSceneNode ) : m_ActorId( actorId ), m_pSceneNode( pSceneNode ) {}
 
-      virtual IEventPtr VCopy(void) const override { return IEventPtr( ENG_NEW Event_New_Render_Component_Root( m_ActorId, m_pSceneNode ) ); }
+      virtual IEventPtr VCopy(void) const override { return IEventPtr( ENG_NEW Event_New_Render_Root_Component( m_ActorId, m_pSceneNode ) ); }
 
     //  virtual const char* GetName(void) const override { return "EvtData_New_Render_Component"; }
 
@@ -197,3 +195,23 @@ class Event_Destroy_Scene_Node : public BaseEvent < Event_Destroy_Scene_Node >
       weak_ptr< ISceneNode > m_pSceneNode;
 
    };
+
+//class IAnimationNode;
+//
+//class Event_New_Anim_Root_Node : public BaseEvent < Event_New_Anim_Root_Node >
+//   {
+//
+//      public:
+//      Event_New_Anim_Root_Node( void ) {}
+//
+//      explicit Event_New_Anim_Root_Node( weak_ptr< IAnimationNode > pAnimRootNode, weak_ptr< ResHandle > pMeshResource ) : m_pAnimRootNode( pAnimRootNode ), m_pMeshResource( pMeshResource ) {}
+//
+//      virtual IEventPtr VCopy( void ) const override { return IEventPtr( ENG_NEW Event_New_Anim_Root_Node( m_pAnimRootNode, m_pMeshResource ) ); }
+//
+//      weak_ptr< IAnimationNode > GetAnimRootNodePtr( void ) const { return m_pAnimRootNode; }
+//      weak_ptr< ResHandle > GetMeshResoucePtr( void ) const { return m_pMeshResource; }
+//
+//      private:
+//      weak_ptr< IAnimationNode > m_pAnimRootNode;
+//      weak_ptr< ResHandle > m_pMeshResource;
+//   };

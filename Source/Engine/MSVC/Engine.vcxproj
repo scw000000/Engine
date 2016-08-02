@@ -109,6 +109,7 @@
     <ClCompile Include="..\Animation\AnimationClipNode.cpp" />
     <ClCompile Include="..\Animation\AnimationManager.cpp" />
     <ClCompile Include="..\Animation\AnimationNode.cpp" />
+    <ClCompile Include="..\Animation\AnimationNodeFactory.cpp" />
     <ClCompile Include="..\Animation\AnimationState.cpp" />
     <ClCompile Include="..\Animation\BoneTransform.cpp" />
     <ClCompile Include="..\Controller\Controller.cpp" />
@@ -190,6 +191,7 @@
     <ClInclude Include="..\Animation\AnimationClipNode.h" />
     <ClInclude Include="..\Animation\AnimationManager.h" />
     <ClInclude Include="..\Animation\AnimationNode.h" />
+    <ClInclude Include="..\Animation\AnimationNodeFactory.h" />
     <ClInclude Include="..\Animation\AnimationState.h" />
     <ClInclude Include="..\Animation\BoneTransform.h" />
     <ClInclude Include="..\Controller\Controller.h" />

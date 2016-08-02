@@ -45,7 +45,7 @@ shared_ptr<IScriptEvent> EventFactory::BuildEvent( EventType eventType, LuaPlus:
    shared_ptr<IScriptEvent> pEvent( EventFactory::CreateScriptEvent( eventType ) );
    if( !pEvent )
       {
-      return shared_ptr<IScriptEvent>( );
+      return pEvent;
       }
    // set the event data that was passed in
    if( !pEvent->SetEventData( eventData ) )

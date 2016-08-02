@@ -16,10 +16,11 @@
 
 struct aiNodeAnim;
 
-class AnimationClipNode : public BaseAnimationNode
+class AnimationClipNode : public BaseAnimationNode< AnimationClipNode >
    {
    public:
-      AnimationClipNode( shared_ptr< MeshResourceExtraData > pMeshExtra, const std::string& clipName );
+      AnimationClipNode( void );
+      //AnimationClipNode( shared_ptr< MeshResourceExtraData > pMeshExtra, const std::string& clipName );
       virtual void VUpdate( unsigned long elapsedMs ) override;
       virtual bool VGetLocalBoneTransform( BoneTransform& boneTransform, BoneId boneId ) const override;
       virtual void VSetTimePosition( float timePos ) override;

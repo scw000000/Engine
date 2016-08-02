@@ -18,10 +18,12 @@ class ResHandle;
 class MeshResourceExtraData;
 class IAnimationNode;
 
+#define INVALID_ANIMSTATE_ID 0
+
 class AnimationState
    {
    public:
-      AnimationState( shared_ptr< ResHandle > pMeshRes );
+      AnimationState( AnimationStateId id, shared_ptr< ResHandle > pMeshRes, shared_ptr< IAnimationNode > pAnimRootNode );
 
       float GetTimePosition( void ) const;
       void SetTimePosition( float newTimePos ); 
@@ -32,11 +34,12 @@ class AnimationState
       bool GetIsRunning( void ) const;
       void SetShouldLoop( bool shouldLoop );
       bool GetShouldLoop( void ) const;
-      
+      AnimationStateId GetId( void ) const { return m_Id; }
 
    private:
       shared_ptr< ResHandle > m_pMeshResource;
       shared_ptr< MeshResourceExtraData > m_pMeshExtraData;
       shared_ptr< IAnimationNode > m_pRootAnimNode;
       std::vector< aiMatrix4x4 > m_GlobalBoneTransform;
+      AnimationStateId m_Id;
    };

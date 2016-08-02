@@ -16,12 +16,14 @@
 #include "AnimationNode.h"
 #include "BoneTransform.h"
 
-AnimationState::AnimationState( shared_ptr< ResHandle > pMeshRes ) : m_pMeshResource( pMeshRes )
+AnimationState::AnimationState( AnimationStateId id, shared_ptr< ResHandle > pMeshRes, shared_ptr< IAnimationNode > pAnimRootNode ) : m_pMeshResource( pMeshRes )
    {
    ENG_ASSERT( pMeshRes );
    m_pMeshExtraData = static_pointer_cast< MeshResourceExtraData >( m_pMeshResource->GetExtraData() );
    m_GlobalBoneTransform.resize( m_pMeshExtraData->m_NumBones );
 
+   m_pRootAnimNode = pAnimRootNode;
+   m_Id = id;
    }
 
 float AnimationState::GetTimePosition( void ) const

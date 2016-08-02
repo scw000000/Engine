@@ -68,10 +68,7 @@ class ScriptEventListener
    public:
       explicit ScriptEventListener( const EventType& eventType, const LuaPlus::LuaObject& scriptCallbackFunction );
       ~ScriptEventListener( void );
-      EventListenerDelegate GetDelegate( void )
-         {
-         return fastdelegate::MakeDelegate( this, &ScriptEventListener::ScriptEventDelegate );
-         }
+      EventListenerDelegate GetDelegate( void );
       // A Callback function, it is registered in EventManager by ScriptEventListenerMgr
       void ScriptEventDelegate( IEventPtr pEvent );
 

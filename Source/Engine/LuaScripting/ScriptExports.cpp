@@ -52,6 +52,7 @@ void InternalScriptExports::Destroy( void )
 	SAFE_DELETE( s_pScriptEventListenerMgr );
    };
 
+//TODO: unfinished function
 bool InternalScriptExports::LoadAndExecuteScriptResource( const char *scriptRes )
    {
    Resource resource( scriptRes );
@@ -122,6 +123,12 @@ ScriptEventListener::~ScriptEventListener( void )
        }
    }
 
+EventListenerDelegate ScriptEventListener::GetDelegate( void )
+   {
+   return fastdelegate::MakeDelegate( this, &ScriptEventListener::ScriptEventDelegate );
+   }
+
+// forward the event ptr to lua and trigger this function
 void ScriptEventListener::ScriptEventDelegate( IEventPtr pEvent )
    {
    shared_ptr<IScriptEvent> pScriptEvent = dynamic_pointer_cast<IScriptEvent>( pEvent );

@@ -355,7 +355,6 @@ void BaseEngineLogic::VStartAndPause( void )
       case BES_Ready:
          SetNextEngineState( BES_Running );
          VGameStart();
-         VSetIsSimulating( true );
          break;
       case BES_Running:
          SetNextEngineState( BES_Pause );
@@ -387,14 +386,14 @@ void BaseEngineLogic::VStop( void )
 
 void BaseEngineLogic::VSetIsSimulating( bool isOn )
    {
-
    IGamePhysics::GetSingleton().VSetSimulation( isOn );
+   VSetWorldUpdate( isOn );
    }
 
 void BaseEngineLogic::VGameStart( void )
    {
    //TODO: send game start event
-   
+   VSetIsSimulating( true );
    }
 
 void BaseEngineLogic::ReInitWorld( void )

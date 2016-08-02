@@ -22,7 +22,7 @@ Scene::Scene( shared_ptr<IRenderer> renderer ) : m_Root( ENG_NEW RootNode ), m_p
    m_pRenderer = renderer;
 	
    IEventManager* pEventMgr = IEventManager::GetSingleton();
-   pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::NewRenderComponentDelegate ), Event_New_Render_Component_Root::s_EventType );
+   pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::NewRenderComponentDelegate ), Event_New_Render_Root_Component::s_EventType );
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::DestroyActorDelegate ), Event_Destroy_Actor::s_EventType);
    //pEventMgr->VAddListener(fastdelegate::MakeDelegate(this, &Scene::MoveActorDelegate), EvtData_Move_Actor::sk_EventType);
    //pEventMgr->VAddListener(fastdelegate::MakeDelegate(this, &Scene::ModifiedRenderComponentDelegate), EvtData_Modified_Render_Component::sk_EventType);
@@ -164,7 +164,7 @@ void Scene::RenderAlphaPass()
 
 void Scene::NewRenderComponentDelegate( IEventPtr pEvent )
    {
-   shared_ptr<Event_New_Render_Component_Root> pDerivedEvent = dynamic_pointer_cast<Event_New_Render_Component_Root>( pEvent );
+   shared_ptr<Event_New_Render_Root_Component> pDerivedEvent = dynamic_pointer_cast<Event_New_Render_Root_Component>( pEvent );
 
     ActorId actorId = pDerivedEvent->GetActorId();
     shared_ptr<SceneNode> pSceneNode( pDerivedEvent->GetSceneNode() );

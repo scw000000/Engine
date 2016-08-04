@@ -19,7 +19,7 @@
 class XmlResourceExtraData : public IResourceExtraData
    {
    public:
-      virtual std::string VToString() { return "XmlResourceExtraData"; }
+      //virtual std::string VToString() { return "XmlResourceExtraData"; }
       void ParseXml( char* pRawBuffer );
       TiXmlElement* GetRoot(void) { return m_xmlDocument.RootElement(); }
 

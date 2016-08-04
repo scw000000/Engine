@@ -53,6 +53,7 @@ class EngineOptions
       std::string GetGUILayoutFieName( void ) const { return m_Layout; }
       bool GetShowMouseCursor( void ) const { return m_ShowMouseCursor; }
       TiXmlDocument* GetEngineOptionDoc( void ) const { return m_pDoc; }
+      std::string GetPreInitScriptFile( void ) const { return m_PreInitScriptFile; }
 
    protected:
       // Rendering options
@@ -72,6 +73,7 @@ class EngineOptions
 
       // TiXmlElement - look at this to find other options added by the developer
 	   TiXmlDocument *m_pDoc;
+      std::string m_PreInitScriptFile;
    };
 
 

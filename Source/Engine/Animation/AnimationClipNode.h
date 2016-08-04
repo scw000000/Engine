@@ -13,10 +13,11 @@
  * \note
  */
 #include "AnimationNode.h"
+#include "..\LuaScripting\ScriptClass.h"
 
 struct aiNodeAnim;
 
-class AnimationClipNode : public BaseAnimationNode< AnimationClipNode >
+class AnimationClipNode : public BaseAnimationNode< AnimationClipNode >, public ScriptClass< AnimationClipNode >
    {
    public:
       AnimationClipNode( void );

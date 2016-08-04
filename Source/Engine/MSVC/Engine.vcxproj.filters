@@ -247,6 +247,9 @@
     <ClCompile Include="..\Animation\AnimationNodeFactory.cpp">
       <Filter>Animation</Filter>
     </ClCompile>
+    <ClCompile Include="..\ResourceCache\ScriptResource.cpp">
+      <Filter>ResourceCache</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -457,6 +460,12 @@
     </ClInclude>
     <ClInclude Include="..\Animation\AnimationNodeFactory.h">
       <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\LuaScripting\ScriptClass.h">
+      <Filter>LuaScripting</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ResourceCache\ScriptResource.h">
+      <Filter>ResourceCache</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -35,7 +35,7 @@ class Resource
 class IResourceExtraData
    {
    public:
-	   virtual std::string VToString()=0;
+	   //virtual std::string VToString()=0;
    };
 
 // an expansion class of resrouce
@@ -110,7 +110,8 @@ class ResourceCache
       ~ResourceCache();
 
       bool Init();
-      void RegisterLoader( shared_ptr< IResourceLoader > loader );
+      // Note that the DefaultResourceLoader is last one in the list, so any loader will match before it if the file format is supported
+      template< typename T > void RegisterLoader( void );
 
       shared_ptr< ResHandle > GetHandle( const Resource& resource );
       int Preload( const std::string pattern, void (*progressCallback)( int, bool & ) );
@@ -140,6 +141,17 @@ class ResourceCache
       unsigned int m_CacheSize; // size in bytes
       unsigned int m_AllocatedSize;
    };
+
+template< typename T > void ResourceCache::RegisterLoader( void )
+   {
+   if( !std::is_base_of< IResourceLoader, T >::value )
+      {
+      ENG_ERROR( "Invalid implementation register" );
+      return;
+      }
+
+   m_ResourceLoaders.push_front( shared_ptr< IResourceLoader >( ENG_NEW T() )  );
+   }
 
 class ResourceZipFile : public IResourceFile
    {

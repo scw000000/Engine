@@ -23,7 +23,6 @@ class IAnimationNode
       virtual EventType GetAnimNodeType( void ) const = 0;
       virtual const char* GetName( void ) const = 0;
       virtual void VUpdate( unsigned long elapsedMs ) = 0;
-      virtual bool VInit( LuaPlus::LuaObject nodeData ) = 0;
       virtual void VSetTimePosition( float timePos ) = 0;
       virtual float VGetTimePosition( void ) const = 0;
       virtual void VAddTimeOffset( float offset ) = 0;
@@ -48,7 +47,7 @@ template <typename T>class BaseAnimationNode : public IAnimationNode
       BaseAnimationNode( void );
       virtual EventType GetAnimNodeType( void ) const override { return s_AnimNodeType; };
       virtual const char* GetName( void ) const override { return s_pName; }
-      virtual void VUpdate( unsigned long elapsedMs ) override;
+      virtual void VUpdate( unsigned long elapsedMs ) override {};
       virtual void VSetTimePosition( float timePos ) override;
       virtual float VGetTimePosition( void ) const override;
 

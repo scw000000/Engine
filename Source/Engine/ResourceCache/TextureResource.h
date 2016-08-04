@@ -24,10 +24,9 @@ class SDLTextureResourceExtraData : public IResourceExtraData
    public:
 	   SDLTextureResourceExtraData();
 	   virtual ~SDLTextureResourceExtraData( void ) { SDL_FreeSurface( m_pSurface ); }
-	   virtual std::string VToString() override { return "SDLTextureResourceExtraData";  }
+	   //virtual std::string VToString() override { return "SDLTextureResourceExtraData";  }
       void* GetTexture( void ) { return m_pSurface->pixels; };
       
-
    public:
       SDL_Surface* m_pSurface;
    };

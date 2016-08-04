@@ -16,6 +16,13 @@
 #include "AnimationClipNode.h"
 #include "BoneTransform.h"
 
+const char* BaseAnimationNode< AnimationClipNode >::s_pName = "AnimationClipNode";
+const AnimNodeType BaseAnimationNode< AnimationClipNode >::s_AnimNodeType = 0xb75bd91f;
+
+AnimationClipNode::AnimationClipNode(void )
+   {
+   }
+
 //AnimationClipNode::AnimationClipNode( shared_ptr< MeshResourceExtraData > pMeshExtra, const std::string& clipName )
 //   {
 //   ENG_ASSERT( pMeshExtra );

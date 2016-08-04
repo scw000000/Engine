@@ -17,6 +17,7 @@
 #include "..\ResourceCache\MeshResource.h"
 #include "..\ResourceCache\TextureResource.h"
 #include "OpenGLRenderer.h"
+#include "..\Animation\AnimationClipNode.h"
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
@@ -106,6 +107,7 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
    OpenGLRenderer::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
 
+   
    // 1st attribute buffer : vertices
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
    glEnableVertexAttribArray( VERTEX_LOCATION );

@@ -20,8 +20,6 @@ class LuaStateManager : public IScriptManager
    {
    public:
       static LuaStateManager& GetSingleton( void );
-      bool Init( void );
-      void Destroy( void );
       
       virtual bool VInit( void ) override;
       // demand lua to execute a lua file
@@ -36,11 +34,11 @@ class LuaStateManager : public IScriptManager
       LuaPlus::LuaObject CreatePath( const char *pathStr, bool toIgnoreLastElement = false );
       // Create a table from m_pLuaState and restore x y z value in vec into this table
       void ConvertVec3ToTable( const Vec3& vec, LuaPlus::LuaObject& outLuaTable ) const;
+      void ClearLuaState( void );
 
    private:
       void SetError( int errorNum );
       void ClearStack( void );
-      void ClearLuaState( void );
 
       explicit LuaStateManager( void );
       virtual ~LuaStateManager( void );

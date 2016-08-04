@@ -55,9 +55,25 @@ void InternalScriptExports::Destroy( void )
 //TODO: unfinished function
 bool InternalScriptExports::LoadAndExecuteScriptResource( const char *scriptRes )
    {
-   Resource resource( scriptRes );
-   shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );
-   return pResourceHandle != NULL;
+   if( !g_pApp->m_EngineOptions.GetIsUsingDevDirectory() )
+      {
+      Resource resource( scriptRes );
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );  // this actually loads the Lua file from the zip file
+      if( pResourceHandle )
+         {
+         return true;
+         }
+      return false;
+      }
+   else
+      {
+      // If we're using development directories, have Lua execute the file directly instead of going through 
+      // the resource cache.  This allows Decoda to see the file for debugging purposes.
+      std::string path( "\\Assets\\" );
+      path += scriptRes;
+      LuaStateManager::GetSingleton().VExecuteFile( path.c_str() );
+      return true;
+      }
    }
 
 unsigned long InternalScriptExports::RegisterEventListener( EventType eventType, LuaPlus::LuaObject callbackFunction )

@@ -157,6 +157,7 @@
     <ClCompile Include="..\ResourceCache\DevResourceFile.cpp" />
     <ClCompile Include="..\ResourceCache\MeshResource.cpp" />
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp" />
+    <ClCompile Include="..\ResourceCache\ScriptResource.cpp" />
     <ClCompile Include="..\ResourceCache\TextureResource.cpp" />
     <ClCompile Include="..\ResourceCache\XmlResource.cpp" />
     <ClCompile Include="..\ResourceCache\ZipFile.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="..\Graphics\SceneNodes.h" />
     <ClInclude Include="..\Graphics\Shaders.h" />
     <ClInclude Include="..\LuaScripting\LuaStateManager.h" />
+    <ClInclude Include="..\LuaScripting\ScriptClass.h" />
     <ClInclude Include="..\LuaScripting\ScriptExports.h" />
     <ClInclude Include="..\LuaScripting\ScriptProcess.h" />
     <ClInclude Include="..\MainLoop\Initialization.h" />
@@ -234,6 +236,7 @@
     <ClInclude Include="..\ResourceCache\DevResourceFile.h" />
     <ClInclude Include="..\ResourceCache\MeshResource.h" />
     <ClInclude Include="..\ResourceCache\ResourceCache.h" />
+    <ClInclude Include="..\ResourceCache\ScriptResource.h" />
     <ClInclude Include="..\ResourceCache\TextureResource.h" />
     <ClInclude Include="..\ResourceCache\XmlResource.h" />
     <ClInclude Include="..\ResourceCache\ZipFile.h" />

@@ -132,16 +132,10 @@ bool ResourceCache::Init()
    bool ret = false;
    if( m_pResourceFile->VOpen() )
       {
-      RegisterLoader( shared_ptr< IResourceLoader > ( ENG_NEW DefaultResourceLoader() ) );
+      RegisterLoader< DefaultResourceLoader >();
       ret = true;
       }
    return ret;
-   }
-
-// The DefaultResourceLoader is last one in the list, so any loader will match it before it
-void ResourceCache::RegisterLoader( shared_ptr< IResourceLoader > loader )
-   {
-   m_ResourceLoaders.push_front( loader );
    }
 
 // This function is callled by ResCache::preload to 

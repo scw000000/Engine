@@ -123,7 +123,6 @@ void EngineOptions::Init( const char* xmlFileName )
             {
             m_LevelInstanceDirectory = pNode->Attribute( "LevelInstanceDirectory" );
             }
-         }
          if( pNode->Attribute( "ShowMouseCursor" ) )
             {
             std::string attribute = pNode->Attribute( "ShowMouseCursor" );
@@ -141,7 +140,16 @@ void EngineOptions::Init( const char* xmlFileName )
                m_Environment = Environment::Environment_Editor;
                }
             }
-
+         }
+         
+      pNode = pRoot->FirstChildElement( "Script" );
+      if( pNode )
+         {
+         if( pNode->Attribute( "PreInitFile" ) )
+            {
+            m_PreInitScriptFile = pNode->Attribute( "PreInitFile" );
+            }
+         }
 	   }
    }
 

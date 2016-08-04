@@ -17,11 +17,6 @@
 
 const char *TEXTURE_LOADER_PATTERNS[] = { "*.bmp", "*.jpg", "*.png" };
 
-shared_ptr<IResourceLoader> CreateTextureResourceLoader()
-   {
-	return shared_ptr<IResourceLoader>( ENG_NEW TextureResourceLoader() );
-   }
-
 SDLTextureResourceExtraData::SDLTextureResourceExtraData() : m_pSurface(NULL) 
    {	
 

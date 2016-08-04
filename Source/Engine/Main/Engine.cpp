@@ -17,10 +17,13 @@
 #include "..\ResourceCache\DevResourceFile.h"
 #include "..\ResourceCache\XmlResource.h"
 #include "..\ResourceCache\MeshResource.h"
+#include "..\ResourceCache\ScriptResource.h"
+#include "..\ResourceCache\TextureResource.h"
 #include "..\Event\EventManager.h"
 #include "..\Event\Events.h"
 #include "..\Graphics\OpenGLRenderer.h"
 #include "..\LuaScripting\LuaStateManager.h"
+#include "..\Animation\AnimationClipNode.h"
 #include "SDL_image.h"
 
 
@@ -137,16 +140,10 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 	   }
 
  //  extern shared_ptr<IResourceLoader> CreateWAVResourceLoader();
-//	extern shared_ptr<IResourceLoader> CreateOGGResourceLoader();
-   extern shared_ptr<IResourceLoader> CreateXmlResourceLoader();
-   extern shared_ptr<IResourceLoader> CreateMeshResourceLoader();
-   extern shared_ptr<IResourceLoader> CreateTextureResourceLoader();
-   //extern shared_ptr<IResourceLoader> CreateScriptResourceLoader();
-
-
-   m_pResCache->RegisterLoader( CreateXmlResourceLoader() );
-   m_pResCache->RegisterLoader( CreateMeshResourceLoader() );
-   m_pResCache->RegisterLoader( CreateTextureResourceLoader() );
+   m_pResCache->RegisterLoader< XmlResourceLoader >();
+   m_pResCache->RegisterLoader< MeshResourceLoader >();
+   m_pResCache->RegisterLoader< TextureResourceLoader >();
+   m_pResCache->RegisterLoader< ScriptResourceLoader >();
 
    if( !LoadStrings("English") )
 	   {
@@ -157,12 +154,25 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //  Initialize ResCache
    //--------------------------------- 
 
+   //--------------------------------- 
+   //  Initialize Lua scripting
+   //---------------------------------
+
    // Rez up the Lua State manager now, and run the initial script - discussed in Chapter 5, page 144.
-   if( !LuaStateManager::GetSingleton().Init() )
+   if( !LuaStateManager::GetSingleton().VInit() )
       {
       ENG_ERROR( "Failed to initialize Lua" );
       return false;
       }
+   
+   Resource resource( m_EngineOptions.GetPreInitScriptFile() );
+   shared_ptr<ResHandle> pResourceHandle = m_pResCache->GetHandle( resource );  
+
+   AnimationClipNode::RegisterScriptClass();
+
+   //--------------------------------- 
+   //  Initialize Lua scripting
+   //---------------------------------
 
    //--------------------------------- 
    //  Initialize EventManager
@@ -706,6 +716,8 @@ void EngineApp::OnClose()
    SDL_Quit();
    SAFE_DELETE( m_pEventManager );
    SAFE_DELETE( m_pResCache );
+
+   LuaStateManager::GetSingleton().ClearLuaState();
    /*
 	VDestroyNetworkEventForwarder();
 
@@ -715,7 +727,7 @@ void EngineApp::OnClose()
 
     BaseScriptComponent::UnregisterScriptFunctions();
     ScriptExports::Unregister();
-    LuaStateManager::Destroy();
+    
 
 	SAFE_DELETE(m_ResCache);
    */

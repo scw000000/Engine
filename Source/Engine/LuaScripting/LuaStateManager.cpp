@@ -22,18 +22,13 @@ LuaStateManager& LuaStateManager::GetSingleton( void )
    return s_LuaStateMgr;
    }
 
-bool LuaStateManager::Init( void )
-   {
-   return GetSingleton().VInit();
-   }
-
-void LuaStateManager::Destroy( void )
-   {
-   GetSingleton().ClearLuaState();
-   }
-
 bool LuaStateManager::VInit( void )
    {
+   if( m_pLuaState )
+      {
+      ENG_ERROR( "Overwriting LuaStateManager singleton" );
+      ClearLuaState();
+      }
    m_pLuaState = LuaPlus::LuaState::Create( true );
    if ( m_pLuaState == NULL )
       {

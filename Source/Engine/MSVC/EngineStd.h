@@ -103,6 +103,16 @@ extern const int SCREEN_HEIGHT;
 #endif
 
 #define __STR2__(x) #x
+// Reference: https://gcc.gnu.org/onlinedocs/cpp/Stringification.html#Stringification
+// Macro arguments are completely macro-expanded before they are substituted into a macro body, unless they are stringified or pasted with other tokens.
+// This macro is for retrieving the value of x, if x is a macro
+// Ex: #define foo 4
+//    __STR2__( foo )
+//       == > "foo"
+//    __STR1__( foo )
+//       == > __STR1__( 4 )
+//       == > __STR2__( 4 )
+//       == > "4"
 #define __STR1__(x) __STR2__(x)
 #define __LOC__ __FILE__ "("__STR1__(__LINE__)") : Warning Msg: "  
 

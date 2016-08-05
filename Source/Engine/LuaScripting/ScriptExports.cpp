@@ -32,6 +32,8 @@ void ScriptExports::Register( void )
 	globals.RegisterDirect( "RemoveEventListener", &InternalScriptExports::RemoveEventListener );
    globals.RegisterDirect( "QueueEvent", &InternalScriptExports::QueueEvent );
 	globals.RegisterDirect( "TriggerEvent", &InternalScriptExports::TriggerEvent );
+
+   globals.RegisterDirect( "Log", &InternalScriptExports::LuaLog );
    }
 
 void ScriptExports::Unregister( void )
@@ -125,6 +127,18 @@ bool InternalScriptExports::TriggerEvent( EventType eventType, LuaPlus::LuaObjec
     return false;
    }
 
+void InternalScriptExports::LuaLog( LuaPlus::LuaObject text )
+   {
+   if( text.IsConvertibleToString() )
+      {
+      ENG_LOG( "Lua", text.ToString() );
+      }
+   else
+      {
+      ENG_LOG( "Lua", "<" + std::string( text.TypeName() ) + ">" );
+      }
+   }
+
 ScriptEventListener::ScriptEventListener( const EventType& eventType, const LuaPlus::LuaObject& scriptCallbackFunction ) : m_ScriptCallbackFunction( scriptCallbackFunction )
    {
    m_EventType = eventType;
@@ -148,7 +162,7 @@ EventListenerDelegate ScriptEventListener::GetDelegate( void )
 void ScriptEventListener::ScriptEventDelegate( IEventPtr pEvent )
    {
    shared_ptr<IScriptEvent> pScriptEvent = dynamic_pointer_cast<IScriptEvent>( pEvent );
-   LuaPlus::LuaFunction< void* > callback = m_ScriptCallbackFunction;
+   LuaPlus::LuaFunctionVoid callback = m_ScriptCallbackFunction;
    callback( pScriptEvent->GetLuaEventData() );
    }
 

@@ -23,6 +23,27 @@ AnimationClipNode::AnimationClipNode(void )
    {
    }
 
+bool AnimationClipNode::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData )
+   {
+   auto clipNameObj = constructionData.Lookup( "ClipName" );
+   
+   if( clipNameObj.IsNil() || !clipNameObj.IsString() )
+      {
+      return false;
+      }
+   m_ClipName = clipNameObj.GetString();
+
+   /* Child Node should be leaf node, so no need for getting its child nodes
+   auto childAnimNodesObj = constructionData.Lookup( "ChildAnimNodes" );
+   ENG_ASSERT( !childAnimNodesObj.IsNil() && childAnimNodesObj.IsTable() );
+   for( LuaPlus::LuaTableIterator childNodesIt( childAnimNodesObj ); childNodesIt; childNodesIt.Next() )
+   {
+
+   }
+   */
+   return true;
+   }
+
 //AnimationClipNode::AnimationClipNode( shared_ptr< MeshResourceExtraData > pMeshExtra, const std::string& clipName )
 //   {
 //   ENG_ASSERT( pMeshExtra );

@@ -13,6 +13,7 @@
  * \note
  */
 #include <assimp/scene.h>
+#include "..\LuaScripting\ScriptClass.h"
 
 class ResHandle;
 class MeshResourceExtraData;
@@ -20,10 +21,13 @@ class IAnimationNode;
 
 #define INVALID_ANIMSTATE_ID 0
 
-class AnimationState
+class AnimationState : public BaseScriptClass< AnimationState >
    {
    public:
+      AnimationState( void ) {}
       AnimationState( AnimationStateId id, shared_ptr< ResHandle > pMeshRes, shared_ptr< IAnimationNode > pAnimRootNode );
+      
+      virtual bool VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) override;
 
       float GetTimePosition( void ) const;
       void SetTimePosition( float newTimePos ); 

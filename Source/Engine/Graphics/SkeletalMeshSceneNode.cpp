@@ -18,6 +18,7 @@
 #include "..\ResourceCache\TextureResource.h"
 #include "OpenGLRenderer.h"
 #include "..\Animation\AnimationClipNode.h"
+#include "..\ResourceCache\ScriptResource.h"
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
@@ -107,6 +108,8 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
    OpenGLRenderer::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
 
+   Resource resource( "Scripts\\selftest.lua" );
+   shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );
    
    // 1st attribute buffer : vertices
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );

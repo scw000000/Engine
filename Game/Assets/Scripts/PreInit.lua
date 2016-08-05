@@ -267,7 +267,7 @@ function class(baseClass, body)
 	end
 	
 	-- Returns true if otherClass appears in this objects class hierarchy anywhere.
-	ret.IsInstance = function(self, otherClass)
+	ret.IsDerivedClassOf = function(self, otherClass)
 		local cls = self.__index;
 		while cls do
 			if cls == otherClass then 

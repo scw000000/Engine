@@ -26,6 +26,18 @@ AnimationState::AnimationState( AnimationStateId id, shared_ptr< ResHandle > pMe
    m_Id = id;
    }
 
+bool AnimationState::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData )
+   {
+   auto rootAnimNode = constructionData.Lookup( "RootAnimNode" );
+   if( rootAnimNode.IsNil() || !rootAnimNode.IsTable() || !IsBaseClassOf< IAnimationNode >( rootAnimNode ) )
+      {
+      return false;
+      }
+
+   m_pRootAnimNode.reset( GetObjUserDataPtr< IAnimationNode >( rootAnimNode ) );
+   return true;
+   }
+
 float AnimationState::GetTimePosition( void ) const
    {
    return m_pRootAnimNode->VGetTimePosition();

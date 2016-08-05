@@ -46,6 +46,7 @@ class InternalScriptExports
       static bool QueueEvent( EventType eventType, LuaPlus::LuaObject eventData );
       // Generate a corresponding C++ event ( IScriptEvent )from Lua Event and trigger it
 	   static bool TriggerEvent( EventType eventType, LuaPlus::LuaObject eventData );
+      static void LuaLog( LuaPlus::LuaObject text );
 
    private:
       static ScriptEventListenerMgr* s_pScriptEventListenerMgr;

@@ -23,7 +23,9 @@
 #include "..\Event\Events.h"
 #include "..\Graphics\OpenGLRenderer.h"
 #include "..\LuaScripting\LuaStateManager.h"
+#include "..\LuaScripting\ScriptExports.h"
 #include "..\Animation\AnimationClipNode.h"
+#include "..\Animation\AnimationState.h"
 #include "SDL_image.h"
 
 
@@ -164,11 +166,18 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       ENG_ERROR( "Failed to initialize Lua" );
       return false;
       }
+
+   ScriptExports::Register();
    
    Resource resource( m_EngineOptions.GetPreInitScriptFile() );
    shared_ptr<ResHandle> pResourceHandle = m_pResCache->GetHandle( resource );  
 
-   AnimationClipNode::RegisterScriptClass();
+  // RegisterAbstractScriptClass< IAnimationNode >();
+
+   RegisterScriptClass< AnimationClipNode, IAnimationNode >();
+   RegisterScriptClass< AnimationState >();
+  // AnimationClipNode::RegisterScriptClass();
+   //AnimationState::RegisterScriptClass();
 
    //--------------------------------- 
    //  Initialize Lua scripting

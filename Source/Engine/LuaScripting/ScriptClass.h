@@ -122,7 +122,8 @@ template< typename T > LuaPlus::LuaObject BaseScriptClass<T>::CreateFromScript( 
    // Note: The self parameter is not use in this function, but it allows us to be consistent when calling
    // Create().  The Lua version of this function needs self.
    ENG_LOG( "Script", std::string( "Creating instance of " ) + typeid( T ).name() );
-   BaseScriptClass<T>* pObj = static_cast< BaseScriptClass<T>* >( ENG_NEW T );
+   auto pObj = ENG_NEW T;
+   //BaseScriptClass<T>* pObj = static_cast< BaseScriptClass<T>* >( orig );
 
    pObj->m_LuaInstance.AssignNewTable( LuaStateManager::GetSingleton().GetLuaState() );
    if( pObj->VBuildCppDataFromScript( originalSubClass, constructionData ) )

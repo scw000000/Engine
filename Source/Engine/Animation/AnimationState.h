@@ -23,12 +23,13 @@ class IAnimationNode;
 
 class AnimationState : public BaseScriptClass< AnimationState >
    {
+   friend class SkeletalMeshSceneNode;
    public:
       AnimationState( void ) {}
       AnimationState( AnimationStateId id, shared_ptr< ResHandle > pMeshRes, shared_ptr< IAnimationNode > pAnimRootNode );
       
       virtual bool VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) override;
-
+      bool Init( void );
       float GetTimePosition( void ) const;
       void SetTimePosition( float newTimePos ); 
       void AddTimeOffset( float timeOffset );
@@ -39,6 +40,10 @@ class AnimationState : public BaseScriptClass< AnimationState >
       void SetShouldLoop( bool shouldLoop );
       bool GetShouldLoop( void ) const;
       AnimationStateId GetId( void ) const { return m_Id; }
+      const std::vector< aiMatrix4x4 >& GetGlobalBoneTransform( void ) const { return m_GlobalBoneTransform; }
+
+   private:
+      void SetMeshResourcePtr( shared_ptr< ResHandle > pMeshRes );
 
    private:
       shared_ptr< ResHandle > m_pMeshResource;

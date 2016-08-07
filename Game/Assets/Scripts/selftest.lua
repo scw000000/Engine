@@ -6,7 +6,7 @@ scriptRet = cppClassTable_AnimationState:Create(
 		{ 
 		RootAnimNode = cppClassTable_AnimationClipNode:Create( 
 				{
-				ClipName = "helloWOrld",
+				ClipName = "mixamo.com",
 				
 				ChildAnimNodes = { }
 				} 	

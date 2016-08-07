@@ -727,6 +727,7 @@ void EngineApp::OnClose()
    SAFE_DELETE( m_pResCache );
 
    LuaStateManager::GetSingleton().ClearLuaState();
+   InternalScriptExports::Destroy();
    /*
 	VDestroyNetworkEventForwarder();
 
@@ -735,8 +736,6 @@ void EngineApp::OnClose()
 	SAFE_DELETE(m_pEventManager);
 
     BaseScriptComponent::UnregisterScriptFunctions();
-    ScriptExports::Unregister();
-    
 
 	SAFE_DELETE(m_ResCache);
    */

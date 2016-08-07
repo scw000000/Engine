@@ -19,6 +19,9 @@
 #include "OpenGLRenderer.h"
 #include "..\Animation\AnimationClipNode.h"
 #include "..\ResourceCache\ScriptResource.h"
+#include "..\LuaScripting\LuaStateManager.h"
+#include "..\Animation\AnimationState.h"
+//#include "..\LuaScripting\ScriptClass.h"
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
@@ -100,17 +103,19 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
    SetRadius( pMeshExtra->m_Radius );
 
-   m_CurrentAnimation = pMeshExtra->m_pScene->mAnimations[ 0 ]->mName.C_Str();
-   /*LoadBones( pMeshExtra );*/
-
-   m_BoneAnimationData.resize( pMeshExtra->m_NumBones );
-
    OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
    OpenGLRenderer::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
 
    Resource resource( "Scripts\\selftest.lua" );
-   shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );
-   
+   shared_ptr<ResHandle> pScriptResHandle = g_pApp->m_pResCache->GetHandle( resource );
+   auto luaAnimState = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( "scriptRet" );
+   ENG_ASSERT( luaAnimState.IsTable() && IsBaseClassOf< AnimationState >( luaAnimState ) );
+   auto pAnimState = GetObjUserDataPtr< AnimationState >( luaAnimState );
+   ENG_ASSERT( pAnimState );
+   m_pAnimationState.reset( pAnimState );
+   m_pAnimationState->SetMeshResourcePtr( pMeshResHandle );
+   ENG_ASSERT( m_pAnimationState->Init() );
+
    // 1st attribute buffer : vertices
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
    glEnableVertexAttribArray( VERTEX_LOCATION );
@@ -218,9 +223,9 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
    glUniform4fv( m_MaterialDiffuse, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse() );
    glUniform3fv( m_MaterialAmbient, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient() );
 
-
-   glUniformMatrix4fv( m_BoneTransform, m_BoneAnimationData.size(), GL_TRUE, &( m_BoneAnimationData[ 0 ].m_AnimationTransform[ 0 ][ 0 ] ) );
-
+   const auto& globalBoneTransform = m_pAnimationState->m_GlobalBoneTransform;
+   glUniformMatrix4fv( m_BoneTransform, globalBoneTransform.size(), GL_TRUE, &( globalBoneTransform[ 0 ][ 0 ][ 0 ] ) );
+   
    // Bind our texture in Texture Unit 0
    glActiveTexture( GL_TEXTURE0 );
    glBindTexture( GL_TEXTURE_2D, m_Texture );
@@ -242,24 +247,26 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
 
 int SkeletalMeshSceneNode::VOnUpdate( Scene * pScene, unsigned long elapsedMs )
    {
-   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
-   shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
-   auto pAiScene = pMeshExtra->m_pScene;
-   auto pAnimation = FindAnimation( m_CurrentAnimation, pMeshExtra->m_pScene );
-   static float aiAnimTicks = 0.f;
-   if( pAnimation )
-      {
-      // The unit of the tick in this animation data
-      float aiTicksPerSecond = ( float ) ( pAnimation->mTicksPerSecond != 0 ? pAnimation->mTicksPerSecond : 25.0f );
-      // how many ticks have passed 
-      float aiTimeInTicks = (float) elapsedMs * aiTicksPerSecond / 1000.f;
-      // If the time is larger than the animation, mod it
-      aiAnimTicks = fmod( aiAnimTicks + aiTimeInTicks, ( float ) pAnimation->mDuration );
+   m_pAnimationState->Update( elapsedMs );
+   //shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
+   //shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
+   //auto pAiScene = pMeshExtra->m_pScene;
+   //auto pAnimation = FindAnimation( m_CurrentAnimation, pMeshExtra->m_pScene );
+   //static float aiAnimTicks = 0.f;
+   //if( pAnimation )
+   //   {
+   //   // The unit of the tick in this animation data
+   //   float aiTicksPerSecond = ( float ) ( pAnimation->mTicksPerSecond != 0 ? pAnimation->mTicksPerSecond : 25.0f );
+   //   // how many ticks have passed 
+   //   float aiTimeInTicks = (float) elapsedMs * aiTicksPerSecond / 1000.f;
+   //   // If the time is larger than the animation, mod it
+   //   aiAnimTicks = fmod( aiAnimTicks + aiTimeInTicks, ( float ) pAnimation->mDuration );
 
-      UpdateAnimationBones( pMeshExtra, aiAnimTicks, pAnimation, pAiScene->mRootNode, pMeshExtra->m_GlobalInverseTransform );
-      }
-   // for updates its children
-   SceneNode::VOnUpdate( pScene, elapsedMs );
+   //   UpdateAnimationBones( pMeshExtra, aiAnimTicks, pAnimation, pAiScene->mRootNode, pMeshExtra->m_GlobalInverseTransform );
+   //   }
+   //// for updates its children
+   //SceneNode::VOnUpdate( pScene, elapsedMs );
+
    return S_OK;
    }
 
@@ -274,8 +281,6 @@ int SkeletalMeshSceneNode::VOnUpdate( Scene * pScene, unsigned long elapsedMs )
 
 void SkeletalMeshSceneNode::ReleaseResource( void )
    {
-   m_BoneAnimationData.clear();
-
    if( m_VertexArrayObj )
       {
       glDeleteVertexArrays( 1, &m_VertexArrayObj );
@@ -296,39 +301,41 @@ void SkeletalMeshSceneNode::ReleaseResource( void )
       glDeleteProgram( m_Program );
       m_Program = 0;
       }
+
+   m_pAnimationState.reset();
    }
 
 void SkeletalMeshSceneNode::UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const aiMatrix4x4& parentTransfrom )
    {
-   std::string nodeName( pAiNode->mName.C_Str() );
+   //std::string nodeName( pAiNode->mName.C_Str() );
 
-   aiMatrix4x4 localBonePoseTransform;
-   // find the corresponding aiNodeAnim of this node
-   // each aiAnimation has multiple channels, which should map to a aiNode( bone )
-   const aiNodeAnim* pNodeAnim = FindNodeAnim( nodeName, pAnimation );
+   //aiMatrix4x4 localBonePoseTransform;
+   //// find the corresponding aiNodeAnim of this node
+   //// each aiAnimation has multiple channels, which should map to a aiNode( bone )
+   //const aiNodeAnim* pNodeAnim = FindNodeAnim( nodeName, pAnimation );
 
-   if( pNodeAnim )
-      {
-      localBonePoseTransform = aiMatrix4x4( CalcInterpolatedScaling( aiAnimTicks, pNodeAnim ), CalcInterpolatedRotation( aiAnimTicks, pNodeAnim ), CalcInterpolatedPosition( aiAnimTicks, pNodeAnim ) );
-      }
-   else
-      {
-      // cannot find animation data, use T pose transform instead
-      localBonePoseTransform = pAiNode->mTransformation; 
-      }
+   //if( pNodeAnim )
+   //   {
+   //   localBonePoseTransform = aiMatrix4x4( CalcInterpolatedScaling( aiAnimTicks, pNodeAnim ), CalcInterpolatedRotation( aiAnimTicks, pNodeAnim ), CalcInterpolatedPosition( aiAnimTicks, pNodeAnim ) );
+   //   }
+   //else
+   //   {
+   //   // cannot find animation data, use T pose transform instead
+   //   localBonePoseTransform = pAiNode->mTransformation; 
+   //   }
 
-   aiMatrix4x4 globalBonePoseTransform = parentTransfrom * localBonePoseTransform;
-   BoneMappingData& boneMappingData = pMeshExtra->m_BoneMappingData;
-   if( boneMappingData.find( nodeName ) != boneMappingData.end() )
-      {
-      BoneData& boneData = boneMappingData[ nodeName ];
-      m_BoneAnimationData[ boneData.m_BoneId ].m_AnimationTransform = globalBonePoseTransform * boneData.m_BoneOffset;
-      }
+   //aiMatrix4x4 globalBonePoseTransform = parentTransfrom * localBonePoseTransform;
+   //BoneMappingData& boneMappingData = pMeshExtra->m_BoneMappingData;
+   //if( boneMappingData.find( nodeName ) != boneMappingData.end() )
+   //   {
+   //   BoneData& boneData = boneMappingData[ nodeName ];
+   //   m_BoneAnimationData[ boneData.m_BoneId ].m_AnimationTransform = globalBonePoseTransform * boneData.m_BoneOffset;
+   //   }
 
-   for( unsigned int i = 0; i < pAiNode->mNumChildren; ++i )
-      {
-      UpdateAnimationBones( pMeshExtra, aiAnimTicks, pAnimation, pAiNode->mChildren[ i ], globalBonePoseTransform );
-      }
+   //for( unsigned int i = 0; i < pAiNode->mNumChildren; ++i )
+   //   {
+   //   UpdateAnimationBones( pMeshExtra, aiAnimTicks, pAnimation, pAiNode->mChildren[ i ], globalBonePoseTransform );
+   //   }
    }
 
 

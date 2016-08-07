@@ -15,6 +15,7 @@
 #include "AnimationState.h"
 #include "AnimationNode.h"
 #include "BoneTransform.h"
+#include "AnimationClipNode.h"
 
 AnimationState::AnimationState( AnimationStateId id, shared_ptr< ResHandle > pMeshRes, shared_ptr< IAnimationNode > pAnimRootNode ) : m_pMeshResource( pMeshRes )
    {
@@ -26,14 +27,22 @@ AnimationState::AnimationState( AnimationStateId id, shared_ptr< ResHandle > pMe
    m_Id = id;
    }
 
-bool AnimationState::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData )
+bool AnimationState::Init( void )
    {
-   auto rootAnimNode = constructionData.Lookup( "RootAnimNode" );
-   if( rootAnimNode.IsNil() || !rootAnimNode.IsTable() || !IsBaseClassOf< IAnimationNode >( rootAnimNode ) )
+   if( !m_pMeshResource || !m_pMeshExtraData || !m_pRootAnimNode )
       {
       return false;
       }
+   return m_pRootAnimNode->VInit();
+   }
 
+bool AnimationState::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData )
+   {
+   auto rootAnimNode = constructionData.Lookup( "RootAnimNode" );
+   if( !rootAnimNode.IsTable() || !IsBaseClassOf< IAnimationNode >( rootAnimNode ) )
+      {
+      return false;
+      }
    m_pRootAnimNode.reset( GetObjUserDataPtr< IAnimationNode >( rootAnimNode ) );
    return true;
    }
@@ -63,25 +72,30 @@ void AnimationState::UpdatetGlobalBoneTransform( aiNode* pAiNode, const aiMatrix
    {
    std::string nodeName( pAiNode->mName.C_Str() );
 
-   BoneTransform localBoneTransform;
-   auto boneMappingDataIt = m_pMeshExtraData->m_BoneMappingData.find( nodeName );
+   aiMatrix4x4 globalBonePoseTransform;
    BoneMappingData& boneMappingData = m_pMeshExtraData->m_BoneMappingData;
-   ENG_ASSERT( boneMappingDataIt != m_pMeshExtraData->m_BoneMappingData.end() );
-   BoneData& boneData = boneMappingDataIt->second;
+   auto boneMappingDataIt = boneMappingData.find( nodeName );
    
-   aiMatrix4x4 localBonePoseTransform;
-   if( m_pRootAnimNode->VGetLocalBoneTransform( localBoneTransform, boneData.m_BoneId ) )
+   if( boneMappingDataIt != boneMappingData.end() )
       {
-      localBonePoseTransform = aiMatrix4x4( localBoneTransform.m_Scale, localBoneTransform.m_Rotation, localBoneTransform.m_Translation );
+      BoneData& boneData = boneMappingData[ nodeName ];
+      BoneTransform localBoneTransform;
+      if( m_pRootAnimNode->VGetLocalBoneTransform( localBoneTransform, boneData.m_BoneId ) )
+         {
+         globalBonePoseTransform = parentTransfrom * aiMatrix4x4( localBoneTransform.m_Scale, localBoneTransform.m_Rotation, localBoneTransform.m_Translation );
+         }
+      else
+         {
+         globalBonePoseTransform = parentTransfrom * pAiNode->mTransformation;
+         }
+
+      m_GlobalBoneTransform[ boneData.m_BoneId ] = globalBonePoseTransform * boneData.m_BoneOffset;
       }
    else
       {
-      localBonePoseTransform = pAiNode->mTransformation;
+      globalBonePoseTransform = parentTransfrom * pAiNode->mTransformation;
       }
-
-   aiMatrix4x4 globalBonePoseTransform = parentTransfrom * localBonePoseTransform;
-   m_GlobalBoneTransform[ boneData.m_BoneId ] = globalBonePoseTransform * boneData.m_BoneOffset;
-
+   
    for( unsigned int i = 0; i < pAiNode->mNumChildren; ++i )
       {
       UpdatetGlobalBoneTransform( pAiNode->mChildren[ i ], globalBonePoseTransform );
@@ -106,4 +120,14 @@ void AnimationState::SetShouldLoop( bool shouldLoop )
 bool AnimationState::GetShouldLoop( void ) const
    {
    return m_pRootAnimNode->VGetShouldLoop();
+   }
+
+void AnimationState::SetMeshResourcePtr( shared_ptr< ResHandle > pMeshRes )
+   {
+   ENG_ASSERT( pMeshRes );
+   m_pMeshResource = pMeshRes;
+   m_pMeshExtraData = static_pointer_cast< MeshResourceExtraData >( m_pMeshResource->GetExtraData() );
+   m_GlobalBoneTransform.resize( m_pMeshExtraData->m_NumBones );
+   ENG_ASSERT( m_pRootAnimNode );
+   m_pRootAnimNode->VSetMeshExtraDataPtr( m_pMeshExtraData );
    }

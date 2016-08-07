@@ -21,6 +21,7 @@ const AnimNodeType BaseAnimationNode< AnimationClipNode >::s_AnimNodeType = 0xb7
 
 AnimationClipNode::AnimationClipNode(void )
    {
+   m_CurrentAiTicks = 0.f;
    }
 
 bool AnimationClipNode::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData )
@@ -44,6 +45,29 @@ bool AnimationClipNode::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass,
    return true;
    }
 
+bool AnimationClipNode::VDelegateVInit( void )
+   {
+   if( !m_pMeshExtraData )
+      {
+      return false;
+      }
+   m_pAnimation = m_pMeshExtraData->FindAnimation( m_ClipName );
+   if( !m_pAnimation )
+      {
+      return false;
+      }
+   m_AiTicksPerMs = ( float ) ( m_pAnimation->mTicksPerSecond != 0 ? m_pAnimation->mTicksPerSecond : 25.f ) / 1000.f;
+   m_DurationInMs = ( float ) 1000.0 * m_pAnimation->mDuration / m_pAnimation->mTicksPerSecond;
+
+   for( unsigned int nodeIdx = 0; nodeIdx < m_pAnimation->mNumChannels; ++nodeIdx )
+      {
+      auto BoneDataIt = m_pMeshExtraData->m_BoneMappingData.find( m_pAnimation->mChannels[ nodeIdx ]->mNodeName.C_Str() );
+      ENG_ASSERT( BoneDataIt != m_pMeshExtraData->m_BoneMappingData.end() );
+      m_BoneIdToNodeAnimMapping[ BoneDataIt->second.m_BoneId ] = m_pAnimation->mChannels[ nodeIdx ];
+      }
+   return true;
+   }
+
 //AnimationClipNode::AnimationClipNode( shared_ptr< MeshResourceExtraData > pMeshExtra, const std::string& clipName )
 //   {
 //   ENG_ASSERT( pMeshExtra );
@@ -63,9 +87,9 @@ bool AnimationClipNode::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass,
 //   m_CurrentAiTicks = 0.f;
 //   }
 
-void AnimationClipNode::VUpdate( unsigned long elapsedMs )
+void AnimationClipNode::VDelegateUpdate( unsigned long elapsedMs )
    {
-   VAddTimeOffset( m_PlaybackRate * elapsedMs );
+   VAddTimeOffset( m_PlaybackRate * elapsedMs / m_DurationInMs );
    
    }
 
@@ -102,7 +126,7 @@ unsigned int AnimationClipNode::FindTranslation( const aiNodeAnim* pNodeAnim ) c
    {
    for( unsigned int i = 0; i < pNodeAnim->mNumPositionKeys - 1; i++ )
       {
-      if( m_CurrentAiTicks < ( float ) pNodeAnim->mPositionKeys[ i + 1 ].mTime )
+      if( m_CurrentAiTicks <= ( float ) pNodeAnim->mPositionKeys[ i + 1 ].mTime )
          {
          return i;
          }
@@ -115,9 +139,9 @@ unsigned int AnimationClipNode::FindRotation( const aiNodeAnim* pNodeAnim ) cons
    {
    ENG_ASSERT( pNodeAnim->mNumRotationKeys > 0 );
 
-   for( unsigned int i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++ )
+   for( unsigned int i = 0; i <= pNodeAnim->mNumRotationKeys - 1; i++ )
       {
-      if( m_CurrentAiTicks < ( float ) pNodeAnim->mRotationKeys[ i + 1 ].mTime )
+      if( m_CurrentAiTicks <= ( float ) pNodeAnim->mRotationKeys[ i + 1 ].mTime )
          {
          return i;
          }
@@ -132,7 +156,7 @@ unsigned int AnimationClipNode::FindScale( const aiNodeAnim* pNodeAnim ) const
 
    for( unsigned int i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++ )
       {
-      if( m_CurrentAiTicks < ( float ) pNodeAnim->mScalingKeys[ i + 1 ].mTime )
+      if( m_CurrentAiTicks <= ( float ) pNodeAnim->mScalingKeys[ i + 1 ].mTime )
          {
          return i;
          }

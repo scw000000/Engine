@@ -20,6 +20,8 @@ class MeshResourceExtraData;
 struct aiAnimation;
 struct aiNodeAnim;
 
+class AnimationState;
+
 class SkeletalMeshSceneNode : public SceneNode
    {
    public:
@@ -94,13 +96,5 @@ class SkeletalMeshSceneNode : public SceneNode
 
       unsigned long     m_VerticesIndexCount;
 
-      std::string      m_CurrentAnimation;
-
-      class BoneAnimationData
-         {
-         public:
-            aiMatrix4x4 m_AnimationTransform;
-         };
-
-      std::vector< BoneAnimationData > m_BoneAnimationData;
+      shared_ptr< AnimationState > m_pAnimationState;
    };

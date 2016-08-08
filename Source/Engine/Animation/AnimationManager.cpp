@@ -21,7 +21,6 @@
 AnimationManager::AnimationManager( void )
    {
    m_IsRunning = false;
-   IEventManager* pEventMgr = IEventManager::GetSingleton();
 
    }
 
@@ -31,54 +30,50 @@ AnimationManager& AnimationManager::GetSingleton( void )
    return animationManager;
    }
 
-void AnimationManager::VUpdate( unsigned long elapsedMs ) 
+void AnimationManager::VSetIsRunning( bool isRunning )
    {
+   m_IsRunning = isRunning; 
    for( auto pAnimStateIt : m_AnimationStates )
       {
-      pAnimStateIt.second->Update( elapsedMs );
+      pAnimStateIt.second->SetIsRunning( isRunning );
+      }
+   }
+
+void AnimationManager::VUpdate( unsigned long elapsedMs ) 
+   {
+   if( m_IsRunning )
+      {
+      for( auto pAnimStateIt : m_AnimationStates )
+         {
+         pAnimStateIt.second->Update( elapsedMs );
+         }
       }
    }
 
 void AnimationManager::VAddAnimationState( shared_ptr< AnimationState > pNewState )
    {
-   auto stateId = pNewState->GetId();
-   ENG_ASSERT( m_AnimationStates.find( stateId ) == m_AnimationStates.end() );
-   m_AnimationStates[ stateId ] = pNewState;
+   auto actorId = pNewState->m_pOwner->GetId();
+   ENG_ASSERT( m_AnimationStates.find( actorId ) == m_AnimationStates.end() );
+   m_AnimationStates[ actorId ] = pNewState;
    }
 
-void AnimationManager::VRemoveAnimationState( AnimationStateId stateId )
+void AnimationManager::VRemoveAnimationState( ActorId actorId )
    {
-   auto animStateIt = m_AnimationStates.find( stateId );
-   ENG_ASSERT( animStateIt != m_AnimationStates.end() );
+   auto animStateIt = m_AnimationStates.find( actorId );
+   if( animStateIt == m_AnimationStates.end() )
+      {
+      return;
+      }
    m_AnimationStates.erase( animStateIt );
    }
 
-shared_ptr< AnimationState > AnimationManager::VGetAnimationState( AnimationStateId stateId ) const
+shared_ptr< AnimationState > AnimationManager::VGetAnimationState( ActorId actorId ) const
    {
-   auto animStateIt = m_AnimationStates.find( stateId );
+   auto animStateIt = m_AnimationStates.find( actorId );
    if( animStateIt == m_AnimationStates.end() )
       {
       return shared_ptr< AnimationState >();
       }
    return animStateIt->second;
    }
-
-
-//void AnimationManager::NewAnimationRootNodedelegate( IEventPtr pEvent )
-//   {
-//   shared_ptr< Event_New_Anim_Root_Node > pDerivedEvt = static_pointer_cast< Event_New_Anim_Root_Node >( pEvent );
-//   auto pRootAnimNode = pDerivedEvt->GetAnimRootNodePtr().lock();
-//   auto pMeshResource = pDerivedEvt->GetMeshResoucePtr().lock();
-//   if( !pRootAnimNode || !pMeshResource )
-//      {
-//      return;
-//      }
-//   if( ++m_NextStateId == INVALID_ANIMSTATE_ID )
-//      {
-//      --m_NextStateId;
-//      return;
-//      }
-//   shared_ptr< AnimationState > pNewStat( ENG_NEW AnimationState( m_NextStateId, pMeshResource, pRootAnimNode ) );
-//   VAddAnimationState( pNewStat );
-//   }
 

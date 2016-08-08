@@ -36,8 +36,6 @@ class SkeletalMeshSceneNode : public SceneNode
       virtual int VOnLostDevice( Scene *pScene ) override { return S_OK; }
 
       virtual int VRender( Scene *pScene )  override;
-      virtual int VOnUpdate( Scene *pScene, unsigned long elapsedMs ) override;
-      
 
       GLuint GetProgram( void ) { return m_Program; };
 

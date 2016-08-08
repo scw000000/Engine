@@ -17,11 +17,10 @@
 #include "..\ResourceCache\MeshResource.h"
 #include "..\ResourceCache\TextureResource.h"
 #include "OpenGLRenderer.h"
-#include "..\Animation\AnimationClipNode.h"
 #include "..\ResourceCache\ScriptResource.h"
 #include "..\LuaScripting\LuaStateManager.h"
 #include "..\Animation\AnimationState.h"
-//#include "..\LuaScripting\ScriptClass.h"
+#include "..\Animation\AnimationManager.h"
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
@@ -115,6 +114,8 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    m_pAnimationState.reset( pAnimState );
    m_pAnimationState->SetMeshResourcePtr( pMeshResHandle );
    ENG_ASSERT( m_pAnimationState->Init() );
+   m_pAnimationState->SetOwner( m_pRenderComponent->VGetOwner().lock() );
+   AnimationManager::GetSingleton().VAddAnimationState( m_pAnimationState );
 
    // 1st attribute buffer : vertices
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
@@ -245,31 +246,6 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
    return S_OK;
    }
 
-int SkeletalMeshSceneNode::VOnUpdate( Scene * pScene, unsigned long elapsedMs )
-   {
-   m_pAnimationState->Update( elapsedMs );
-   //shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
-   //shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
-   //auto pAiScene = pMeshExtra->m_pScene;
-   //auto pAnimation = FindAnimation( m_CurrentAnimation, pMeshExtra->m_pScene );
-   //static float aiAnimTicks = 0.f;
-   //if( pAnimation )
-   //   {
-   //   // The unit of the tick in this animation data
-   //   float aiTicksPerSecond = ( float ) ( pAnimation->mTicksPerSecond != 0 ? pAnimation->mTicksPerSecond : 25.0f );
-   //   // how many ticks have passed 
-   //   float aiTimeInTicks = (float) elapsedMs * aiTicksPerSecond / 1000.f;
-   //   // If the time is larger than the animation, mod it
-   //   aiAnimTicks = fmod( aiAnimTicks + aiTimeInTicks, ( float ) pAnimation->mDuration );
-
-   //   UpdateAnimationBones( pMeshExtra, aiAnimTicks, pAnimation, pAiScene->mRootNode, pMeshExtra->m_GlobalInverseTransform );
-   //   }
-   //// for updates its children
-   //SceneNode::VOnUpdate( pScene, elapsedMs );
-
-   return S_OK;
-   }
-
 //void SkeletalMeshSceneNode::LoadBones( shared_ptr<MeshResourceExtraData> pMeshExtra )
 //   {
 //   
@@ -301,8 +277,11 @@ void SkeletalMeshSceneNode::ReleaseResource( void )
       glDeleteProgram( m_Program );
       m_Program = 0;
       }
-
-   m_pAnimationState.reset();
+   if( m_pAnimationState )
+      {
+      AnimationManager::GetSingleton().VRemoveAnimationState( m_pAnimationState->m_pOwner->GetId() );
+      m_pAnimationState.reset();
+      }
    }
 
 void SkeletalMeshSceneNode::UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const aiMatrix4x4& parentTransfrom )

@@ -291,4 +291,3 @@ class IScriptManager
    };
 
 typedef unsigned int BoneId;
-typedef unsigned int AnimationStateId;

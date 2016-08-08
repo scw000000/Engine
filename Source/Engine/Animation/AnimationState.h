@@ -24,9 +24,10 @@ class IAnimationNode;
 class AnimationState : public BaseScriptClass< AnimationState >
    {
    friend class SkeletalMeshSceneNode;
+   friend class AnimationManager;
    public:
       AnimationState( void ) {}
-      AnimationState( AnimationStateId id, shared_ptr< ResHandle > pMeshRes, shared_ptr< IAnimationNode > pAnimRootNode );
+      AnimationState( shared_ptr< ResHandle > pMeshRes, shared_ptr< IAnimationNode > pAnimRootNode );
       
       virtual bool VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) override;
       bool Init( void );
@@ -39,8 +40,8 @@ class AnimationState : public BaseScriptClass< AnimationState >
       bool GetIsRunning( void ) const;
       void SetShouldLoop( bool shouldLoop );
       bool GetShouldLoop( void ) const;
-      AnimationStateId GetId( void ) const { return m_Id; }
       const std::vector< aiMatrix4x4 >& GetGlobalBoneTransform( void ) const { return m_GlobalBoneTransform; }
+      void SetOwner( shared_ptr< Actor > pOwner );
 
    private:
       void SetMeshResourcePtr( shared_ptr< ResHandle > pMeshRes );
@@ -49,6 +50,6 @@ class AnimationState : public BaseScriptClass< AnimationState >
       shared_ptr< ResHandle > m_pMeshResource;
       shared_ptr< MeshResourceExtraData > m_pMeshExtraData;
       shared_ptr< IAnimationNode > m_pRootAnimNode;
+      shared_ptr< Actor > m_pOwner;
       std::vector< aiMatrix4x4 > m_GlobalBoneTransform;
-      AnimationStateId m_Id;
    };

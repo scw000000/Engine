@@ -17,14 +17,13 @@
 #include "BoneTransform.h"
 #include "AnimationClipNode.h"
 
-AnimationState::AnimationState( AnimationStateId id, shared_ptr< ResHandle > pMeshRes, shared_ptr< IAnimationNode > pAnimRootNode ) : m_pMeshResource( pMeshRes )
+AnimationState::AnimationState( shared_ptr< ResHandle > pMeshRes, shared_ptr< IAnimationNode > pAnimRootNode ) : m_pMeshResource( pMeshRes )
    {
    ENG_ASSERT( pMeshRes );
    m_pMeshExtraData = static_pointer_cast< MeshResourceExtraData >( m_pMeshResource->GetExtraData() );
    m_GlobalBoneTransform.resize( m_pMeshExtraData->m_NumBones );
 
    m_pRootAnimNode = pAnimRootNode;
-   m_Id = id;
    }
 
 bool AnimationState::Init( void )
@@ -120,6 +119,12 @@ void AnimationState::SetShouldLoop( bool shouldLoop )
 bool AnimationState::GetShouldLoop( void ) const
    {
    return m_pRootAnimNode->VGetShouldLoop();
+   }
+
+void AnimationState::SetOwner( shared_ptr< Actor > pOwner )
+   {
+   ENG_ASSERT( pOwner );
+   m_pOwner = pOwner;
    }
 
 void AnimationState::SetMeshResourcePtr( shared_ptr< ResHandle > pMeshRes )

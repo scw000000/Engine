@@ -23,8 +23,6 @@ class IAnimationNode
       virtual ~IAnimationNode( void ) {}
       virtual bool VInit( void ) = 0;
       virtual bool VDelegateVInit( void ) = 0;
-      virtual EventType GetAnimNodeType( void ) const = 0;
-      virtual const char* GetName( void ) const = 0;
       virtual void VUpdate( unsigned long elapsedMs ) = 0;
       virtual void VDelegateUpdate( unsigned long elapsedMs ) = 0;
       virtual void VSetTimePosition( float timePos ) = 0;
@@ -44,16 +42,12 @@ class IAnimationNode
 class MeshResourceExtraData;
 struct aiAnimation;
 
-typedef unsigned long AnimNodeType;
-
 template <typename T>class BaseAnimationNode : public IAnimationNode
    {
    public:
       BaseAnimationNode( void );
       virtual bool VInit( void ) override;
       virtual bool VDelegateVInit( void ) override { return true; };
-      virtual EventType GetAnimNodeType( void ) const override { return s_AnimNodeType; };
-      virtual const char* GetName( void ) const override { return s_pName; }
       virtual void VUpdate( unsigned long elapsedMs ) final override;
       virtual void VDelegateUpdate( unsigned long elapsedMs ) override {  };
       virtual void VSetTimePosition( float timePos ) override;
@@ -78,9 +72,6 @@ template <typename T>class BaseAnimationNode : public IAnimationNode
       virtual void VSetMeshExtraDataPtr( shared_ptr< MeshResourceExtraData > pMeshExtraData ) override;
 
    protected:
-      const static AnimNodeType  s_AnimNodeType;
-      const static char*      s_pName;
-
       float m_PlaybackRate;
       float m_TimePosition;
       bool m_IsRunning;
@@ -115,10 +106,13 @@ template <typename T> bool BaseAnimationNode<T>::VInit( void )
 
 template <typename T> void BaseAnimationNode<T>::VUpdate( unsigned long elapsedMs )
    {
-   VDelegateUpdate( elapsedMs );
-   for( auto pChildNode : m_ChildAnimNodes )
+   if( m_IsRunning )
       {
-      pChildNode->VUpdate( elapsedMs );
+      VDelegateUpdate( elapsedMs );
+      for( auto pChildNode : m_ChildAnimNodes )
+         {
+         pChildNode->VUpdate( elapsedMs );
+         }
       }
    }
 

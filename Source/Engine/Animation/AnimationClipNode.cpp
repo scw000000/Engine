@@ -16,9 +16,6 @@
 #include "AnimationClipNode.h"
 #include "BoneTransform.h"
 
-const char* BaseAnimationNode< AnimationClipNode >::s_pName = "AnimationClipNode";
-const AnimNodeType BaseAnimationNode< AnimationClipNode >::s_AnimNodeType = 0xb75bd91f;
-
 AnimationClipNode::AnimationClipNode(void )
    {
    m_CurrentAiTicks = 0.f;

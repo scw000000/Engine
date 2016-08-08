@@ -24,6 +24,7 @@
 #include "..\Event\EventManager.h"
 #include "..\Physics\Physics.h"
 #include "..\Physics\Raycast.h"
+#include "..\Animation\AnimationManager.h"
 
 void LevelManager::Init(void)
    {
@@ -215,6 +216,9 @@ void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
       {
       m_pWrold->OnUpdate( deltaMs );
       }
+
+   AnimationManager::GetSingleton().VUpdate( deltaMs );
+
    m_pGUIManager->OnUpdate( deltaMs );
    // update all game views
    for ( ViewList::iterator it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
@@ -388,6 +392,7 @@ void BaseEngineLogic::VSetIsSimulating( bool isOn )
    {
    IGamePhysics::GetSingleton().VSetSimulation( isOn );
    VSetWorldUpdate( isOn );
+   AnimationManager::GetSingleton().VSetIsRunning( isOn );
    }
 
 void BaseEngineLogic::VGameStart( void )
@@ -448,6 +453,8 @@ void BaseEngineLogic::ReInitWorld( void )
          }
       }
 
+  // VOnRestore();
+
    // register script events from the engine
    //   [mrmike] this was moved to the constructor post-press, since this function can be called when new levels are loaded by the game or editor
    // RegisterEngineScriptEventImps();
@@ -456,7 +463,7 @@ void BaseEngineLogic::ReInitWorld( void )
    if( postLoadScript )
       {
       Resource resource( postLoadScript );
-      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );  // this actually loads the XML file from the zip file
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource ); 
       }
 
    //return true;

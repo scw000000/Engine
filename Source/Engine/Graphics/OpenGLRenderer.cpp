@@ -259,17 +259,21 @@ GLuint OpenGLRenderer::CompileShader( const GLchar* const* pSrcData, const GLuin
    glCompileShader( shaderID );
 
    GLint result = GL_FALSE;
-   int infoLogLength;
-   // Check Vertex Shader compliing
+   
+   // Check Vertex Shader compiling
    glGetShaderiv( shaderID, GL_COMPILE_STATUS, &result );
-   glGetShaderiv( shaderID, GL_INFO_LOG_LENGTH, &infoLogLength );
-   if( infoLogLength > 0 )
+   if( result == GL_FALSE )
       {
-      GLchar* p_ErrMsg = new GLchar[ infoLogLength + 1 ];
+      int infoLogLength;
+      glGetShaderiv( shaderID, GL_INFO_LOG_LENGTH, &infoLogLength );
+      GLchar* p_ErrMsg = ENG_NEW GLchar[ infoLogLength + 1 ];
       glGetShaderInfoLog( shaderID, infoLogLength, NULL, p_ErrMsg );
       ENG_ERROR( p_ErrMsg );
       SAFE_DELETE_ARRAY( p_ErrMsg );
+      glDeleteShader( shaderID ); // Don't leak the shader.
+      return result;
       }
+
    return result;
    }
 
@@ -291,18 +295,17 @@ GLuint OpenGLRenderer::GenerateProgram( GLuint vertexShader, GLuint fragmentShad
    glAttachShader( program, fragmentShader );
    glLinkProgram( program );
 
-
-   int infoLogLength;
    // Check the program
    glGetProgramiv( program, GL_LINK_STATUS, &result );
-   glGetProgramiv( program, GL_INFO_LOG_LENGTH, &infoLogLength );
-
-   if( infoLogLength > 0 )
+   if( result == GL_FALSE )
       {
-      GLchar* p_ErrMsg = new GLchar[ infoLogLength + 1 ];
+      int infoLogLength;
+      glGetProgramiv( program, GL_INFO_LOG_LENGTH, &infoLogLength );
+      GLchar* p_ErrMsg = ENG_NEW GLchar[ infoLogLength + 1 ];
       glGetProgramInfoLog( program, infoLogLength, NULL, p_ErrMsg );
       ENG_ERROR( p_ErrMsg );
       SAFE_DELETE_ARRAY( p_ErrMsg );
+      glDeleteProgram( program );
       return 0;
       }
 

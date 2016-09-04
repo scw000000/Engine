@@ -15,11 +15,11 @@
 #include "AnimationNode.h"
 #include "..\LuaScripting\ScriptClass.h"
 
-class AnimationLerpNode : public BaseAnimationNode< AnimationLerpNode >, public BaseScriptClass< AnimationLerpNode >
+class AnimationLerpNode : public BaseAnimationNode< AnimationLerpNode >
    {
    public:
       AnimationLerpNode( void );
-      virtual bool VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) override;
+      virtual bool VDelegateBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) override;
       virtual void VRegisterExposedMemberFunctions( LuaPlus::LuaObject& metaTableObj ) override;
       virtual bool VDelegateVInit( void ) override;
       virtual void VDelegateUpdate( unsigned long elapsedMs ) override;

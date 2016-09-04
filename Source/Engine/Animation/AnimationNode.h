@@ -12,6 +12,7 @@
  *
  * \note
  */
+#include "..\LuaScripting\ScriptClass.h"
 
 struct BoneTransform;
 typedef unsigned int BoneId;
@@ -42,7 +43,7 @@ class IAnimationNode
 class MeshResourceExtraData;
 struct aiAnimation;
 
-template <typename T>class BaseAnimationNode : public IAnimationNode
+template <typename T>class BaseAnimationNode : public IAnimationNode, public BaseScriptClass< T >
    {
    public:
       BaseAnimationNode( void );
@@ -52,7 +53,6 @@ template <typename T>class BaseAnimationNode : public IAnimationNode
       virtual void VDelegateUpdate( unsigned long elapsedMs ) override {  };
       virtual void VSetTimePosition( float timePos ) override;
       virtual float VGetTimePosition( void ) const override;
-
       /**
        * @brief take the scaled offset as input and set time position to 0 ~ 1
        *
@@ -67,6 +67,10 @@ template <typename T>class BaseAnimationNode : public IAnimationNode
       virtual void VSetShouldLoop( bool shouldLoop ) override;
       virtual bool VGetShouldLoop( void ) const override;
       virtual void VSetLoopCount( unsigned int count ) override;
+
+
+      virtual bool VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) final override;
+      virtual bool VDelegateBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) { return true; };
 
    protected:
       virtual void VSetMeshExtraDataPtr( shared_ptr< MeshResourceExtraData > pMeshExtraData ) override;
@@ -151,6 +155,10 @@ template <typename T> float BaseAnimationNode<T>::VGetPlayBackRate( void ) const
 template <typename T> void BaseAnimationNode<T>::VSetIsRunning( bool isRunning )
    {
    m_IsRunning = isRunning;
+   for( auto pChildNode : m_ChildAnimNodes )
+      {
+      pChildNode->VSetIsRunning( m_IsRunning );
+      }
    }
 
 template <typename T> bool BaseAnimationNode<T>::VGetIsRunning( void ) const
@@ -171,6 +179,27 @@ template <typename T> bool BaseAnimationNode<T>::VGetShouldLoop( void ) const
 template <typename T> void BaseAnimationNode<T>::VSetLoopCount( unsigned int count )
    {
    m_LoopCount = count;
+   }
+
+template <typename T> bool BaseAnimationNode<T>::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData )
+   {
+   auto childAnimNodesObj = constructionData.Lookup( "ChildAnimNodes" );
+
+   if( !childAnimNodesObj .IsTable())
+      {
+      return false;
+      }
+
+   for( LuaPlus::LuaTableIterator childNodesIt( childAnimNodesObj ); childNodesIt; childNodesIt.Next() )
+      {
+      if( !IsBaseClassOf< IAnimationNode >( childNodesIt.GetValue() ) )
+         {
+         return false;         
+         }
+      m_ChildAnimNodes.push_back( shared_ptr< IAnimationNode >( GetObjUserDataPtr< IAnimationNode >( childNodesIt.GetValue() ) ) );
+      }
+
+   return VDelegateBuildCppDataFromScript( scriptClass, constructionData );
    }
 
 template <typename T> void BaseAnimationNode<T>::VSetMeshExtraDataPtr( shared_ptr< MeshResourceExtraData > pMeshExtraData )

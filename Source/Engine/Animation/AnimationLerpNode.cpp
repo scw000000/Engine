@@ -21,31 +21,15 @@ AnimationLerpNode::AnimationLerpNode( void )
    m_LerpFactor = 0.f;
    }
 
-bool AnimationLerpNode::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) 
+bool AnimationLerpNode::VDelegateBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData )
    {
-   auto childNodeObj = constructionData.Lookup( "LeftChild" );
-
-   if( !IsBaseClassOf< IAnimationNode >( childNodeObj ) )
+   if( m_ChildAnimNodes.size() != 2 )
       {
       return false;
       }
-   m_pLeftChild.reset( GetObjUserDataPtr< IAnimationNode >( childNodeObj ) );
+   m_pLeftChild = m_ChildAnimNodes.front();
    
-   childNodeObj = constructionData.Lookup( "RightChild" );
-
-   if( !IsBaseClassOf< IAnimationNode >( childNodeObj ) )
-      {
-      return false;
-      }
-   m_pRightChild.reset( GetObjUserDataPtr< IAnimationNode >( childNodeObj ) );
-
-
-   /*auto childAnimNodesObj = constructionData.Lookup( "ChildAnimNodes" );
-   ENG_ASSERT( childAnimNodesObj.IsTable() );
-   for( LuaPlus::LuaTableIterator childNodesIt( childAnimNodesObj ); childNodesIt; childNodesIt.Next() )
-      {
-
-      }*/
+   m_pRightChild = m_ChildAnimNodes.back();
 
    return true;
    }

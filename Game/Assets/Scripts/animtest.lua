@@ -21,22 +21,23 @@ scriptRet = cppClassTable_AnimationState:Create(
 		{
         RootAnimNode = cppClassTable_AnimationLerpNode:Create( 
 				{	
-                LeftChild = cppClassTable_AnimationClipNode:Create( 
+				ChildAnimNodes = 
                     {
-                    ClipName = "art\\run_left_inPlace.fbx",
-				
-                    ChildAnimNodes = { }
-                    }
-                    ),
+                    RightChild = cppClassTable_AnimationClipNode:Create( 
+                        {
+                        ClipName = "art\\run_right_inPlace_Mirrored.fbx",
                     
-                RightChild = cppClassTable_AnimationClipNode:Create( 
-                    {
-                    ClipName = "art\\run_right_inPlace_Mirrored.fbx",
+                        ChildAnimNodes = { }
+                        } 	
+                        ),
+                    LeftChild = cppClassTable_AnimationClipNode:Create( 
+                        {
+                        ClipName = "art\\run_left_inPlace.fbx",
 				
-                    ChildAnimNodes = { }
-                    } 	
-                    ),
-				ChildAnimNodes = { }
+                        ChildAnimNodes = { }
+                        }
+                        )
+                    }
 				} 	
 			)
 		} 

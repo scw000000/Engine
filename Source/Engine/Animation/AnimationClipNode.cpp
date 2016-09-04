@@ -24,8 +24,14 @@ AnimationClipNode::AnimationClipNode(void )
    m_CurrentAiTicks = 0.f;
    }
 
-bool AnimationClipNode::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData )
+bool AnimationClipNode::VDelegateBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData )
    {
+   // this is a leaf node, it must not contain any child node
+   if( m_ChildAnimNodes.size() )
+      {
+      return false;
+      }
+
    auto clipNameObj = constructionData.Lookup( "ClipName" );
    
    if( clipNameObj.IsNil() || !clipNameObj.IsString() )
@@ -34,8 +40,6 @@ bool AnimationClipNode::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass,
       }
    m_pAnimRes.reset( ENG_NEW Resource( clipNameObj.GetString() ) );
 
-   // Child Node should be leaf node, so no need for getting its child nodes
-   
    return true;
    }
 

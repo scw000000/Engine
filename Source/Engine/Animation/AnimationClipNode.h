@@ -17,11 +17,11 @@
 
 struct aiNodeAnim;
 
-class AnimationClipNode : public BaseAnimationNode< AnimationClipNode >, public BaseScriptClass< AnimationClipNode >
+class AnimationClipNode : public BaseAnimationNode< AnimationClipNode >
    {
    public:
       AnimationClipNode( void );
-      virtual bool VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) override;
+      virtual bool VDelegateBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) override;
       //AnimationClipNode( shared_ptr< MeshResourceExtraData > pMeshExtra, const std::string& clipName );
       virtual bool VDelegateVInit( void ) override;
       virtual void VDelegateUpdate( unsigned long elapsedMs ) override;

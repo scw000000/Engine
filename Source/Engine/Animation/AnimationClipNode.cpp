@@ -15,6 +15,9 @@
 #include "EngineStd.h"
 #include "AnimationClipNode.h"
 #include "BoneTransform.h"
+#include "..\ResourceCache\MeshResource.h"
+
+#define DEFAULT_ANIMATION_CLIP_NAME "mixamo.com"
 
 AnimationClipNode::AnimationClipNode(void )
    {
@@ -29,16 +32,10 @@ bool AnimationClipNode::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass,
       {
       return false;
       }
-   m_ClipName = clipNameObj.GetString();
+   m_pAnimRes.reset( ENG_NEW Resource( clipNameObj.GetString() ) );
 
-   /* Child Node should be leaf node, so no need for getting its child nodes
-   auto childAnimNodesObj = constructionData.Lookup( "ChildAnimNodes" );
-   ENG_ASSERT( !childAnimNodesObj.IsNil() && childAnimNodesObj.IsTable() );
-   for( LuaPlus::LuaTableIterator childNodesIt( childAnimNodesObj ); childNodesIt; childNodesIt.Next() )
-   {
-
-   }
-   */
+   // Child Node should be leaf node, so no need for getting its child nodes
+   
    return true;
    }
 
@@ -48,7 +45,17 @@ bool AnimationClipNode::VDelegateVInit( void )
       {
       return false;
       }
-   m_pAnimation = m_pMeshExtraData->FindAnimation( m_ClipName );
+   m_pAnimResHandle = g_pApp->m_pResCache->GetHandle( *m_pAnimRes );
+   if( m_pAnimResHandle )
+      {
+      shared_ptr<MeshResourceExtraData> pMeshAnimExtra = static_pointer_cast< MeshResourceExtraData >( m_pAnimResHandle->GetExtraData() );
+      m_pAnimation = pMeshAnimExtra->FindAnimation( 0 );
+      }
+   else
+      {
+      m_pAnimation = m_pMeshExtraData->FindAnimation( 0 );
+      }
+
    if( !m_pAnimation )
       {
       return false;

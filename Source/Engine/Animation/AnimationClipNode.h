@@ -38,10 +38,12 @@ class AnimationClipNode : public BaseAnimationNode< AnimationClipNode >, public 
       aiVector3D CalcInterpolatedScale( const aiNodeAnim* pNodeAnim ) const;
 
    private:
+      shared_ptr< Resource > m_pAnimRes;
+      shared_ptr< ResHandle > m_pAnimResHandle;
       aiAnimation* m_pAnimation;
       float m_AiTicksPerMs;
       float m_DurationInMs;
       float m_CurrentAiTicks;
-      std::string m_ClipName;
+      //std::string m_ClipName;
       std::unordered_map< BoneId, aiNodeAnim* > m_BoneIdToNodeAnimMapping;
    };

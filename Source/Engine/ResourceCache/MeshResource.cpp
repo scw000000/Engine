@@ -68,6 +68,12 @@ aiAnimation* MeshResourceExtraData::FindAnimation( const std::string& animationN
    return NULL;
    }
 
+aiAnimation* MeshResourceExtraData::FindAnimation( int animIdx ) const
+   {
+   ENG_ASSERT( animIdx < m_pScene->mNumAnimations );
+   return m_pScene->mAnimations[ animIdx ];
+   }
+
 shared_ptr<IResourceLoader> CreateMeshResourceLoader()
    {
    return shared_ptr<IResourceLoader>( ENG_NEW MeshResourceLoader() );

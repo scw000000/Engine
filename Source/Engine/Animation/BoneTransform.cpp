@@ -16,11 +16,14 @@
 #include "BoneTransform.h"
 
 
-BoneTransform BoneTransform::Interpolate( const BoneTransform& other, float factor )
+void BoneTransform::InterpolateWith( const BoneTransform& other, float factor )
    {
    float invFactor = 1 - factor;
-   aiQuaternion ret;
+   /*aiQuaternion ret;
    aiQuaternion::Interpolate( ret, m_Rotation, other.m_Rotation, factor );
-   ret.Normalize();
-   return BoneTransform( invFactor * m_Scale + factor * other.m_Scale, ret, invFactor * m_Translation + factor * other.m_Translation );
+   ret.Normalize();*/
+   aiQuaternion::Interpolate( m_Rotation, m_Rotation, other.m_Rotation, factor );
+   m_Rotation.Normalize();
+   m_Scale = invFactor * m_Scale + factor * other.m_Scale;
+   m_Translation = invFactor * m_Translation + factor * other.m_Translation;
    }

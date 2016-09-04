@@ -25,6 +25,7 @@
 #include "..\LuaScripting\LuaStateManager.h"
 #include "..\LuaScripting\ScriptExports.h"
 #include "..\Animation\AnimationClipNode.h"
+#include "..\Animation\AnimationLerpNode.h"
 #include "..\Animation\AnimationState.h"
 #include "SDL_image.h"
 
@@ -175,9 +176,9 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
   // RegisterAbstractScriptClass< IAnimationNode >();
 
    RegisterScriptClass< AnimationClipNode, IAnimationNode >();
+   RegisterScriptClass< AnimationLerpNode, IAnimationNode >();
    RegisterScriptClass< AnimationState >();
   // AnimationClipNode::RegisterScriptClass();
-   //AnimationState::RegisterScriptClass();
 
    //--------------------------------- 
    //  Initialize Lua scripting

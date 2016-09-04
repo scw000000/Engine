@@ -23,6 +23,10 @@ template< typename T > std::string GetLuaClassTableName( void )
 
 template< typename T > bool IsBaseClassOf( LuaPlus::LuaObject other )
    {
+   if( !other.IsTable() )
+      {
+      return false;
+      }
    auto selfMetableTableObj = BaseScriptClass< T >::GetLuaClassMetatable();
    auto otherMetatableObj = other.Lookup( "__index" );
    while( !otherMetatableObj.IsNil() )
@@ -49,34 +53,13 @@ template< typename T > void RegisterScriptClass( void )
    {
    if( !std::is_base_of< BaseScriptClass< T >, T >::value )
       {
-      ENG_WARNING( "Register class failed, this class is not derived from BaseScriptClass" );
+      ENG_ASSERT( "Register class failed, this class is not derived from BaseScriptClass" );
       return;
       }
    RegisterAbstractScriptClass< T >();
    auto metaTableObj = BaseScriptClass< T >::GetLuaClassMetatable();
    metaTableObj.RegisterDirect( "Create", &BaseScriptClass<T>::CreateFromScript );
    }
-
-template< typename D, typename B > void RegisterScriptClass( void );
-   //{
-   //if( !std::is_base_of< BaseScriptClass< D >, D >::value || !std::is_base_of< B, D >::value )
-   //   {
-   //   ENG_WARNING( "Register class failed, this class is not derived from BaseScriptClass" );
-   //   return;
-   //   }
-   //auto baseClassMetaTableObj = BaseScriptClass< B >::GetLuaClassMetatable();
-   //if( baseClassMetaTableObj.IsNil() )
-   //   {
-   //   RegisterAbstractScriptClass< B >();
-   //   baseClassMetaTableObj = BaseScriptClass< B >::GetLuaClassMetatable();
-   //   }
-   //RegisterScriptClass< D >();
-   //auto derivedClassMetaTableObj = BaseScriptClass< D >::GetLuaClassMetatable();
-   //derivedClassMetaTableObj.RegisterDirect( "Create", &BaseScriptClass< D >::CreateFromScript );
-
-   //derivedClassMetaTableObj.SetObject( "__index", baseClassMetaTableObj );
-   //derivedClassMetaTableObj.SetObject( "base", baseClassMetaTableObj );  // base refers to the parent class; ie the metatable
-   //}
 
 template< typename T > T* GetObjUserDataPtr( const LuaPlus::LuaObject& luaObj )
    {
@@ -90,15 +73,11 @@ template< typename T > class BaseScriptClass
    friend bool IsBaseClassOf< T >( LuaPlus::LuaObject other );
    template< typename D, typename B > friend void RegisterScriptClass( void );
    public:
-     // static void RegisterScriptClass( void );
-     // static bool IsBaseClassOf( LuaPlus::LuaObject other );
-    //  
 
    protected:
       // this class should be used when inherited only
       explicit BaseScriptClass( void ) { };
       static LuaPlus::LuaObject CreateFromScript( LuaPlus::LuaObject self, LuaPlus::LuaObject constructionData, LuaPlus::LuaObject originalSubClass );
-      //static std::string GetLuaClassTableName( void );
       static LuaPlus::LuaObject GetLuaClassMetatable( void );
       virtual bool VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) { return true; };
       virtual void VRegisterExposedMemberFunctions( LuaPlus::LuaObject& metaTableObj ) {};
@@ -106,16 +85,6 @@ template< typename T > class BaseScriptClass
    protected:
       LuaPlus::LuaObject m_LuaInstance;
    };
-
-//template< typename T > void BaseScriptClass<T>::RegisterScriptClass( void )
-//   {
-//   LuaPlus::LuaObject metaTableObj = LuaStateManager::GetSingleton().GetGlobalVars().CreateTable( GetLuaClassTableName().c_str() );
-//   metaTableObj.SetObject( "__index", metaTableObj );
-//   metaTableObj.SetObject( "base", metaTableObj );  // base refers to the parent class; ie the metatable
-//   metaTableObj.SetBoolean( "cpp", true );
-//   metaTableObj.RegisterDirect( "Create", &BaseScriptClass<T>::CreateFromScript );
-//   metaTableObj.RegisterDirect( "IsBaseClassOf", &BaseScriptClass<T>::IsBaseClassOf );
-//   }
 
 template< typename T > LuaPlus::LuaObject BaseScriptClass<T>::CreateFromScript( LuaPlus::LuaObject self, LuaPlus::LuaObject constructionData, LuaPlus::LuaObject originalSubClass )
    {
@@ -134,6 +103,10 @@ template< typename T > LuaPlus::LuaObject BaseScriptClass<T>::CreateFromScript( 
       pObj->m_LuaInstance.SetObject( "__index", metaTableObj );
       pObj->m_LuaInstance.SetObject( "base", metaTableObj );
       pObj->VRegisterExposedMemberFunctions( metaTableObj );
+      for( LuaPlus::LuaTableIterator childNodesIt( constructionData ); childNodesIt; childNodesIt.Next() )
+         {
+         pObj->m_LuaInstance.SetObject( childNodesIt.GetKey(), childNodesIt.GetValue() );
+         }
       }
    else
       {
@@ -145,34 +118,12 @@ template< typename T > LuaPlus::LuaObject BaseScriptClass<T>::CreateFromScript( 
    return pObj->m_LuaInstance;
    }
 
-//template< typename T > std::string BaseScriptClass<T>::GetLuaClassTableName( void )
-//   {
-//   std::string className = typeid( T ).name();
-//   className = className.substr( className.find_first_of( " " ) + 1 );
-//   return std::string( "cppClassTable_" ) + className;
-//   }
-
 template< typename T > LuaPlus::LuaObject BaseScriptClass<T>::GetLuaClassMetatable( void )
    {
    LuaPlus::LuaObject metaTableObj = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( GetLuaClassTableName< T >().c_str() );
    //ENG_ASSERT( !metaTableObj.IsNil() && "This class is not registered yet" );
    return metaTableObj;
    }
-
-//template< typename T > bool BaseScriptClass<T>::IsBaseClassOf( LuaPlus::LuaObject other )
-//   {
-//   auto otherMetatableObj = other.Lookup( "__index" );
-//   auto selfMetableTableObj = GetLuaClassMetatable();
-//   while( !otherMetatableObj.IsNil() )
-//      {
-//      if( otherMetatableObj == selfMetableTableObj )
-//         {
-//         return true;
-//         }
-//      otherMetatableObj = otherMetatableObj.Lookup( "__index" );
-//      }
-//   return false;
-//   }
 
 template< typename D, typename B > void RegisterScriptClass( void )
    {

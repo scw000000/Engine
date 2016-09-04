@@ -26,7 +26,7 @@ struct BoneTransform
          m_Translation = translation;
          }
 
-      BoneTransform Interpolate( const BoneTransform& other, float factor );
+      void InterpolateWith( const BoneTransform& other, float factor );
       aiVector3D m_Scale;
       aiVector3D m_Translation;
       aiQuaternion m_Rotation;

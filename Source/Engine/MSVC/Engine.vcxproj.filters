@@ -250,6 +250,9 @@
     <ClCompile Include="..\ResourceCache\ScriptResource.cpp">
       <Filter>ResourceCache</Filter>
     </ClCompile>
+    <ClCompile Include="..\Animation\AnimationLerpNode.cpp">
+      <Filter>Animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -466,6 +469,9 @@
     </ClInclude>
     <ClInclude Include="..\ResourceCache\ScriptResource.h">
       <Filter>ResourceCache</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Animation\AnimationLerpNode.h">
+      <Filter>Animation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

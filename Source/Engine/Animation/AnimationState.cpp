@@ -28,10 +28,15 @@ AnimationState::AnimationState( shared_ptr< ResHandle > pMeshRes, shared_ptr< IA
 
 bool AnimationState::Init( void )
    {
-   if( !m_pMeshResource || !m_pMeshExtraData || !m_pRootAnimNode )
+   if( !m_pMeshResource || !m_pMeshExtraData )
       {
       return false;
       }
+   if( !m_pRootAnimNode )
+      {
+      return true;
+      }
+   
    return m_pRootAnimNode->VInit();
    }
 
@@ -48,21 +53,37 @@ bool AnimationState::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, Lu
 
 float AnimationState::GetTimePosition( void ) const
    {
+   if( !m_pRootAnimNode )
+      {
+      return 0.f;
+      }
    return m_pRootAnimNode->VGetTimePosition();
    }
 
 void AnimationState::SetTimePosition( float newTimePos )
    {
+   if( !m_pRootAnimNode )
+      {
+      return;
+      }
    m_pRootAnimNode->VSetTimePosition( newTimePos );
    }
 
 void AnimationState::AddTimeOffset( float timeOffset )
    {
+   if( !m_pRootAnimNode )
+      {
+      return;
+      }
    m_pRootAnimNode->VAddTimeOffset( timeOffset );
    }
 
 void AnimationState::Update( unsigned long elapsedMs )
    {
+   if( !m_pRootAnimNode )
+      {
+      return;
+      }
    m_pRootAnimNode->VUpdate( elapsedMs );
    UpdatetGlobalBoneTransform( m_pMeshExtraData->m_pScene->mRootNode, m_pMeshExtraData->m_GlobalInverseTransform );
    }
@@ -79,7 +100,7 @@ void AnimationState::UpdatetGlobalBoneTransform( aiNode* pAiNode, const aiMatrix
       {
       BoneData& boneData = boneMappingData[ nodeName ];
       BoneTransform localBoneTransform;
-      if( m_pRootAnimNode->VGetLocalBoneTransform( localBoneTransform, boneData.m_BoneId ) )
+      if( m_pRootAnimNode && m_pRootAnimNode->VGetLocalBoneTransform( localBoneTransform, boneData.m_BoneId ) )
          {
          globalBonePoseTransform = parentTransfrom * aiMatrix4x4( localBoneTransform.m_Scale, localBoneTransform.m_Rotation, localBoneTransform.m_Translation );
          }
@@ -103,22 +124,39 @@ void AnimationState::UpdatetGlobalBoneTransform( aiNode* pAiNode, const aiMatrix
 
 void AnimationState::SetIsRunning( bool isRunning )
    {
-   m_pRootAnimNode->VSetIsRunning( isRunning );
+   if( !m_pRootAnimNode )
+      {
+      return;
+      }
+   m_pRootAnimNode->VSetIsRunning( isRunning ); 
    }
 
 bool AnimationState::GetIsRunning( void ) const
    {
+   if( !m_pRootAnimNode )
+      {
+      return false;
+      }
    return m_pRootAnimNode->VGetIsRunning();
    }
 
 void AnimationState::SetShouldLoop( bool shouldLoop )
    {
+   if( !m_pRootAnimNode )
+      {
+      return;
+      }
+   
    m_pRootAnimNode->VSetShouldLoop( shouldLoop );
    }
 
 bool AnimationState::GetShouldLoop( void ) const
    {
-   return m_pRootAnimNode->VGetShouldLoop();
+   if( m_pRootAnimNode )
+      {
+      return m_pRootAnimNode->VGetShouldLoop();
+      }
+   return false;
    }
 
 void AnimationState::SetOwner( shared_ptr< Actor > pOwner )
@@ -133,6 +171,9 @@ void AnimationState::SetMeshResourcePtr( shared_ptr< ResHandle > pMeshRes )
    m_pMeshResource = pMeshRes;
    m_pMeshExtraData = static_pointer_cast< MeshResourceExtraData >( m_pMeshResource->GetExtraData() );
    m_GlobalBoneTransform.resize( m_pMeshExtraData->m_NumBones );
-   ENG_ASSERT( m_pRootAnimNode );
+   if( !m_pRootAnimNode )
+      {
+      return;
+      }
    m_pRootAnimNode->VSetMeshExtraDataPtr( m_pMeshExtraData );
    }

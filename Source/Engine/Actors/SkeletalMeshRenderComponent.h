@@ -38,7 +38,8 @@ class SkeletalMeshRenderComponent : public BaseRenderComponent< SkeletalMeshRend
 
    protected:
       MaterialPtr m_pMaterial;
-      shared_ptr<Resource> m_pSkeletalMeshRes;
+      shared_ptr< Resource > m_pSkeletalMeshResource;
+      shared_ptr< Resource > m_pAnimScriptResource;
    };
 
 #pragma warning( pop )

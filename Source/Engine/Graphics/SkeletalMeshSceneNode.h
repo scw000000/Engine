@@ -28,6 +28,7 @@ class SkeletalMeshSceneNode : public SceneNode
       SkeletalMeshSceneNode( const ActorId actorId,
                      IRenderComponent* pRenderComponent,
                      shared_ptr<Resource> pMeshResouce,
+                     shared_ptr<Resource> pAnimScriptResource,
                      MaterialPtr pMaterial,
                      RenderPass renderPass,
                      TransformPtr pTransform );
@@ -54,6 +55,7 @@ class SkeletalMeshSceneNode : public SceneNode
 
    protected:
       shared_ptr<Resource>	 m_pMeshResource;
+      shared_ptr< Resource > m_pAnimScriptResource;
 
       GLuint            m_Program;
       VertexShader		m_VertexShader;

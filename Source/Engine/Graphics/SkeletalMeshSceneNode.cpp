@@ -43,9 +43,10 @@ Quaternion aiQuateronionToQuat( const aiQuaternion& aiQuat )
 
 
 SkeletalMeshSceneNode::SkeletalMeshSceneNode(
-   const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, MaterialPtr pMaterial, RenderPass renderPass, TransformPtr pTransform )
+   const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, shared_ptr<Resource> pAnimScriptResource, MaterialPtr pMaterial, RenderPass renderPass, TransformPtr pTransform )
    : SceneNode( actorId, pRenderComponent, renderPass, pTransform, pMaterial ),
    m_pMeshResource( pMeshResouce ),
+   m_pAnimScriptResource( pAnimScriptResource ),
    // m_pMaterial(  ),
    m_VertexShader( VERTEX_SHADER_FILE_NAME ),
    m_FragmentShader( FRAGMENT_SHADER_FILE_NAME )
@@ -105,17 +106,18 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
    OpenGLRenderer::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
 
-   Resource resource( "Scripts\\selftest.lua" );
-   shared_ptr<ResHandle> pScriptResHandle = g_pApp->m_pResCache->GetHandle( resource );
-   auto luaAnimState = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( "scriptRet" );
-   ENG_ASSERT( luaAnimState.IsTable() && IsBaseClassOf< AnimationState >( luaAnimState ) );
-   auto pAnimState = GetObjUserDataPtr< AnimationState >( luaAnimState );
-   ENG_ASSERT( pAnimState );
-   m_pAnimationState.reset( pAnimState );
-   m_pAnimationState->SetMeshResourcePtr( pMeshResHandle );
-   ENG_ASSERT( m_pAnimationState->Init() );
-   m_pAnimationState->SetOwner( m_pRenderComponent->VGetOwner().lock() );
-   AnimationManager::GetSingleton().VAddAnimationState( m_pAnimationState );
+   shared_ptr<ResHandle> pScriptResHandle = g_pApp->m_pResCache->GetHandle( *m_pAnimScriptResource );
+   if( pScriptResHandle )
+      {
+      auto luaAnimState = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( "scriptRet" );
+      ENG_ASSERT( luaAnimState.IsTable() && IsBaseClassOf< AnimationState >( luaAnimState ) );
+      auto pAnimState = GetObjUserDataPtr< AnimationState >( luaAnimState );
+      m_pAnimationState.reset( pAnimState );
+      m_pAnimationState->SetMeshResourcePtr( pMeshResHandle );
+      ENG_ASSERT( m_pAnimationState->Init() );
+      m_pAnimationState->SetOwner( m_pRenderComponent->VGetOwner().lock() );
+      AnimationManager::GetSingleton().VAddAnimationState( m_pAnimationState );
+      }
 
    // 1st attribute buffer : vertices
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );

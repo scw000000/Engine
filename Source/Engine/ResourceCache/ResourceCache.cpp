@@ -241,7 +241,7 @@ shared_ptr< ResHandle > ResourceCache::Load( const Resource& resource )
    int rawSize = m_pResourceFile->VGetRawResourceSize( resource );
 	if ( rawSize < 0 )
 	   { 
-		ENG_ASSERT( rawSize > 0 && "Resource size returned -1 - Resource not found" );
+		//ENG_ASSERT( rawSize > 0 && "Resource size returned -1 - Resource not found" );
 		return shared_ptr<ResHandle>();
 	   }
    // add addition one byte if needed, lua resource loader will use this feature
@@ -410,6 +410,23 @@ std::vector<std::string> ResourceCache::Match( const std::string pattern )
 		   }
 	   }
 	return matchingNames;
+   }
+
+bool ResourceCache::IsFileExist( const Resource& resource )
+   {
+   shared_ptr< ResHandle > handle( Find( resource ) );
+   if( handle )
+      {
+      return true;
+      }
+   
+   int rawSize = m_pResourceFile->VGetRawResourceSize( resource );
+   if( rawSize >= 0 )
+      {
+      return true;
+      }
+
+   return false;
    }
 
 //========================================================================

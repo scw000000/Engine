@@ -111,13 +111,16 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       {
       auto luaAnimState = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( "scriptRet" );
       ENG_ASSERT( luaAnimState.IsTable() && IsBaseClassOf< AnimationState >( luaAnimState ) );
-      auto pAnimState = GetObjUserDataPtr< AnimationState >( luaAnimState );
-      m_pAnimationState.reset( pAnimState );
+      m_pAnimationState.reset( GetObjUserDataPtr< AnimationState >( luaAnimState ) );
       m_pAnimationState->SetMeshResourcePtr( pMeshResHandle );
-      ENG_ASSERT( m_pAnimationState->Init() );
-      m_pAnimationState->SetOwner( m_pRenderComponent->VGetOwner().lock() );
-      AnimationManager::GetSingleton().VAddAnimationState( m_pAnimationState );
       }
+   else
+      {
+      m_pAnimationState.reset( ENG_NEW AnimationState( pMeshResHandle, NULL ) );
+      }
+   ENG_ASSERT( m_pAnimationState->Init() );
+   m_pAnimationState->SetOwner( m_pRenderComponent->VGetOwner().lock() );
+   AnimationManager::GetSingleton().VAddAnimationState( m_pAnimationState );
 
    // 1st attribute buffer : vertices
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );

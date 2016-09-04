@@ -118,6 +118,7 @@ class ResourceCache
       void Flush( void );
       bool IsUsingDevelopmentDirectories( void ) const { ENG_ASSERT( m_pResourceFile ); return m_pResourceFile->VIsUsingDevelopmentDirectories(); }
       std::vector<std::string> Match( const std::string pattern );
+      bool IsFileExist( const Resource& resource );
 
    protected:
       shared_ptr< ResHandle > Find( const Resource& resource );

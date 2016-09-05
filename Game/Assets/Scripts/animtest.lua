@@ -24,18 +24,14 @@ scriptRet = cppClassTable_AnimationState:Create(
 				ChildAnimNodes = 
                     {
                     RightChild = cppClassTable_AnimationClipNode:Create( 
-                        {
-                        ClipName = "art\\run_right_inPlace_Mirrored.fbx",
-                    
-                        ChildAnimNodes = { }
-                        } 	
+                            {
+                            ClipName = "art\\run_right_inPlace_Mirrored.fbx"
+                            } 	
                         ),
                     LeftChild = cppClassTable_AnimationClipNode:Create( 
-                        {
-                        ClipName = "art\\run_left_inPlace.fbx",
-				
-                        ChildAnimNodes = { }
-                        }
+                            {
+                            ClipName = "art\\run_left_inPlace.fbx"
+                            }
                         )
                     }
 				} 	
@@ -43,8 +39,6 @@ scriptRet = cppClassTable_AnimationState:Create(
 		} 
 	);
    
---RootAnimNodeData:SetLerpFactor( 1.0 );  
 scriptRet.RootAnimNode:SetLerpFactor( 0.5 );
---scriptRet.RootAnimNodeData:SetLerpFactor( 1.0 );
 	
 print("Loading script complete");

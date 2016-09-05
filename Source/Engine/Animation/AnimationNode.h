@@ -185,18 +185,22 @@ template <typename T> bool BaseAnimationNode<T>::VBuildCppDataFromScript( LuaPlu
    {
    auto childAnimNodesObj = constructionData.Lookup( "ChildAnimNodes" );
 
-   if( !childAnimNodesObj .IsTable())
+   // child nodes can be unspecified, but it should be table if it exist
+   if( !childAnimNodesObj.IsTable() && !childAnimNodesObj.IsNil() )
       {
       return false;
       }
 
-   for( LuaPlus::LuaTableIterator childNodesIt( childAnimNodesObj ); childNodesIt; childNodesIt.Next() )
+   if( childAnimNodesObj.IsTable() )
       {
-      if( !IsBaseClassOf< IAnimationNode >( childNodesIt.GetValue() ) )
+      for( LuaPlus::LuaTableIterator childNodesIt( childAnimNodesObj ); childNodesIt; childNodesIt.Next() )
          {
-         return false;         
+         if( !IsBaseClassOf< IAnimationNode >( childNodesIt.GetValue() ) )
+            {
+            return false;
+            }
+         m_ChildAnimNodes.push_back( shared_ptr< IAnimationNode >( GetObjUserDataPtr< IAnimationNode >( childNodesIt.GetValue() ) ) );
          }
-      m_ChildAnimNodes.push_back( shared_ptr< IAnimationNode >( GetObjUserDataPtr< IAnimationNode >( childNodesIt.GetValue() ) ) );
       }
 
    return VDelegateBuildCppDataFromScript( scriptClass, constructionData );

@@ -184,7 +184,7 @@ aiVector3D AnimationClipNode::CalcInterpolatedTranslation( const aiNodeAnim* pNo
    ENG_ASSERT( nxtPositionIdx < pNodeAnim->mNumPositionKeys );
    float deltaTime = ( float ) ( pNodeAnim->mPositionKeys[ nxtPositionIdx ].mTime - pNodeAnim->mPositionKeys[ positionIdx ].mTime );
    float factor = ( m_CurrentAiTicks - ( float ) pNodeAnim->mPositionKeys[ positionIdx ].mTime ) / deltaTime;
-   ENG_ASSERT( factor >= 0.0f && factor <= 1.0f );
+   factor = std::max( 0.0f, std::min( factor, 1.0f ) );
    const aiVector3D& start = pNodeAnim->mPositionKeys[ positionIdx ].mValue;
    const aiVector3D& end = pNodeAnim->mPositionKeys[ nxtPositionIdx ].mValue;
    return ( 1 - factor ) * start + factor * end;
@@ -202,7 +202,7 @@ aiQuaternion AnimationClipNode::CalcInterpolatedRotation( const aiNodeAnim* pNod
    ENG_ASSERT( nxtRotationIdx < pNodeAnim->mNumRotationKeys );
    float deltaTime = ( float ) ( pNodeAnim->mRotationKeys[ nxtRotationIdx ].mTime - pNodeAnim->mRotationKeys[ rotationIdx ].mTime );
    float factor = ( m_CurrentAiTicks - ( float ) pNodeAnim->mRotationKeys[ rotationIdx ].mTime ) / deltaTime;
-   ENG_ASSERT( factor >= 0.0f && factor <= 1.0f );
+   factor = std::max( 0.0f, std::min( factor, 1.0f ) );
    const aiQuaternion& startRotationQ = pNodeAnim->mRotationKeys[ rotationIdx ].mValue;
    const aiQuaternion& endRotationQ = pNodeAnim->mRotationKeys[ nxtRotationIdx ].mValue;
    aiQuaternion ret;
@@ -224,7 +224,7 @@ aiVector3D AnimationClipNode::CalcInterpolatedScale( const aiNodeAnim* pNodeAnim
    // time between these two key frames
    float deltaTime = ( float ) ( pNodeAnim->mScalingKeys[ nxtScaleIdx ].mTime - pNodeAnim->mScalingKeys[ scaleIdx ].mTime );
    float factor = ( m_CurrentAiTicks - ( float ) pNodeAnim->mScalingKeys[ scaleIdx ].mTime ) / deltaTime;
-   ENG_ASSERT( factor >= 0.0f && factor <= 1.0f );
+   factor = std::max( 0.0f, std::min( factor, 1.0f ) );
    const aiVector3D& start = pNodeAnim->mScalingKeys[ scaleIdx ].mValue;
    const aiVector3D& end = pNodeAnim->mScalingKeys[ nxtScaleIdx ].mValue;
    return ( 1 - factor ) * start + factor * end;

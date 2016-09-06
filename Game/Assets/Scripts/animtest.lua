@@ -23,12 +23,12 @@ scriptRet = cppClassTable_AnimationState:Create(
 				{	
 				ChildAnimNodes = 
                     {
-                    RightChild = cppClassTable_AnimationClipNode:Create( 
+                    cppClassTable_AnimationClipNode:Create( 
                             {
                             ClipName = "art\\run_right_inPlace_Mirrored.fbx"
                             } 	
                         ),
-                    LeftChild = cppClassTable_AnimationClipNode:Create( 
+                    cppClassTable_AnimationClipNode:Create( 
                             {
                             ClipName = "art\\run_left_inPlace.fbx"
                             }

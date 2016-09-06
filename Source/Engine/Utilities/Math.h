@@ -16,10 +16,6 @@
 #include <functional>
 #include <vector>
 
-
-//////////////
-// DEFINES //
-//////////////
 /* Period parameters */  
 #define CMATH_N 624
 #define CMATH_M 397
@@ -55,3 +51,4 @@ class ENGRandom
 
 extern float Interpolate( float normalizedValue, float begin, float end );
 extern Vec3 Interpolate( float normalizedValue, Vec3 begin, Vec3 end );
+extern std::vector< std::vector< bool > > Triangulation( const std::vector< Vec2 >& points );

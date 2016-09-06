@@ -14,12 +14,39 @@
 #include "EngineStd.h"
 #include "Geometry.h"
 
+const Vec2 Vec2::g_Zero( 0.0f, 0.0f );
+const Vec2 Vec2::g_Identity( 1.0f, 1.0f );
 
 const Vec3 Vec3::g_Zero( 0.0f, 0.0f, 0.0f );
 const Vec3 Vec3::g_Identity( 1.0f, 1.0f, 1.0f );
+
 const Mat4x4 Mat4x4::g_Identity( glm::mat4( 1.0f ) );
+
 const Quaternion Quaternion::g_Identity( 1.0f, 0.0f, 0.0f, 0.0f );
+
 const Transform Transform::g_Identity( Vec3::g_Zero, Vec3::g_Identity, Quaternion::g_Identity );
+
+bool Vec2::Init( TiXmlElement* pData )
+   {
+   if( !pData )
+      {
+      return false;
+      }
+   bool success = ( TIXML_SUCCESS == pData->QueryFloatAttribute( "x", &x ) )
+      | ( TIXML_SUCCESS == pData->QueryFloatAttribute( "y", &y ) );
+
+   return success;
+   }
+
+TiXmlElement* Vec2::GernerateXML( void ) const
+   {
+   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Vector2" );
+   pRetNode->SetAttribute( "x", ToStr( x ).c_str() );
+   pRetNode->SetAttribute( "y", ToStr( y ).c_str() );
+
+   return pRetNode;
+   }
+
 
 bool Vec3::Init( TiXmlElement* pData )
    {

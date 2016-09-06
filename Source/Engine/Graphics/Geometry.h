@@ -41,6 +41,55 @@ class Vec4;
 typedef std::list<Vec3> Vec3List;
 typedef std::list<Vec4> Vec4List;
 
+class Vec2 : public glm::vec2
+   {
+      public:
+      Vec2() : glm::vec2() {}
+      Vec2( const glm::vec2 &v2 ) : glm::vec2( v2 ) { /*x = v3.x; y = v3.y; z = v3.z;*/ }
+      Vec2( float _x, float _y ) : glm::vec2( _x, _y ) {}
+      Vec2( double _x, double _y ) : glm::vec2( _x, _y ) {}
+      Vec2( int _x, int _y ) : glm::vec2( _x, _y ) {}
+      Vec2( const Vec2 &v2 ) { x = v2.x; y = v2.y; }
+
+      Vec2 operator+( const Vec2& other ) const { return Vec2( this->x + other.x, this->y + other.y ); }
+      Vec2 operator-( const Vec2& other ) const { return Vec2( this->x - other.x, this->y - other.y ); }
+      Vec2& operator+=( const Vec2& other ) { return ( *this = *this + other ); }
+      Vec2& operator-=( const Vec2& other ) { return *this += ( -other ); }
+
+      Vec2 operator*( float other ) const { return Vec2( this->x * other, this->y * other ); }
+      Vec2 operator/( float other ) const { return Vec2( this->x / other, this->y / other ); }
+
+      Vec2 operator*=( const Vec2& other ) { *this = *this * other; return *this; }
+      Vec2 operator/=( const Vec2& other ) { *this = *this / other; return *this; }
+
+      Vec2 operator*( const Vec2& other ) const { return Vec2( this->x * other.x, this->y * other.y ); }
+      Vec2 operator/( const Vec2& other ) const { return Vec2( this->x / other.x, this->y / other.y ); }
+
+      Vec2& operator*=( float other ) { return ( *this = *this * other ); }
+      Vec2& operator/=( float other ) { return ( *this = *this / other ); }
+
+      inline float Length() { return glm::length<float, glm::highp, glm::tvec2>( ( *this ) ); }
+
+      inline void Normalize()
+         {
+         ( *this ) = glm::normalize<float, glm::highp, glm::tvec2>( ( *this ) );
+         }
+      inline float Dot( const Vec2 &other ) const
+         {
+         return glm::dot<float, glm::highp, glm::tvec2>( *this, other );
+         }
+
+      bool Init( TiXmlElement* pData );
+      TiXmlElement* GernerateXML( void ) const;
+      TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource ) const;
+
+   public:
+      static const Vec2 g_Zero;
+      static const Vec2 g_Identity;
+
+      private:
+   };
+
 class Vec3 : public glm::vec3
    {
    public:
@@ -49,6 +98,7 @@ class Vec3 : public glm::vec3
 	   Vec3( float _x, float _y, float _z ) : glm::vec3( _x, _y, _z ) { }
       Vec3( double _x, double _y, double _z ) : glm::vec3( _x, _y, _z ) { }
       Vec3( int _x, int _y, int _z ) : glm::vec3( _x, _y, _z ) {}
+      Vec3( const Vec2 v2 ) : glm::vec3( v2.x, v2.y, 0.f ) {}
       inline Vec3( const Vec4 &v4 );
 
       Vec3 operator+( const Vec3& other ) const { return Vec3( this->x + other.x, this->y + other.y, this->z + other.z ); }

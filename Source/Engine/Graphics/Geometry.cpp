@@ -26,6 +26,36 @@ const Quaternion Quaternion::g_Identity( 1.0f, 0.0f, 0.0f, 0.0f );
 
 const Transform Transform::g_Identity( Vec3::g_Zero, Vec3::g_Identity, Quaternion::g_Identity );
 
+
+bool Vec2::IsIntersect( const Vec2& p0, const Vec2& p1, const Vec2& p2, const Vec2& p3 )
+   {
+   Vec2 v0 = p1 - p0;
+   Vec2 v1 = p3 - p2;
+
+   float s, t;
+   s = ( -v0.y * ( p0.x - p2.x ) + v0.x * ( p0.y - p2.y ) ) / ( -v1.x * v0.y + v0.x * v1.y );
+   t = ( v1.x * ( p0.y - p2.y ) - v1.y * ( p0.x - p2.x ) ) / ( -v1.x * v0.y + v0.x * v1.y );
+
+   if( s >= 0 && s <= 1 && t >= 0 && t <= 1 )
+      {
+      //// Collision detected
+      //if( i_x != NULL )
+      //   *i_x = p0.x + ( t * v0.x );
+      //if( i_y != NULL )
+      //   *i_y = p0.y + ( t * v0.y );
+      return true;
+      }
+
+   return false; // No collision
+   }
+
+bool Vec2::IsInClockwiseDirection( const Vec2& p0, const Vec2& p1, const Vec2& p2 )
+   {
+   Vec3 v02( p2 - p0 );
+   Vec3 v01( p1 - p0 );
+   return Vec3( v02 ).Cross( Vec3( v01 ) ).z >= 0.f;
+   }
+
 bool Vec2::Init( TiXmlElement* pData )
    {
    if( !pData )

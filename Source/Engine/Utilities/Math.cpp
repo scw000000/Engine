@@ -14,7 +14,6 @@
 #include "EngineStd.h"
 #include "Math.h"
 
-
 //
 // void Interpolate									- Chapter 9, page 258
 //
@@ -70,9 +69,11 @@ class DelaunayPoint
    DelaunayPoint( const Vec2* point, unsigned int arrayIdx )
          {
          m_Point = point;
-         m_ArrayIdx = arrayIdx;
-         m_NextHullPoint = NULL;
-         m_PrevHullPoint = NULL;
+         m_PoiintArrayIdx = arrayIdx;
+         m_SortedArrayIdx = 0;
+         m_CWHullPoint = NULL;
+         m_CCWHullPoint = NULL;
+         m_PairHullPoint = NULL;
          }
 
   /* DELAUNAYPOINT( const DELAUNAYPOINT& target )
@@ -92,179 +93,249 @@ class DelaunayPoint
 
       void UnlinkHull( bool isForward )
          {
-         if( isForward && m_NextHullPoint )
+         if( isForward && m_CWHullPoint )
             {
-            m_NextHullPoint->m_PrevHullPoint = NULL;
-            m_NextHullPoint = NULL;
+            m_CWHullPoint->m_CCWHullPoint = NULL;
+            m_CWHullPoint = NULL;
             }
-         else if( !isForward && m_PrevHullPoint )
+         else if( !isForward && m_CCWHullPoint )
             {
-            m_PrevHullPoint->m_NextHullPoint = NULL;
-            m_PrevHullPoint = NULL;
+            m_CCWHullPoint->m_CWHullPoint = NULL;
+            m_CCWHullPoint = NULL;
             }
          }
 
-      void LinkHull( DelaunayPoint& other, bool isForward = true )
+      void LinkHull( DelaunayPoint& other, bool isCWDir = true )
          {
-         UnlinkHull( isForward );
-         other.UnlinkHull( !isForward );
-         if( isForward )
+         UnlinkHull( isCWDir );
+         other.UnlinkHull( !isCWDir );
+         if( isCWDir )
             {
-            m_NextHullPoint = &other;
-            other.m_PrevHullPoint = this;
+            m_CWHullPoint = &other;
+            other.m_CCWHullPoint = this;
             }
          else
             {
-            m_PrevHullPoint = &other;
-            other.m_NextHullPoint = this;
+            m_CCWHullPoint = &other;
+            other.m_CWHullPoint = this;
             }
          }
 
-      DelaunayPoint* GetAdjacentHullPoint( bool isNextDir )
+      void LinkPairHull( DelaunayPoint& other )
          {
-         if( isNextDir )
+         UnlinkPairHull();
+         m_PairHullPoint = &other;
+         other.m_PairHullPoint = this;
+         }
+
+      void UnlinkPairHull( void )
+         {
+         if( m_PairHullPoint )
             {
-            return m_NextHullPoint;
+            m_PairHullPoint->m_PairHullPoint = NULL;
             }
-         return m_PrevHullPoint;
+         m_PairHullPoint = NULL;
+         }
+
+      DelaunayPoint* GetAdjacentHullPoint( bool isCWDir )
+         {
+         if( isCWDir )
+            {
+            return m_CWHullPoint;
+            }
+         return m_CCWHullPoint;
          }
 
    public:
       const Vec2* m_Point;
-      unsigned int m_ArrayIdx;
-      DelaunayPoint* m_NextHullPoint; // clock-wise convex hull edge point of this point
-      DelaunayPoint* m_PrevHullPoint; // counter clock-wise convex hull edge point of this point
+      unsigned int m_PoiintArrayIdx;
+      unsigned int m_SortedArrayIdx;
+      DelaunayPoint* m_CWHullPoint; // clock-wise convex hull edge point of this point
+      DelaunayPoint* m_CCWHullPoint; // counter clock-wise convex hull edge point of this point
+      DelaunayPoint* m_PairHullPoint; // for hull that has only two points
+
       std::map< DelaunayPoint*, DelaunayPoint* > m_LinkedEdges;
    };
 
+bool IsPointInsideCircle( const DelaunayPoint& circlePA, 
+                              const DelaunayPoint& circlePB,
+                              const DelaunayPoint& circlePC, 
+                              const DelaunayPoint& testPoint )
+   {
+   return Mat4x4( circlePA.m_Point->x, circlePA.m_Point->y, circlePA.m_Point->x * circlePA.m_Point->x + circlePA.m_Point->y * circlePA.m_Point->y, 1,
+                  circlePB.m_Point->x, circlePB.m_Point->y, circlePB.m_Point->x * circlePB.m_Point->x + circlePB.m_Point->y * circlePB.m_Point->y, 1,
+                  circlePC.m_Point->x, circlePC.m_Point->y, circlePC.m_Point->x * circlePC.m_Point->x + circlePC.m_Point->y * circlePC.m_Point->y, 1,
+                  testPoint.m_Point->x, testPoint.m_Point->y, testPoint.m_Point->x * testPoint.m_Point->x + testPoint.m_Point->y * testPoint.m_Point->y, 1 ).Determinant() <= 0.f;
+   }
+
 void Triangulation_Merge( std::vector< DelaunayPoint >& points, int start, int leftBound, int rightBound )
    {
-   ENG_ASSERT( points[ leftBound - 1 ].m_NextHullPoint || points[ leftBound - 1 ].m_NextHullPoint );
-   ENG_ASSERT( points[ leftBound ].m_NextHullPoint || points[ leftBound ].m_NextHullPoint );
+   ENG_ASSERT( points[ leftBound - 1 ].m_CWHullPoint || points[ leftBound - 1 ].m_PairHullPoint );
+   ENG_ASSERT( points[ leftBound ].m_CWHullPoint || points[ leftBound ].m_PairHullPoint );
 
    //find lower common tangent first
-   int leftPrevIdx = -1;
-   int rightPrevIdx = -1;
    bool isLeftIdxOptimal = false;
    bool isrightIdxOptimal = false;
    int leftCurIdx = leftBound - 1;
    int rightCurIdx = leftBound;
-   bool firstRound = true;
-   bool isRightHullCCWNext = true;
-   bool leftHullCWDir = true;
    int rightHullPointCount = rightBound - leftBound;
+   int leftHullPointCount = leftBound - start;
 
-   if( rightHullPointCount > 2 )
+   if( rightHullPointCount <= 2 )
       {
-      Vec3 crossProduct = Vec3( *points[ leftBound ].m_Point - *points[ leftBound ].m_Point ).Cross(
-         *points[ leftBound ].m_NextHullPoint->m_Point - *points[ leftBound ].m_Point
-         );
-      isRightHullCCWNext = crossProduct.z > 0.f ? true: false;
-      crossProduct = Vec3( *points[ leftBound + 1 ].m_Point - *points[ leftBound ].m_Point ).Cross(
-         *points[ leftBound ].m_NextHullPoint->m_Point - *points[ leftBound ].m_Point
-         );
+      if( rightHullPointCount == 1 )
+         {
+         rightCurIdx = leftBound;
+         isrightIdxOptimal = true;
+         }
+      else // two points
+         {
+         rightCurIdx = points[ leftBound ].m_Point->y <= points[ leftBound + 1 ].m_Point->y ? leftBound : leftBound + 1;
+         isrightIdxOptimal = true;
+         }
+      }
+
+   if( leftHullPointCount <= 2 )
+      {
+      if( leftHullPointCount == 1 )
+         {
+         leftCurIdx = leftBound - 1;
+         isLeftIdxOptimal = true;
+         }
+      else // two points
+         {
+         leftCurIdx = points[ leftBound - 1 ].m_Point->y <= points[ leftBound - 2 ].m_Point->y ? leftBound - 1: leftBound -2;
+         isLeftIdxOptimal = true;
+         }
       }
 
    while( !isLeftIdxOptimal || !isrightIdxOptimal )
       {
-      if( isrightIdxOptimal )
+      if( !isrightIdxOptimal )
          {
-         firstRound = false;
-         
-         if( rightHullPointCount > 2 ) // nontrivial case, its at least a triangle
+         if( rightHullPointCount >= 3 ) // nontrivial case, its at least a triangle
             {
+            while( !Vec2::IsIntersect( *( points[ leftCurIdx ].m_Point ), 
+                                      *( points[ rightCurIdx ].GetAdjacentHullPoint( false )->m_Point ), // its CCW point ( test point )
+                                      *( points[ rightCurIdx ].m_Point ),
+                                      *( points[ rightCurIdx ].GetAdjacentHullPoint( true ) )->m_Point) ) // its CW point
+               {
+               auto nxtValidRightHullPoint = ( points[ rightCurIdx ].GetAdjacentHullPoint( false ) );
+               rightCurIdx = nxtValidRightHullPoint->m_SortedArrayIdx;
+               if( leftHullPointCount >= 3 )
+                  {
+                  isLeftIdxOptimal = false;
+                  }
+               }
             
-            while( true )
-               {
-               
-               }
-            }
-         else // trivial case, its a point or a line segment
-            {
-            if( rightHullPointCount == 1 )
-               {
-               rightCurIdx = leftBound;
-               }
-            else
-               {
-               rightCurIdx = points[ leftBound ].m_Point->y <= points[ leftBound + 1 ].m_Point->y ? leftBound : leftBound + 1;
-               }
             }
          isrightIdxOptimal = true;
          }
       else
          {
-         //auto currLowIdx = findNextRightLowPoint( curRIdx, rBound );
+         if( leftHullPointCount >= 3 ) // nontrivial case, its at least a triangle
+            {
+            while( !Vec2::IsIntersect( *( points[ rightCurIdx ].m_Point ),
+               *( points[ leftCurIdx ].GetAdjacentHullPoint( true )->m_Point ), // its CW point ( test point )
+               *( points[ leftCurIdx ].m_Point ),
+               *( points[ leftCurIdx ].GetAdjacentHullPoint( false ) )->m_Point ) ) // its CCW point
+               {
+               auto nxtValidLeftHullPoint = ( points[ leftCurIdx ].GetAdjacentHullPoint( true ) );
+               leftCurIdx = nxtValidLeftHullPoint->m_SortedArrayIdx;
+               if( rightHullPointCount >= 3 )
+                  {
+                  isrightIdxOptimal = false;
+                  }
+               }
+
+            }
+         isLeftIdxOptimal = true;
          }
       }
+   if( rightHullPointCount == 2 )
+      {
+      auto pTheOtherPoint = points[ rightCurIdx ].m_PairHullPoint;
+      points[ rightCurIdx ].UnlinkPairHull();
+      points[ rightCurIdx ].LinkHull( *pTheOtherPoint, false );
+      }
+   if( leftHullPointCount == 2 )
+      {
+      auto pTheOtherPoint = points[ leftCurIdx ].m_PairHullPoint;
+      points[ leftCurIdx ].UnlinkPairHull();
+      points[ leftCurIdx ].LinkHull( *pTheOtherPoint, true );
+      }
 
-   //auto findNextLeftLowPoint = [ &] ( int rStart, int lEndBound ) -> int
-   //   {
-   //   int validIdx = rStart;
-   //   for( int i = rStart; i > lEndBound; --i )
-   //      {
-   //      if( points[ index[ i ] ].x == points[ index[ validIdx ] ].x )
-   //         {
-   //         validIdx = i;
-   //         }
-   //      else
-   //         {
-   //         return validIdx;
-   //         }
-   //      }
-   //   return validIdx;
-   //   };
+   points[ leftCurIdx ].LinkHull( points[ rightCurIdx ], false );
 
-   //auto findNextRightLowPoint = [ &] ( int lStart, int rEndBound ) -> int
-   //   {
-   //   int validIdx = lStart;
-   //   for( int i = lStart; i < rEndBound; ++i )
-   //      {
-   //      if( points[ index[ i ] ].x == points[ index[ validIdx ] ].x )
-   //         {
-   //         validIdx = i;
-   //         }
-   //      else
-   //         {
-   //         return validIdx;
-   //         }
-   //      }
-   //   return validIdx;
-   //   };
+   // first sort the points
+   // next
+   std::vector< DelaunayPoint* > rightCandicates;
+   std::vector< DelaunayPoint* > leftCandicates;
+   bool isRightTurn = true;
+   int leftBaseEdgeIdx = leftCurIdx;
+   int rightBaseEdgeIdx = rightCurIdx;
+   while( true )
+      {
+      if( isRightTurn )
+         {
+         for( auto pointIt : points[ rightBaseEdgeIdx ].m_LinkedEdges )
+            {
+            if( pointIt.first->m_SortedArrayIdx != rightBaseEdgeIdx && !Vec2::IsInClockwiseDirection( *points[ leftBaseEdgeIdx ].m_Point,
+                                                                       *points[ rightBaseEdgeIdx ].m_Point, 
+                                                                       *( pointIt.first->m_Point ) ) )
+               {
+               rightCandicates.push_back( &points[ pointIt.first->m_SortedArrayIdx ] );
+               }
+            }
+         if( !rightCandicates.empty() )
+            {
+            Vec2 vLR = *points[ rightBaseEdgeIdx ].m_Point - *points[ leftBaseEdgeIdx ].m_Point;
+            std::sort( rightCandicates.begin(), rightCandicates.end(), [ &] ( const DelaunayPoint*& pA, const DelaunayPoint*& pB )
+               {
+               return vLR.Dot( *pA->m_Point - *points[ leftBaseEdgeIdx ].m_Point ) > vLR.Dot( *pB->m_Point - *points[ leftBaseEdgeIdx ].m_Point );
+               } );
 
-   //auto isIntersect = [ & ] ( Vec2 lineIdx1, Vec2 lineIdx2 ) -> bool 
-   //   {
-
-   //   return true;
-   //   };
-   
-
-   //for( int l = lBound - 1; l >= start; --l )
-   //   {
-   //   }
-   //find first pair of common tangent
-   ///*float leftMaxXValue = points[ index[ lBound - 1 ] ].x;
-   //auto findLeftRightMost = [ & ] ( int x )
-   //{
-   //if(  )
-   //{
-
-   //}
-   //};
-   //std::find_e*/
+            for( int i = 0; i < rightCandicates.size(); ++i )
+               {
+               
+               }
+            }
+         }
+      else
+         {
+         }
+      isRightTurn != isRightTurn;
+      }
    }
+//
+//typedef struct DelaunayTestResult
+//   {
+//   public:
+//      bool m_
+//   }DelaunayTestResult;
 
 void Triangulation_Recursive( std::vector< DelaunayPoint >& points, int start, int rightBound )
    {
-   if( rightBound - start <= 3 )
+   int pointCount = rightBound - start;
+   if( pointCount == 3 )
       {
-      for( int i = start; i < rightBound - 1; ++i )
+      // stat, start + 1, start + 2 are in clockwise direction
+      bool is_Point012_Clockwise = Vec2::IsInClockwiseDirection( *points[ start ].m_Point, *points[ start + 1 ].m_Point, *points[ start + 2 ].m_Point );
+      points[ start ].LinkHull( points[ start + 1 ], is_Point012_Clockwise );
+      points[ start ].Link( points[ start + 1 ] );
+      points[ start + 1 ].LinkHull( points[ start + 2 ], is_Point012_Clockwise );
+      points[ start + 1 ].Link( points[ start + 2 ] );
+      points[ start + 2 ].LinkHull( points[ start ], is_Point012_Clockwise );
+      points[ start + 2 ].Link( points[ start ] );
+      return;
+      }
+
+   if( pointCount <= 2 )
+      {
+      if( pointCount == 2 )
          {
-         points[ i ].LinkHull( points[ i + 1 ] );
-         }
-      if( rightBound - start == 3 )
-         {
-         points[ rightBound - 1 ].LinkHull( points[ start ] );
+         points[ rightBound - 1 ].LinkPairHull( points[ rightBound - 2 ] );
+         points[ rightBound - 1 ].Link( points[ rightBound - 2 ] );
          }
       return;
       }
@@ -297,7 +368,10 @@ std::vector< std::vector< bool > > Triangulation( const std::vector< Vec2 >& poi
                   }
                return false;
       } );
-
+   for( int i = 0; i < delaunayPoints.size(); ++i )
+      {
+      delaunayPoints[ i ].m_SortedArrayIdx = i;
+      }
    Triangulation_Recursive( delaunayPoints, 0, points.size() );
    return ret;
    }

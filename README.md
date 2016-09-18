@@ -15,4 +15,7 @@ This project aims to provide common features in modern game engines
 
 •	Provided resource cache for assets loading and memory management
 
+Environment:
 
+•	Win7/ 10, Visual Studio 2013
+ 

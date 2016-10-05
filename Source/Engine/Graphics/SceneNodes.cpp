@@ -123,7 +123,6 @@ bool SceneNode::VIsVisible( Scene *pScene )
    }
 
 
-// TODO: finish the implementation
 int SceneNode::VRenderChildren( Scene *pScene )
    {
    for( auto it : m_Children )
@@ -307,7 +306,7 @@ CameraNode::CameraNode( TransformPtr pTransform, Frustum const &frustum )
 	      m_IsDebugCamera( false ),
          m_pTarget( shared_ptr<SceneNode>() ),
 	      m_CamOffsetVector( 0.0f, 1.0f, -10.0f, 0.0f ),
-         m_View( Mat4x4::ViewMatrix( pTransform->GetToWorldPosition(), pTransform->GetToWorldPosition() + pTransform->GetForward(), g_Up ) )
+         m_View( Mat4x4::LookAt( pTransform->GetToWorldPosition(), pTransform->GetToWorldPosition() + pTransform->GetForward(), g_Up ) )
    {
    }
 
@@ -315,14 +314,14 @@ CameraNode::CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, Fru
 	      : SceneNode( INVALID_ACTOR_ID, 
                       NULL,
                       RenderPass_0, 
-                      TransformPtr ( ENG_NEW Transform( Mat4x4::LookAt( eye, center, up ).Inverse() ) )
+                      TransformPtr( ENG_NEW Transform( Mat4x4::LookAtToTransform( eye, center, up ).Inverse() ) )
                       ),
             m_Frustum( frustum ),
 	         m_IsActive( true ),
 	         m_IsDebugCamera( false ),
             m_pTarget( shared_ptr<SceneNode>() ),
 	         m_CamOffsetVector( 0.0f, 1.0f, -10.0f, 0.0f ),
-            m_View( Mat4x4::ViewMatrix( eye, center, g_Up ) )
+            m_View( Mat4x4::LookAt( eye, center, up ) )
    { 
    }
 
@@ -351,7 +350,7 @@ int CameraNode::VOnRestore( Scene *pScene )
 void CameraNode::VSetTransform( const Transform& newTransform ) 
    { 
    SceneNode::VSetTransform( newTransform ); 
-   m_View = Mat4x4::ViewMatrix( newTransform.GetToWorldPosition(), newTransform.GetToWorldPosition() + newTransform.GetForward(), newTransform.GetUp() );
+   m_View = Mat4x4::LookAt( newTransform.GetToWorldPosition(), newTransform.GetToWorldPosition() + newTransform.GetForward(), newTransform.GetUp() );
 
    }
 

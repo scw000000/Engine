@@ -89,7 +89,7 @@ int Scene::OnLostDevice()
 	return S_OK;
    }
 
-int Scene::OnUpdate( const unsigned long deltaMs )
+int Scene::OnUpdate( unsigned long deltaMs )
    {
    if (!m_Root)
 		return S_OK;

@@ -51,8 +51,7 @@ void AnimationLerpNode::VDelegateUpdate( unsigned long elapsedMs )
 
 bool AnimationLerpNode::VGetLocalBoneTransform( BoneTransform& boneTransform, BoneId boneId ) const
    {
-   BoneTransform leftChildTransform;
-   if( !m_pLeftChild->VGetLocalBoneTransform( leftChildTransform, boneId ) )
+   if( !m_pLeftChild->VGetLocalBoneTransform( boneTransform, boneId ) )
       {
       return false;
       }
@@ -61,7 +60,6 @@ bool AnimationLerpNode::VGetLocalBoneTransform( BoneTransform& boneTransform, Bo
       {
       return false;
       }
-   boneTransform = leftChildTransform;
    boneTransform.InterpolateWith( rightChildTransform, m_LerpFactor );
    return true;
    }

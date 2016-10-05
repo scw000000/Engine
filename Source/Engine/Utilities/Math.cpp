@@ -80,15 +80,27 @@ class DelaunayPoint
       {
 
       }*/
-         
+      
+   void Unlink( DelaunayPoint& other )
+      {
+      // edge is not exist
+      if( m_LinkedEdges.find( &other ) == m_LinkedEdges.end() )
+         {
+         return;
+         }
+      m_LinkedEdges.erase( &other );
+      other.m_LinkedEdges.erase( this );
+      }
+
       void Link( DelaunayPoint& other )
          {
-         if( other.m_LinkedEdges.find( this ) != other.m_LinkedEdges.end() )
+         // edge already exist
+         if( m_LinkedEdges.find( &other ) != m_LinkedEdges.end() )
             {
             return;
             }
-         other.m_LinkedEdges[ this ] = this;
          m_LinkedEdges[ &other ] = &other;
+         other.m_LinkedEdges[ this ] = this;
          }
 
       void UnlinkHull( bool isForward )
@@ -209,7 +221,7 @@ void Triangulation_Merge( std::vector< DelaunayPoint >& points, int start, int l
          }
       }
 
-   while( !isLeftIdxOptimal || !isrightIdxOptimal )
+   while( !( isLeftIdxOptimal && isrightIdxOptimal ) )
       {
       if( !isrightIdxOptimal )
          {
@@ -252,59 +264,83 @@ void Triangulation_Merge( std::vector< DelaunayPoint >& points, int start, int l
          isLeftIdxOptimal = true;
          }
       }
+
    if( rightHullPointCount == 2 )
       {
       auto pTheOtherPoint = points[ rightCurIdx ].m_PairHullPoint;
       points[ rightCurIdx ].UnlinkPairHull();
       points[ rightCurIdx ].LinkHull( *pTheOtherPoint, false );
       }
-   if( leftHullPointCount == 2 )
+   else if( leftHullPointCount == 2 )
       {
       auto pTheOtherPoint = points[ leftCurIdx ].m_PairHullPoint;
       points[ leftCurIdx ].UnlinkPairHull();
       points[ leftCurIdx ].LinkHull( *pTheOtherPoint, true );
       }
 
-   points[ leftCurIdx ].LinkHull( points[ rightCurIdx ], false );
+   // do it later
+   //points[ leftCurIdx ].LinkHull( points[ rightCurIdx ], false );
 
-   // first sort the points
-   // next
-   std::vector< DelaunayPoint* > rightCandicates;
-   std::vector< DelaunayPoint* > leftCandicates;
-   bool isRightTurn = true;
+   
+   std::vector< DelaunayPoint* > rightCandidates;
+   std::vector< DelaunayPoint* > leftCandidates;
+   DelaunayPoint* pLeftCandidate = NULL;
+   DelaunayPoint* pRightCandidate = NULL;
    int leftBaseEdgeIdx = leftCurIdx;
    int rightBaseEdgeIdx = rightCurIdx;
+   std::vector< std::pair< DelaunayPoint*, DelaunayPoint* > > newLREdges;
    while( true )
       {
-      if( isRightTurn )
+      pLeftCandidate = NULL;
+      pRightCandidate = NULL;
+      // Find right candidate
+      // first get the points of angle is less than 180 degree with base LR edge
+      for( auto pointIt : points[ rightBaseEdgeIdx ].m_LinkedEdges )
          {
-         for( auto pointIt : points[ rightBaseEdgeIdx ].m_LinkedEdges )
-            {
-            if( pointIt.first->m_SortedArrayIdx != rightBaseEdgeIdx && !Vec2::IsInClockwiseDirection( *points[ leftBaseEdgeIdx ].m_Point,
+         if( pointIt.first->m_SortedArrayIdx != rightBaseEdgeIdx && !Vec2::IsInClockwiseDirection( *points[ leftBaseEdgeIdx ].m_Point,
                                                                        *points[ rightBaseEdgeIdx ].m_Point, 
                                                                        *( pointIt.first->m_Point ) ) )
-               {
-               rightCandicates.push_back( &points[ pointIt.first->m_SortedArrayIdx ] );
-               }
-            }
-         if( !rightCandicates.empty() )
             {
-            Vec2 vLR = *points[ rightBaseEdgeIdx ].m_Point - *points[ leftBaseEdgeIdx ].m_Point;
-            std::sort( rightCandicates.begin(), rightCandicates.end(), [ &] ( const DelaunayPoint*& pA, const DelaunayPoint*& pB )
+            rightCandidates.push_back( &points[ pointIt.first->m_SortedArrayIdx ] );
+            }
+         }
+      if( !rightCandidates.empty() )
+         {
+         // Then sort them by their angle with base LR edge
+         Vec2 vLR = *points[ rightBaseEdgeIdx ].m_Point - *points[ leftBaseEdgeIdx ].m_Point;
+         /*std::sort( rightCandidates.begin(), rightCandidates.end(), [ &] ( const DelaunayPoint*& pA, const DelaunayPoint*& pB )
+            {
+            return vLR.Dot( *pA->m_Point - *points[ leftBaseEdgeIdx ].m_Point ) > vLR.Dot( *pB->m_Point - *points[ leftBaseEdgeIdx ].m_Point );
+            } );*/
+         rightCurIdx = rightCandidates.back()->m_SortedArrayIdx;
+         for( int i = 0; i < rightCandidates.size() - 1; ++i )
+            {
+            if( !IsPointInsideCircle( points[ leftBaseEdgeIdx ], points[ rightBaseEdgeIdx ], *rightCandidates[ i ], *rightCandidates[ i + 1 ] ) )
                {
-               return vLR.Dot( *pA->m_Point - *points[ leftBaseEdgeIdx ].m_Point ) > vLR.Dot( *pB->m_Point - *points[ leftBaseEdgeIdx ].m_Point );
-               } );
-
-            for( int i = 0; i < rightCandicates.size(); ++i )
+               pRightCandidate = rightCandidates[ i ];
+               }
+            else
                {
-               
+               rightCandidates[ i ]->Unlink( points[ rightBaseEdgeIdx ] );
                }
             }
+         }
+
+      if( !pLeftCandidate && !pRightCandidate ) // cannot find more new LR edges, stop
+         {
+         break;
+         }
+      
+      if( pLeftCandidate && pRightCandidate )
+         {
+       
+         }
+      else if( pRightCandidate )
+         {
          }
       else
          {
          }
-      isRightTurn != isRightTurn;
       }
    }
 //

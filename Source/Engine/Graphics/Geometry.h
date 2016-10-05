@@ -342,10 +342,10 @@ class Mat4x4 : public glm::mat4
 
       static Mat4x4 GetRotationMatrix( const float pitchRad, const float yawRad, const float rollRad ){  Mat4x4 mat = g_Identity; mat.BuildPitchYawRollRad( pitchRad, yawRad, rollRad ); return mat; }
 
-      static Mat4x4 ViewMatrix( const Vec3& eye, const Vec3& center, const Vec3& up ) { return Mat4x4( glm::lookAt( eye, center, up ) ); }
+      static Mat4x4 LookAt( const Vec3& eye, const Vec3& center, const Vec3& up ) { return Mat4x4( glm::lookAt( eye, center, up ) ); }
       // Caution! this matrix is not the same as glm::lookat, the whole direction
-      // is reversed
-      static Mat4x4 LookAt( const Vec3& eye, const Vec3& center, const Vec3& up ){ return ViewMatrix( eye, 2.0f * eye - center, up ) ; }
+      // is reversed, target = eye + inversed forward = eye - ( center - eye )
+      static Mat4x4 LookAtToTransform( const Vec3& eye, const Vec3& center, const Vec3& up ) { return LookAt( eye, 2.0f * eye - center, up ); }
 
    public: 
       static const Mat4x4 g_Identity;

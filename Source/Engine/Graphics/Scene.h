@@ -29,7 +29,7 @@ class Scene
       int OnRender( void );
       int OnRestore( void );
       int OnLostDevice( void );
-      int OnUpdate( const unsigned long deltaMs );
+      int OnUpdate( unsigned long deltaMs );
       shared_ptr< ISceneNode > FindSceneNode( ActorId id );
       bool AddChild( ActorId id, shared_ptr< ISceneNode > pNode );
       bool RemoveChild( ActorId id );

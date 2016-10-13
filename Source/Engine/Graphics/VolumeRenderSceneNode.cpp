@@ -52,18 +52,18 @@ VolumeRenderSceneNode::VolumeRenderSceneNode( const ActorId actorId,
                                               RenderPass renderPass,
                                               TransformPtr pTransform )
                                               : SceneNode( actorId, pRenderComponent, renderPass, pTransform ),
-                                              m_FirstPassVertexShader( FIRST_PASS_VERTEX_SHADER_FILE_NAME ),
-                                              m_FirstPassFragmentShader( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ),
-                                              m_SecondPassVertexShader( SECOND_PASS_VERTEX_SHADER_FILE_NAME ),
-                                              m_SecondPassFragmentShader( SECOND_PASS_FRAGMENT_SHADER_FILE_NAME )
+                                              m_FirstPassVertexShader( Resource ( FIRST_PASS_VERTEX_SHADER_FILE_NAME ) ),
+                                              m_FirstPassFragmentShader( Resource( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ) ),
+                                              m_SecondPassVertexShader( Resource( SECOND_PASS_VERTEX_SHADER_FILE_NAME ) ),
+                                              m_SecondPassFragmentShader( Resource( SECOND_PASS_FRAGMENT_SHADER_FILE_NAME ) )
    {
    m_FirstPassProgram = 0;
    m_SecondPassProgram = 0;
    ENG_ZERO_MEM( m_VBOs );
 
    m_MVPMatrix = -1;
-   m_Texture = 0;
-   m_TextureUni = 0;
+   m_Texture = -1;
+   m_TextureUni = -1;
    m_FirstPassVAO = 0;
    m_SecondPassVAO = 0;
 
@@ -93,13 +93,13 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    glGenVertexArrays( 1, &m_FirstPassVAO );
    glBindVertexArray( m_FirstPassVAO );
 
-   m_FirstPassVertexShader.OnRestore( pScene );
-   m_FirstPassFragmentShader.OnRestore( pScene );
+   m_FirstPassVertexShader.VOnRestore();
+   m_FirstPassFragmentShader.VOnRestore();
 
-   m_FirstPassProgram = OpenGLRenderer::GenerateProgram( m_FirstPassVertexShader.GetVertexShader(), m_FirstPassFragmentShader.GetFragmentShader() );
+   m_FirstPassProgram = OpenGLRenderer::GenerateProgram( m_FirstPassVertexShader.VGetShaderObject(), m_FirstPassFragmentShader.VGetShaderObject() );
 
-   m_FirstPassVertexShader.ReleaseShader( m_FirstPassProgram );
-   m_FirstPassFragmentShader.ReleaseShader( m_FirstPassProgram );
+   m_FirstPassVertexShader.VReleaseShader( m_FirstPassProgram );
+   m_FirstPassFragmentShader.VReleaseShader( m_FirstPassProgram );
 
 
    //OpenGLRenderer::LoadTexture2D( &m_Texture, m_Props.GetMaterialPtr()->GetTextureResource() );
@@ -143,6 +143,12 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof( unsigned int ), s_VerticesIndex, GL_STATIC_DRAW );
 
    m_MVPMatrix = glGetUniformLocation( m_FirstPassProgram, "MVP" );
+
+   //m_FirstPassVertexShader.OnRestore( pScene );
+   //m_FirstPassFragmentShader.OnRestore( pScene );
+
+   //m_FirstPassProgram = OpenGLRenderer::GenerateProgram( m_FirstPassVertexShader.GetVertexShader(), m_FirstPassFragmentShader.GetFragmentShader() );
+
 
    /*m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler" );
 

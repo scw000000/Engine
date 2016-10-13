@@ -43,11 +43,7 @@ class OpenGLRenderer : public IRenderer
       static void LoadTexture2D( GLuint* textureId, const Resource& pTextureResource );
       static void LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint* pIndexBuffer, GLuint* pNormalBuffer, shared_ptr<ResHandle> pMeshResHandle );
       static void LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMeshResHandle );
-      //virtual shared_ptr<IRenderState> VPrepareAlphaPass( void )=0;
-	   //virtual shared_ptr<IRenderState> VPrepareSkyBoxPass( void )=0;
       
-      static GLuint GenerateShader( const Resource& shaderRes, GLuint shaderType );
-
       static GLuint GenerateProgram( GLuint vertexShader, GLuint fragmentShader );
 
       static void SetRenderAlpha( bool isAlpha );
@@ -55,8 +51,6 @@ class OpenGLRenderer : public IRenderer
       virtual void VDrawLine( const Vec3& from,const Vec3& to,const Color& color ) const override;
 
    private:
-      static GLuint CompileShader( const GLchar* const* pSrcData, const GLuint shaderID );
-
       struct VertexToBoneMapping
          {
          public:

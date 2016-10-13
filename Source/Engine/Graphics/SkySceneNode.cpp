@@ -29,8 +29,8 @@ SkySceneNode::SkySceneNode(
    : SceneNode( actorId, pRenderComponent, renderPass, pTransform ),
    m_pMeshResource( pMeshResource ),
    m_pTextureResource( ptextureResource ),
-   m_VertexShader( VERTEX_SHADER_FILE_NAME ),
-   m_FragmentShader( FRAGMENT_SHADER_FILE_NAME ),
+   m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
+   m_FragmentShader( Resource( FRAGMENT_SHADER_FILE_NAME ) ),
    m_IsActive( true )
    {
    m_Program = 0;
@@ -56,13 +56,13 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    glGenVertexArrays( 1, &m_VertexArrayObj );
    glBindVertexArray( m_VertexArrayObj );
 
-   m_VertexShader.OnRestore( pScene );
-   m_FragmentShader.OnRestore( pScene );
+   m_VertexShader.VOnRestore();
+   m_FragmentShader.VOnRestore();
 
-   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.GetVertexShader( ), m_FragmentShader.GetFragmentShader( ) );
+   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
 
-   m_VertexShader.ReleaseShader( m_Program );
-   m_FragmentShader.ReleaseShader( m_Program );
+   m_VertexShader.VReleaseShader( m_Program );
+   m_FragmentShader.VReleaseShader( m_Program );
 
 
    OpenGLRenderer::LoadTexture2D( &m_Texture, *m_pTextureResource );

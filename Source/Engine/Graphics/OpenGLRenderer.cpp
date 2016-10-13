@@ -231,51 +231,6 @@ void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMesh
                  GL_STATIC_DRAW );
    }
 
-GLuint OpenGLRenderer::GenerateShader( const Resource& shaderRes, GLuint shaderType )
-   {
-   // Create the shaders
-   GLuint shader = glCreateShader( shaderType );
-
-
-   shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( shaderRes );  // this actually loads the shader file from the zip file
-
-   if( !pResourceHandle )
-      {
-      ENG_ERROR( "Invalid shader file path" );
-      }
-   // Compile Vertex Shader
-   ENG_LOG( "Renderer", "Compiling vertex shader: " + shaderRes.m_Name );
-
-   GLchar* p_VSSourcePointer = ( GLchar* ) pResourceHandle->GetBuffer();
-   CompileShader( &p_VSSourcePointer, shader );
-
-   return shader;
-   }
-
-GLuint OpenGLRenderer::CompileShader( const GLchar* const* pSrcData, const GLuint shaderID )
-   {
-   glShaderSource( shaderID, 1, pSrcData, NULL );
-   glCompileShader( shaderID );
-
-   GLint result = GL_FALSE;
-   
-   // Check Vertex Shader compiling
-   glGetShaderiv( shaderID, GL_COMPILE_STATUS, &result );
-   if( result == GL_FALSE )
-      {
-      int infoLogLength;
-      glGetShaderiv( shaderID, GL_INFO_LOG_LENGTH, &infoLogLength );
-      GLchar* p_ErrMsg = ENG_NEW GLchar[ infoLogLength + 1 ];
-      glGetShaderInfoLog( shaderID, infoLogLength, NULL, p_ErrMsg );
-      ENG_ERROR( p_ErrMsg );
-      SAFE_DELETE_ARRAY( p_ErrMsg );
-      glDeleteShader( shaderID ); // Don't leak the shader.
-      return result;
-      }
-
-   return result;
-   }
-
 GLuint OpenGLRenderer::GenerateProgram( GLuint vertexShader, GLuint fragmentShader )
    {
    GLint result = GL_FALSE;

@@ -48,8 +48,8 @@ SkeletalMeshSceneNode::SkeletalMeshSceneNode(
    m_pMeshResource( pMeshResouce ),
    m_pAnimScriptResource( pAnimScriptResource ),
    // m_pMaterial(  ),
-   m_VertexShader( VERTEX_SHADER_FILE_NAME ),
-   m_FragmentShader( FRAGMENT_SHADER_FILE_NAME )
+   m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
+   m_FragmentShader( Resource( FRAGMENT_SHADER_FILE_NAME ) )
    {
    m_Program = 0;
 
@@ -87,13 +87,13 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    glGenVertexArrays( 1, &m_VertexArrayObj );
    glBindVertexArray( m_VertexArrayObj );
 
-   m_VertexShader.OnRestore( pScene );
-   m_FragmentShader.OnRestore( pScene );
+   m_VertexShader.VOnRestore();
+   m_FragmentShader.VOnRestore();
 
-   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.GetVertexShader(), m_FragmentShader.GetFragmentShader() );
+   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
 
-   m_VertexShader.ReleaseShader( m_Program );
-   m_FragmentShader.ReleaseShader( m_Program );
+   m_VertexShader.VReleaseShader( m_Program );
+   m_FragmentShader.VReleaseShader( m_Program );
 
    OpenGLRenderer::LoadTexture2D( &m_Texture, m_Props.GetMaterialPtr()->GetTextureResource() );
 

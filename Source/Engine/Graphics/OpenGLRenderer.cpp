@@ -325,6 +325,7 @@ void OpenGLRenderer::SetRenderAlpha( bool isAlpha )
       {
       glDisable( GL_BLEND );
       glEnable( GL_CULL_FACE );
+      glCullFace( GL_BACK );
       glBlendFunc( GL_ONE, GL_ZERO );
       }
 

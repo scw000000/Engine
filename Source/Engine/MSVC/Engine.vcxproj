@@ -108,6 +108,7 @@
     <ClCompile Include="..\Actors\SkeletalMeshRenderComponent.cpp" />
     <ClCompile Include="..\Actors\SkyRenderComponent.cpp" />
     <ClCompile Include="..\Actors\TransformComponent.cpp" />
+    <ClCompile Include="..\Actors\VolumeRenderComponent.cpp" />
     <ClCompile Include="..\Animation\AnimationClipNode.cpp" />
     <ClCompile Include="..\Animation\AnimationLerpNode.cpp" />
     <ClCompile Include="..\Animation\AnimationManager.cpp" />
@@ -135,6 +136,7 @@
     <ClCompile Include="..\Graphics\Scene.cpp" />
     <ClCompile Include="..\Graphics\SceneNodes.cpp" />
     <ClCompile Include="..\Graphics\Shaders.cpp" />
+    <ClCompile Include="..\Graphics\VolumeRenderSceneNode.cpp" />
     <ClCompile Include="..\LuaScripting\LuaStateManager.cpp" />
     <ClCompile Include="..\LuaScripting\ScriptExports.cpp" />
     <ClCompile Include="..\LuaScripting\ScriptProcess.cpp" />
@@ -192,6 +194,7 @@
     <ClInclude Include="..\Actors\SkeletalMeshRenderComponent.h" />
     <ClInclude Include="..\Actors\SkyRenderComponent.h" />
     <ClInclude Include="..\Actors\TransformComponent.h" />
+    <ClInclude Include="..\Actors\VolumeRenderComponent.h" />
     <ClInclude Include="..\Animation\AnimationClipNode.h" />
     <ClInclude Include="..\Animation\AnimationLerpNode.h" />
     <ClInclude Include="..\Animation\AnimationManager.h" />
@@ -219,6 +222,7 @@
     <ClInclude Include="..\Graphics\Scene.h" />
     <ClInclude Include="..\Graphics\SceneNodes.h" />
     <ClInclude Include="..\Graphics\Shaders.h" />
+    <ClInclude Include="..\Graphics\VolumeRenderSceneNode.h" />
     <ClInclude Include="..\LuaScripting\LuaStateManager.h" />
     <ClInclude Include="..\LuaScripting\ScriptClass.h" />
     <ClInclude Include="..\LuaScripting\ScriptExports.h" />

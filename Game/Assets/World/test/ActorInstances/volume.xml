@@ -1,0 +1,21 @@
+<ActorInstance>
+    <Data type="volume">
+        <ActorClassResource path="actors\volume.xml" />
+    </Data>
+    <VolumeRenderComponent>
+        <Data>
+            <Transform>
+                <Position/>
+                <PitchYawRoll/>
+                <Scale />
+            </Transform>
+            
+			<VolumeTexture>
+                <Dimension/>
+            </VolumeTexture>
+            
+            <TransferFuncion />
+			
+        </Data>
+    </VolumeRenderComponent>
+</ActorInstance>

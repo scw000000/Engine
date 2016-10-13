@@ -65,7 +65,7 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    m_FragmentShader.ReleaseShader( m_Program );
 
 
-   OpenGLRenderer::LoadTexture( &m_Texture, *m_pTextureResource );
+   OpenGLRenderer::LoadTexture2D( &m_Texture, *m_pTextureResource );
    
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );

@@ -40,7 +40,7 @@ class OpenGLRenderer : public IRenderer
 	   virtual bool VPostRender( void ) override;
 	   //virtual void VCalcLighting( Lights *lights, int maximumLights ) override;
 
-      static void LoadTexture( GLuint* textureId, const Resource& pTextureResource );
+      static void LoadTexture2D( GLuint* textureId, const Resource& pTextureResource );
       static void LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint* pIndexBuffer, GLuint* pNormalBuffer, shared_ptr<ResHandle> pMeshResHandle );
       static void LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMeshResHandle );
       //virtual shared_ptr<IRenderState> VPrepareAlphaPass( void )=0;

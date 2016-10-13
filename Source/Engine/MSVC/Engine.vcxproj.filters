@@ -253,6 +253,12 @@
     <ClCompile Include="..\Animation\AnimationLerpNode.cpp">
       <Filter>Animation</Filter>
     </ClCompile>
+    <ClCompile Include="..\Actors\VolumeRenderComponent.cpp">
+      <Filter>Actors</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\VolumeRenderSceneNode.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -472,6 +478,12 @@
     </ClInclude>
     <ClInclude Include="..\Animation\AnimationLerpNode.h">
       <Filter>Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Actors\VolumeRenderComponent.h">
+      <Filter>Actors</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\VolumeRenderSceneNode.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

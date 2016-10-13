@@ -70,7 +70,7 @@ class ResourceLoader : public IResourceLoader
       ResourceLoader( std::vector< std::string > patterns ) : m_Patterns( patterns ) { };
 	   virtual bool VUseRawFile() = 0;
 	   virtual bool VDiscardRawBufferAfterLoad() = 0;
-	   virtual unsigned int VGetLoadedResourceSize(char *rawBuffer, unsigned int rawSize)  = 0;
+      virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize ) { return 0; };
 	   virtual bool VLoadResource(char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle) = 0;
 	   virtual const std::vector< std::string >& VGetPattern( void ) override { return m_Patterns; }
       virtual bool VUsePreAllocate( void ) override = 0;

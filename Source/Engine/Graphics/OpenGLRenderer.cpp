@@ -81,7 +81,7 @@ void OpenGLRenderer::VSetProjectionTransform( const Mat4x4 *m )
 
 }*/
 
-void OpenGLRenderer::LoadTexture( GLuint* textureId, const Resource& textureResource )
+void OpenGLRenderer::LoadTexture2D( GLuint* textureId, const Resource& textureResource )
    {
    glGenTextures( 1, textureId );
 
@@ -96,7 +96,6 @@ void OpenGLRenderer::LoadTexture( GLuint* textureId, const Resource& textureReso
       {
       Mode = GL_RGBA;
       }
-
    glTexImage2D( GL_TEXTURE_2D, 0, Mode, pSurface->w, pSurface->h, 0, Mode, GL_UNSIGNED_BYTE, pSurface->pixels );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );

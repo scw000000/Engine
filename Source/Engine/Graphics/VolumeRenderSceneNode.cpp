@@ -1,3 +1,4 @@
+x
 /*!
  * \file VolumeRenderSceneNode.cpp
  * \date 2016/10/13 12:22
@@ -46,38 +47,52 @@ const Vec3 VolumeRenderSceneNode::s_BackFacePosition[] = {// Front face
 
 VolumeRenderSceneNode::VolumeRenderSceneNode( const ActorId actorId,
                                               IRenderComponent* pRenderComponent,
-                                              shared_ptr<Resource> pVolumeTextureResource,
-                                              const Vec3& dimension,
-                                              shared_ptr<Resource> pTransferFunctionResource,
                                               RenderPass renderPass,
-                                              TransformPtr pTransform )
+                                              TransformPtr pTransform,
+                                              shared_ptr<Resource> pVolumeTextureResource,
+                                              shared_ptr<Resource> pTransferFunctionResource,
+                                              const Vec3& textureDiemension,
+                                              const Vec3& cuboidDimension )
                                               : SceneNode( actorId, pRenderComponent, renderPass, pTransform ),
                                               m_FirstPassVertexShader( Resource ( FIRST_PASS_VERTEX_SHADER_FILE_NAME ) ),
                                               m_FirstPassFragmentShader( Resource( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ) ),
                                               m_SecondPassVertexShader( Resource( SECOND_PASS_VERTEX_SHADER_FILE_NAME ) ),
                                               m_SecondPassFragmentShader( Resource( SECOND_PASS_FRAGMENT_SHADER_FILE_NAME ) )
    {
+   m_pVolumeTextureResource = pVolumeTextureResource;
+   m_pTransferFuncionResource = pTransferFunctionResource;
+
+   m_FirstPassVAO = 0;
    m_FirstPassProgram = 0;
-   m_SecondPassProgram = 0;
    ENG_ZERO_MEM( m_VBOs );
 
-   m_MVPMatrix = -1;
-   m_Texture = -1;
-   m_TextureUni = -1;
-   m_FirstPassVAO = 0;
-   m_SecondPassVAO = 0;
+   m_FirstPassMVPUni = -1;
 
-   auto halfDimension = dimension / 2.0f;
-   m_VerticesLocation[ 0 ] = Vec3( -halfDimension.x, -halfDimension.y, halfDimension.z );
-   m_VerticesLocation[ 1 ] = Vec3( halfDimension.x, -halfDimension.y, halfDimension.z );
-   m_VerticesLocation[ 2 ] = Vec3( halfDimension.x, halfDimension.y, halfDimension.z );
-   m_VerticesLocation[ 3 ] = Vec3( -halfDimension.x, halfDimension.y, halfDimension.z );
+   m_RenderedTextureObj = 0;
+   m_RenderDepthBufferObj = 0;
+   m_FrameBufferObj = 0;
+
+   m_TextureUni = -1;
+
+   m_SecondPassVAO = 0;
+   m_SecondPassProgram = 0;
+
+   m_VolumeTextureObj = 0;
+   m_TranserTextureObj = 0;
+
+   m_TextureDimension = textureDiemension;
+   
+   auto halfCuboidDimension = cuboidDimension / 2.0f;
+   m_VerticesLocation[ 0 ] = Vec3( -halfCuboidDimension.x, -halfCuboidDimension.y, halfCuboidDimension.z );
+   m_VerticesLocation[ 1 ] = Vec3( halfCuboidDimension.x, -halfCuboidDimension.y, halfCuboidDimension.z );
+   m_VerticesLocation[ 2 ] = Vec3( halfCuboidDimension.x, halfCuboidDimension.y, halfCuboidDimension.z );
+   m_VerticesLocation[ 3 ] = Vec3( -halfCuboidDimension.x, halfCuboidDimension.y, halfCuboidDimension.z );
 
    // Back face
-   m_VerticesLocation[ 4 ] = Vec3( -halfDimension.x, -halfDimension.y, -halfDimension.z );
-   m_VerticesLocation[ 5 ] = Vec3( -halfDimension.x, halfDimension.y, -halfDimension.z );
-   m_VerticesLocation[ 6 ] = Vec3( halfDimension.x, halfDimension.y, -halfDimension.z );
-   m_VerticesLocation[ 7 ] = Vec3( halfDimension.x, -halfDimension.y, -halfDimension.z );
+   m_VerticesLocation[ 4 ] = Vec3( -halfCuboidDimension.x, -halfCuboidDimension.y, -halfCuboidDimension.z );
+   m_VerticesLocation[ 5 ] = Vec3( -halfCuboidDimension.x, halfCuboidDimension.y, -halfCuboidDimension.z );
+   m_VerticesLocation[ 6 ] = Vec3( halfCuboidDimension.x, halfCuboidDimension.y, -halfCuboidDimension.z );
+   m_VerticesLocation[ 7 ] = Vec3( halfCuboidDimension.x, -halfCuboidDimension.y, -halfCuboidDimension.z );
    }
 
 VolumeRenderSceneNode::~VolumeRenderSceneNode( void )
@@ -142,8 +157,55 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_VBOs[ Vertex_Index ] );
    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof( unsigned int ), s_VerticesIndex, GL_STATIC_DRAW );
 
-   m_MVPMatrix = glGetUniformLocation( m_FirstPassProgram, "MVP" );
+   m_FirstPassMVPUni = glGetUniformLocation( m_FirstPassProgram, "MVP" );
 
+   m_SecondPassVertexShader.VOnRestore();
+   m_SecondPassFragmentShader.VOnRestore();
+
+   m_SecondPassProgram = OpenGLRenderer::GenerateProgram( m_SecondPassVertexShader.VGetShaderObject(), m_SecondPassFragmentShader.VGetShaderObject() );
+
+   m_SecondPassVertexShader.VReleaseShader( m_SecondPassProgram );
+   m_SecondPassFragmentShader.VReleaseShader( m_SecondPassProgram );
+
+   // ---------------------Read and load volume texture---------------------
+   glGenTextures( 1, &m_VolumeTextureObj );
+   // bind 3D texture target
+   glBindTexture( GL_TEXTURE_3D, m_VolumeTextureObj );
+   glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+   glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+   glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+   glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+   glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT );
+   // pixel transfer happens here from client to OpenGL server
+   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+   auto volumeTextureResHandle = g_pApp->m_pResCache->GetHandle( *m_pVolumeTextureResource );
+   auto pRawBuffer = volumeTextureResHandle->GetBuffer();
+   glTexImage3D( GL_TEXTURE_3D, 0, GL_INTENSITY, m_TextureDimension.x, m_TextureDimension.y, m_TextureDimension.z, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pRawBuffer );
+
+   // ---------------------Read and load transfer function texture---------------------
+   glGenTextures( 1, &m_TranserTextureObj );
+   glBindTexture( GL_TEXTURE_1D, m_TranserTextureObj );
+   // Set texture sample function
+   glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+   glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+   glTexParameteri( GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+   // Set texture storage methods
+   glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+
+   auto transferFunctionTextureResHandle = g_pApp->m_pResCache->GetHandle( *m_pTransferFuncionResource );
+   pRawBuffer = transferFunctionTextureResHandle->GetBuffer();
+   glTexImage1D( GL_TEXTURE_1D, 0, GL_RGBA8, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, pRawBuffer );
+
+   SetUpRenderedTexture();
+   SetUpFrameBuffer();
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+   m_ScreenSizeUni = glGetUniformLocation( m_SecondPassProgram, "ScreenSize" );
+   m_StepSizeUni = glGetUniformLocation( m_SecondPassProgram, "StepSize" );
+   m_TransferTextureUni = glGetUniformLocation( m_SecondPassProgram, "TransferFunc" );
+   m_RenderedTextureUni = glGetUniformLocation( m_SecondPassProgram, "ExitPoints" );
+   m_VolumeTextureUni = glGetUniformLocation( m_SecondPassProgram, "VolumeTex" );
+   m_SecondPassMVPUni = glGetUniformLocation( m_SecondPassProgram, "MVP" );
    //m_FirstPassVertexShader.OnRestore( pScene );
    //m_FirstPassFragmentShader.OnRestore( pScene );
 
@@ -173,17 +235,22 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
 
 int VolumeRenderSceneNode::VRender( Scene *pScene )
    {
+   auto screenSize = g_pApp->GetScreenSize();
    glCullFace( GL_FRONT );
    // Use our shader
+   glBindFramebuffer( GL_DRAW_FRAMEBUFFER, m_FrameBufferObj );
    glUseProgram( m_FirstPassProgram );
    glBindVertexArray( m_FirstPassVAO );
 
    // Get the projection & view matrix from the camera class
    Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
-   // Send our transformation to the currently bound shader, 
-   // in the "MVP" uniform
-   // 1-> how many matrix, GL_FALSE->should transpose or not
-   glUniformMatrix4fv( m_MVPMatrix, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
+   glUniformMatrix4fv( m_FirstPassMVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
+   glDrawElements(
+      GL_TRIANGLES,      // mode
+      36,    // count
+      GL_UNSIGNED_INT,   // type
+      ( void* ) 0           // element array buffer offset
+      );
 /*
    glUniformMatrix4fv( m_ToWorldMatrix, 1, GL_FALSE, &pScene->GetTopMatrix()[ 0 ][ 0 ] );
 
@@ -208,15 +275,38 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
    // Set our "myTextureSampler" sampler to user Texture Unit 0
    /*glUniform1i( m_TextureUni, 0 );*/
 
+   
+
+  // 
+   glCullFace( GL_BACK );
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+   glUseProgram( m_SecondPassProgram );
+
+   
+   glUniform2f( m_ScreenSizeUni, ( float ) screenSize.x, ( float ) screenSize.y );
+
+   glUniform1f( m_StepSizeUni, 0.001f );
+
+   glActiveTexture( GL_TEXTURE0 );
+   glBindTexture( GL_TEXTURE_1D, m_TranserTextureObj );
+   glUniform1i( m_TransferTextureUni, 0 );
+
+   glActiveTexture( GL_TEXTURE1 );
+   glBindTexture( GL_TEXTURE_2D, m_RenderedTextureObj );
+   glUniform1i( m_RenderedTextureUni, 1 );
+
+   glActiveTexture( GL_TEXTURE2 );
+   glBindTexture( GL_TEXTURE_3D, m_VolumeTextureObj );
+   glUniform1i( m_VolumeTextureUni, 2 );
+
+   glUniformMatrix4fv( m_FirstPassMVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
    glDrawElements(
       GL_TRIANGLES,      // mode
       36,    // count
       GL_UNSIGNED_INT,   // type
       ( void* ) 0           // element array buffer offset
       );
-
    glBindVertexArray( 0 );
-   glCullFace( GL_BACK );
    return S_OK;
    }
 
@@ -233,8 +323,8 @@ void VolumeRenderSceneNode::ReleaseResource( void )
 
    if( m_TextureUni )
       {
-      glDeleteTextures( 1, &m_Texture );
-      m_Texture = 0;
+      glDeleteTextures( 1, &m_RenderedTextureObj );
+      m_RenderedTextureObj = 0;
       }
 
    if( m_FirstPassProgram )
@@ -243,4 +333,41 @@ void VolumeRenderSceneNode::ReleaseResource( void )
       m_FirstPassProgram = 0;
       }
 
+   }
+
+void VolumeRenderSceneNode::SetUpRenderedTexture( void )
+   {
+   glGenTextures( 1, &m_RenderedTextureObj );
+   ENG_ASSERT( m_RenderedTextureObj );
+
+   glBindTexture( GL_TEXTURE_2D, m_RenderedTextureObj );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+   auto screenSize = g_pApp->GetScreenSize();
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA16F, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
+   }
+
+void VolumeRenderSceneNode::SetUpFrameBuffer( void )
+   {
+   // create a depth buffer for our framebuffer
+   glGenRenderbuffers( 1, &m_RenderDepthBufferObj );
+   glBindRenderbuffer( GL_RENDERBUFFER, m_RenderDepthBufferObj );
+   auto screenSize = g_pApp->GetScreenSize();
+   glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenSize.x, screenSize.y );
+
+   // attach the texture and the depth buffer to the framebuffer
+   glGenFramebuffers( 1, &m_FrameBufferObj );
+   ENG_ASSERT( m_RenderedTextureObj );
+
+   glBindFramebuffer( GL_FRAMEBUFFER, m_FrameBufferObj );
+   glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_RenderedTextureObj, 0 );
+   glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RenderedTextureObj );
+   
+   GLenum result = glCheckFramebufferStatus( GL_FRAMEBUFFER );
+   if( result != GL_FRAMEBUFFER_COMPLETE )
+      {
+      ENG_ERROR( "Frame buffer setup failed" );
+      }
    }

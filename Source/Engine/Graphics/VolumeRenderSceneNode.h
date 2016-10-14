@@ -22,11 +22,12 @@ class VolumeRenderSceneNode : public SceneNode
    public:
       VolumeRenderSceneNode( const ActorId actorId,
                      IRenderComponent* pRenderComponent,
-                     shared_ptr<Resource> pVolumeTextureResource,
-                     const Vec3& dimension,
-                     shared_ptr<Resource> pTransferFunctionResource,
                      RenderPass renderPass,
-                     TransformPtr pTransform );
+                     TransformPtr pTransform,
+                     shared_ptr<Resource> pVolumeTextureResource,
+                     shared_ptr<Resource> pTransferFunctionResource,
+                     const Vec3& textureDiemension,
+                     const Vec3& cuboidDimension );
       ~VolumeRenderSceneNode( void );
       virtual int VOnRestore( Scene *pScene ) override;
       virtual int VOnLostDevice( Scene *pScene ) override { return S_OK; }
@@ -34,6 +35,8 @@ class VolumeRenderSceneNode : public SceneNode
 
    protected:
       void ReleaseResource( void );
+      void SetUpRenderedTexture( void );
+      void SetUpFrameBuffer( void );
 
    protected:
       shared_ptr<Resource> m_pVolumeTextureResource;
@@ -54,16 +57,31 @@ class VolumeRenderSceneNode : public SceneNode
       
       GLuint            m_VBOs[ Num_Buffers ];
 
+      GLuint            m_RenderedTextureObj;
+      GLuint            m_RenderDepthBufferObj;
+      GLuint            m_FrameBufferObj;
+
       GLuint            m_SecondPassProgram;
       GLuint            m_SecondPassVAO;
       VertexShader		m_SecondPassVertexShader;
       FragmentShader		m_SecondPassFragmentShader;
 
-      GLuint            m_MVPMatrix;
-      GLuint            m_Texture;
+      GLuint            m_FirstPassMVPUni;
+
+      GLuint            m_VolumeTextureObj;
+      GLuint            m_TranserTextureObj;
+
+      GLuint            m_ScreenSizeUni;
+      GLuint            m_StepSizeUni;
+      GLuint            m_TransferTextureUni;
+      GLuint            m_RenderedTextureUni;
+      GLuint            m_VolumeTextureUni;
+      GLuint            m_SecondPassMVPUni;
+
       GLuint            m_TextureUni;
 
       Vec3              m_VerticesLocation[ 8 ];
+      Vec3              m_TextureDimension;
       const static Vec3              s_BackFacePosition[];
       const static unsigned int              s_VerticesIndex[];
    };

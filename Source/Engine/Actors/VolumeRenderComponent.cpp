@@ -26,7 +26,7 @@ VolumeRenderComponent::VolumeRenderComponent( void ) : m_pVolumeTextureResource(
 
 shared_ptr<SceneNode> VolumeRenderComponent::VCreateSceneNode( void ) 
    {
-   return shared_ptr< SceneNode >( ENG_NEW VolumeRenderSceneNode( m_pOwner->GetId(), this, m_pVolumeTextureResource, m_VolumeDimension, m_pTransferFuncionResource, RenderPass::RenderPass_Actor, m_pTransform ) );
+   return shared_ptr< SceneNode >( ENG_NEW VolumeRenderSceneNode( m_pOwner->GetId(), this, RenderPass::RenderPass_Actor, m_pTransform, m_pVolumeTextureResource, m_pTransferFuncionResource, m_TextureDimension, m_CuboidDimension ) );
    }
 
 bool VolumeRenderComponent::VDelegateInit( TiXmlElement* pData ) 
@@ -35,10 +35,16 @@ bool VolumeRenderComponent::VDelegateInit( TiXmlElement* pData )
    if( pVolumeTextureRes )
       {
       m_pVolumeTextureResource->Init( pVolumeTextureRes );
-      auto pDimensionElement = pVolumeTextureRes->FirstChildElement( "Dimension" );
+      auto pDimensionElement = pVolumeTextureRes->FirstChildElement( "TextureDimension" );
       if( pDimensionElement )
          {
-         m_VolumeDimension.Init( pDimensionElement );
+         m_TextureDimension.Init( pDimensionElement );
+         }
+
+      pDimensionElement = pVolumeTextureRes->FirstChildElement( "CuboidDimension" );
+      if( pDimensionElement )
+         {
+         m_CuboidDimension.Init( pDimensionElement );
          }
       }
 
@@ -63,9 +69,14 @@ void VolumeRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )
    auto pVolumeTexture = m_pVolumeTextureResource->GenerateXML();
    pVolumeTexture->SetValue( "VolumeTexture" );
 
-   auto pVolumeDimension = m_VolumeDimension.GernerateXML();
-   pVolumeDimension->SetValue( "Dimension" );
-   pVolumeTexture->LinkEndChild( pVolumeDimension );
+   auto pTextureDimension = m_TextureDimension.GernerateXML();
+   pTextureDimension->SetValue( "TextureDimension" );
+   pVolumeTexture->LinkEndChild( pTextureDimension );
+
+   auto pCuboidDimension = m_CuboidDimension.GernerateXML();
+   pCuboidDimension->SetValue( "CuboidDimension" );
+   pVolumeTexture->LinkEndChild( pCuboidDimension );
+
    pBaseElement->LinkEndChild( pVolumeTexture );
 
    auto pTransferFunction = m_pTransferFuncionResource->GenerateXML();

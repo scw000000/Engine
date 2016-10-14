@@ -33,7 +33,8 @@ class VolumeRenderComponent : public BaseRenderComponent< VolumeRenderComponent 
       /*MaterialPtr m_pMaterial;*/
       shared_ptr<Resource> m_pVolumeTextureResource;
       shared_ptr<Resource> m_pTransferFuncionResource;
-      Vec3 m_VolumeDimension;
+      Vec3 m_CuboidDimension;
+      Vec3 m_TextureDimension;
    };
 
 #pragma warning( pop )

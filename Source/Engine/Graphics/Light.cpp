@@ -107,10 +107,10 @@ void LightManager::CalcLighting( Scene *pScene )
 
    for( Lights::iterator lightIt = m_ActiveLights.begin( ); lightIt != m_ActiveLights.end( ); ++lightIt )
       {
-      if( lightIt == m_ActiveLights.begin() )
+      /*if( lightIt == m_ActiveLights.begin() )
          {
          m_LightAmbient = lightIt->get()->GetLightPropertiesPtr()->m_Diffuse * 0.2f;
-         }
+         }*/
       memcpy( m_LightPosWorldSpace, &lightIt->get( )->VGetWorldPosition( ), sizeof( Vec3 ) );
       memcpy( m_LightDir, &lightIt->get( )->GetForward( ), sizeof( Vec3 ) );
       memcpy( m_LightPower, &lightIt->get( )->GetLightPropertiesPtr( )->m_Power, sizeof( float ) );

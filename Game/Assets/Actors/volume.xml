@@ -18,6 +18,5 @@
             <TransferFunction path="art\tff.dat" />
 			
         </Data>
-
     </VolumeRenderComponent>
 </ActorClass>

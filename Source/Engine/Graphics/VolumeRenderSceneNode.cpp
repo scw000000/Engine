@@ -62,7 +62,7 @@ VolumeRenderSceneNode::VolumeRenderSceneNode( const ActorId actorId,
    m_pVolumeTextureResource = pVolumeTextureResource;
    m_pTransferFuncionResource = pTransferFunctionResource;
 
-   m_FirstPassVAO = 0;
+   m_VAO = 0;
    m_FirstPassProgram = 0;
    ENG_ZERO_MEM( m_VBOs );
 
@@ -113,8 +113,8 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    m_FirstPassVertexShader.VReleaseShader( m_FirstPassProgram );
    m_FirstPassFragmentShader.VReleaseShader( m_FirstPassProgram );
 
-   glGenVertexArrays( 1, &m_FirstPassVAO );
-   glBindVertexArray( m_FirstPassVAO );
+   glGenVertexArrays( 1, &m_VAO );
+   glBindVertexArray( m_VAO );
 
    //OpenGLRenderer::LoadTexture2D( &m_Texture, m_Props.GetMaterialPtr()->GetTextureResource() );
 
@@ -238,7 +238,7 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
    auto screenSize = g_pApp->GetScreenSize();
    glCullFace( GL_FRONT );
    // Use our shader
-   glBindVertexArray( m_FirstPassVAO );
+   glBindVertexArray( m_VAO );
    glBindFramebuffer( GL_DRAW_FRAMEBUFFER, m_FrameBufferObj );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    glUseProgram( m_FirstPassProgram );
@@ -312,10 +312,10 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
 
 void VolumeRenderSceneNode::ReleaseResource( void )
    {
-   if( m_FirstPassVAO )
+   if( m_VAO )
       {
-      glDeleteVertexArrays( 1, &m_FirstPassVAO );
-      m_FirstPassVAO = 0;
+      glDeleteVertexArrays( 1, &m_VAO );
+      m_VAO = 0;
       }
 
    glDeleteBuffers( ENG_ARRAY_SIZE_IN_ELEMENTS( m_VBOs ), &m_VBOs[ 0 ] );
@@ -350,7 +350,7 @@ void VolumeRenderSceneNode::SetUpRenderedTexture( void )
    }
 
 void VolumeRenderSceneNode::SetUpFrameBuffer( void )
-   {
+{
    // create a depth buffer for our framebuffer
    glGenRenderbuffers( 1, &m_RenderDepthBufferObj );
    ENG_ASSERT( m_RenderDepthBufferObj );
@@ -371,5 +371,35 @@ void VolumeRenderSceneNode::SetUpFrameBuffer( void )
    if( result != GL_FRAMEBUFFER_COMPLETE )
       {
       ENG_ERROR( "Frame buffer setup failed" );
+      }
+   }
+
+void VolumeRenderSceneNode::SetUpNormalVolume( std::vector< Vec3 >& output, const char* pRawTexture )
+   {
+   auto getIntensity = [ &] ( int X, int Y, int Z ) -> char 
+      {
+      return pRawTexture[ X * ( int ) ( m_TextureDimension.y * m_TextureDimension.z ) + Y * ( int ) ( m_TextureDimension.z ) + Z ];
+      };
+   for( int i = 0; i < m_TextureDimension.x; ++i )
+      {
+      for( int j = 0; j < m_TextureDimension.y; ++j )
+         {
+         for( int k = 0; k < m_TextureDimension.z; ++k )
+            {
+            int prevX = ( i > 0 ) ? i - 1: i;
+            int nextX = ( i < m_TextureDimension.x - 1 ) ? i + 1: i;
+
+            int prevY = ( j > 0 ) ? j - 1 : j;
+            int nextY = ( j < m_TextureDimension.y - 1 ) ? j + 1 : j;
+
+            int prevZ = ( k > 0 ) ? k - 1 : k;
+            int nextZ = ( k < m_TextureDimension.z - 1 ) ? k + 1 : k;
+
+            output.push_back( Vec3( ( getIntensity( nextX, j, k ) - getIntensity( prevX, j, k ) ) / 2.0f,
+               ( getIntensity( i, nextY, k ) - getIntensity( i, prevY, k ) ) / 2.0f,
+               ( getIntensity( i, j, nextZ ) - getIntensity( i, j, prevZ ) ) / 2.0f
+               ) );
+            }
+         }
       }
    }

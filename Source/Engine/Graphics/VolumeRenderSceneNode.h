@@ -37,6 +37,7 @@ class VolumeRenderSceneNode : public SceneNode
       void ReleaseResource( void );
       void SetUpRenderedTexture( void );
       void SetUpFrameBuffer( void );
+      void SetUpNormalVolume( std::vector< Vec3 >& output, const char* pRawTexture );
 
    protected:
       shared_ptr<Resource> m_pVolumeTextureResource;
@@ -49,9 +50,10 @@ class VolumeRenderSceneNode : public SceneNode
          Vertex_Index,
          Num_Buffers
          };
+      GLuint            m_VAO;
 
       GLuint            m_FirstPassProgram;
-      GLuint            m_FirstPassVAO;
+      
       VertexShader		m_FirstPassVertexShader;
       FragmentShader		m_FirstPassFragmentShader;
       

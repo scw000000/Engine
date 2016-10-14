@@ -105,9 +105,6 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    {
    ReleaseResource();
 
-   glGenVertexArrays( 1, &m_FirstPassVAO );
-   glBindVertexArray( m_FirstPassVAO );
-
    m_FirstPassVertexShader.VOnRestore();
    m_FirstPassFragmentShader.VOnRestore();
 
@@ -116,6 +113,8 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    m_FirstPassVertexShader.VReleaseShader( m_FirstPassProgram );
    m_FirstPassFragmentShader.VReleaseShader( m_FirstPassProgram );
 
+   glGenVertexArrays( 1, &m_FirstPassVAO );
+   glBindVertexArray( m_FirstPassVAO );
 
    //OpenGLRenderer::LoadTexture2D( &m_Texture, m_Props.GetMaterialPtr()->GetTextureResource() );
 
@@ -159,6 +158,8 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
 
    m_FirstPassMVPUni = glGetUniformLocation( m_FirstPassProgram, "MVP" );
 
+   // ---------------------Set up second pass program---------------------
+
    m_SecondPassVertexShader.VOnRestore();
    m_SecondPassFragmentShader.VOnRestore();
 
@@ -198,8 +199,7 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
 
    SetUpRenderedTexture();
    SetUpFrameBuffer();
-   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
+   
    m_ScreenSizeUni = glGetUniformLocation( m_SecondPassProgram, "ScreenSize" );
    m_StepSizeUni = glGetUniformLocation( m_SecondPassProgram, "StepSize" );
    m_TransferTextureUni = glGetUniformLocation( m_SecondPassProgram, "TransferFunc" );
@@ -229,7 +229,7 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
 
    // restore all of its children
    SceneNode::VOnRestore( pScene );
-
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    return S_OK;
    }
 
@@ -238,10 +238,11 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
    auto screenSize = g_pApp->GetScreenSize();
    glCullFace( GL_FRONT );
    // Use our shader
-   glBindFramebuffer( GL_DRAW_FRAMEBUFFER, m_FrameBufferObj );
-   glUseProgram( m_FirstPassProgram );
    glBindVertexArray( m_FirstPassVAO );
-
+   glBindFramebuffer( GL_DRAW_FRAMEBUFFER, m_FrameBufferObj );
+   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+   glUseProgram( m_FirstPassProgram );
+   
    // Get the projection & view matrix from the camera class
    Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
    glUniformMatrix4fv( m_FirstPassMVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
@@ -276,13 +277,13 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
    /*glUniform1i( m_TextureUni, 0 );*/
 
    
-
+   
   // 
    glCullFace( GL_BACK );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+  // glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    glUseProgram( m_SecondPassProgram );
 
-   
    glUniform2f( m_ScreenSizeUni, ( float ) screenSize.x, ( float ) screenSize.y );
 
    glUniform1f( m_StepSizeUni, 0.001f );
@@ -299,7 +300,7 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
    glBindTexture( GL_TEXTURE_3D, m_VolumeTextureObj );
    glUniform1i( m_VolumeTextureUni, 2 );
 
-   glUniformMatrix4fv( m_FirstPassMVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
+   glUniformMatrix4fv( m_SecondPassMVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
    glDrawElements(
       GL_TRIANGLES,      // mode
       36,    // count
@@ -353,17 +354,19 @@ void VolumeRenderSceneNode::SetUpFrameBuffer( void )
    {
    // create a depth buffer for our framebuffer
    glGenRenderbuffers( 1, &m_RenderDepthBufferObj );
+   ENG_ASSERT( m_RenderDepthBufferObj );
    glBindRenderbuffer( GL_RENDERBUFFER, m_RenderDepthBufferObj );
+   
    auto screenSize = g_pApp->GetScreenSize();
    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenSize.x, screenSize.y );
 
    // attach the texture and the depth buffer to the framebuffer
    glGenFramebuffers( 1, &m_FrameBufferObj );
-   ENG_ASSERT( m_RenderedTextureObj );
+   ENG_ASSERT( m_FrameBufferObj );
 
    glBindFramebuffer( GL_FRAMEBUFFER, m_FrameBufferObj );
    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_RenderedTextureObj, 0 );
-   glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RenderedTextureObj );
+   glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RenderDepthBufferObj );
    
    GLenum result = glCheckFramebufferStatus( GL_FRAMEBUFFER );
    if( result != GL_FRAMEBUFFER_COMPLETE )

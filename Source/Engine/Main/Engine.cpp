@@ -174,6 +174,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    
    Resource resource( m_EngineOptions.GetPreInitScriptFile() );
    shared_ptr<ResHandle> pResourceHandle = m_pResCache->GetHandle( resource );  
+   ENG_ASSERT( pResourceHandle );
 
    RegisterScriptClass< AnimationClipNode, IAnimationNode >();
    RegisterScriptClass< AnimationLerpNode, IAnimationNode >();

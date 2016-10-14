@@ -289,15 +289,20 @@ void OpenGLRenderer::VDrawLine( const Vec3& from, const Vec3& to, const Color& c
    {
    shared_ptr<Scene> pScene = g_pApp->m_pEngineLogic->m_pWrold;
 
-   auto camera = pScene->GetCamera();
-   if( !camera )
+   auto pCamera = pScene->GetCamera();
+   if( !pCamera )
+      {
+      return;
+      }
+   auto toCameraSpace = pCamera->VGetProperties().GetFromWorld();
+   if( !pCamera->GetFrustum().Inside( toCameraSpace.Xform( from ) ) && !pCamera->GetFrustum().Inside( toCameraSpace.Xform( to ) ) )
       {
       return;
       }
 
    Vec4 from4( from );
    Vec4 to4( to );
-   Mat4x4 mvp = ( camera->GetProjection() * camera->GetView() );
+   Mat4x4 mvp = ( pCamera->GetProjection() * pCamera->GetView() );
    Vec4 from_Proj = mvp.Xform( from4 );
    Vec4 to_Proj = mvp.Xform( to4 );
 

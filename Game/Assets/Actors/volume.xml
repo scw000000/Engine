@@ -5,14 +5,14 @@
     <VolumeRenderComponent>
         <Data>
             <Transform>
-                <Position x="0.000000" y="0.000000" z="15.000000" />
-                <PitchYawRoll x="-0.000000" y="0.000000" z="0.000000" />
+                <Position x="0.000000" y="0.000000" z="30.000000" />
+                <PitchYawRoll x="90.000000" y="0.000000" z="0.000000" />
                 <Scale x="1.000000" y="1.000000" z="1.000000" />
             </Transform>
             
 			<VolumeTexture path="art\head256.raw">
                 <TextureDimension x="256.000000" y="256.000000" z="225.000000"/>
-                <CuboidDimension x="9.000000" y="9.000000" z="8.000000"/>
+                <CuboidDimension x="17.000000" y="17.000000" z="15.000000"/>
             </VolumeTexture>
             
             <TransferFunction path="art\tff.dat" />

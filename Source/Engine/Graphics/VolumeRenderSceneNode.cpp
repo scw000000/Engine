@@ -281,7 +281,6 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
   // 
    glCullFace( GL_BACK );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-  // glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    glUseProgram( m_SecondPassProgram );
 
    glUniform2f( m_ScreenSizeUni, ( float ) screenSize.x, ( float ) screenSize.y );

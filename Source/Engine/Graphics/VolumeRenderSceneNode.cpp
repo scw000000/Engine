@@ -62,25 +62,31 @@ VolumeRenderSceneNode::VolumeRenderSceneNode( const ActorId actorId,
    m_pVolumeTextureResource = pVolumeTextureResource;
    m_pTransferFuncionResource = pTransferFunctionResource;
 
+   m_TextureDimension = textureDiemension;
+
    m_VAO = 0;
+
    m_FirstPassProgram = 0;
-   ENG_ZERO_MEM( m_VBOs );
 
    m_FirstPassMVPUni = -1;
+
+   ENG_ZERO_MEM( m_VBOs );
 
    m_RenderedTextureObj = 0;
    m_RenderDepthBufferObj = 0;
    m_FrameBufferObj = 0;
 
-   m_TextureUni = -1;
-
-   m_SecondPassVAO = 0;
    m_SecondPassProgram = 0;
-
+   
    m_VolumeTextureObj = 0;
    m_TranserTextureObj = 0;
 
-   m_TextureDimension = textureDiemension;
+   m_ScreenSizeUni = -1;
+   m_StepSizeUni = -1;
+   m_TransferTextureUni = -1;
+   m_RenderedTextureUni = -1;
+   m_VolumeTextureUni = -1;
+   m_SecondPassMVPUni = -1;
    
    auto halfCuboidDimension = cuboidDimension / 2.0f;
    m_VerticesLocation[ 0 ] = Vec3( -halfCuboidDimension.x, -halfCuboidDimension.y, halfCuboidDimension.z );
@@ -116,14 +122,6 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    glGenVertexArrays( 1, &m_VAO );
    glBindVertexArray( m_VAO );
 
-   //OpenGLRenderer::LoadTexture2D( &m_Texture, m_Props.GetMaterialPtr()->GetTextureResource() );
-
-   //shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
-   //shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
-
-   //m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
-   //SetRadius( pMeshExtra->m_Radius );
-   //OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
    // 1st attribute buffer : vertices
    glGenBuffers( 1, &m_VBOs[ Vertex_Position ] );
    glBindBuffer( GL_ARRAY_BUFFER, m_VBOs[ Vertex_Position ] );
@@ -206,30 +204,11 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    m_RenderedTextureUni = glGetUniformLocation( m_SecondPassProgram, "ExitPoints" );
    m_VolumeTextureUni = glGetUniformLocation( m_SecondPassProgram, "VolumeTex" );
    m_SecondPassMVPUni = glGetUniformLocation( m_SecondPassProgram, "MVP" );
-   //m_FirstPassVertexShader.OnRestore( pScene );
-   //m_FirstPassFragmentShader.OnRestore( pScene );
 
-   //m_FirstPassProgram = OpenGLRenderer::GenerateProgram( m_FirstPassVertexShader.GetVertexShader(), m_FirstPassFragmentShader.GetFragmentShader() );
-
-
-   /*m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler" );
-
-   m_ToWorldMatrix = glGetUniformLocation( m_Program, "M" );
-   m_LightPosWorldSpace = glGetUniformLocation( m_Program, "LightPosition_WorldSpace" );
-   m_LigthDirection = glGetUniformLocation( m_Program, "LighDirection" );
-   m_LightColor = glGetUniformLocation( m_Program, "LightColor" );
-   m_LightPower = glGetUniformLocation( m_Program, "LightPower" );
-   m_LightAmbient = glGetUniformLocation( m_Program, "LightAmbient" );
-   m_LightNumber = glGetUniformLocation( m_Program, "LightNumber" );
-
-   m_EyeDirWorldSpace = glGetUniformLocation( m_Program, "EyeDirection_WorldSpace" );
-
-   m_MaterialDiffuse = glGetUniformLocation( m_Program, "MaterialDiffuse" );
-   m_MaterialAmbient = glGetUniformLocation( m_Program, "MaterialAmbient" );*/
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
    // restore all of its children
    SceneNode::VOnRestore( pScene );
-   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    return S_OK;
    }
 
@@ -247,10 +226,10 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
    Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
    glUniformMatrix4fv( m_FirstPassMVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
    glDrawElements(
-      GL_TRIANGLES,      // mode
-      36,    // count
-      GL_UNSIGNED_INT,   // type
-      ( void* ) 0           // element array buffer offset
+      GL_TRIANGLES,     // mode
+      36,               // count
+      GL_UNSIGNED_INT,  // type
+      ( void* ) 0       // element array buffer offset
       );
 /*
    glUniformMatrix4fv( m_ToWorldMatrix, 1, GL_FALSE, &pScene->GetTopMatrix()[ 0 ][ 0 ] );
@@ -275,12 +254,11 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
    glBindTexture( GL_TEXTURE_2D, m_Texture );*/
    // Set our "myTextureSampler" sampler to user Texture Unit 0
    /*glUniform1i( m_TextureUni, 0 );*/
-
-   
    
   // 
    glCullFace( GL_BACK );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
    glUseProgram( m_SecondPassProgram );
 
    glUniform2f( m_ScreenSizeUni, ( float ) screenSize.x, ( float ) screenSize.y );
@@ -302,9 +280,9 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
    glUniformMatrix4fv( m_SecondPassMVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
    glDrawElements(
       GL_TRIANGLES,      // mode
-      36,    // count
+      36,                // count
       GL_UNSIGNED_INT,   // type
-      ( void* ) 0           // element array buffer offset
+      ( void* ) 0        // element array buffer offset
       );
    glBindVertexArray( 0 );
    return S_OK;
@@ -312,27 +290,34 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
 
 void VolumeRenderSceneNode::ReleaseResource( void )
    {
-   if( m_VAO )
-      {
-      glDeleteVertexArrays( 1, &m_VAO );
-      m_VAO = 0;
-      }
+  
+   glDeleteVertexArrays( 1, &m_VAO );
+   m_VAO = 0;
+
 
    glDeleteBuffers( ENG_ARRAY_SIZE_IN_ELEMENTS( m_VBOs ), &m_VBOs[ 0 ] );
    ENG_ZERO_MEM( m_VBOs );
 
-   if( m_TextureUni )
-      {
-      glDeleteTextures( 1, &m_RenderedTextureObj );
-      m_RenderedTextureObj = 0;
-      }
+   glDeleteProgram( m_FirstPassProgram );
+   m_FirstPassProgram = 0;
 
-   if( m_FirstPassProgram )
-      {
-      glDeleteProgram( m_FirstPassProgram );
-      m_FirstPassProgram = 0;
-      }
+   glDeleteTextures( 1, &m_RenderedTextureObj );
+   m_RenderedTextureObj = 0;
 
+   glDeleteFramebuffers( 1, &m_FrameBufferObj );
+   m_FrameBufferObj = 0;
+
+   glDeleteRenderbuffers( 1, &m_RenderDepthBufferObj );
+   m_RenderDepthBufferObj = 0;
+
+   glDeleteProgram( m_SecondPassProgram );
+   m_SecondPassProgram = 0;
+
+   glDeleteTextures( 1, &m_VolumeTextureObj );
+   m_VolumeTextureObj = 0;
+
+   glDeleteTextures( 1, &m_TranserTextureObj );
+   m_TranserTextureObj = 0;
    }
 
 void VolumeRenderSceneNode::SetUpRenderedTexture( void )
@@ -350,7 +335,7 @@ void VolumeRenderSceneNode::SetUpRenderedTexture( void )
    }
 
 void VolumeRenderSceneNode::SetUpFrameBuffer( void )
-{
+   {
    // create a depth buffer for our framebuffer
    glGenRenderbuffers( 1, &m_RenderDepthBufferObj );
    ENG_ASSERT( m_RenderDepthBufferObj );

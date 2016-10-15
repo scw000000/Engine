@@ -168,6 +168,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    
    glUniform4fv( m_MaterialDiffuseUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse( ) );
    glUniform3fv( m_MaterialAmbientUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient( ) );
+   glUniform3fv( m_MaterialSpecularUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetSpecular() );
 
 	// Bind our texture in Texture Unit 0
 	glActiveTexture( GL_TEXTURE0 );

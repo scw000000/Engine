@@ -57,6 +57,8 @@ class VolumeRenderSceneNode : public SceneNode
       VertexShader		m_FirstPassVertexShader;
       FragmentShader		m_FirstPassFragmentShader;
       
+      GLuint            m_FirstPassMVPUni;
+
       GLuint            m_VBOs[ Num_Buffers ];
 
       GLuint            m_RenderedTextureObj;
@@ -64,11 +66,9 @@ class VolumeRenderSceneNode : public SceneNode
       GLuint            m_FrameBufferObj;
 
       GLuint            m_SecondPassProgram;
-      GLuint            m_SecondPassVAO;
+
       VertexShader		m_SecondPassVertexShader;
       FragmentShader		m_SecondPassFragmentShader;
-
-      GLuint            m_FirstPassMVPUni;
 
       GLuint            m_VolumeTextureObj;
       GLuint            m_TranserTextureObj;
@@ -79,8 +79,6 @@ class VolumeRenderSceneNode : public SceneNode
       GLuint            m_RenderedTextureUni;
       GLuint            m_VolumeTextureUni;
       GLuint            m_SecondPassMVPUni;
-
-      GLuint            m_TextureUni;
 
       Vec3              m_VerticesLocation[ 8 ];
       Vec3              m_TextureDimension;

@@ -70,6 +70,7 @@ SkeletalMeshSceneNode::SkeletalMeshSceneNode(
    m_EyePosWorldSpaceUni = 0;
    m_MaterialAmbientUni = 0;
    m_MaterialDiffuseUni = 0;
+   m_MaterialSpecularUni = 0;
 
    m_VerticesIndexCount = 0;
    }
@@ -189,6 +190,7 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
 
    m_MaterialDiffuseUni = glGetUniformLocation( m_Program, "uMaterialDiffuse" );
    m_MaterialAmbientUni = glGetUniformLocation( m_Program, "uMaterialAmbient" );
+   m_MaterialSpecularUni = glGetUniformLocation( m_Program, "uMaterialSpecular" );
 
    m_BoneTransformUni = glGetUniformLocation( m_Program, "uBoneTransform" );
 
@@ -226,6 +228,7 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
 
    glUniform4fv( m_MaterialDiffuseUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse() );
    glUniform3fv( m_MaterialAmbientUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient() );
+   glUniform3fv( m_MaterialSpecularUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetSpecular() );
 
    const auto& globalBoneTransform = m_pAnimationState->m_GlobalBoneTransform;
    glUniformMatrix4fv( m_BoneTransformUni, globalBoneTransform.size(), GL_TRUE, &( globalBoneTransform[ 0 ][ 0 ][ 0 ] ) );

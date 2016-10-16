@@ -1,16 +1,16 @@
 // for raycasting
 #version 400
 
-layout(location = 0) in vec3 VerPos;
-layout(location = 1) in vec3 VerClr;
+layout(location = 0) in vec3 iVerPos;
+layout(location = 1) in vec3 iVerClr;
 
-out vec3 Color;
+out vec3 oColor;
 
-uniform mat4 MVP;
+uniform mat4 uMVP;
 
 
 void main()
 {
-    Color = VerClr;
-    gl_Position = MVP * vec4(VerPos, 1.0);
+    oColor = iVerClr;
+    gl_Position = uMVP * vec4( iVerPos, 1.0 );
 }

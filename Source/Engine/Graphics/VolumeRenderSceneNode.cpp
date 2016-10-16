@@ -14,6 +14,7 @@ x
 */
 #include "EngineStd.h"
 #include "VolumeRenderSceneNode.h"
+#include "Material.h"
 
 const char* const FIRST_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\VolumeRenderingFirstPass.vertexshader";
 const char* const FIRST_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\VolumeRenderingFirstPass.fragmentshader";
@@ -53,12 +54,14 @@ VolumeRenderSceneNode::VolumeRenderSceneNode( const ActorId actorId,
                                               shared_ptr<Resource> pTransferFunctionResource,
                                               const Vec3& textureDiemension,
                                               const Vec3& cuboidDimension )
-                                              : SceneNode( actorId, pRenderComponent, renderPass, pTransform ),
+                                              : SceneNode( actorId, pRenderComponent, renderPass, pTransform, shared_ptr< Material >( ENG_NEW Material() ) ),
                                               m_FirstPassVertexShader( Resource ( FIRST_PASS_VERTEX_SHADER_FILE_NAME ) ),
                                               m_FirstPassFragmentShader( Resource( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ) ),
                                               m_SecondPassVertexShader( Resource( SECOND_PASS_VERTEX_SHADER_FILE_NAME ) ),
-                                              m_SecondPassFragmentShader( Resource( SECOND_PASS_FRAGMENT_SHADER_FILE_NAME ) )
+                                              m_SecondPassFragmentShader( Resource( SECOND_PASS_FRAGMENT_SHADER_FILE_NAME ))
    {
+   m_Props.SetAlpha( 0.1f );
+
    m_pVolumeTextureResource = pVolumeTextureResource;
    m_pTransferFuncionResource = pTransferFunctionResource;
 
@@ -154,7 +157,7 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_VBOs[ Vertex_Index ] );
    glBufferData( GL_ELEMENT_ARRAY_BUFFER, 36 * sizeof( unsigned int ), s_VerticesIndex, GL_STATIC_DRAW );
 
-   m_FirstPassMVPUni = glGetUniformLocation( m_FirstPassProgram, "MVP" );
+   m_FirstPassMVPUni = glGetUniformLocation( m_FirstPassProgram, "uMVP" );
 
    // ---------------------Set up second pass program---------------------
 
@@ -198,12 +201,12 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    SetUpRenderedTexture();
    SetUpFrameBuffer();
    
-   m_ScreenSizeUni = glGetUniformLocation( m_SecondPassProgram, "ScreenSize" );
-   m_StepSizeUni = glGetUniformLocation( m_SecondPassProgram, "StepSize" );
-   m_TransferTextureUni = glGetUniformLocation( m_SecondPassProgram, "TransferFunc" );
-   m_RenderedTextureUni = glGetUniformLocation( m_SecondPassProgram, "ExitPoints" );
-   m_VolumeTextureUni = glGetUniformLocation( m_SecondPassProgram, "VolumeTex" );
-   m_SecondPassMVPUni = glGetUniformLocation( m_SecondPassProgram, "MVP" );
+   m_ScreenSizeUni = glGetUniformLocation( m_SecondPassProgram, "uScreenSize" );
+   m_StepSizeUni = glGetUniformLocation( m_SecondPassProgram, "uStepSize" );
+   m_TransferTextureUni = glGetUniformLocation( m_SecondPassProgram, "uTransferFunction" );
+   m_RenderedTextureUni = glGetUniformLocation( m_SecondPassProgram, "uExitPoints" );
+   m_VolumeTextureUni = glGetUniformLocation( m_SecondPassProgram, "uVolumeTexture" );
+   m_SecondPassMVPUni = glGetUniformLocation( m_SecondPassProgram, "uMVP" );
 
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
@@ -215,6 +218,7 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
 int VolumeRenderSceneNode::VRender( Scene *pScene )
    {
    auto screenSize = g_pApp->GetScreenSize();
+   glEnable( GL_CULL_FACE );
    glCullFace( GL_FRONT );
    // Use our shader
    glBindVertexArray( m_VAO );

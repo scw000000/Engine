@@ -63,22 +63,23 @@ class MeshSceneNode : public SceneNode
 
       GLuint            m_Buffers[ Num_Buffers ];
 
-      GLuint            m_MVPMatrix;
-      GLuint            m_Texture;
-      GLuint            m_TextureUni;
+      GLuint            m_MVPUni;
+      GLuint            m_MeshTextureObj;
+      GLuint            m_MeshTextureUni;
       
-      GLuint            m_ToWorldMatrix;
-      GLuint            m_LightPosWorldSpace;
-      GLuint            m_LigthDirection;
-      GLuint            m_LightColor;
-      GLuint            m_LightPower;
-      GLuint            m_LightAmbient;
-      GLuint            m_LightNumber;
+      GLuint            m_MUni;
+      GLuint            m_LightPosWorldSpaceUni;
+      GLuint            m_LigthDirectionUni;
+      GLuint            m_LightColorUni;
+      GLuint            m_LightPowerUni;
+      GLuint            m_LightAmbientUni;
+      GLuint            m_LightNumberUni;
 
-      GLuint            m_EyeDirWorldSpace;
+      GLuint            m_EyePosWorldSpaceUni;
 
-      GLuint            m_MaterialAmbient;
-      GLuint            m_MaterialDiffuse;
+      GLuint            m_MaterialAmbientUni;
+      GLuint            m_MaterialDiffuseUni;
+      GLuint            m_MaterialSpecularUni;
 
       unsigned long     m_VerticesIndexCount;
    };

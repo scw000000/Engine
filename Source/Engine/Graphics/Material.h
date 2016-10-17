@@ -32,7 +32,7 @@ class Material
 	   Color GetDiffuse( void ) { return m_Diffuse; }
 
 	   void SetSpecular( const Color &color, const float shininess );
-	   void GetSpecular( Color &_color, float &_power ) { _color = m_Specular; _power = m_Shininess; }
+      Color GetSpecular( void ) const { return m_Specular; }
 
 	   void SetEmissive(const Color &color);
 	   Color GetEmissive( void ) const { return m_Emissive; }

@@ -81,7 +81,7 @@ void OpenGLRenderer::VSetProjectionTransform( const Mat4x4 *m )
 
 }*/
 
-void OpenGLRenderer::LoadTexture( GLuint* textureId, const Resource& textureResource )
+void OpenGLRenderer::LoadTexture2D( GLuint* textureId, const Resource& textureResource )
    {
    glGenTextures( 1, textureId );
 
@@ -96,7 +96,6 @@ void OpenGLRenderer::LoadTexture( GLuint* textureId, const Resource& textureReso
       {
       Mode = GL_RGBA;
       }
-
    glTexImage2D( GL_TEXTURE_2D, 0, Mode, pSurface->w, pSurface->h, 0, Mode, GL_UNSIGNED_BYTE, pSurface->pixels );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
@@ -232,51 +231,6 @@ void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMesh
                  GL_STATIC_DRAW );
    }
 
-GLuint OpenGLRenderer::GenerateShader( const Resource& shaderRes, GLuint shaderType )
-   {
-   // Create the shaders
-   GLuint shader = glCreateShader( shaderType );
-
-
-   shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( shaderRes );  // this actually loads the shader file from the zip file
-
-   if( !pResourceHandle )
-      {
-      ENG_ERROR( "Invalid shader file path" );
-      }
-   // Compile Vertex Shader
-   ENG_LOG( "Renderer", "Compiling vertex shader: " + shaderRes.m_Name );
-
-   GLchar* p_VSSourcePointer = ( GLchar* ) pResourceHandle->GetBuffer();
-   CompileShader( &p_VSSourcePointer, shader );
-
-   return shader;
-   }
-
-GLuint OpenGLRenderer::CompileShader( const GLchar* const* pSrcData, const GLuint shaderID )
-   {
-   glShaderSource( shaderID, 1, pSrcData, NULL );
-   glCompileShader( shaderID );
-
-   GLint result = GL_FALSE;
-   
-   // Check Vertex Shader compiling
-   glGetShaderiv( shaderID, GL_COMPILE_STATUS, &result );
-   if( result == GL_FALSE )
-      {
-      int infoLogLength;
-      glGetShaderiv( shaderID, GL_INFO_LOG_LENGTH, &infoLogLength );
-      GLchar* p_ErrMsg = ENG_NEW GLchar[ infoLogLength + 1 ];
-      glGetShaderInfoLog( shaderID, infoLogLength, NULL, p_ErrMsg );
-      ENG_ERROR( p_ErrMsg );
-      SAFE_DELETE_ARRAY( p_ErrMsg );
-      glDeleteShader( shaderID ); // Don't leak the shader.
-      return result;
-      }
-
-   return result;
-   }
-
 GLuint OpenGLRenderer::GenerateProgram( GLuint vertexShader, GLuint fragmentShader )
    {
    GLint result = GL_FALSE;
@@ -335,15 +289,20 @@ void OpenGLRenderer::VDrawLine( const Vec3& from, const Vec3& to, const Color& c
    {
    shared_ptr<Scene> pScene = g_pApp->m_pEngineLogic->m_pWrold;
 
-   auto camera = pScene->GetCamera();
-   if( !camera )
+   auto pCamera = pScene->GetCamera();
+   if( !pCamera )
+      {
+      return;
+      }
+   auto toCameraSpace = pCamera->VGetProperties().GetFromWorld();
+   if( !pCamera->GetFrustum().Inside( toCameraSpace.Xform( from ) ) && !pCamera->GetFrustum().Inside( toCameraSpace.Xform( to ) ) )
       {
       return;
       }
 
    Vec4 from4( from );
    Vec4 to4( to );
-   Mat4x4 mvp = ( camera->GetProjection() * camera->GetView() );
+   Mat4x4 mvp = ( pCamera->GetProjection() * pCamera->GetView() );
    Vec4 from_Proj = mvp.Xform( from4 );
    Vec4 to_Proj = mvp.Xform( to4 );
 

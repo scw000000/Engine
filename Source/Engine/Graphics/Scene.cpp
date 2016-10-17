@@ -147,6 +147,7 @@ void Scene::RenderAlphaPass()
    {
    //  shared_ptr<IRenderState> alphaPass = m_Renderer->VPrepareAlphaPass();
    OpenGLRenderer::SetRenderAlpha( true );
+   // This it not implemented yet!
 	m_AlphaSceneNodes.sort();
    // rendering from back to front in order to make visual effort of transparant objects
 	while ( !m_AlphaSceneNodes.empty() )

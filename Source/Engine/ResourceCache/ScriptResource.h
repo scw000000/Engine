@@ -20,7 +20,7 @@ class ScriptResourceLoader : public ResourceLoader
       virtual bool VUseRawFile() override { return false; }
       virtual bool VDiscardRawBufferAfterLoad() override { return true; }
       virtual bool VAddNullZero() override { return true; }
-      virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize ) override { return rawSize; }
+      virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize ) override { return 0; }
       virtual bool VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) override;
       virtual bool VUsePreAllocate( void ) override { return true; }
    };

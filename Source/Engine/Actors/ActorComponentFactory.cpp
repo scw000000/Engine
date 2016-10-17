@@ -21,6 +21,7 @@
 #include "PhysicsComponent.h"
 #include "MeshRenderComponent.h"
 #include "SkeletalMeshRenderComponent.h"
+#include "VolumeRenderComponent.h"
 
 ActorComponentFactory& ActorComponentFactory::GetSingleton( void )
    {
@@ -68,4 +69,5 @@ ActorComponentFactory::ActorComponentFactory( void )
    REGISTER_COMPONENT( LightRenderComponent );
    REGISTER_COMPONENT( SkyRenderComponent );
    REGISTER_COMPONENT( PhysicsComponent );
+   REGISTER_COMPONENT( VolumeRenderComponent );
    }

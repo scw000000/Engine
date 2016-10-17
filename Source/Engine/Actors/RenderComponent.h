@@ -49,7 +49,7 @@ class IRenderComponent : virtual public IActorComponent
       // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
       virtual shared_ptr<SceneNode> VCreateSceneNode( void ) = 0;
       virtual void VDelegateGenerateXML( TiXmlElement* pBaseElement ) = 0;
-      virtual void VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode ) = 0;
+      virtual void VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode ) {};
 
    protected:
       

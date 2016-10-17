@@ -48,28 +48,29 @@ SkeletalMeshSceneNode::SkeletalMeshSceneNode(
    m_pMeshResource( pMeshResouce ),
    m_pAnimScriptResource( pAnimScriptResource ),
    // m_pMaterial(  ),
-   m_VertexShader( VERTEX_SHADER_FILE_NAME ),
-   m_FragmentShader( FRAGMENT_SHADER_FILE_NAME )
+   m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
+   m_FragmentShader( Resource( FRAGMENT_SHADER_FILE_NAME ) )
    {
    m_Program = 0;
 
    ENG_ZERO_MEM( m_Buffers );
 
-   m_BoneTransform = 0;
-   m_MVPMatrix = 0;
-   m_Texture = 0;
-   m_TextureUni = 0;
+   m_BoneTransformUni = 0;
+   m_MVPUni = 0;
+   m_MeshTextureObj = 0;
+   m_NeshTextureUni = 0;
    m_VertexArrayObj = 0;
 
-   m_ToWorldMatrix = 0;
-   m_LightPosWorldSpace = 0;
-   m_LigthDirection = 0;
-   m_LightColor = 0;
-   m_LightPower = 0;
-   m_LightAmbient = 0;
-   m_LightNumber = 0;
-   m_MaterialAmbient = 0;
-   m_MaterialDiffuse = 0;
+   m_MUni = 0;
+   m_LightPosWorldSpaceUni = 0;
+   m_LigthDirWorldSpaceUni = 0;
+   m_LightColorUni = 0;
+   m_LightPowerUni = 0;
+   m_LightNumberUni = 0;
+   m_EyePosWorldSpaceUni = 0;
+   m_MaterialAmbientUni = 0;
+   m_MaterialDiffuseUni = 0;
+   m_MaterialSpecularUni = 0;
 
    m_VerticesIndexCount = 0;
    }
@@ -87,15 +88,15 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    glGenVertexArrays( 1, &m_VertexArrayObj );
    glBindVertexArray( m_VertexArrayObj );
 
-   m_VertexShader.OnRestore( pScene );
-   m_FragmentShader.OnRestore( pScene );
+   m_VertexShader.VOnRestore();
+   m_FragmentShader.VOnRestore();
 
-   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.GetVertexShader(), m_FragmentShader.GetFragmentShader() );
+   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
 
-   m_VertexShader.ReleaseShader( m_Program );
-   m_FragmentShader.ReleaseShader( m_Program );
+   m_VertexShader.VReleaseShader( m_Program );
+   m_FragmentShader.VReleaseShader( m_Program );
 
-   OpenGLRenderer::LoadTexture( &m_Texture, m_Props.GetMaterialPtr()->GetTextureResource() );
+   OpenGLRenderer::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
 
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
@@ -175,23 +176,23 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       sizeof( OpenGLRenderer::VertexToBoneMapping ), 
       ( const GLvoid* ) ( sizeof( unsigned int ) * MAXIMUM_BONES_PER_VEREX ) );
 
-   m_MVPMatrix = glGetUniformLocation( m_Program, "MVP" );
-   m_TextureUni = glGetUniformLocation( m_Program, "myTextureSampler" );
+   m_MVPUni = glGetUniformLocation( m_Program, "uMVP" );
+   m_NeshTextureUni = glGetUniformLocation( m_Program, "uMeshTexture" );
 
-   m_ToWorldMatrix = glGetUniformLocation( m_Program, "M" );
-   m_LightPosWorldSpace = glGetUniformLocation( m_Program, "LightPosition_WorldSpace" );
-   m_LigthDirection = glGetUniformLocation( m_Program, "LighDirection" );
-   m_LightColor = glGetUniformLocation( m_Program, "LightColor" );
-   m_LightPower = glGetUniformLocation( m_Program, "LightPower" );
-   m_LightAmbient = glGetUniformLocation( m_Program, "LightAmbient" );
-   m_LightNumber = glGetUniformLocation( m_Program, "LightNumber" );
+   m_MUni = glGetUniformLocation( m_Program, "uM" );
+   m_LightPosWorldSpaceUni = glGetUniformLocation( m_Program, "uLightPosition_WorldSpace" );
+   m_LigthDirWorldSpaceUni = glGetUniformLocation( m_Program, "uLighDirection_WorldSpace" );
+   m_LightColorUni = glGetUniformLocation( m_Program, "uLightColor" );
+   m_LightPowerUni = glGetUniformLocation( m_Program, "uLightPower" );
+   m_LightNumberUni = glGetUniformLocation( m_Program, "uLightNumber" );
 
-   m_EyeDirWorldSpace = glGetUniformLocation( m_Program, "EyeDirection_WorldSpace" );
+   m_EyePosWorldSpaceUni = glGetUniformLocation( m_Program, "uEyePosition_WorldSpace" );
 
-   m_MaterialDiffuse = glGetUniformLocation( m_Program, "MaterialDiffuse" );
-   m_MaterialAmbient = glGetUniformLocation( m_Program, "MaterialAmbient" );
+   m_MaterialDiffuseUni = glGetUniformLocation( m_Program, "uMaterialDiffuse" );
+   m_MaterialAmbientUni = glGetUniformLocation( m_Program, "uMaterialAmbient" );
+   m_MaterialSpecularUni = glGetUniformLocation( m_Program, "uMaterialSpecular" );
 
-   m_BoneTransform = glGetUniformLocation( m_Program, "BoneTransform" );
+   m_BoneTransformUni = glGetUniformLocation( m_Program, "uBoneTransform" );
 
    // restore all of its children
    SceneNode::VOnRestore( pScene );
@@ -210,33 +211,33 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
    // Send our transformation to the currently bound shader, 
    // in the "MVP" uniform
    // 1-> how many matrix, GL_FALSE->should transpose or not
-   glUniformMatrix4fv( m_MVPMatrix, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
+   glUniformMatrix4fv( m_MVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
 
-   glUniformMatrix4fv( m_ToWorldMatrix, 1, GL_FALSE, &pScene->GetTopMatrix()[ 0 ][ 0 ] );
+   glUniformMatrix4fv( m_MUni, 1, GL_FALSE, &pScene->GetTopMatrix()[ 0 ][ 0 ] );
 
    auto pLightManager = pScene->GetLightManagerPtr();
 
-   glUniform3fv( m_LightPosWorldSpace, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPosWorldSpace() );
-   glUniform3fv( m_LigthDirection, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightDirection() );
-   glUniform3fv( m_LightColor, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor() );
-   glUniform1fv( m_LightPower, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower() );
-   glUniform3fv( m_LightAmbient, 1, ( const GLfloat* ) pLightManager->GetLightAmbient() );
-   glUniform1i( m_LightNumber, pLightManager->GetActiveLightCount() );
+   glUniform3fv( m_LightPosWorldSpaceUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPosWorldSpace() );
+   glUniform3fv( m_LigthDirWorldSpaceUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightDirection() );
+   glUniform3fv( m_LightColorUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor() );
+   glUniform1fv( m_LightPowerUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower() );
+   glUniform1i( m_LightNumberUni, pLightManager->GetActiveLightCount() );
 
 
-   glUniform3fv( m_EyeDirWorldSpace, 1, ( const GLfloat* ) &pScene->GetCamera()->GetForward() );
+   glUniform3fv( m_EyePosWorldSpaceUni, 1, ( const GLfloat* ) &pScene->GetCamera()->GetToWorldPosition() );
 
-   glUniform4fv( m_MaterialDiffuse, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse() );
-   glUniform3fv( m_MaterialAmbient, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient() );
+   glUniform4fv( m_MaterialDiffuseUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse() );
+   glUniform3fv( m_MaterialAmbientUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient() );
+   glUniform3fv( m_MaterialSpecularUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetSpecular() );
 
    const auto& globalBoneTransform = m_pAnimationState->m_GlobalBoneTransform;
-   glUniformMatrix4fv( m_BoneTransform, globalBoneTransform.size(), GL_TRUE, &( globalBoneTransform[ 0 ][ 0 ][ 0 ] ) );
+   glUniformMatrix4fv( m_BoneTransformUni, globalBoneTransform.size(), GL_TRUE, &( globalBoneTransform[ 0 ][ 0 ][ 0 ] ) );
    
    // Bind our texture in Texture Unit 0
    glActiveTexture( GL_TEXTURE0 );
-   glBindTexture( GL_TEXTURE_2D, m_Texture );
+   glBindTexture( GL_TEXTURE_2D, m_MeshTextureObj );
    // Set our "myTextureSampler" sampler to user Texture Unit 0
-   glUniform1i( m_TextureUni, 0 );
+   glUniform1i( m_NeshTextureUni, 0 );
 
    // Draw the triangles !
    glDrawElements(
@@ -271,10 +272,10 @@ void SkeletalMeshSceneNode::ReleaseResource( void )
    glDeleteBuffers( ENG_ARRAY_SIZE_IN_ELEMENTS( m_Buffers ), &m_Buffers[ 0 ] );
    ENG_ZERO_MEM( m_Buffers );
 
-   if( m_TextureUni )
+   if( m_NeshTextureUni )
       {
-      glDeleteTextures( 1, &m_Texture );
-      m_Texture = 0;
+      glDeleteTextures( 1, &m_MeshTextureObj );
+      m_MeshTextureObj = 0;
       }
 
    if( m_Program )

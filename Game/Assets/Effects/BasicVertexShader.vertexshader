@@ -1,73 +1,36 @@
-#version 330 core
+#version 400
 
 // Input vertex data, different for all executions of this shader.
-layout(location = 0) in vec3 VertexPosition_Modelspace;
-layout(location = 1) in vec2 VertexUV;
-layout(location = 2) in vec3 VertexNormal_Modelspace;
+layout(location = 0) in vec3 iVertexPosition_Modelspace;
+layout(location = 1) in vec2 iVertexUV;
+layout(location = 2) in vec3 iVertexNormal_Modelspace;
 
 // Output data ; will be interpolated for each fragment.
-out vec2 UV;
-out vec4 TotalDiffuseColor;
-out vec3 TotalSpecularColor;
+out vec2 oUV;
+out vec3 oPosition_WorldSpace;
+out vec3 oNormal_WorldSpace;
+out vec3 oEyeDirection_WorldSpace;
 
 // Values that stay constant for the whole mesh.
-uniform mat4 	MVP;
-uniform mat4 	M;
+uniform mat4 	uMVP;
+uniform mat4 	uM;
 
-const int MAXIMUM_LIGHTS_SUPPORTED = 8;
-
-uniform vec3 	LightPosition_WorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
-uniform vec3 	LighDirection[ MAXIMUM_LIGHTS_SUPPORTED ];
-uniform vec3	LightColor[ MAXIMUM_LIGHTS_SUPPORTED ];
-uniform float   LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
-uniform vec3 	LightAmbient;
-uniform int     LightNumber;
-
-uniform vec3	EyeDirection_WorldSpace;
-
-uniform vec4 	MaterialDiffuse;
-uniform vec3	MaterialAmbient;
-
+uniform vec3	uEyePosition_WorldSpace;
 
 void main()
 	{
-
-	// Output position of the vertex, in clip space : MVP * position
-	gl_Position =  MVP * vec4( VertexPosition_Modelspace, 1 );
+    // Output position of the vertex, in clip space : MVP * position
+	gl_Position =  uMVP * vec4( iVertexPosition_Modelspace, 1 );
 	
-	vec3 vecPosition_Worldspace = ( M * vec4( VertexPosition_Modelspace, 1 ) ).xyz;
-	vec3 vecNormal_WorldSpace = normalize( ( M * vec4( VertexNormal_Modelspace, 0 ) ).xyz );
-	vec3 reflection;
-	float cosAlpha;
-	float dotProduct;
-	float dist;
-	TotalDiffuseColor.rgb = vec3( 0, 0, 0 );
-	TotalSpecularColor = vec3( 0, 0, 0 );
-		
-	for( int i = 0; i < LightNumber; ++i )
-		{
-		dotProduct = max( 0, dot( vecNormal_WorldSpace, -LighDirection[i] ) );
-		dist = distance( vecPosition_Worldspace, LightPosition_WorldSpace[i] );
-		
-		// Direction in which the triangle reflects the light
-		reflection = reflect ( LighDirection[i], vecNormal_WorldSpace );
-		// Cosine of the angle between the Eye vector and the Reflect vector,
-		// clamped to 0
-		//  - Looking into the reflection -> 1
-		//  - Looking elsewhere -> < 1
-		cosAlpha = clamp( dot( -EyeDirection_WorldSpace, reflection ), 0, 1 );
-		
-		float temp = LightPower[i] / ( dist * dist );
-		TotalDiffuseColor.rgb +=  LightColor[i] * temp * dotProduct;
-		TotalSpecularColor +=  vec3( 0.3, 0.3, 0.3 ) * LightColor[i] * temp * pow( cosAlpha,5 );
-		}
-
-	//TotalDiffuseColor = MaterialAmbient * LightAmbient + MaterialDiffuse.rgb * TotalDiffuseColor;
-	TotalDiffuseColor.rgb = LightAmbient + TotalDiffuseColor.rgb;
+	// Position of the vertex, in worldspace : M * position
+	oPosition_WorldSpace = ( uM * vec4( iVertexPosition_Modelspace, 1 ) ).xyz;
 	
-	TotalDiffuseColor.a = MaterialDiffuse.a;
+	oEyeDirection_WorldSpace = uEyePosition_WorldSpace - oPosition_WorldSpace;
+	
+	// Normal of the the vertex, in camera space
+	oNormal_WorldSpace = ( uM * vec4( iVertexNormal_Modelspace, 0 ) ) .xyz; // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
 	
 	// UV of the vertex. No special space for this one.
-	UV = VertexUV;
+	oUV = iVertexUV;
 	}
 

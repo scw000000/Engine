@@ -174,13 +174,11 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    
    Resource resource( m_EngineOptions.GetPreInitScriptFile() );
    shared_ptr<ResHandle> pResourceHandle = m_pResCache->GetHandle( resource );  
-
-  // RegisterAbstractScriptClass< IAnimationNode >();
+   ENG_ASSERT( pResourceHandle );
 
    RegisterScriptClass< AnimationClipNode, IAnimationNode >();
    RegisterScriptClass< AnimationLerpNode, IAnimationNode >();
    RegisterScriptClass< AnimationState >();
-  // AnimationClipNode::RegisterScriptClass();
 
    //--------------------------------- 
    //  Initialize Lua scripting

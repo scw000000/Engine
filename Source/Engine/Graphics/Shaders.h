@@ -1,59 +1,61 @@
 #pragma once
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Shaders.h
-////////////////////////////////////////////////////////////////////////////////
+/*!
+ * \file Shaders.h
+ * \date 2016/10/13 18:12
+ *
+ * \author scw00
+ * Contact: user@company.com
+ *
+ * \brief 
+ *
+ * TODO: long description
+ *
+ * \note
+*/
 
-class SceneNode;
-class Scene;
-
-class VertexShader
+class IShader
    {
    public:
-	   VertexShader( const char* pResourceFile );
+      virtual ~IShader( void ){ }
+      virtual void VOnRestore( void ) = 0;
+      virtual void VReleaseShader( GLuint program ) = 0;
+      virtual GLuint VGetShaderObject( void ) const = 0;
+   };
+
+class OpenGLShader : public IShader
+   {
+   public:
+      OpenGLShader( const Resource& shaderResource );
+      
+      virtual void VReleaseShader( GLuint program ) override;
+      virtual GLuint VGetShaderObject( void ) const override { return m_ShaderObj; };
+
+   protected:
+      void CompileAndSetShader( GLuint shaderType );
+
+
+   protected:
+      GLuint m_ShaderObj;
+      Resource m_ShaderResource;
+   };
+
+class VertexShader : public OpenGLShader
+   {
+   public:
+      VertexShader( const Resource& shaderResource );
 	   ~VertexShader( void );
       // This function is called in SceneNode::Onrestore
       // reload and compile vertex shader
-	   void OnRestore( Scene *pScene );
-      // 
-	   /**
-	    * @brief  
-	    *
-       *  This function is called at begin of SceneNode::VRender 
-       *  The original implementation of SetupRender
-	    * @param  pScene Scene * pScene
-	    * @param  pNode SceneNode * pNode
-	    * @return GLint
-	    */
-	    GLint SetupRender( Scene *pScene, SceneNode *pNode );
-	   void SetEnableLights(bool enableLights) { m_enableLights = enableLights; }
-      GLuint GetVertexShader( void ) { return m_VertexShader; }
-      void ReleaseShader( GLuint program );
-
-   protected:
-      GLuint m_VertexShader;
-      GLuint m_MVPMatrix;
-      GLuint m_WorldMatrix;
-	   bool	m_enableLights;
-      Resource m_ShaderResource;
+      void VOnRestore( void ) override;
 
    };
 
-class FragmentShader
+class FragmentShader : public OpenGLShader
    {
    public:
-      
-	   FragmentShader( const char* pResourceFile );
+      FragmentShader( const Resource& shaderResource );
 	   ~FragmentShader( void );
       // This function is called in SceneNode::Onrestore
       // reload and compile fragment shader
-	   void OnRestore( Scene *pScene );
-      // This function is called at begin of SceneNode::VRender
-      // bind fragment shader to program
-	   GLint SetupRender( Scene *pScene, SceneNode *pNode );
-      GLuint GetFragmentShader( void ) { return m_FragmentShader; }
-      void ReleaseShader( GLuint program );
-
-   protected:
-      GLuint m_FragmentShader;
-      Resource m_ShaderResource;
+      void VOnRestore( void ) override;
    };

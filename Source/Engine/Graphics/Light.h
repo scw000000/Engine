@@ -94,7 +94,6 @@ class LightManager
       Vec3* GetLightDirection( void ) { return m_LightDir; }
       float* GetLightPower( void ) { return m_LightPower; }
       Color* GetLightColor( void ) { return m_LightColor; }
-      Color* GetLightAmbient( void ) { return &m_LightAmbient; }
       void NewSceneNodeDelegate( IEventPtr pEvent );
       void DestroySceneNodeDelegate( IEventPtr pEvent );
 
@@ -105,5 +104,4 @@ class LightManager
       Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
       float     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
       Color		m_LightColor[ MAXIMUM_LIGHTS_SUPPORTED ];
-      Color		m_LightAmbient;
    };

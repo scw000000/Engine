@@ -64,6 +64,6 @@ void main()
     oFragColor = colorAcum;
 
     // FragColor = vec4( oEntryPoint_ModelSpace, 1.0);
-    // FragColor = vec4(exitPoint, 1.0);
+    // oFragColor = vec4(exitPoint, 1.0);
    
     }

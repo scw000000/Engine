@@ -42,7 +42,7 @@ const Vec3 VolumeRenderSceneNode::s_BackFacePosition[] = {// Front face
                                                                      // Back face
                                                                      Vec3( 0, 0, 0 ),
                                                                      Vec3( 0, 1, 0 ),
-                                                                     Vec3( 1, 0, 0 ),
+                                                                     Vec3( 1, 1, 0 ),
                                                                      Vec3( 1, 0, 0 )
                                                                      };
 

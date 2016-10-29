@@ -14,7 +14,7 @@
 
 #include "EngineStd.h"
 #include "VolumeRenderComponent.h"
-#include "..\Graphics\VolumeRenderSceneNode.h"
+#include "..\Graphics\SceneNode\VolumeRenderSceneNode.h"
 
 const ComponentRegisterId BaseActorComponent< VolumeRenderComponent >::s_ComponentId = 0x17c79c8f;
 const std::string BaseActorComponent< VolumeRenderComponent >::s_Name = "VolumeRenderComponent";

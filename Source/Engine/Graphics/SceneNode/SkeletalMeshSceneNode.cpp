@@ -16,7 +16,7 @@
 #include "SkeletalMeshSceneNode.h"
 #include "..\ResourceCache\MeshResource.h"
 #include "..\ResourceCache\TextureResource.h"
-#include "OpenGLRenderer.h"
+#include "..\OpenGLRenderer.h"
 #include "..\ResourceCache\ScriptResource.h"
 #include "..\LuaScripting\LuaStateManager.h"
 #include "..\Animation\AnimationState.h"

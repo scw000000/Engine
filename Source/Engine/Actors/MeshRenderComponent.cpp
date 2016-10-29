@@ -14,7 +14,7 @@
 
 #include "EngineStd.h"
 #include "MeshRenderComponent.h"
-#include "..\Graphics\MeshSceneNode.h"
+#include "..\Graphics\SceneNode\MeshSceneNode.h"
 #include "..\Physics\PhysicsAttributes.h"
 #include "..\ResourceCache\MeshResource.h"
 

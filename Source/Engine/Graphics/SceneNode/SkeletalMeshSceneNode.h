@@ -12,7 +12,7 @@
  *
  * \note
  */
-#include "Shaders.h"
+#include "..\Shaders.h"
 
 
 class MeshResourceExtraData;

@@ -73,3 +73,18 @@ class PerspectiveFrustum : public BaseFrustum
       float m_FarDis;
 
    };
+
+class OrthogonalFrustum : public BaseFrustum
+   {
+   public:
+      OrthogonalFrustum( void );
+      void Init( const float left, const float right, const float up, const float bottom, const float farDis, const float nearDis );
+   
+   private:
+      float m_Left;
+      float m_Right;
+      float m_Up;
+      float m_Bottom;
+      float m_FarDis;
+      float m_NearDis;
+   };

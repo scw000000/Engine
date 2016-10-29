@@ -14,7 +14,7 @@
 
 #include "EngineStd.h"
 #include "SceneNodes.h"
-#include "Scene.h"
+#include "..\Scene.h"
 #include "..\Actors\ActorComponent.h"
 #include "..\Actors\RenderComponent.h"
 

@@ -47,17 +47,6 @@ TiXmlElement* LightProperties::GenerateXML( void )
 
    pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
 
-   /*TiXmlElement* pDiffuse = ENG_NEW TiXmlElement( "Diffuse" );
-   pDiffuse->SetAttribute( "r", ToStr( m_Diffuse.m_Component.r ).c_str() );
-   pDiffuse->SetAttribute( "g", ToStr( m_Diffuse.m_Component.g ).c_str() );
-   pDiffuse->SetAttribute( "b", ToStr( m_Diffuse.m_Component.b ).c_str() );
-   pDiffuse->SetAttribute( "a", ToStr( m_Diffuse.m_Component.a ).c_str() );
-   pBaseElement->LinkEndChild( pDiffuse );
-
-   TiXmlElement* pPower = ENG_NEW TiXmlElement( "Power" );
-   pPower->SetAttribute( "magnitude", ToStr( m_Power ).c_str() );
-   pBaseElement->LinkEndChild( pPower );*/
-
    return pRetNode;
    }
 
@@ -98,10 +87,14 @@ LightManager::LightManager( void )
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &LightManager::DestroySceneNodeDelegate ), Event_Destroy_Scene_Node::s_EventType );
    }
 
+void LightManager::RenderShadowMap( shared_ptr< LightNode > ) const
+   {
+   
+   }
+
 void LightManager::CalcLighting( Scene *pScene )
    {
 	//// LATER: There might be all kinds of things you'd want to do here for optimization, especially turning off lights on actors that can't be seen, etc.
-
 
 	ENG_ASSERT( m_ActiveLights.size() <= MAXIMUM_LIGHTS_SUPPORTED );
 

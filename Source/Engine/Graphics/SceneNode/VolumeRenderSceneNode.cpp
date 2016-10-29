@@ -14,7 +14,7 @@ x
 */
 #include "EngineStd.h"
 #include "VolumeRenderSceneNode.h"
-#include "Material.h"
+#include "..\Material.h"
 
 const char* const FIRST_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\VolumeRenderingFirstPass.vertexshader";
 const char* const FIRST_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\VolumeRenderingFirstPass.fragmentshader";

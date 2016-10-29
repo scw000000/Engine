@@ -16,7 +16,7 @@
 #include "MeshSceneNode.h"
 #include "..\ResourceCache\MeshResource.h"
 #include "..\ResourceCache\TextureResource.h"
-#include "OpenGLRenderer.h"
+#include "..\OpenGLRenderer.h"
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1

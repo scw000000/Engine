@@ -244,21 +244,6 @@
     <ClCompile Include="..\Actors\VolumeRenderComponent.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
-    <ClCompile Include="..\Graphics\SceneNodes.cpp">
-      <Filter>Graphics\SceneNode</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Graphics\SkeletalMeshSceneNode.cpp">
-      <Filter>Graphics\SceneNode</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Graphics\SkySceneNode.cpp">
-      <Filter>Graphics\SceneNode</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Graphics\VolumeRenderSceneNode.cpp">
-      <Filter>Graphics\SceneNode</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Graphics\MeshSceneNode.cpp">
-      <Filter>Graphics\SceneNode</Filter>
-    </ClCompile>
     <ClCompile Include="..\Utilities\Math.cpp">
       <Filter>Math</Filter>
     </ClCompile>
@@ -267,6 +252,24 @@
     </ClCompile>
     <ClCompile Include="..\Math\Frustum.cpp">
       <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNode\DirectLightSceneNode.cpp">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNode\MeshSceneNode.cpp">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNode\SceneNodes.cpp">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNode\SkeletalMeshSceneNode.cpp">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNode\SkySceneNode.cpp">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNode\VolumeRenderSceneNode.cpp">
+      <Filter>Graphics\SceneNode</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -473,21 +476,6 @@
     <ClInclude Include="..\Actors\VolumeRenderComponent.h">
       <Filter>Actors</Filter>
     </ClInclude>
-    <ClInclude Include="..\Graphics\SceneNodes.h">
-      <Filter>Graphics\SceneNode</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Graphics\SkeletalMeshSceneNode.h">
-      <Filter>Graphics\SceneNode</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Graphics\SkySceneNode.h">
-      <Filter>Graphics\SceneNode</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Graphics\VolumeRenderSceneNode.h">
-      <Filter>Graphics\SceneNode</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Graphics\MeshSceneNode.h">
-      <Filter>Graphics\SceneNode</Filter>
-    </ClInclude>
     <ClInclude Include="..\Utilities\Math.h">
       <Filter>Math</Filter>
     </ClInclude>
@@ -496,6 +484,24 @@
     </ClInclude>
     <ClInclude Include="..\Math\Frustum.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNode\DirectLightSceneNode.h">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNode\MeshSceneNode.h">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNode\SceneNodes.h">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNode\SkeletalMeshSceneNode.h">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNode\SkySceneNode.h">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNode\VolumeRenderSceneNode.h">
+      <Filter>Graphics\SceneNode</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

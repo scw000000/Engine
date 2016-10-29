@@ -79,3 +79,50 @@ void PerspectiveFrustum::Init( const float fov, const float aspect, const float 
    m_Planes[ Left ].Init( origin, m_FarPlaneVerts[ 3 ], m_FarPlaneVerts[ 0 ] );
    m_Planes[ Bottom ].Init( origin, m_FarPlaneVerts[ 2 ], m_FarPlaneVerts[ 3 ] );
    }
+
+OrthogonalFrustum::OrthogonalFrustum( void )
+   {
+   m_Left = 100.f;
+   m_Right = -100.f;
+   m_Up = 100.f;
+   m_Bottom = -100.f;
+   m_FarDis = 200.f;
+   m_NearDis = 0.f;
+   }
+
+void OrthogonalFrustum::Init( const float left, const float right, const float up, const float bottom, const float farDis, const float nearDis )
+   {
+   m_Left = left;
+   m_Right = right;
+   m_Up = up;
+   m_Bottom = bottom;
+   m_FarDis = farDis;
+   m_NearDis = nearDis;
+
+   // left up
+   m_NearPlaneVerts[ 0 ] = Vec3( m_Left, m_Up, m_NearDis );
+   // right up
+   m_NearPlaneVerts[ 1 ] = Vec3( m_Right, m_Up, m_NearDis );
+   // right down
+   m_NearPlaneVerts[ 2 ] = Vec3( m_Right, m_Bottom, m_NearDis );
+   // left down
+   m_NearPlaneVerts[ 3 ] = Vec3( m_Left, m_Bottom, m_NearDis );
+
+   // left up
+   m_FarPlaneVerts[ 0 ] = Vec3( m_Left, m_Up, m_FarDis );
+   // right up
+   m_FarPlaneVerts[ 1 ] = Vec3( m_Right, m_Up, m_FarDis );
+   // right down
+   m_FarPlaneVerts[ 2 ] = Vec3( m_Right, m_Bottom, m_FarDis );
+   // left down
+   m_FarPlaneVerts[ 3 ] = Vec3( m_Left, m_Bottom, m_FarDis );
+
+   Vec3 origin( 0.0f, 0.0f, 0.0f );
+
+   m_Planes[ Near ].Init( m_NearPlaneVerts[ 0 ], m_NearPlaneVerts[ 1 ], m_NearPlaneVerts[ 2 ] );
+   m_Planes[ Far ].Init( m_FarPlaneVerts[ 2 ], m_FarPlaneVerts[ 1 ], m_FarPlaneVerts[ 0 ] );
+   m_Planes[ Right ].Init( origin, m_FarPlaneVerts[ 1 ], m_FarPlaneVerts[ 2 ] );
+   m_Planes[ Top ].Init( origin, m_FarPlaneVerts[ 0 ], m_FarPlaneVerts[ 1 ] );
+   m_Planes[ Left ].Init( origin, m_FarPlaneVerts[ 3 ], m_FarPlaneVerts[ 0 ] );
+   m_Planes[ Bottom ].Init( origin, m_FarPlaneVerts[ 2 ], m_FarPlaneVerts[ 3 ] );
+   }

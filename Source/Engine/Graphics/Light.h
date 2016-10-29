@@ -12,7 +12,7 @@
  *
  * \note
  */
-#include "SceneNodes.h"
+#include ".\SceneNode\SceneNodes.h"
 #include "OpenGLRenderer.h"
 
 #define MAXIMUM_LIGHTS_SUPPORTED (8)
@@ -44,7 +44,7 @@ class LightNode : public SceneNode
 	   LightPropertiesPtr m_pLightProps;
 
    public:
-   LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
+      LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
 
       const LightPropertiesPtr& GetLightPropertiesPtr( void ) const { return m_pLightProps; };
    };
@@ -96,6 +96,9 @@ class LightManager
       Color* GetLightColor( void ) { return m_LightColor; }
       void NewSceneNodeDelegate( IEventPtr pEvent );
       void DestroySceneNodeDelegate( IEventPtr pEvent );
+
+   protected:
+      void RenderShadowMap( shared_ptr< LightNode > ) const;
 
    protected:
       Lights	m_Lights;

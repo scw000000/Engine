@@ -13,7 +13,7 @@
  */
 #include "EngineStd.h"
 #include "SkeletalMeshRenderComponent.h"
-#include "..\Graphics\SkeletalMeshSceneNode.h"
+#include "..\Graphics\SceneNode\SkeletalMeshSceneNode.h"
 #include "..\Physics\PhysicsAttributes.h"
 #include "..\ResourceCache\MeshResource.h"
 

@@ -12,9 +12,8 @@
  *
  * \note
  */
-#include "SceneNodes.h"
+#include ".\SceneNode\SceneNodes.h"
 #include "TransformStack.h"
-#include "SceneNodes.h"
 #include "..\Event\Events.h"
 #include "Light.h"
 

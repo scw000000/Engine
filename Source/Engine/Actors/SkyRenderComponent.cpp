@@ -14,7 +14,7 @@
 
 #include "EngineStd.h"
 #include "SkyRenderComponent.h"
-#include "..\Graphics\SkySceneNode.h"
+#include "..\Graphics\SceneNode\SkySceneNode.h"
 
 //const char* SkyRenderComponent::g_Name = "SkyRenderComponent";
 

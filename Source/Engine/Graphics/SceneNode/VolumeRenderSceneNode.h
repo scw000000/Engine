@@ -14,7 +14,7 @@
 */
 
 #include "SceneNodes.h"
-#include "Shaders.h"
+#include "..\Shaders.h"
 
 
 class VolumeRenderSceneNode : public SceneNode

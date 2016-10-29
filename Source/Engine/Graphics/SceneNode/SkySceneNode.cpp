@@ -15,7 +15,7 @@
 #include "EngineStd.h"
 #include "SkySceneNode.h"
 #include "..\ResourceCache\TextureResource.h"
-#include "OpenGLRenderer.h"
+#include "..\OpenGLRenderer.h"
 #include "..\ResourceCache\MeshResource.h"
 
 #define VERTEX_LOCATION    0

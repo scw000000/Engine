@@ -50,13 +50,13 @@ Scene::~Scene()
 
 int Scene::OnRender()
    {
-   if ( m_Root && m_Camera )
+   if ( m_Root && m_pCamera )
 	   {
 		// The scene root could be anything, but it
 		// is usually a SceneNode with the identity
 		// matrix
-		m_Camera->SetViewTransform( this );
-
+		m_pCamera->SetViewTransform( this );
+      m_CameraGlobalTransform = m_pCamera->VGetGlobalTransform();
 		m_pLightManager->CalcLighting( this );
 
 		if ( m_Root->VPreRender( this ) == S_OK )

@@ -259,6 +259,7 @@ class ISceneNode
 
 	   virtual void VSetTransformPtr( TransformPtr pNewTransform ) = 0;
       virtual void VSetTransform( const Transform& newTransform ) = 0;
+      virtual Transform VGetGlobalTransform( void ) const = 0;
 
 	   virtual int VOnUpdate( Scene *pScene, unsigned long deltaMs ) = 0;
 	   virtual int VOnRestore( Scene *pScene ) = 0;
@@ -271,7 +272,7 @@ class ISceneNode
 
       virtual Vec3 GetToWorldPosition( void ) const = 0;
       virtual void SetToWorldPosition( const Vec3& pos ) = 0;
-      virtual Vec3 VGetWorldPosition( void ) const = 0;
+      virtual Vec3 VGetGlobalPosition( void ) const = 0;
 
 	   virtual bool VAddChild( shared_ptr<ISceneNode> kid )=0;
 	   virtual bool VRemoveChild( ActorId id ) = 0;

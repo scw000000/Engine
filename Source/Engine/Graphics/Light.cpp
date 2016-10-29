@@ -111,7 +111,7 @@ void LightManager::CalcLighting( Scene *pScene )
          {
          m_LightAmbient = lightIt->get()->GetLightPropertiesPtr()->m_Diffuse * 0.2f;
          }*/
-      memcpy( m_LightPosWorldSpace, &lightIt->get( )->VGetWorldPosition( ), sizeof( Vec3 ) );
+      memcpy( m_LightPosWorldSpace, &lightIt->get( )->VGetGlobalPosition( ), sizeof( Vec3 ) );
       memcpy( m_LightDir, &lightIt->get( )->GetForward( ), sizeof( Vec3 ) );
       memcpy( m_LightPower, &lightIt->get( )->GetLightPropertiesPtr( )->m_Power, sizeof( float ) );
       memcpy( m_LightColor, &lightIt->get()->GetLightPropertiesPtr()->m_Diffuse, sizeof( Color ) );

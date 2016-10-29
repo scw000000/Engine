@@ -125,7 +125,6 @@
     <ClCompile Include="..\Event\PhysicsEvents.cpp" />
     <ClCompile Include="..\Event\ScriptEvent.cpp" />
     <ClCompile Include="..\Event\EventFactory.cpp" />
-    <ClCompile Include="..\Graphics\Geometry.cpp" />
     <ClCompile Include="..\Graphics\Light.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
     <ClCompile Include="..\Graphics\SkeletalMeshSceneNode.cpp" />
@@ -154,6 +153,8 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="..\Math\Frustum.cpp" />
+    <ClCompile Include="..\Math\Geometry.cpp" />
     <ClCompile Include="..\Physics\CollisionTable.cpp" />
     <ClCompile Include="..\Physics\Physics.cpp" />
     <ClCompile Include="..\Physics\PhysicsAttributes.cpp" />
@@ -211,7 +212,6 @@
     <ClInclude Include="..\Event\PhysicsEvents.h" />
     <ClInclude Include="..\Event\ScriptEvent.h" />
     <ClInclude Include="..\Event\EventFactory.h" />
-    <ClInclude Include="..\Graphics\Geometry.h" />
     <ClInclude Include="..\Graphics\Light.h" />
     <ClInclude Include="..\Graphics\Material.h" />
     <ClInclude Include="..\Graphics\SkeletalMeshSceneNode.h" />
@@ -234,6 +234,8 @@
     <ClInclude Include="..\Main\BaseEngineLogic.h" />
     <ClInclude Include="..\Main\Engine.h" />
     <ClInclude Include="..\Main\Interfaces.h" />
+    <ClInclude Include="..\Math\Frustum.h" />
+    <ClInclude Include="..\Math\Geometry.h" />
     <ClInclude Include="..\Memory\MemoryPool.h" />
     <ClInclude Include="..\Multicore\CriticalSection.h" />
     <ClInclude Include="..\Physics\CollisionTable.h" />

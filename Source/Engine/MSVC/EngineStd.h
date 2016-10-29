@@ -135,7 +135,8 @@ extern const int SCREEN_HEIGHT;
 #include "..\Debugging\Logger.h"  // this should be the first of the gcc includes since it defines ENG_ASSERT()
 #include "..\Utilities\types.h"
 #include "..\Utilities\templates.h"
-#include "..\Graphics\Geometry.h"
+#include "..\Math\Geometry.h"
+#include "..\Math\Frustum.h"
 #include "..\Utilities\Math.h"
 #include "..\Utilities\String.h"
 #include "..\Utilities\XMLHelper.h"

@@ -41,14 +41,7 @@ class SceneNodeProperties
       Mat4x4 GetFromWorld( void ) const { return m_pTransform->GetFromWorld(); }
       TransformPtr GetTransformPtr( void ) const;
 
-      /**
-       * @brief If you don't want to the change value of transform, call it instead of GetTransformPtr 
-       *
-       * @param   void
-       * @return const Transform&
-       */
-      const Transform& GetTransform( void ) const;
-      Transform GetTransform( void );
+      Transform GetLocalTransform( void ) const;
 
       const char* Name( void ) const { return m_Name.c_str(); }
 
@@ -99,6 +92,8 @@ class SceneNode : public ISceneNode
 	   virtual void VSetTransformPtr( TransformPtr pNewTransform ) override;
       virtual void VSetTransform( const Transform& newTransform ) override;
 
+      virtual Transform VGetGlobalTransform( void ) const override;
+
 	   virtual int VOnRestore( Scene *pScene ) override;
       virtual int VOnUpdate( Scene *pScene, unsigned long elapsedMs ) override;
 
@@ -123,7 +118,7 @@ class SceneNode : public ISceneNode
 
       Vec3 GetForward( void ) const { return m_Props.m_pTransform->GetForward(); }
 
-      virtual Vec3 VGetWorldPosition( void ) const override final;
+      virtual Vec3 VGetGlobalPosition( void ) const override final;
 
 	   void SetRadius( float radius ) { m_Props.m_Radius = radius; }
 
@@ -169,15 +164,15 @@ class RootNode : public SceneNode
 class CameraNode : public SceneNode
    {
    public:
-	   CameraNode( TransformPtr pTransform, Frustum const &frustum );
-      CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, Frustum const &frustum );
+	   CameraNode( TransformPtr pTransform, PerspectiveFrustum const &frustum );
+      CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, PerspectiveFrustum const &frustum );
 
 	   virtual int VRender( Scene *pScene ) override;
 	   virtual int VOnRestore( Scene *pScene ) override;
 	   virtual bool VIsVisible( Scene *pScene ) const { return m_IsActive; }
       virtual void VSetTransform( const Transform& newTransform ) override ;
 
-	   const Frustum &GetFrustum( void ) { return m_Frustum; }
+	   const PerspectiveFrustum &GetFrustum( void ) { return m_Frustum; }
 	   void SetTarget(shared_ptr<SceneNode> pTarget) { m_pTarget = pTarget; }
 	   void ClearTarget( void ) { m_pTarget = shared_ptr<SceneNode>(); }
 	   
@@ -200,7 +195,7 @@ class CameraNode : public SceneNode
        void GetScreenProjectPoint( Vec3& start, Vec3& end, const Point& screenPosition, float distance );
 
    protected:
-	   Frustum			m_Frustum;
+	   PerspectiveFrustum			m_Frustum;
       Mat4x4			m_Projection;
 	   Mat4x4			m_View;
 	   bool			m_IsActive;

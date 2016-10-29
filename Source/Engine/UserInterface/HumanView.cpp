@@ -31,7 +31,7 @@ HumanView::HumanView( void )
    if ( g_pApp->m_pEngineLogic->m_pWrold )
 	   {
       m_pWorld = g_pApp->m_pEngineLogic->m_pWrold;
-		Frustum frustum;
+		PerspectiveFrustum frustum;
       Point screenSize = g_pApp->m_EngineOptions.GetScreenSize();
       frustum.Init( ENG_PI / 4.0f, ( float ) screenSize.x / ( float ) screenSize.y, 0.1f, 2000.0f );
       

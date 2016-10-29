@@ -295,7 +295,7 @@ void OpenGLRenderer::VDrawLine( const Vec3& from, const Vec3& to, const Color& c
       return;
       }
    auto toCameraSpace = pCamera->VGetProperties().GetFromWorld();
-   if( !pCamera->GetFrustum().Inside( toCameraSpace.Xform( from ) ) && !pCamera->GetFrustum().Inside( toCameraSpace.Xform( to ) ) )
+   if( !pCamera->GetFrustum().VInside( toCameraSpace.Xform( from ) ) && !pCamera->GetFrustum().VInside( toCameraSpace.Xform( to ) ) )
       {
       return;
       }

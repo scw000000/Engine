@@ -31,12 +31,7 @@ TransformPtr SceneNodeProperties::GetTransformPtr( void ) const
    return m_pTransform;
    }
 
-const Transform& SceneNodeProperties::GetTransform( void ) const
-   {
-   return *m_pTransform;
-   }
-
-Transform SceneNodeProperties::GetTransform( void )
+Transform SceneNodeProperties::GetLocalTransform( void ) const
    {
    return *m_pTransform;
    }
@@ -85,7 +80,16 @@ void SceneNode::VSetTransform( const Transform& newTransform )
    *m_Props.m_pTransform = newTransform;
    }
 
-
+Transform SceneNode::VGetGlobalTransform( void ) const 
+   {
+   if( !m_pParent )
+      {
+      return m_Props.GetLocalTransform();
+      }
+   Transform& ret = m_pParent->VGetGlobalTransform();
+   ret = ret * m_Props.GetLocalTransform();
+   return ret;
+   }
 
 int SceneNode::VOnRestore( Scene *pScene )
    {
@@ -113,13 +117,13 @@ int SceneNode::VPreRender( Scene *pScene )
 
 bool SceneNode::VIsVisible( Scene *pScene )
    {
-   auto camTransform = pScene->GetCamera()->VGetProperties().GetTransform();
-   Vec3 nodeInCamWorldPos = VGetWorldPosition();
+   auto camTransform = pScene->GetCameraGlobalTransform();
+   Vec3 nodeInCamWorldPos = VGetGlobalPosition();
    // transform to camera's local space
    nodeInCamWorldPos = camTransform.GetFromWorld().Xform( nodeInCamWorldPos );;
-   const Frustum &frustum = pScene->GetCamera()->GetFrustum();
+   const PerspectiveFrustum &frustum = pScene->GetCamera()->GetFrustum();
    //return true;
-   return frustum.Inside( nodeInCamWorldPos, VGetProperties().GetRadius() );
+   return frustum.VInside( nodeInCamWorldPos, VGetProperties().GetRadius() );
    }
 
 
@@ -146,7 +150,7 @@ int SceneNode::VRenderChildren( Scene *pScene )
 
                Vec4 worldPos( asn->m_Concat.GetToWorldPosition() );
 
-               Mat4x4 fromWorld = pScene->GetCamera( )->VGetProperties().GetFromWorld();
+               Mat4x4 fromWorld = pScene->GetCameraGlobalTransform().GetFromWorld();
 
                Vec4 screenPos = fromWorld.Xform( worldPos );
 
@@ -217,12 +221,12 @@ void SceneNode::SetAlpha( float alpha )
    }
 
 // Sum up relative position from child to root node in order to get position in world space
-Vec3 SceneNode::VGetWorldPosition( void ) const
+Vec3 SceneNode::VGetGlobalPosition( void ) const
    {
    Vec3 pos = GetToWorldPosition();
 	if ( m_pParent )
 	   {
-		pos += m_pParent->VGetWorldPosition();
+		pos += m_pParent->VGetGlobalPosition();
 	   }
 	return pos;
    }
@@ -259,7 +263,6 @@ bool RootNode::VAddChild( shared_ptr<ISceneNode> child )
 	return m_Children[pass]->VAddChild( child );
    }
 
-// TODO: finish implement
 int RootNode::VRenderChildren( Scene *pScene )
    {
    // the child node of Root nodes are empty node, so there's no need calling VRender for them
@@ -299,7 +302,7 @@ bool RootNode::VRemoveChild( ActorId id )
 	return anythingRemoved;
    }
 
-CameraNode::CameraNode( TransformPtr pTransform, Frustum const &frustum ) 
+CameraNode::CameraNode( TransformPtr pTransform, PerspectiveFrustum const &frustum ) 
 	      : SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_0, pTransform ),
 	      m_Frustum( frustum ),
 	      m_IsActive( true ),
@@ -310,7 +313,7 @@ CameraNode::CameraNode( TransformPtr pTransform, Frustum const &frustum )
    {
    }
 
-CameraNode::CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, Frustum const &frustum ) 
+CameraNode::CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, PerspectiveFrustum const &frustum ) 
 	      : SceneNode( INVALID_ACTOR_ID, 
                       NULL,
                       RenderPass_0, 
@@ -350,7 +353,8 @@ int CameraNode::VOnRestore( Scene *pScene )
 void CameraNode::VSetTransform( const Transform& newTransform ) 
    { 
    SceneNode::VSetTransform( newTransform ); 
-   m_View = Mat4x4::LookAt( newTransform.GetToWorldPosition(), newTransform.GetToWorldPosition() + newTransform.GetForward(), newTransform.GetUp() );
+   auto& globalTransform = VGetGlobalTransform();
+   m_View = Mat4x4::LookAt( globalTransform.GetToWorldPosition(), globalTransform.GetToWorldPosition() + globalTransform.GetForward(), globalTransform.GetUp() );
 
    }
 

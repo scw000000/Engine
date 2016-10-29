@@ -554,53 +554,6 @@ class Plane
       float d;
    };
 
-class Frustum
-   {
-   public:
-      Frustum( void );
-      void Init( const float fov, const float aspect, const float nearClipDis, const float farClipDis );
-      /**
-       * @brief Return if a single point is inside the frustum, point should be in Frustum's local space
-       *
-       * @param  point const Vec3 & point
-       * @return bool
-       */
-      bool Inside( const Vec3 &point ) const ;
-
-      /**
-       * @brief return if a shpere is inside the frustum, point should be in Frustum's local space
-       *
-       * @param  point const Vec3 & point
-       * @param  radius float radius
-       * @return bool
-       */
-      bool Inside( const Vec3 &point, float radius ) const ;
-      
-      void SetFOV(float fov) { m_Fov=fov; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
-	   void SetAspect(float aspect) { m_Aspect=aspect; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
-	   void SetNear(float nearClip) { m_NearDis=nearClip; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
-	   void SetFar(float farClip) { m_FarDis=farClip; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
-
-   public:
-      enum Side { Near, Far, Top, Right, Bottom, Left, NumPlanes };
-
-      Plane m_Planes[ NumPlanes ];
-      // represent four vertices for near plane rectangle
-      Vec3 m_NearPlaneVerts[4];
-      // represenr four vertices for far plane rectangle 
-      Vec3 m_FarPlaneVerts[4];
-
-      // field of view in radians
-      float m_Fov;
-      // width divided by height
-      float m_Aspect;
-      // near plane distance
-      float m_NearDis;
-      // far plane distance
-      float m_FarDis;
-
-   };
-
  class Transform
     {
     public:

@@ -163,7 +163,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    glUniform1i( m_LightNumberUni, pLightManager->GetActiveLightCount( ) );
 
 
-   glUniform3fv( m_EyePosWorldSpaceUni, 1, ( const GLfloat* ) &pScene->GetCamera()->GetToWorldPosition() );
+   glUniform3fv( m_EyePosWorldSpaceUni, 1, ( const GLfloat* ) &pScene->GetCameraGlobalTransform().GetToWorldPosition() );
    
    glUniform4fv( m_MaterialDiffuseUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse( ) );
    glUniform3fv( m_MaterialAmbientUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient( ) );

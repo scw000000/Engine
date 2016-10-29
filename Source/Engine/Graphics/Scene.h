@@ -33,7 +33,7 @@ class Scene
       shared_ptr< ISceneNode > FindSceneNode( ActorId id );
       bool AddChild( ActorId id, shared_ptr< ISceneNode > pNode );
       bool RemoveChild( ActorId id );
-      void SetCamera(shared_ptr<CameraNode> camera) { m_Camera = camera; }
+      void SetCamera(shared_ptr<CameraNode> camera) { m_pCamera = camera; }
       // This function is called by SceneNode::PreRender
       void PushAndSetTransform( TransformPtr pTransform )
 	      {
@@ -57,19 +57,20 @@ class Scene
       void NewRenderComponentDelegate( IEventPtr pEvent );
       void DestroyActorDelegate( IEventPtr pEvent );
       shared_ptr<IRenderer> GetRenderer( void ) { return m_pRenderer; }
-      shared_ptr<CameraNode> GetCamera( void ) { return m_Camera; }
+      shared_ptr<CameraNode> GetCamera( void ) { return m_pCamera; }
       shared_ptr<LightManager> GetLightManagerPtr( void ){ return m_pLightManager; }
+      Transform GetCameraGlobalTransform( void ) const { return m_CameraGlobalTransform; };
 
    protected:
       void RenderAlphaPass();
       
    protected:
       shared_ptr<SceneNode>         m_Root;
-      shared_ptr<CameraNode>        m_Camera;
+      shared_ptr<CameraNode>        m_pCamera;
       shared_ptr<IRenderer>         m_pRenderer;
       TransformStack                m_TransformStack;
       AlphaSceneNodes               m_AlphaSceneNodes;
       ActorSceneMap                 m_ActorMap;
       shared_ptr<LightManager>      m_pLightManager;
-      
+      Transform                     m_CameraGlobalTransform;
    };

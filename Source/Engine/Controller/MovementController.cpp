@@ -21,7 +21,7 @@ MovementController::MovementController( shared_ptr<SceneNode> object,
                                         bool rotateWhenLButtonDown, 
                                         float smoothness ) : 
                                         m_object( object ),
-                                        m_pTransform( ENG_NEW Transform( object->VGetProperties().GetTransform() ) )
+                                        m_pTransform( ENG_NEW Transform( object->VGetProperties().GetLocalTransform() ) )
    {
 	m_MaxSpeed = 40.0f / 1000.f;			// 40 meters per Ms
 	m_CurrentSpeed = 0.0f;

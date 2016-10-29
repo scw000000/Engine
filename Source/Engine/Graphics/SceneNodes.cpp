@@ -205,7 +205,6 @@ int SceneNode::VOnLostDevice( Scene *pScene )
    return S_OK;
    }
 
-// TODO: finish implementation
 void SceneNode::SetAlpha( float alpha )
    {
    for( auto it : m_Children )
@@ -214,6 +213,7 @@ void SceneNode::SetAlpha( float alpha )
       shared_ptr<SceneNode> sceneNode = static_pointer_cast<SceneNode>( it );
       sceneNode->SetAlpha( alpha );
       }
+   m_Props.SetAlpha( alpha );
    }
 
 // Sum up relative position from child to root node in order to get position in world space

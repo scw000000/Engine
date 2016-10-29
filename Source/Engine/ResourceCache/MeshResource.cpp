@@ -68,7 +68,7 @@ aiAnimation* MeshResourceExtraData::FindAnimation( const std::string& animationN
    return NULL;
    }
 
-aiAnimation* MeshResourceExtraData::FindAnimation( int animIdx ) const
+aiAnimation* MeshResourceExtraData::FindAnimation( unsigned int animIdx ) const
    {
    ENG_ASSERT( animIdx < m_pScene->mNumAnimations );
    return m_pScene->mAnimations[ animIdx ];

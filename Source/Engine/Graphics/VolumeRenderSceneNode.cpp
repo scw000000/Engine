@@ -60,7 +60,7 @@ VolumeRenderSceneNode::VolumeRenderSceneNode( const ActorId actorId,
                                               m_SecondPassVertexShader( Resource( SECOND_PASS_VERTEX_SHADER_FILE_NAME ) ),
                                               m_SecondPassFragmentShader( Resource( SECOND_PASS_FRAGMENT_SHADER_FILE_NAME ))
    {
-   m_Props.SetAlpha( 0.1f );
+   SetAlpha( 0.1f );
 
    m_pVolumeTextureResource = pVolumeTextureResource;
    m_pTransferFuncionResource = pTransferFunctionResource;

@@ -28,8 +28,7 @@ const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\BasicFragmentShader.frag
 MeshSceneNode::MeshSceneNode( 
    const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, MaterialPtr pMaterial, RenderPass renderPass, TransformPtr pTransform )
    : SceneNode( actorId, pRenderComponent, renderPass, pTransform, pMaterial ),
-   m_pMeshResource( pMeshResouce ), 
-  // m_pMaterial(  ),
+   m_pMeshResource( pMeshResouce ),
    m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
    m_FragmentShader( Resource( FRAGMENT_SHADER_FILE_NAME ) )
    {

@@ -580,12 +580,12 @@ int EngineApp::PumpUntilMessage( Uint32& eventEnd, Sint32& code )
 			// Remember this is a modal screen.
 			if ( m_pEngineLogic )
 			   {
-				double fAppTime = 0.0;
-            double fAbsoluteTime = 0.0;
+				double appTime = 0.0;
+            double absoluteTime = 0.0;
             float  fElapasedTime = 0.0f;
-            GetGlobalTimer()->GetTimeValues( &fAppTime, &fAbsoluteTime, &fElapasedTime );
-            m_pEngineLogic->VOnUpdate( fAppTime, fElapasedTime );
-				OnFrameRender( fAppTime, fElapasedTime );
+            GetGlobalTimer()->GetTimeValues( &appTime, &absoluteTime, &fElapasedTime );
+            m_pEngineLogic->VOnUpdate( ( float ) appTime, fElapasedTime );
+            OnFrameRender( appTime, fElapasedTime );
 			   }
 		   }
 	}

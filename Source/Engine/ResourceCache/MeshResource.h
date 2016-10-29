@@ -47,7 +47,7 @@ class MeshResourceExtraData : public IResourceExtraData
       virtual ~MeshResourceExtraData() { aiReleaseImport( m_pScene ); }
       //virtual std::string VToString() { return "MeshResourceExtraData"; }
       aiAnimation* FindAnimation( const std::string& animationName ) const;
-      aiAnimation* FindAnimation( int animIdx ) const;
+      aiAnimation* FindAnimation( unsigned int animIdx ) const;
 
    public:
       const struct aiScene* m_pScene;

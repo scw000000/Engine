@@ -72,14 +72,6 @@ LightNode::LightNode( const ActorId actorId, IRenderComponent* pRenderComponent,
 	m_pLightProps = props;
    }
 
-int GLLightNode::VOnUpdate( Scene *, const unsigned long deltaMs )
-   { 
-	// light color can change anytime! Check the BaseRenderComponent!
-	//LightRenderComponent* lrc = static_cast<LightRenderComponent*>( m_pRenderComponent );
-	/*m_Props.GetMaterial().SetDiffuse( lrc->GetLightProperties().m_Color );*/
-	return S_OK; 
-   }
-
 LightManager::LightManager( void )
    {
    IEventManager* pEventMgr = IEventManager::GetSingleton();

@@ -31,35 +31,16 @@ struct LightProperties
    TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
    };
 
-
-//
-// class LightNode						- Chapter 16, page 551
-//
-//    Note: In the book this class implements the LightNode in D3D11, but here it is a base
-//    class. The derived classes make it possible to run the engine in D3D9 or D3D11.
-//
 class LightNode : public SceneNode
    {
-   protected:
-	   LightPropertiesPtr m_pLightProps;
-
    public:
       LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
-
       const LightPropertiesPtr& GetLightPropertiesPtr( void ) const { return m_pLightProps; };
+      virtual void RenderShadowMap( shared_ptr< SceneNode > pTarget ) = 0;
+
+   protected:
+      LightPropertiesPtr m_pLightProps;
    };
-
-class GLLightNode : public LightNode
-   {
-   public:
-   GLLightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform )
-      : LightNode( actorId, pRenderComponent, pLightProps, pTransform )
-      {}
-
-      virtual int VOnRestore( Scene *pScene ) override { return S_OK; } ;
-      virtual int VOnUpdate( Scene *, unsigned long deltaMs ) override;
-   };
-
 
 /*!
  * \class LightManager

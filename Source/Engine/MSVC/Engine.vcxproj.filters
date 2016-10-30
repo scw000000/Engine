@@ -271,6 +271,9 @@
     <ClCompile Include="..\Graphics\SceneNode\VolumeRenderSceneNode.cpp">
       <Filter>Graphics\SceneNode</Filter>
     </ClCompile>
+    <ClCompile Include="..\Graphics\TexureDrawer.cpp">
+      <Filter>Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -502,6 +505,9 @@
     </ClInclude>
     <ClInclude Include="..\Graphics\SceneNode\VolumeRenderSceneNode.h">
       <Filter>Graphics\SceneNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\TexureDrawer.h">
+      <Filter>Graphics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

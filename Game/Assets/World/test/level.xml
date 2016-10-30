@@ -4,9 +4,9 @@
         <Actor actorinstance="cube.xml" />
         
         <Actor actorinstance="volume.xml" />
-        <Actor actorinstance="cube.xml" /> -->
+        <Actor actorinstance="cube.xml" /> 
         <Actor actorinstance="cube2.xml" />
-        <Actor actorinstance="cube3.xml" />
+        <Actor actorinstance="cube3.xml" />-->
         <Actor actorinstance="cube4.xml" />
         <Actor actorinstance="sky.xml" />
         <Actor actorinstance="floor.xml" />

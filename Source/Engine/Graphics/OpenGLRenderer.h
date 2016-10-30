@@ -13,7 +13,7 @@
  * \note
  */
 #include "..\ResourceCache\MeshResource.h"
-
+#include "TexureDrawer.h"
 struct aiScene;
 
 /*!
@@ -24,6 +24,7 @@ struct aiScene;
  * \author SCW
  * \date 05 2016
  */
+
 class OpenGLRenderer : public IRenderer
    {
    friend class SkeletalMeshSceneNode;
@@ -49,6 +50,9 @@ class OpenGLRenderer : public IRenderer
       static void SetRenderAlpha( bool isAlpha );
 
       virtual void VDrawLine( const Vec3& from,const Vec3& to,const Color& color ) const override;
+
+   public:
+      static OpenGLTextureDrawer s_TextureDrawer;
 
    private:
       struct VertexToBoneMapping

@@ -39,7 +39,7 @@ MeshSceneNode::MeshSceneNode(
    m_MVPUni = 0;
    m_MeshTextureObj = 0;
    m_MeshTextureUni = 0;
-   m_VertexArrayObj = 0;
+   m_VAO = 0;
 
    m_MUni = 0;
    m_LightPosWorldSpaceUni = 0;
@@ -64,8 +64,8 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    {
    ReleaseResource();
 
-	glGenVertexArrays( 1, &m_VertexArrayObj );
-	glBindVertexArray( m_VertexArrayObj );
+	glGenVertexArrays( 1, &m_VAO );
+	glBindVertexArray( m_VAO );
 
    m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
@@ -143,7 +143,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    {
 	// Use our shader
 	glUseProgram( m_Program );
-   glBindVertexArray( m_VertexArrayObj );
+   glBindVertexArray( m_VAO );
 
    // Get the projection & view matrix from the camera class
 	Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
@@ -190,25 +190,15 @@ int MeshSceneNode::VRender( Scene *pScene )
 
 void MeshSceneNode::ReleaseResource( void )
    {
-   if( m_VertexArrayObj )
-      {
-      glDeleteVertexArrays( 1, &m_VertexArrayObj );
-      m_VertexArrayObj = 0;
-      }
+   glDeleteVertexArrays( 1, &m_VAO );
+   m_VAO = 0;
 
    glDeleteBuffers( ENG_ARRAY_SIZE_IN_ELEMENTS( m_Buffers ), &m_Buffers[ 0 ] );
    ENG_ZERO_MEM( m_Buffers );
 
-   if( m_MeshTextureUni )
-      {
-      glDeleteTextures( 1, &m_MeshTextureObj );
-      m_MeshTextureObj = 0;
-      }
-
-   if( m_Program )
-      {
-      glDeleteProgram( m_Program );
-      m_Program = 0;
-      }
+   glDeleteTextures( 1, &m_MeshTextureObj );
+   m_MeshTextureObj = 0;
    
+   glDeleteProgram( m_Program );
+   m_Program = 0;
    }

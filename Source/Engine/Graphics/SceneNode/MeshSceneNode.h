@@ -50,7 +50,7 @@ class MeshSceneNode : public SceneNode
       VertexShader		m_VertexShader;
       FragmentShader		m_FragmentShader;
 
-      GLuint            m_VertexArrayObj;
+      GLuint            m_VAO;
 
       enum VB_TYPES
          {

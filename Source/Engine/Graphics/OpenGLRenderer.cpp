@@ -12,6 +12,8 @@
 #include "..\ResourceCache\TextureResource.h"
 #include "..\ResourceCache\MeshResource.h"
 
+OpenGLTextureDrawer OpenGLRenderer::s_TextureDrawer;
+
 void OpenGLRenderer::VertexToBoneMapping::AddBoneData( BoneId boneID, float boneWeight )
    {
    for( unsigned i = 0; i < MAXIMUM_BONES_PER_VEREX; i++ )
@@ -45,7 +47,7 @@ void OpenGLRenderer::VSetBackgroundColor( Color color )
 
 GLuint OpenGLRenderer::VOnRestore( void )
    {
-
+   s_TextureDrawer.OnRestore();
    return GL_NO_ERROR;
    }
 
@@ -62,6 +64,7 @@ bool OpenGLRenderer::VPreRender( void )
 
 bool OpenGLRenderer::VPostRender( void )
    {
+   OpenGLRenderer::s_TextureDrawer.DrawTexture( 1, Point( 0, 0 ), Point( 300, 300 ) ); // for testing
    SDL_GL_SwapWindow( g_pApp->GetWindow() );
    return true;
    }

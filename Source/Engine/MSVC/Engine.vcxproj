@@ -133,6 +133,7 @@
     <ClCompile Include="..\Graphics\SceneNode\SkeletalMeshSceneNode.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\SkySceneNode.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\VolumeRenderSceneNode.cpp" />
+    <ClCompile Include="..\Graphics\TexureDrawer.cpp" />
     <ClCompile Include="..\Graphics\TransformStack.cpp" />
     <ClCompile Include="..\Graphics\OpenGLRenderer.cpp" />
     <ClCompile Include="..\Graphics\Scene.cpp" />
@@ -221,6 +222,7 @@
     <ClInclude Include="..\Graphics\SceneNode\SkeletalMeshSceneNode.h" />
     <ClInclude Include="..\Graphics\SceneNode\SkySceneNode.h" />
     <ClInclude Include="..\Graphics\SceneNode\VolumeRenderSceneNode.h" />
+    <ClInclude Include="..\Graphics\TexureDrawer.h" />
     <ClInclude Include="..\Graphics\TransformStack.h" />
     <ClInclude Include="..\Graphics\OpenGLRenderer.h" />
     <ClInclude Include="..\Graphics\Scene.h" />

@@ -14,7 +14,7 @@
 
 #include "EngineStd.h"
 #include "LightRenderComponent.h"
-#include "..\Graphics\Light.h"
+#include "..\Graphics\SceneNode\DirectLightSceneNode.h"
 
 //const char* LightRenderComponent::g_Name = "LightRenderComponent";
 
@@ -48,7 +48,7 @@ shared_ptr<SceneNode> LightRenderComponent::VCreateSceneNode( void )
       {
       case Renderer::Renderer_OpenGL:
             {
-            return shared_ptr<SceneNode>( ENG_NEW LightNode( m_pOwner->GetId(), this, m_pLightProps, m_pTransform ) );
+            return shared_ptr<SceneNode>( ENG_NEW DirectLightNode( m_pOwner->GetId(), this, m_pLightProps, m_pTransform ) );
             }
       default:
          ENG_ASSERT( 0 && "Unknown Renderer Implementation in GridRenderComponent" );

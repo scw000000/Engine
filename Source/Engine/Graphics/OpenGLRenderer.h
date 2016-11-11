@@ -25,9 +25,24 @@ struct aiScene;
  * \date 05 2016
  */
 
+struct VertexToBoneMapping
+   {
+      public:
+      BoneId m_BoneIDs[ MAXIMUM_BONES_PER_VEREX ];
+      float m_BoneWeights[ MAXIMUM_BONES_PER_VEREX ];
+
+      VertexToBoneMapping( void )
+         {
+         ENG_ZERO_MEM( m_BoneIDs );
+         ENG_ZERO_MEM( m_BoneWeights );
+         };
+
+      void AddBoneData( BoneId boneID, float boneWeight );
+   };
+
 class OpenGLRenderer : public IRenderer
    {
-   friend class SkeletalMeshSceneNode;
+  // friend class SkeletalMeshSceneNode;
    public:
       OpenGLRenderer( void );
       ~OpenGLRenderer( void );
@@ -55,18 +70,5 @@ class OpenGLRenderer : public IRenderer
       static OpenGLTextureDrawer s_TextureDrawer;
 
    private:
-      struct VertexToBoneMapping
-         {
-         public:
-            BoneId m_BoneIDs[ MAXIMUM_BONES_PER_VEREX ];
-            float m_BoneWeights[ MAXIMUM_BONES_PER_VEREX ];
-
-            VertexToBoneMapping( void )
-               {
-               ENG_ZERO_MEM( m_BoneIDs );
-               ENG_ZERO_MEM( m_BoneWeights );
-               };
-
-            void AddBoneData( BoneId boneID, float boneWeight );
-         };
+      
    };

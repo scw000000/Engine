@@ -102,9 +102,19 @@ int SceneNode::VOnRestore( Scene *pScene )
 
 int SceneNode::VOnUpdate( Scene* pScene, unsigned long deltaMs )
    {
+   int ret = VDelegateUpdate( pScene, deltaMs );
+   if( ret != S_OK )
+      {
+      return ret;
+      }
+
    for( auto it : m_Children )
       {
-      it->VOnUpdate( pScene, deltaMs );
+      ret = it->VOnUpdate( pScene, deltaMs );
+      if( ret != S_OK )
+         {
+         return ret;
+         }
       }
    return S_OK;
    }

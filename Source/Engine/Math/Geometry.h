@@ -532,6 +532,7 @@ class Plane
       Plane( void ) { n = g_Up; d = 0.f; };
       // To make a plane with normal vector points upward, The order of the points 
       //should be counter clockwise for right handed system 
+      // d is distance to origin (If the normal vector is normalized )
       void Init( const Vec3& p0, const Vec3& p1, const Vec3& p2 )
          {
          n = glm::cross( p1 - p0, p2 - p0 );

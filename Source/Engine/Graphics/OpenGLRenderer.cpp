@@ -14,7 +14,7 @@
 
 OpenGLTextureDrawer OpenGLRenderer::s_TextureDrawer;
 
-void OpenGLRenderer::VertexToBoneMapping::AddBoneData( BoneId boneID, float boneWeight )
+void VertexToBoneMapping::AddBoneData( BoneId boneID, float boneWeight )
    {
    for( unsigned i = 0; i < MAXIMUM_BONES_PER_VEREX; i++ )
       {
@@ -208,7 +208,7 @@ void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMesh
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
    auto pAiScene = pMeshExtra->m_pScene;
    unsigned int vertexIdOffest = 0;
-   std::vector< OpenGLRenderer::VertexToBoneMapping > vertexToBoneMappings( pMeshExtra->m_NumVertices );
+   std::vector< VertexToBoneMapping > vertexToBoneMappings( pMeshExtra->m_NumVertices );
    for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
       {
       auto pMesh = pAiScene->mMeshes[ meshIdx ];

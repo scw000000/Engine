@@ -60,24 +60,24 @@ void PerspectiveFrustum::Init( const float fov, const float aspect, const float 
    Vec3 farUp = static_cast< float >( m_FarDis * tanFovOver2 ) * g_Up;
 
    // These vertiCes start in upper right and go around clockwise
-   m_NearPlaneVerts[ 0 ] = ( m_NearDis * g_Forward ) - nearRight + nearUp;
-   m_NearPlaneVerts[ 1 ] = ( m_NearDis * g_Forward ) + nearRight + nearUp;
-   m_NearPlaneVerts[ 2 ] = ( m_NearDis * g_Forward ) + nearRight - nearUp;
-   m_NearPlaneVerts[ 3 ] = ( m_NearDis * g_Forward ) - nearRight - nearUp;
+   m_PlaneVerts[ 0 ] = ( m_NearDis * g_Forward ) - nearRight + nearUp;
+   m_PlaneVerts[ 1 ] = ( m_NearDis * g_Forward ) + nearRight + nearUp;
+   m_PlaneVerts[ 2 ] = ( m_NearDis * g_Forward ) + nearRight - nearUp;
+   m_PlaneVerts[ 3 ] = ( m_NearDis * g_Forward ) - nearRight - nearUp;
 
-   m_FarPlaneVerts[ 0 ] = ( m_FarDis * g_Forward ) - farRight + farUp;
-   m_FarPlaneVerts[ 1 ] = ( m_FarDis * g_Forward ) + farRight + farUp;
-   m_FarPlaneVerts[ 2 ] = ( m_FarDis * g_Forward ) + farRight - farUp;
-   m_FarPlaneVerts[ 3 ] = ( m_FarDis * g_Forward ) - farRight - farUp;
+   m_PlaneVerts[ 4 ] = ( m_FarDis * g_Forward ) - farRight + farUp;
+   m_PlaneVerts[ 5 ] = ( m_FarDis * g_Forward ) + farRight + farUp;
+   m_PlaneVerts[ 6 ] = ( m_FarDis * g_Forward ) + farRight - farUp;
+   m_PlaneVerts[ 7 ] = ( m_FarDis * g_Forward ) - farRight - farUp;
 
    Vec3 origin( 0.0f, 0.0f, 0.0f );
 
-   m_Planes[ Near ].Init( m_NearPlaneVerts[ 0 ], m_NearPlaneVerts[ 1 ], m_NearPlaneVerts[ 2 ] );
-   m_Planes[ Far ].Init( m_FarPlaneVerts[ 2 ], m_FarPlaneVerts[ 1 ], m_FarPlaneVerts[ 0 ] );
-   m_Planes[ Right ].Init( origin, m_FarPlaneVerts[ 1 ], m_FarPlaneVerts[ 2 ] );
-   m_Planes[ Top ].Init( origin, m_FarPlaneVerts[ 0 ], m_FarPlaneVerts[ 1 ] );
-   m_Planes[ Left ].Init( origin, m_FarPlaneVerts[ 3 ], m_FarPlaneVerts[ 0 ] );
-   m_Planes[ Bottom ].Init( origin, m_FarPlaneVerts[ 2 ], m_FarPlaneVerts[ 3 ] );
+   m_Planes[ Near ].Init( m_PlaneVerts[ 0 ], m_PlaneVerts[ 1 ], m_PlaneVerts[ 2 ] );
+   m_Planes[ Far ].Init( m_PlaneVerts[ 6 ], m_PlaneVerts[ 5 ], m_PlaneVerts[ 4 ] );
+   m_Planes[ Right ].Init( origin, m_PlaneVerts[ 5 ], m_PlaneVerts[ 6 ] );
+   m_Planes[ Top ].Init( origin, m_PlaneVerts[ 4 ], m_PlaneVerts[ 5 ] );
+   m_Planes[ Left ].Init( origin, m_PlaneVerts[ 7 ], m_PlaneVerts[ 4 ] );
+   m_Planes[ Bottom ].Init( origin, m_PlaneVerts[ 6 ], m_PlaneVerts[ 7 ] );
    }
 
 OrthogonalFrustum::OrthogonalFrustum( void )
@@ -100,29 +100,29 @@ void OrthogonalFrustum::Init( const float left, const float right, const float u
    m_NearDis = nearDis;
 
    // left up
-   m_NearPlaneVerts[ 0 ] = Vec3( m_Left, m_Up, m_NearDis );
+   m_PlaneVerts[ 0 ] = Vec3( m_Left, m_Up, m_NearDis );
    // right up
-   m_NearPlaneVerts[ 1 ] = Vec3( m_Right, m_Up, m_NearDis );
+   m_PlaneVerts[ 1 ] = Vec3( m_Right, m_Up, m_NearDis );
    // right down
-   m_NearPlaneVerts[ 2 ] = Vec3( m_Right, m_Bottom, m_NearDis );
+   m_PlaneVerts[ 2 ] = Vec3( m_Right, m_Bottom, m_NearDis );
    // left down
-   m_NearPlaneVerts[ 3 ] = Vec3( m_Left, m_Bottom, m_NearDis );
+   m_PlaneVerts[ 3 ] = Vec3( m_Left, m_Bottom, m_NearDis );
 
    // left up
-   m_FarPlaneVerts[ 0 ] = Vec3( m_Left, m_Up, m_FarDis );
+   m_PlaneVerts[ 4 ] = Vec3( m_Left, m_Up, m_FarDis );
    // right up
-   m_FarPlaneVerts[ 1 ] = Vec3( m_Right, m_Up, m_FarDis );
+   m_PlaneVerts[ 5 ] = Vec3( m_Right, m_Up, m_FarDis );
    // right down
-   m_FarPlaneVerts[ 2 ] = Vec3( m_Right, m_Bottom, m_FarDis );
+   m_PlaneVerts[ 6 ] = Vec3( m_Right, m_Bottom, m_FarDis );
    // left down
-   m_FarPlaneVerts[ 3 ] = Vec3( m_Left, m_Bottom, m_FarDis );
+   m_PlaneVerts[ 7 ] = Vec3( m_Left, m_Bottom, m_FarDis );
 
    Vec3 origin( 0.0f, 0.0f, 0.0f );
 
-   m_Planes[ Near ].Init( m_NearPlaneVerts[ 0 ], m_NearPlaneVerts[ 1 ], m_NearPlaneVerts[ 2 ] );
-   m_Planes[ Far ].Init( m_FarPlaneVerts[ 2 ], m_FarPlaneVerts[ 1 ], m_FarPlaneVerts[ 0 ] );
-   m_Planes[ Right ].Init( origin, m_FarPlaneVerts[ 1 ], m_FarPlaneVerts[ 2 ] );
-   m_Planes[ Top ].Init( origin, m_FarPlaneVerts[ 0 ], m_FarPlaneVerts[ 1 ] );
-   m_Planes[ Left ].Init( origin, m_FarPlaneVerts[ 3 ], m_FarPlaneVerts[ 0 ] );
-   m_Planes[ Bottom ].Init( origin, m_FarPlaneVerts[ 2 ], m_FarPlaneVerts[ 3 ] );
+   m_Planes[ Near ].Init( m_PlaneVerts[ 0 ], m_PlaneVerts[ 1 ], m_PlaneVerts[ 2 ] );
+   m_Planes[ Far ].Init( m_PlaneVerts[ 6 ], m_PlaneVerts[ 5 ], m_PlaneVerts[ 4 ] );
+   m_Planes[ Right ].Init( origin, m_PlaneVerts[ 5 ], m_PlaneVerts[ 6 ] );
+   m_Planes[ Top ].Init( origin, m_PlaneVerts[ 4 ], m_PlaneVerts[ 5 ] );
+   m_Planes[ Left ].Init( origin, m_PlaneVerts[ 7 ], m_PlaneVerts[ 4 ] );
+   m_Planes[ Bottom ].Init( origin, m_PlaneVerts[ 6 ], m_PlaneVerts[ 7 ] );
    }

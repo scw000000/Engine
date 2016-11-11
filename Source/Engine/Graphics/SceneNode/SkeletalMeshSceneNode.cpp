@@ -165,7 +165,7 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       BONE_ID_LOCATION, 
       MAXIMUM_BONES_PER_VEREX,
       GL_UNSIGNED_INT, 
-      sizeof( OpenGLRenderer::VertexToBoneMapping ), 
+      sizeof( VertexToBoneMapping ), 
       ( const GLvoid* ) 0 );
 
    glEnableVertexAttribArray( BONE_WEIGHT_LOCATION );
@@ -173,7 +173,7 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       BONE_WEIGHT_LOCATION, 
       MAXIMUM_BONES_PER_VEREX,
       GL_FLOAT, GL_FALSE, 
-      sizeof( OpenGLRenderer::VertexToBoneMapping ), 
+      sizeof( VertexToBoneMapping ), 
       ( const GLvoid* ) ( sizeof( unsigned int ) * MAXIMUM_BONES_PER_VEREX ) );
 
    m_MVPUni = glGetUniformLocation( m_Program, "uMVP" );

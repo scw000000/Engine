@@ -262,6 +262,8 @@ class ISceneNode
       virtual Transform VGetGlobalTransform( void ) const = 0;
 
 	   virtual int VOnUpdate( Scene *pScene, unsigned long deltaMs ) = 0;
+      virtual int VDelegateUpdate( Scene *pScene, unsigned long elapsedMs ) = 0;
+
 	   virtual int VOnRestore( Scene *pScene ) = 0;
 
 	   virtual int VPreRender( Scene *pScene ) = 0;

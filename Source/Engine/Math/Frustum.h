@@ -41,14 +41,12 @@ class BaseFrustum : public IFrustum
       virtual bool VInside( const Vec3 &point ) const override;
       virtual bool VInside( const Vec3 &point, float radius ) const override;
 
-   protected:
+   public:
       enum Side { Near, Far, Top, Right, Bottom, Left, NumPlanes };
-      
+
       Plane m_Planes[ NumPlanes ];
-      // represent four vertices for near plane rectangle
-      Vec3 m_NearPlaneVerts[ 4 ];
-      // represent four vertices for far plane rectangle 
-      Vec3 m_FarPlaneVerts[ 4 ];
+      // represent four vertices for near plane rectangle, first 4 for near plane, last 4 for far plane
+      Vec3 m_PlaneVerts[ 8 ]; 
    };
 
 class PerspectiveFrustum : public BaseFrustum

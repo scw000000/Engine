@@ -19,7 +19,6 @@
 
 class RenderComponent;
 
-
 //   This enum defines the different types of alpha blending
 //   types that can be set on a scene node.
 enum AlphaType {
@@ -33,6 +32,7 @@ enum AlphaType {
 class SceneNodeProperties
    {
    friend class SceneNode;
+   friend class DirectLightNode;
    public:
       SceneNodeProperties( void );
 
@@ -96,6 +96,7 @@ class SceneNode : public ISceneNode
 
 	   virtual int VOnRestore( Scene *pScene ) override;
       virtual int VOnUpdate( Scene *pScene, unsigned long elapsedMs ) override;
+      virtual int VDelegateUpdate( Scene *pScene, unsigned long elapsedMs ) override { return S_OK; };
 
 	   virtual int VPreRender( Scene *pScene ) override;
 	   virtual bool VIsVisible( Scene *pScene ) override;

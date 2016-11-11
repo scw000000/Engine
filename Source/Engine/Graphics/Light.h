@@ -20,15 +20,16 @@
 struct LightProperties;
 typedef shared_ptr<LightProperties> LightPropertiesPtr;
 
-// Note: Light color is stored in the Material structure, which is already present in all SceneNodes.
-
 struct LightProperties
    {
-   Color m_Diffuse;
-   float m_Power;
-   bool Init( TiXmlElement* pData );
-   TiXmlElement* GenerateXML( void );
-   TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
+   public:
+      bool Init( TiXmlElement* pData );
+      TiXmlElement* GenerateXML( void );
+      TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
+
+   public:
+      Color m_Diffuse;
+      float m_Power;
    };
 
 class LightNode : public SceneNode
@@ -36,7 +37,7 @@ class LightNode : public SceneNode
    public:
       LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
       const LightPropertiesPtr& GetLightPropertiesPtr( void ) const { return m_pLightProps; };
-      virtual void RenderShadowMap( shared_ptr< SceneNode > pTarget ) = 0;
+      virtual void VRenderShadowMap( shared_ptr< SceneNode > pTarget ) = 0;
 
    protected:
       LightPropertiesPtr m_pLightProps;

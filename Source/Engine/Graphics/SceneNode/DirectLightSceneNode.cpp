@@ -82,18 +82,16 @@ void DirectLightNode::VRenderShadowMap( shared_ptr< SceneNode > pTarget )
 int DirectLightNode::VDelegateUpdate( Scene *pScene, unsigned long elapsedMs )
    {
    auto pCamera = pScene->GetCamera();
-   auto cameraTransform = pScene->GetCameraGlobalTransform();
    auto cameraFrustum = pCamera->GetFrustum();
-   auto selfTransform = VGetGlobalTransform();
    Vec3 maxDimension;
    Vec3 minDimension;
    Vec3 cameraVerts[ 8 ];
    for( int i = 0; i < 8; ++i )
       {
       // Transform to world space
-      cameraFrustum.m_PlaneVerts[ i ] = cameraTransform.GetToWorld().Xform( cameraFrustum.m_PlaneVerts[ i ] );
+      cameraFrustum.m_PlaneVerts[ i ] = pCamera->VGetGlobalTransformPtr()->GetToWorld().Xform( cameraFrustum.m_PlaneVerts[ i ] );
       // Transform to light space
-      cameraFrustum.m_PlaneVerts[ i ] = selfTransform.GetFromWorld().Xform( cameraFrustum.m_PlaneVerts[ i ] );
+      cameraFrustum.m_PlaneVerts[ i ] = VGetGlobalTransformPtr()->GetFromWorld().Xform( cameraFrustum.m_PlaneVerts[ i ] );
 
       if( i == 0 )
          {

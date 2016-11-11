@@ -259,7 +259,9 @@ class ISceneNode
 
 	   virtual void VSetTransformPtr( TransformPtr pNewTransform ) = 0;
       virtual void VSetTransform( const Transform& newTransform ) = 0;
-      virtual Transform VGetGlobalTransform( void ) const = 0;
+      virtual TransformPtr VGetGlobalTransformPtr( void ) const = 0;
+
+      virtual int VPreUpdate( Scene *pScene ) = 0;
 
 	   virtual int VOnUpdate( Scene *pScene, unsigned long deltaMs ) = 0;
       virtual int VDelegateUpdate( Scene *pScene, unsigned long elapsedMs ) = 0;

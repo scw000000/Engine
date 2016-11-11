@@ -212,19 +212,19 @@ void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
    IGamePhysics::GetSingleton().VOnUpdate( elapsedTime );
    IGamePhysics::GetSingleton().VSyncVisibleScene();
 
-   if( m_EnableWorldUpdate )
-      {
-      m_pWrold->OnUpdate( deltaMs );
-      }
-
-   AnimationManager::GetSingleton().VUpdate( deltaMs );
-
    m_pGUIManager->OnUpdate( deltaMs );
    // update all game views
    for ( ViewList::iterator it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
 	   {
 		(*it)->VOnUpdate( deltaMs );
 	   }
+
+   if( m_EnableWorldUpdate )
+      {
+      m_pWrold->OnUpdate( deltaMs );
+      }
+
+   AnimationManager::GetSingleton().VUpdate( deltaMs );
 
    if( m_EnableActorUpdate )
       {
@@ -323,7 +323,7 @@ bool BaseEngineLogic::VLoadLevel()
       }
 
     // register script events from the engine
-	//   [mrmike] this was moved to the constructor post-press, since this function can be called when new levels are loaded by the game or editor
+	 // this was moved to the constructor post-press, since this function can be called when new levels are loaded by the game or editor
     // RegisterEngineScriptEventImps();
 
     // load the post-load script if there is one

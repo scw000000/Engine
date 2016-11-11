@@ -47,8 +47,28 @@ Scene::~Scene()
    
    }
 
+int Scene::PreRender( void )
+   {
+   //if( m_Root && m_pCamera )
+   //   {
+   //   // The scene root could be anything, but it
+   //   // is usually a SceneNode with the identity
+   //   // matrix
+   //   m_pCamera->SetViewTransform( this );
+   //   m_pLightManager->CalcLighting( this );
 
-int Scene::OnRender()
+   //   if( m_Root->VPreRender( this ) == S_OK )
+   //      {
+   //      m_Root->VRender( this );
+   //      m_Root->VRenderChildren( this );
+   //      m_Root->VPostRender( this );
+   //      }
+   //   RenderAlphaPass();
+   //   }
+   return S_OK;
+   }
+
+int Scene::OnRender( void )
    {
    if ( m_Root && m_pCamera )
 	   {
@@ -56,7 +76,6 @@ int Scene::OnRender()
 		// is usually a SceneNode with the identity
 		// matrix
 		m_pCamera->SetViewTransform( this );
-      m_CameraGlobalTransform = m_pCamera->VGetGlobalTransform();
 		m_pLightManager->CalcLighting( this );
 
 		if ( m_Root->VPreRender( this ) == S_OK )
@@ -89,8 +108,18 @@ int Scene::OnLostDevice()
 	return S_OK;
    }
 
+int Scene::PreUpdate( void )
+   {
+   if( !m_Root )
+      return S_OK;
+
+   return m_Root->VPreUpdate( this );
+   }
+
 int Scene::OnUpdate( unsigned long deltaMs )
    {
+   PreUpdate();
+
    if (!m_Root)
 		return S_OK;
 

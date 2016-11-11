@@ -25,9 +25,12 @@ class Scene
    public:
       Scene( shared_ptr<IRenderer> renderer );
       virtual ~Scene( void );
+      int PreRender( void );
       int OnRender( void );
       int OnRestore( void );
       int OnLostDevice( void );
+      // For setting up global transform
+      int PreUpdate( void );
       int OnUpdate( unsigned long deltaMs );
       shared_ptr< ISceneNode > FindSceneNode( ActorId id );
       bool AddChild( ActorId id, shared_ptr< ISceneNode > pNode );
@@ -58,7 +61,6 @@ class Scene
       shared_ptr<IRenderer> GetRenderer( void ) { return m_pRenderer; }
       shared_ptr<CameraNode> GetCamera( void ) { return m_pCamera; }
       shared_ptr<LightManager> GetLightManagerPtr( void ){ return m_pLightManager; }
-      Transform GetCameraGlobalTransform( void ) const { return m_CameraGlobalTransform; };
 
    protected:
       void RenderAlphaPass();
@@ -71,5 +73,4 @@ class Scene
       AlphaSceneNodes               m_AlphaSceneNodes;
       ActorSceneMap                 m_ActorMap;
       shared_ptr<LightManager>      m_pLightManager;
-      Transform                     m_CameraGlobalTransform;
    };

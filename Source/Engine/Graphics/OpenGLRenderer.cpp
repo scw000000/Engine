@@ -305,9 +305,9 @@ void OpenGLRenderer::VDrawLine( const Vec3& from, const Vec3& to, const Color& c
 
    Vec4 from4( from );
    Vec4 to4( to );
-   Mat4x4 mvp = ( pCamera->GetProjection() * pCamera->GetView() );
-   Vec4 from_Proj = mvp.Xform( from4 );
-   Vec4 to_Proj = mvp.Xform( to4 );
+   Mat4x4 vp = ( pCamera->GetProjection() * pCamera->GetView() );
+   Vec4 from_Proj = vp.Xform( from4 );
+   Vec4 to_Proj = vp.Xform( to4 );
 
    glLineWidth( 2.5 );
 

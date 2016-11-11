@@ -56,11 +56,12 @@ class SceneNodeProperties
 
    protected:
       ActorId m_ActorId;
-      std::string m_Name;
       TransformPtr m_pTransform;
+      TransformPtr m_pGlobalTransform;
       float m_Radius;
-      RenderPass m_RenderPass;
       MaterialPtr m_pMaterial;
+      std::string m_Name;
+      RenderPass m_RenderPass;
 
    private:
 
@@ -73,8 +74,7 @@ class SceneNode : public ISceneNode
 	friend class Scene;
    
    public:
-      // TODO: finish constructor
-   SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderPass renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ), MaterialPtr pMaterial = MaterialPtr() );
+      SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderPass renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ), MaterialPtr pMaterial = MaterialPtr() );
 
 	   virtual ~SceneNode();
 
@@ -92,9 +92,12 @@ class SceneNode : public ISceneNode
 	   virtual void VSetTransformPtr( TransformPtr pNewTransform ) override;
       virtual void VSetTransform( const Transform& newTransform ) override;
 
-      virtual Transform VGetGlobalTransform( void ) const override;
+      virtual TransformPtr VGetGlobalTransformPtr( void ) const override;
 
 	   virtual int VOnRestore( Scene *pScene ) override;
+
+      virtual int VPreUpdate( Scene *pScene ) override;
+
       virtual int VOnUpdate( Scene *pScene, unsigned long elapsedMs ) override;
       virtual int VDelegateUpdate( Scene *pScene, unsigned long elapsedMs ) override { return S_OK; };
 
@@ -174,13 +177,13 @@ class CameraNode : public SceneNode
       virtual void VSetTransform( const Transform& newTransform ) override ;
 
 	   const PerspectiveFrustum &GetFrustum( void ) { return m_Frustum; }
-	   void SetTarget(shared_ptr<SceneNode> pTarget) { m_pTarget = pTarget; }
+	   void SetTarget( shared_ptr<SceneNode> pTarget ) { m_pTarget = pTarget; }
 	   void ClearTarget( void ) { m_pTarget = shared_ptr<SceneNode>(); }
 	   
       shared_ptr<SceneNode> GetTarget( void ) { return m_pTarget; }
 
-	   Mat4x4 GetWorldViewProjection(Scene *pScene);
-	   int SetViewTransform(Scene *pScene);
+	   Mat4x4 GetWorldViewProjection( Scene *pScene );
+	   int SetViewTransform( Scene *pScene );
 
 	   Mat4x4 GetProjection() { return m_Projection; }
 	   Mat4x4 GetView( void ) { return m_View; }

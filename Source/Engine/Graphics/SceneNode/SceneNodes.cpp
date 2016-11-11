@@ -18,7 +18,7 @@
 #include "..\Actors\ActorComponent.h"
 #include "..\Actors\RenderComponent.h"
 
-SceneNodeProperties::SceneNodeProperties( void ) : m_pTransform( ENG_NEW Transform() ), m_pMaterial()
+SceneNodeProperties::SceneNodeProperties( void ) : m_pTransform(), m_pGlobalTransform( ENG_NEW Transform() ), m_pMaterial()
    {
    m_ActorId = INVALID_ACTOR_ID;
    m_Radius = 0;
@@ -55,15 +55,16 @@ float SceneNodeProperties::GetAlpha( void ) const
 
 SceneNode::SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderPass renderPass, TransformPtr pNewTransform, MaterialPtr pMaterial )
    {
-   m_pParent= NULL;
+   m_pParent = NULL;
 	m_Props.m_ActorId = actorId;
    m_Props.m_Name = ( pRenderComponent ) ? pRenderComponent->VGetName() : "SceneNode";
 	m_Props.m_RenderPass = renderPass;
 	//m_Props.m_AlphaType = AlphaOpaque;
    m_pRenderComponent = pRenderComponent;
    m_Props.m_pMaterial = pMaterial;
-	VSetTransformPtr( pNewTransform ); 
-	SetRadius( 0.0f );
+   m_Props.m_pTransform = pNewTransform;
+   *m_Props.m_pGlobalTransform = *pNewTransform; // copy value from local transform
+   m_Props.m_Radius = 0.f;
    }
 
 SceneNode::~SceneNode()
@@ -80,15 +81,16 @@ void SceneNode::VSetTransform( const Transform& newTransform )
    *m_Props.m_pTransform = newTransform;
    }
 
-Transform SceneNode::VGetGlobalTransform( void ) const 
+TransformPtr SceneNode::VGetGlobalTransformPtr( void ) const
    {
-   if( !m_pParent )
+   return m_Props.m_pGlobalTransform;
+   /*if( !m_pParent )
       {
       return m_Props.GetLocalTransform();
       }
    Transform& ret = m_pParent->VGetGlobalTransform();
    ret = ret * m_Props.GetLocalTransform();
-   return ret;
+   return ret;*/
    }
 
 int SceneNode::VOnRestore( Scene *pScene )
@@ -100,9 +102,36 @@ int SceneNode::VOnRestore( Scene *pScene )
    return S_OK;
    }
 
+int SceneNode::VPreUpdate( Scene *pScene )
+   {
+   // No parent, copy its local transform to global transform directly
+   if( !m_pParent )
+      {
+      ( *m_Props.m_pGlobalTransform ) = ( *( m_Props.m_pTransform ) );
+      }
+   else
+      {
+      ( *m_Props.m_pGlobalTransform ) = ( *m_pParent->VGetGlobalTransformPtr() ) * ( *( m_Props.m_pTransform ) );
+      }
+
+   int ret = S_OK;
+
+   for( auto it : m_Children )
+      {
+      ret = it->VPreUpdate( pScene );
+      if( ret != S_OK )
+         {
+         return ret;
+         }
+      }
+
+   return ret;
+   }
+
 int SceneNode::VOnUpdate( Scene* pScene, unsigned long deltaMs )
    {
    int ret = VDelegateUpdate( pScene, deltaMs );
+ 
    if( ret != S_OK )
       {
       return ret;
@@ -121,19 +150,19 @@ int SceneNode::VOnUpdate( Scene* pScene, unsigned long deltaMs )
 
 int SceneNode::VPreRender( Scene *pScene )
    {
-   pScene->PushAndSetTransform( VGetProperties().GetTransformPtr() );
+   pScene->PushAndSetTransform( m_Props.m_pTransform );
    return S_OK;
    }
 
 bool SceneNode::VIsVisible( Scene *pScene )
    {
-   auto camTransform = pScene->GetCameraGlobalTransform();
+   auto camTransform = pScene->GetCamera()->VGetGlobalTransformPtr();
    Vec3 nodeInCamWorldPos = VGetGlobalPosition();
    // transform to camera's local space
-   nodeInCamWorldPos = camTransform.GetFromWorld().Xform( nodeInCamWorldPos );;
+   nodeInCamWorldPos = camTransform->GetFromWorld().Xform( nodeInCamWorldPos );;
    const PerspectiveFrustum &frustum = pScene->GetCamera()->GetFrustum();
    //return true;
-   return frustum.VInside( nodeInCamWorldPos, VGetProperties().GetRadius() );
+   return frustum.VInside( nodeInCamWorldPos, m_Props.GetRadius() );
    }
 
 
@@ -160,7 +189,7 @@ int SceneNode::VRenderChildren( Scene *pScene )
 
                Vec4 worldPos( asn->m_Concat.GetToWorldPosition() );
 
-               Mat4x4 fromWorld = pScene->GetCameraGlobalTransform().GetFromWorld();
+               Mat4x4 fromWorld = pScene->GetCamera()->VGetGlobalTransformPtr()->GetFromWorld();
 
                Vec4 screenPos = fromWorld.Xform( worldPos );
 
@@ -233,12 +262,7 @@ void SceneNode::SetAlpha( float alpha )
 // Sum up relative position from child to root node in order to get position in world space
 Vec3 SceneNode::VGetGlobalPosition( void ) const
    {
-   Vec3 pos = GetToWorldPosition();
-	if ( m_pParent )
-	   {
-		pos += m_pParent->VGetGlobalPosition();
-	   }
-	return pos;
+   return VGetGlobalTransformPtr()->GetToWorldPosition();
    }
 
 
@@ -363,8 +387,8 @@ int CameraNode::VOnRestore( Scene *pScene )
 void CameraNode::VSetTransform( const Transform& newTransform ) 
    { 
    SceneNode::VSetTransform( newTransform ); 
-   auto& globalTransform = VGetGlobalTransform();
-   m_View = Mat4x4::LookAt( globalTransform.GetToWorldPosition(), globalTransform.GetToWorldPosition() + globalTransform.GetForward(), globalTransform.GetUp() );
+   auto globalTransformPtr = VGetGlobalTransformPtr();
+   m_View = Mat4x4::LookAt( globalTransformPtr->GetToWorldPosition(), globalTransformPtr->GetToWorldPosition() + globalTransformPtr->GetForward(), globalTransformPtr->GetUp() );
 
    }
 

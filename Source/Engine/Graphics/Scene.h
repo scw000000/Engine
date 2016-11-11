@@ -37,23 +37,23 @@ class Scene
       bool RemoveChild( ActorId id );
       void SetCamera(shared_ptr<CameraNode> camera) { m_pCamera = camera; }
       // This function is called by SceneNode::PreRender
-      void PushAndSetTransform( TransformPtr pTransform )
-	      {
-         m_TransformStack.Push( *pTransform );
-	      }
+    //  void PushAndSetTransform( TransformPtr pTransform )
+	   //   {
+    //     m_TransformStack.Push( *pTransform );
+	   //   }
 
-      void PushAndSetTransform( Transform transform )
-         {
-         m_TransformStack.Push( transform );
-         }
+    //  void PushAndSetTransform( Transform transform )
+    //     {
+    //     m_TransformStack.Push( transform );
+    //     }
 
-	   void PopTransform() 
-	      {
-		   //Scene::PopMatrix - Chapter 16, page 541
-		   m_TransformStack.Pop(); 
-	      }
-      Mat4x4 GetTopMatrix() { return m_TransformStack.GetTopMatrix(); }
-      Transform GetTopTransform( void ) const{ return m_TransformStack.GetTopTransForm(); };
+	   //void PopTransform() 
+	   //   {
+		  // //Scene::PopMatrix - Chapter 16, page 541
+		  // m_TransformStack.Pop(); 
+	   //   }
+   //   Mat4x4 GetTopMatrix() { return m_TransformStack.GetTopMatrix(); }
+   //   Transform GetTopTransform( void ) const{ return m_TransformStack.GetTopTransForm(); };
 
 	   void AddAlphaSceneNode( AlphaSceneNode *asn ) { m_AlphaSceneNodes.push_back( asn ); }
       void NewRenderComponentDelegate( IEventPtr pEvent );
@@ -69,7 +69,7 @@ class Scene
       shared_ptr<SceneNode>         m_Root;
       shared_ptr<CameraNode>        m_pCamera;
       shared_ptr<IRenderer>         m_pRenderer;
-      TransformStack                m_TransformStack;
+     // TransformStack                m_TransformStack;
       AlphaSceneNodes               m_AlphaSceneNodes;
       ActorSceneMap                 m_ActorMap;
       shared_ptr<LightManager>      m_pLightManager;

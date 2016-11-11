@@ -143,7 +143,7 @@ class SceneNode : public ISceneNode
 struct AlphaSceneNode
    {
 	shared_ptr<ISceneNode> m_pNode;
-	Transform m_Concat;
+	Transform m_GlobalToWorld;
 	float m_ScreenZ;
 
 	// For the STL sort...
@@ -182,7 +182,7 @@ class CameraNode : public SceneNode
 	   
       shared_ptr<SceneNode> GetTarget( void ) { return m_pTarget; }
 
-	   Mat4x4 GetWorldViewProjection( Scene *pScene );
+	  // Mat4x4 GetWorldViewProjection( Scene *pScene );
 	   int SetViewTransform( Scene *pScene );
 
 	   Mat4x4 GetProjection() { return m_Projection; }

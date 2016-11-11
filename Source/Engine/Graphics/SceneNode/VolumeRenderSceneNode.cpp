@@ -226,8 +226,11 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    glUseProgram( m_FirstPassProgram );
    
+   Mat4x4 globalToWorld = VGetGlobalTransformPtr()->GetToWorld();
+
    // Get the projection & view matrix from the camera class
-   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
+   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * globalToWorld;
+
    glUniformMatrix4fv( m_FirstPassMVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
    glDrawElements(
       GL_TRIANGLES,     // mode

@@ -113,8 +113,11 @@ int SkySceneNode::VRender( Scene *pScene )
 	glUseProgram( m_Program );
    glBindVertexArray( m_VertexArrayObj );
 
+   Mat4x4 globalToWorld = VGetGlobalTransformPtr()->GetToWorld();
+
    // Get the projection & view matrix from the camera class
-	Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
+   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * globalToWorld;
+
 	// Send our transformation to the currently bound shader, 
 	// in the "MVP" uniform
    // 1-> how many matrix, GL_FALSE->should transpose or not

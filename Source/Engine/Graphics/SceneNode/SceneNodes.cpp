@@ -150,7 +150,7 @@ int SceneNode::VOnUpdate( Scene* pScene, unsigned long deltaMs )
 
 int SceneNode::VPreRender( Scene *pScene )
    {
-   pScene->PushAndSetTransform( m_Props.m_pTransform );
+  // pScene->PushAndSetTransform( m_Props.m_pTransform );
    return S_OK;
    }
 
@@ -185,9 +185,9 @@ int SceneNode::VRenderChildren( Scene *pScene )
                AlphaSceneNode *asn = ENG_NEW AlphaSceneNode;
                ENG_ASSERT( asn );
                asn->m_pNode = it;
-               asn->m_Concat = pScene->GetTopTransform();
+               asn->m_GlobalToWorld = VGetGlobalTransformPtr()->GetToWorld();
 
-               Vec4 worldPos( asn->m_Concat.GetToWorldPosition() );
+               Vec4 worldPos( asn->m_GlobalToWorld.GetToWorldPosition() );
 
                Mat4x4 fromWorld = pScene->GetCamera()->VGetGlobalTransformPtr()->GetFromWorld();
 
@@ -208,7 +208,7 @@ int SceneNode::VRenderChildren( Scene *pScene )
 
 int SceneNode::VPostRender( Scene *pScene )
    {
-   pScene->PopTransform();
+ //  pScene->PopTransform();
    return S_OK;
    }
 
@@ -392,11 +392,11 @@ void CameraNode::VSetTransform( const Transform& newTransform )
 
    }
 
-Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene )
-   {
-   const Mat4x4& world = pScene->GetTopMatrix();
-	return m_Projection * m_View * world;
-   }
+//Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene )
+//   {
+//   const Mat4x4& world = pScene->GetTopMatrix();
+//	return m_Projection * m_View * world;
+//   }
 
 // TODO: check if it's correct
 // I think atWorld should be set by GetWorldPosition

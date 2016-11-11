@@ -182,10 +182,10 @@ void Scene::RenderAlphaPass()
 	while ( !m_AlphaSceneNodes.empty() )
 	   {
 		AlphaSceneNodes::reverse_iterator i = m_AlphaSceneNodes.rbegin();
-		PushAndSetTransform( (*i)->m_Concat );
+	//	PushAndSetTransform( (*i)->m_GlobalToWorld );
 		(*i)->m_pNode->VRender( this );
 		SAFE_DELETE( *i );
-		PopTransform();
+	//	PopTransform();
 		m_AlphaSceneNodes.pop_back();
 	   }
 

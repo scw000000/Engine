@@ -145,15 +145,16 @@ int MeshSceneNode::VRender( Scene *pScene )
 	glUseProgram( m_Program );
    glBindVertexArray( m_VAO );
 
-   // Get the projection & view matrix from the camera class
-	//Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
-   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * VGetGlobalTransformPtr()->GetToWorld();
-	// Send our transformation to the currently bound shader, 
-	// in the "MVP" uniform
-   // 1-> how many matrix, GL_FALSE->should transpose or not
-	glUniformMatrix4fv( m_MVPUni, 1, GL_FALSE, &mWorldViewProjection[0][0]);
+   Mat4x4 globalToWorld = VGetGlobalTransformPtr()->GetToWorld();
 
-   glUniformMatrix4fv( m_MUni, 1, GL_FALSE, &pScene->GetTopMatrix()[0][0] );
+   // Get the projection & view matrix from the camera class
+   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * globalToWorld;
+   // Send our transformation to the currently bound shader, 
+   // in the "MVP" uniform
+   // 1-> how many matrix, GL_FALSE->should transpose or not
+   glUniformMatrix4fv( m_MVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
+
+   glUniformMatrix4fv( m_MUni, 1, GL_FALSE, &( globalToWorld[ 0 ][ 0 ] ) );
 
    auto pLightManager = pScene->GetLightManagerPtr();
    

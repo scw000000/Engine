@@ -52,6 +52,8 @@ MeshSceneNode::MeshSceneNode(
    m_MaterialSpecularUni = 0;
 
    m_VerticesIndexCount = 0;
+
+   m_Props.SetEnableShadow( true );
    }
 
 MeshSceneNode::~MeshSceneNode( void )

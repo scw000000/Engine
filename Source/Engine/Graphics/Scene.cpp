@@ -17,7 +17,7 @@
 #include "..\Event\EventManager.h"
 #include "FastDelegate.h"
 
-Scene::Scene( shared_ptr<IRenderer> renderer ) : m_Root( ENG_NEW RootNode ), m_pLightManager( ENG_NEW LightManager )
+Scene::Scene( shared_ptr<IRenderer> renderer ) : m_pRoot( ENG_NEW RootNode ), m_pLightManager( ENG_NEW LightManager )
    {
    m_pRenderer = renderer;
 	
@@ -70,7 +70,7 @@ int Scene::PreRender( void )
 
 int Scene::OnRender( void )
    {
-   if ( m_Root && m_pCamera )
+   if ( m_pRoot && m_pCamera )
 	   {
 		// The scene root could be anything, but it
 		// is usually a SceneNode with the identity
@@ -78,11 +78,11 @@ int Scene::OnRender( void )
 		m_pCamera->SetViewTransform( this );
 		m_pLightManager->CalcLighting( this );
 
-		if ( m_Root->VPreRender( this ) == S_OK )
+		if ( m_pRoot->VPreRender( this ) == S_OK )
 		   {
-			m_Root->VRender( this );
-			m_Root->VRenderChildren( this );
-			m_Root->VPostRender( this );
+			m_pRoot->VRender( this );
+			m_pRoot->VRenderChildren( this );
+			m_pRoot->VPostRender( this );
 		   }
 		RenderAlphaPass();
 	   }
@@ -91,36 +91,36 @@ int Scene::OnRender( void )
 
 int Scene::OnRestore()
    {
-   if (!m_Root)
+   if ( !m_pRoot )
 		return S_OK;
 
 	//m_Renderer->VOnRestore() ;
 
-	return m_Root->VOnRestore(this);
+	return m_pRoot->VOnRestore(this);
    }
 
 int Scene::OnLostDevice()
    {
-   if (m_Root)
+   if ( m_pRoot )
 	   {
-		return m_Root->VOnLostDevice(this);
+		return m_pRoot->VOnLostDevice(this);
 	   }
 	return S_OK;
    }
 
 int Scene::PreUpdate( void )
    {
-   if( !m_Root )
+   if( !m_pRoot )
       return S_OK;
 
-   return m_Root->VPreUpdate( this );
+   return m_pRoot->VPreUpdate( this );
    }
 
 int Scene::OnUpdate( unsigned long deltaMs )
    {
    PreUpdate();
 
-   if (!m_Root)
+   if ( !m_pRoot )
 		return S_OK;
 
    static double lastTime = GetGlobalTimer()->GetTime();
@@ -128,7 +128,7 @@ int Scene::OnUpdate( unsigned long deltaMs )
 	unsigned long elapsedTime = (unsigned long) ( ( now - lastTime )* 1000.0 );
 	lastTime = now;
 
-	return m_Root->VOnUpdate( this, elapsedTime );
+	return m_pRoot->VOnUpdate( this, elapsedTime );
    }
 
 shared_ptr< ISceneNode > Scene::FindSceneNode( ActorId id )
@@ -156,7 +156,7 @@ bool Scene::AddChild( ActorId id, shared_ptr< ISceneNode > pNode )
    //   return m_pLightManager->AddLightNode( pLight );
    //   }
 
-   return m_Root->VAddChild( pNode );
+   return m_pRoot->VAddChild( pNode );
    }
 
 
@@ -169,7 +169,7 @@ bool Scene::RemoveChild( ActorId id )
 
    shared_ptr<ISceneNode> childNode = FindSceneNode( id );
    m_ActorMap.erase( id );
-   return m_Root->VRemoveChild( id );
+   return m_pRoot->VRemoveChild( id );
    }
 
 void Scene::RenderAlphaPass()

@@ -86,9 +86,15 @@ void LightManager::RenderShadowMap( shared_ptr< LightNode > ) const
 
 void LightManager::CalcLighting( Scene *pScene )
    {
-	//// LATER: There might be all kinds of things you'd want to do here for optimization, especially turning off lights on actors that can't be seen, etc.
+   // Only calculate shadow for nodes in static and actor group
+   if( pScene->m_pRoot ) 
+      {
+      //auto pStaticGroup = pScene->m_pRoot->m_Children[ RenderPass_Static ];
+     // CalcShadow( pStaticGroup );
+      auto pActorGroup = pScene->m_pRoot->m_Children[ RenderPass_Actor ];
+      CalcShadow( pActorGroup );
+      }
 
-	ENG_ASSERT( m_ActiveLights.size() <= MAXIMUM_LIGHTS_SUPPORTED );
 
    for( Lights::iterator lightIt = m_ActiveLights.begin( ); lightIt != m_ActiveLights.end( ); ++lightIt )
       {
@@ -96,8 +102,8 @@ void LightManager::CalcLighting( Scene *pScene )
          {
          m_LightAmbient = lightIt->get()->GetLightPropertiesPtr()->m_Diffuse * 0.2f;
          }*/
-      memcpy( m_LightPosWorldSpace, &lightIt->get( )->VGetGlobalPosition( ), sizeof( Vec3 ) );
-      memcpy( m_LightDir, &lightIt->get( )->GetForward( ), sizeof( Vec3 ) );
+      memcpy( m_LightPosWorldSpace, &lightIt->get()->VGetGlobalPosition( ), sizeof( Vec3 ) );
+      memcpy( m_LightDir, &lightIt->get()->VGetGlobalTransformPtr()->GetForward(), sizeof( Vec3 ) );
       memcpy( m_LightPower, &lightIt->get( )->GetLightPropertiesPtr( )->m_Power, sizeof( float ) );
       memcpy( m_LightColor, &lightIt->get()->GetLightPropertiesPtr()->m_Diffuse, sizeof( Color ) );
       }
@@ -120,6 +126,31 @@ void LightManager::CalcLighting( SceneNode *pNode )
 		memcpy(pLighting->m_vLightDiffuse, GetLightDiffuse(pNode), sizeof( Vec4 ) * count);
 		pLighting->m_nNumLights = count;
 	   }*/
+   }
+
+void LightManager::CalcShadow( shared_ptr< ISceneNode > pNode )
+   {
+   for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt )
+      {
+      // If the node is inside the frustum of current light, then render it to current light's shadow map
+      auto nodeGlobalPos = pNode->VGetGlobalTransformPtr()->GetToWorldPosition();
+      if( pNode->VGetProperties().GetEnableShadow() && lightIt->get()->VIsInside( nodeGlobalPos, pNode->VGetProperties().GetRadius() ) )
+         {
+         lightIt->get()->VPreRenderShadowMap();
+         pNode->VSetShadowVertexBuffer();
+         lightIt->get()->VRenderShadowMap( pNode );
+         }
+      }
+   auto& childrenList = pNode->VGetChildrenSceneNodes();
+   for( auto pChild : childrenList )
+      {
+      CalcShadow( pChild );
+      }
+   }
+
+void LightManager::RenderShadowMap( ISceneNode *pNode )
+   {
+ 
    }
 
 bool LightManager::AddLightNode( shared_ptr<LightNode> pNewLight )

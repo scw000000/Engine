@@ -1,11 +1,16 @@
 /*!
  * \file OpenGLRenderer.cpp
+ * \date 2016/11/11 11:38
  *
- * \author SCW
- * \date д╗ды 2016
+ * \author scw00
+ * Contact: user@company.com
  *
+ * \brief 
  *
- */
+ * TODO: long description
+ *
+ * \note
+*/
 
 #include "EngineStd.h"
 #include "OpenGLRenderer.h"
@@ -64,7 +69,7 @@ bool OpenGLRenderer::VPreRender( void )
 
 bool OpenGLRenderer::VPostRender( void )
    {
-   OpenGLRenderer::s_TextureDrawer.DrawTexture( 1, Point( 0, 0 ), Point( 300, 300 ) ); // for testing
+   OpenGLRenderer::s_TextureDrawer.DrawTexture( 2, Point( 0, 0 ), Point( 300, 300 ) ); // for testing
    SDL_GL_SwapWindow( g_pApp->GetWindow() );
    return true;
    }

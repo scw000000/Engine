@@ -76,12 +76,12 @@ class OrthogonalFrustum : public BaseFrustum
    {
    public:
       OrthogonalFrustum( void );
-      void Init( const float left, const float right, const float up, const float bottom, const float farDis, const float nearDis );
+      void Init( const float left, const float right, const float top, const float bottom, const float farDis, const float nearDis );
    
-   private:
+      public:
       float m_Left;
       float m_Right;
-      float m_Up;
+      float m_Top;
       float m_Bottom;
       float m_FarDis;
       float m_NearDis;

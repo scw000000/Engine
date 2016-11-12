@@ -182,6 +182,7 @@ namespace LevelEditorApp
 
       private bool GetParentTableRow( ref String parentNodeName, ref int parentNodeIndex, String curNodeName, int curNodeIndex ) 
          {
+         var test = m_DataSet.Tables[ curNodeName ].Rows[ curNodeIndex ];
          for( int i = 0; i < m_DataSet.Tables[ curNodeName ].Rows[ curNodeIndex ].ItemArray.Length; ++i )
             {
             object element = m_DataSet.Tables[ curNodeName ].Rows[ curNodeIndex ].ItemArray[ i ];

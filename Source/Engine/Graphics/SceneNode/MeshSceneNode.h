@@ -39,6 +39,7 @@ class MeshSceneNode : public SceneNode
 	    */
 	    virtual int VRender( Scene *pScene )  override;
       GLuint GetProgram( void ) { return m_Program; };
+      virtual ShadowVertexInfo VGetShadowVertexInfo( void ) const override { return ShadowVertexInfo( m_Buffers[ Vertex_Buffer ], m_Buffers[ Index_Buffer ], m_VerticesIndexCount ); }
 
    protected:
       void ReleaseResource( void );

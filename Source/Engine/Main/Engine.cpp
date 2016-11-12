@@ -85,6 +85,8 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    /*auto test = std::vector< Vec2 >( { Vec2( 1.0f, 1.0f ), Vec2( 5.0f, 5.0f ), Vec2( 4.0f, 4.0f ), Vec2( 1.0f, -3.0f ) } );*/
    //auto test = std::vector< Vec2 >( { Vec2( 0.0f, 2.0f ), Vec2( 1.0f, 4.0f ), Vec2( 2.0f, 0.0f ), Vec2( 3.0f, 1.0f ), Vec2( 4.0f, 3.0f ) } );
    //Triangulation( test );
+
+
    // Check for existing instance of the same window
 	// Not sure if this feature is working normally.... 
    #ifndef _DEBUG

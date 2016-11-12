@@ -22,6 +22,7 @@ typedef std::map< ActorId, shared_ptr< ISceneNode > > ActorSceneMap;
 
 class Scene
    {
+   friend class LightManager;
    public:
       Scene( shared_ptr<IRenderer> renderer );
       virtual ~Scene( void );
@@ -66,7 +67,7 @@ class Scene
       void RenderAlphaPass();
       
    protected:
-      shared_ptr<SceneNode>         m_Root;
+      shared_ptr<SceneNode>         m_pRoot;
       shared_ptr<CameraNode>        m_pCamera;
       shared_ptr<IRenderer>         m_pRenderer;
      // TransformStack                m_TransformStack;

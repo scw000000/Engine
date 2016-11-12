@@ -249,6 +249,11 @@ class IRenderer
 	   virtual void VDrawLine( const Vec3& from,const Vec3& to,const Color& color ) const = 0;
    };
 
+class ISceneNode;
+struct ShadowVertexInfo;
+
+typedef std::vector< std::shared_ptr< ISceneNode > > SceneNodeList;
+
 class ISceneNode
    {
    public:
@@ -278,12 +283,17 @@ class ISceneNode
       virtual void SetToWorldPosition( const Vec3& pos ) = 0;
       virtual Vec3 VGetGlobalPosition( void ) const = 0;
 
-	   virtual bool VAddChild( shared_ptr<ISceneNode> kid )=0;
+	   virtual bool VAddChild( shared_ptr< ISceneNode > kid )=0;
 	   virtual bool VRemoveChild( ActorId id ) = 0;
 	   virtual int VOnLostDevice( Scene *pScene ) = 0;
 
       virtual void VSetParentNode( ISceneNode* pParent ) = 0;
       virtual ISceneNode* VGetParentNode( void ) = 0;
+      virtual SceneNodeList& VGetChildrenSceneNodes( void ) = 0;
+
+      virtual void VSetShadowVertexBuffer( void ) const = 0;
+
+      virtual ShadowVertexInfo VGetShadowVertexInfo( void ) const = 0;
    };
 
 class IScriptManager

@@ -28,7 +28,23 @@ enum AlphaType {
    AlphaVertex
    };
 
-// TODO: implement rest graphic class such as material, alpha, render component.... 
+
+struct ShadowVertexInfo
+   {
+   public:
+      ShadowVertexInfo( GLuint vertexBuffer = 0, GLuint elementBuffer = 0, unsigned int vertexCount = 0 )
+         {
+         m_Vertexbuffer = vertexBuffer;
+         m_Elementbuffer = elementBuffer;
+         m_VertexCount = vertexCount;
+         }
+
+   public:
+      GLuint m_Vertexbuffer;
+      GLuint m_Elementbuffer;
+      unsigned int m_VertexCount;
+   };
+
 class SceneNodeProperties
    {
    friend class SceneNode;
@@ -51,8 +67,11 @@ class SceneNodeProperties
       RenderPass GetRenderPass( void ) const { return m_RenderPass; }
       float GetRadius( void ) const { return m_Radius; }
       
-      MaterialPtr GetMaterialPtr( void ) { return m_pMaterial; }
+      MaterialPtr GetMaterialPtr( void ) const { return m_pMaterial; }
       void SetMaterialPtr( MaterialPtr pMaterial ) { pMaterial = m_pMaterial; }
+
+      bool GetEnableShadow( void ) const { return m_EnableShadow; }
+      void SetEnableShadow( bool isEnabled ) { m_EnableShadow = isEnabled; }
 
    protected:
       ActorId m_ActorId;
@@ -62,17 +81,19 @@ class SceneNodeProperties
       MaterialPtr m_pMaterial;
       std::string m_Name;
       RenderPass m_RenderPass;
+      bool m_EnableShadow;
 
    private:
 
    };
 
-typedef std::vector< std::shared_ptr< ISceneNode > > SceneNodeList;
+
 
 class SceneNode : public ISceneNode
    {
 	friend class Scene;
-   
+   friend class LightManager;
+
    public:
       SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderPass renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ), MaterialPtr pMaterial = MaterialPtr() );
 
@@ -86,7 +107,7 @@ class SceneNode : public ISceneNode
 	    * @return SceneNodeProperties&
 	    */
       virtual SceneNodeProperties& VGetProperties() override { 
-        return const_cast< SceneNodeProperties& >(static_cast< const SceneNode* >(this)->VGetProperties() );
+         return const_cast< SceneNodeProperties& >(static_cast< const SceneNode* >(this)->VGetProperties() );
          }
 
 	   virtual void VSetTransformPtr( TransformPtr pNewTransform ) override;
@@ -107,7 +128,7 @@ class SceneNode : public ISceneNode
 	   virtual int VRenderChildren( Scene *pScene ) override;
 	   virtual int VPostRender( Scene *pScene ) override;
 
-	   virtual bool VAddChild( shared_ptr<ISceneNode> child ) override;
+      virtual bool VAddChild( shared_ptr< ISceneNode > child ) override;
 	   virtual bool VRemoveChild( ActorId id ) override;
 	   virtual int VOnLostDevice( Scene *pScene ) override;
 	   //virtual int VPick(Scene *pScene, RayCast *pRayCast);
@@ -128,8 +149,9 @@ class SceneNode : public ISceneNode
 
       virtual void VSetParentNode( ISceneNode* pParent ) override { m_pParent = pParent; }
       virtual ISceneNode* VGetParentNode( void ) override { return m_pParent; };
-
-	   /*void SetMaterial( const Material& mat ) { m_Props.m_Material = mat; }*/
+      virtual void VSetShadowVertexBuffer( void ) const override {  };
+      virtual SceneNodeList& VGetChildrenSceneNodes( void ) override { return m_Children; };
+      virtual ShadowVertexInfo VGetShadowVertexInfo( void ) const override { return ShadowVertexInfo(); };
 
    protected:
 	   SceneNodeList			m_Children;

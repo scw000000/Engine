@@ -16,5 +16,6 @@
                 <Ambient r="0.200000" g="0.200000" b="0.200000" a="1.000000" />
             </Material>
         </Data>
+        
     </MeshRenderComponent>
 </ActorClass>

@@ -45,6 +45,6 @@ void main()
 	 	textureColor * uMaterialDiffuse.xyz * uLightColor[ i ] * uLightPower[ i ] * cosTheta / distanceSqr +
 	 	uMaterialSpecular * uLightColor[ i ] * uLightPower[ i ] * pow(cosAlpha,5) / distanceSqr;
         }
-        
+    
     color.a = uMaterialDiffuse.a;
     }

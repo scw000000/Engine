@@ -84,34 +84,34 @@ OrthogonalFrustum::OrthogonalFrustum( void )
    {
    m_Left = 100.f;
    m_Right = -100.f;
-   m_Up = 100.f;
+   m_Top = 100.f;
    m_Bottom = -100.f;
    m_FarDis = 200.f;
    m_NearDis = 0.f;
    }
 
-void OrthogonalFrustum::Init( const float left, const float right, const float up, const float bottom, const float farDis, const float nearDis )
+void OrthogonalFrustum::Init( const float left, const float right, const float top, const float bottom, const float farDis, const float nearDis )
    {
    m_Left = left;
    m_Right = right;
-   m_Up = up;
+   m_Top = top;
    m_Bottom = bottom;
    m_FarDis = farDis;
    m_NearDis = nearDis;
 
    // left up
-   m_PlaneVerts[ 0 ] = Vec3( m_Left, m_Up, m_NearDis );
+   m_PlaneVerts[ 0 ] = Vec3( m_Left, m_Top, m_NearDis );
    // right up
-   m_PlaneVerts[ 1 ] = Vec3( m_Right, m_Up, m_NearDis );
+   m_PlaneVerts[ 1 ] = Vec3( m_Right, m_Top, m_NearDis );
    // right down
    m_PlaneVerts[ 2 ] = Vec3( m_Right, m_Bottom, m_NearDis );
    // left down
    m_PlaneVerts[ 3 ] = Vec3( m_Left, m_Bottom, m_NearDis );
 
    // left up
-   m_PlaneVerts[ 4 ] = Vec3( m_Left, m_Up, m_FarDis );
+   m_PlaneVerts[ 4 ] = Vec3( m_Left, m_Top, m_FarDis );
    // right up
-   m_PlaneVerts[ 5 ] = Vec3( m_Right, m_Up, m_FarDis );
+   m_PlaneVerts[ 5 ] = Vec3( m_Right, m_Top, m_FarDis );
    // right down
    m_PlaneVerts[ 6 ] = Vec3( m_Right, m_Bottom, m_FarDis );
    // left down

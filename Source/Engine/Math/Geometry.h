@@ -347,6 +347,8 @@ class Mat4x4 : public glm::mat4
       // is reversed, target = eye + inversed forward = eye - ( center - eye )
       static Mat4x4 LookAtToTransform( const Vec3& eye, const Vec3& center, const Vec3& up ) { return LookAt( eye, 2.0f * eye - center, up ); }
 
+      static Mat4x4 Ortho( float left, float right, float up, float bottom, float farDis, float nearDis ) { return Mat4x4( glm::ortho( left, right, bottom, up, nearDis, farDis ) ); }
+
    public: 
       static const Mat4x4 g_Identity;
 

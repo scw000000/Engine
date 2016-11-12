@@ -23,7 +23,7 @@ SceneNodeProperties::SceneNodeProperties( void ) : m_pTransform(), m_pGlobalTran
    m_ActorId = INVALID_ACTOR_ID;
    m_Radius = 0;
    m_RenderPass = RenderPass_0;
-   
+   m_EnableShadow = false;
    }
 
 TransformPtr SceneNodeProperties::GetTransformPtr( void ) const

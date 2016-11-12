@@ -21,9 +21,12 @@ class DirectLightNode : public LightNode
    DirectLightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
 
       virtual int VOnRestore( Scene *pScene ) override;
-      virtual void VRenderShadowMap( shared_ptr< SceneNode > pTarget ) override;
+      virtual void VPreRenderShadowMap( void ) override;
+      virtual void VRenderShadowMap( shared_ptr< ISceneNode > pNode ) override;
       // Update Frustum size here       
       virtual int VDelegateUpdate( Scene *pScene, unsigned long elapsedMs ) override;
+      virtual bool VIsInside( const Vec3& worldPos, float radius = 0.f ) const override;
+      virtual Mat4x4 VGetVPMatrix( void ) const override;
 
    protected:
       
@@ -40,6 +43,8 @@ class DirectLightNode : public LightNode
 
       GLuint         m_ShadowMapTextureObj;
       GLuint         m_FrameBufferObj;
+
+      GLuint         m_MVPUni;
 
       OrthogonalFrustum  m_Frustum;
 

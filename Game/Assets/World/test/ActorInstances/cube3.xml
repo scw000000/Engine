@@ -16,5 +16,6 @@
                 <Ambient />
             </Material>
         </Data>
+        
     </MeshRenderComponent>
 </ActorInstance>

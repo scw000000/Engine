@@ -291,8 +291,6 @@ class ISceneNode
       virtual ISceneNode* VGetParentNode( void ) = 0;
       virtual SceneNodeList& VGetChildrenSceneNodes( void ) = 0;
 
-      virtual void VSetShadowVertexBuffer( void ) const = 0;
-
       virtual ShadowVertexInfo VGetShadowVertexInfo( void ) const = 0;
    };
 

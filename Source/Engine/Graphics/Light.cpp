@@ -84,18 +84,27 @@ void LightManager::RenderShadowMap( shared_ptr< LightNode > ) const
    
    }
 
+
+Mat4x4 gTest;
+
 void LightManager::CalcLighting( Scene *pScene )
    {
    // Only calculate shadow for nodes in static and actor group
+   for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt )
+      {
+      lightIt->get()->VPreRenderShadowMap();
+      }
+
    if( pScene->m_pRoot ) 
       {
       //auto pStaticGroup = pScene->m_pRoot->m_Children[ RenderPass_Static ];
      // CalcShadow( pStaticGroup );
+      gTest = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView();
       auto pActorGroup = pScene->m_pRoot->m_Children[ RenderPass_Actor ];
       CalcShadow( pActorGroup );
       }
 
-
+   
    for( Lights::iterator lightIt = m_ActiveLights.begin( ); lightIt != m_ActiveLights.end( ); ++lightIt )
       {
       /*if( lightIt == m_ActiveLights.begin() )
@@ -128,6 +137,7 @@ void LightManager::CalcLighting( SceneNode *pNode )
 	   }*/
    }
 
+
 void LightManager::CalcShadow( shared_ptr< ISceneNode > pNode )
    {
    for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt )
@@ -136,9 +146,8 @@ void LightManager::CalcShadow( shared_ptr< ISceneNode > pNode )
       auto nodeGlobalPos = pNode->VGetGlobalTransformPtr()->GetToWorldPosition();
       if( pNode->VGetProperties().GetEnableShadow() && lightIt->get()->VIsInside( nodeGlobalPos, pNode->VGetProperties().GetRadius() ) )
          {
-         lightIt->get()->VPreRenderShadowMap();
-         pNode->VSetShadowVertexBuffer();
-         lightIt->get()->VRenderShadowMap( pNode );
+         lightIt->get()->VSetUpRenderShadowMap();
+         lightIt->get()->VRenderShadowMap( gTest, pNode );
          }
       }
    auto& childrenList = pNode->VGetChildrenSceneNodes();

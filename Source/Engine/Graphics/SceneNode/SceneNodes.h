@@ -149,7 +149,6 @@ class SceneNode : public ISceneNode
 
       virtual void VSetParentNode( ISceneNode* pParent ) override { m_pParent = pParent; }
       virtual ISceneNode* VGetParentNode( void ) override { return m_pParent; };
-      virtual void VSetShadowVertexBuffer( void ) const override {  };
       virtual SceneNodeList& VGetChildrenSceneNodes( void ) override { return m_Children; };
       virtual ShadowVertexInfo VGetShadowVertexInfo( void ) const override { return ShadowVertexInfo(); };
 

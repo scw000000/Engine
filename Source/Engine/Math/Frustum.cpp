@@ -121,8 +121,8 @@ void OrthogonalFrustum::Init( const float left, const float right, const float t
 
    m_Planes[ Near ].Init( m_PlaneVerts[ 0 ], m_PlaneVerts[ 1 ], m_PlaneVerts[ 2 ] );
    m_Planes[ Far ].Init( m_PlaneVerts[ 6 ], m_PlaneVerts[ 5 ], m_PlaneVerts[ 4 ] );
-   m_Planes[ Right ].Init( origin, m_PlaneVerts[ 5 ], m_PlaneVerts[ 6 ] );
-   m_Planes[ Top ].Init( origin, m_PlaneVerts[ 4 ], m_PlaneVerts[ 5 ] );
-   m_Planes[ Left ].Init( origin, m_PlaneVerts[ 7 ], m_PlaneVerts[ 4 ] );
-   m_Planes[ Bottom ].Init( origin, m_PlaneVerts[ 6 ], m_PlaneVerts[ 7 ] );
+   m_Planes[ Right ].Init( m_PlaneVerts[ 1 ], m_PlaneVerts[ 5 ], m_PlaneVerts[ 6 ] );
+   m_Planes[ Top ].Init( m_PlaneVerts[ 1 ], m_PlaneVerts[ 4 ], m_PlaneVerts[ 5 ] );
+   m_Planes[ Left ].Init( m_PlaneVerts[ 0 ], m_PlaneVerts[ 7 ], m_PlaneVerts[ 4 ] );
+   m_Planes[ Bottom ].Init( m_PlaneVerts[ 2 ], m_PlaneVerts[ 6 ], m_PlaneVerts[ 7 ] );
    }

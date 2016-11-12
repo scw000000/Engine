@@ -45,9 +45,6 @@ int DirectLightNode::VOnRestore( Scene *pScene )
    glGenVertexArrays( 1, &m_VAO );
    glBindVertexArray( m_VAO );
 
-   glEnableVertexAttribArray( VERTEX_LOCATION );
-   glVertexAttribFormat( VERTEX_LOCATION, 3, GL_FLOAT, GL_FALSE, 0 );
-
    // Generate depth texture for shadow map
    glGenTextures( 1, &m_ShadowMapTextureObj );
    ENG_ASSERT( m_ShadowMapTextureObj );
@@ -89,7 +86,7 @@ int DirectLightNode::VOnRestore( Scene *pScene )
    return S_OK; 
    }
 
-void DirectLightNode::VPreRenderShadowMap( void )
+void DirectLightNode::VSetUpRenderShadowMap( void )
    {
    glUseProgram( m_FirstPassProgram );
    glBindVertexArray( m_VAO );
@@ -99,12 +96,9 @@ void DirectLightNode::VPreRenderShadowMap( void )
 
    glEnable( GL_CULL_FACE );
    glCullFace( GL_BACK ); 
-
-   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
    }
 
-void DirectLightNode::VRenderShadowMap( shared_ptr< ISceneNode > pNode )
+void DirectLightNode::VRenderShadowMap( const Mat4x4& vp, shared_ptr< ISceneNode > pNode )
    {
    auto& vertexInfo = pNode->VGetShadowVertexInfo();
 
@@ -116,20 +110,21 @@ void DirectLightNode::VRenderShadowMap( shared_ptr< ISceneNode > pNode )
    //glVertexArrayElementBuffer
    
    auto mvp = VGetVPMatrix();
+   //mvp = vp * pNode->VGetGlobalTransformPtr()->GetToWorld();
    mvp = mvp * pNode->VGetGlobalTransformPtr()->GetToWorld();
 
    glUniformMatrix4fv( m_MVPUni, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
 
-   glEnableVertexAttribArray( VERTEX_LOCATION );
    glBindBuffer( GL_ARRAY_BUFFER, vertexInfo.m_Vertexbuffer );
-   //glVertexAttribPointer(
-   //   VERTEX_LOCATION,  // The attribute we want to configure
-   //   3,                  // size
-   //   GL_FLOAT,           // type
-   //   GL_FALSE,           // normalized?
-   //   0,                  // stride
-   //   ( void* ) 0            // array buffer offset
-   //   );
+   glEnableVertexAttribArray( VERTEX_LOCATION );
+   glVertexAttribPointer(
+      VERTEX_LOCATION,  // The attribute we want to configure
+      3,                  // size
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      ( void* ) 0            // array buffer offset
+      );
 
    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vertexInfo.m_Elementbuffer );
 
@@ -144,6 +139,13 @@ void DirectLightNode::VRenderShadowMap( shared_ptr< ISceneNode > pNode )
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    auto screenDimension = g_pApp->GetScreenSize();
    glViewport( 0, 0, screenDimension.x, screenDimension.y );
+   }
+
+void DirectLightNode::VPreRenderShadowMap( void )
+   {
+   glBindFramebuffer( GL_FRAMEBUFFER, m_FrameBufferObj );
+   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    }
 
 int DirectLightNode::VDelegateUpdate( Scene *pScene, unsigned long elapsedMs )
@@ -198,6 +200,7 @@ Mat4x4 DirectLightNode::VGetVPMatrix( void ) const
    auto& worldPos = VGetGlobalTransformPtr()->GetToWorldPosition();
 
    auto view = Mat4x4::LookAt( worldPos, worldPos + VGetGlobalTransformPtr()->GetForward(), VGetGlobalTransformPtr()->GetUp() );
-   auto projection = Mat4x4::Ortho( m_Frustum.m_Left, m_Frustum.m_Right, m_Frustum.m_Top, m_Frustum.m_Bottom, m_Frustum.m_FarDis, m_Frustum.m_NearDis );
+   //auto projection = Mat4x4::Ortho( m_Frustum.m_Right, m_Frustum.m_Left, m_Frustum.m_Top, m_Frustum.m_Bottom, m_Frustum.m_FarDis, m_Frustum.m_NearDis );
+   auto projection = Mat4x4::Ortho( -m_Frustum.m_Left, -m_Frustum.m_Right, m_Frustum.m_Top, m_Frustum.m_Bottom, m_Frustum.m_FarDis, m_Frustum.m_NearDis );
    return projection * view;
    }

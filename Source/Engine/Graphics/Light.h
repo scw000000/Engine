@@ -38,8 +38,9 @@ class LightNode : public SceneNode
    public:
       LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
       const LightPropertiesPtr& GetLightPropertiesPtr( void ) const { return m_pLightProps; };
+      virtual void VSetUpRenderShadowMap( void ) = 0;
+      virtual void VRenderShadowMap( const Mat4x4& vp, shared_ptr< ISceneNode > pNode ) = 0;
       virtual void VPreRenderShadowMap( void ) = 0;
-      virtual void VRenderShadowMap( shared_ptr< ISceneNode > pNode ) = 0;
       virtual bool VIsInside( const Vec3& worldPos, float radius = 0.f ) const = 0;
       virtual Mat4x4 VGetVPMatrix( void ) const = 0;
 

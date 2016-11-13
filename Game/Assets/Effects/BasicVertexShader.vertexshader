@@ -1,36 +1,42 @@
 #version 400
+const int MAXIMUM_LIGHTS_SUPPORTED = 8;
 
-// Input vertex data, different for all executions of this shader.
 layout(location = 0) in vec3 iVertexPosition_Modelspace;
 layout(location = 1) in vec2 iVertexUV;
 layout(location = 2) in vec3 iVertexNormal_Modelspace;
 
-// Output data ; will be interpolated for each fragment.
-out vec2 oUV;
-out vec3 oPosition_WorldSpace;
-out vec3 oNormal_WorldSpace;
-out vec3 oEyeDirection_WorldSpace;
+out vec2 vUV;
+out vec3 vPosition_WorldSpace;
+out vec3 vNormal_WorldSpace;
+out vec3 vEyeDirection_WorldSpace;
+out vec4 vShadowMapTexCoord[ MAXIMUM_LIGHTS_SUPPORTED ];
 
-// Values that stay constant for the whole mesh.
 uniform mat4 	uMVP;
 uniform mat4 	uM;
 
 uniform vec3	uEyePosition_WorldSpace;
 
+uniform int     uLightNumber;
+uniform mat4    uShadowMapMatrix[ MAXIMUM_LIGHTS_SUPPORTED ];
+
 void main()
 	{
-    // Output position of the vertex, in clip space : MVP * position
 	gl_Position =  uMVP * vec4( iVertexPosition_Modelspace, 1 );
 	
-	// Position of the vertex, in worldspace : M * position
-	oPosition_WorldSpace = ( uM * vec4( iVertexPosition_Modelspace, 1 ) ).xyz;
+    vec4 vertexPosition_WorldSpace = uM * vec4( iVertexPosition_Modelspace, 1 );
+	vPosition_WorldSpace = vertexPosition_WorldSpace.xyz;
 	
-	oEyeDirection_WorldSpace = uEyePosition_WorldSpace - oPosition_WorldSpace;
+	vEyeDirection_WorldSpace = uEyePosition_WorldSpace - vPosition_WorldSpace;
 	
 	// Normal of the the vertex, in camera space
-	oNormal_WorldSpace = ( uM * vec4( iVertexNormal_Modelspace, 0 ) ) .xyz; // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not.
+    // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not
+	vNormal_WorldSpace = ( uM * vec4( iVertexNormal_Modelspace, 0 ) ) .xyz;
 	
-	// UV of the vertex. No special space for this one.
-	oUV = iVertexUV;
+	vUV = iVertexUV;
+    
+    for( int i = 0; i < uLightNumber; ++i )
+        {
+        vShadowMapTexCoord[ i ] = ( uShadowMapMatrix[ i ] * vertexPosition_WorldSpace );
+        }
 	}
 

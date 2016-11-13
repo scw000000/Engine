@@ -72,7 +72,7 @@ bool OpenGLRenderer::VPostRender( void )
    auto screensize = g_pApp->GetScreenSize();
    float ySize = 300.f * ( float ) screensize.y / ( float ) screensize.x;
 
-   OpenGLRenderer::s_TextureDrawer.DrawTexture( 2, Point( 0, 0 ), Point( 300, ( Sint32 ) ( ySize ) ) ); // for testing
+   OpenGLRenderer::s_TextureDrawer.DrawTexture( 5, Point( 0, 0 ), Point( 300, ( Sint32 ) ( ySize ) ) ); // for testing
    SDL_GL_SwapWindow( g_pApp->GetWindow() );
    return true;
    }

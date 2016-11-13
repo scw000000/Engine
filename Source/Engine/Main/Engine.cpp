@@ -127,7 +127,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
 
 	//--------------------------------- 
-   //  Initialize ResCache, all assets are within a zip file
+   //  Initialize ResCache, all assets are within a zip file or a folder
    //--------------------------------- 
    IResourceFile *pFile = NULL;
    if( m_EngineOptions.GetIsUsingDevDirectory() )
@@ -206,19 +206,21 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
    // Initiate window & SDL, glew
    //--------------------------------- 
-   if ( SDL_Init(SDL_INIT_EVERYTHING) != 0 )
-      {
-      ENG_ERROR( SDL_GetError() );
-      return false;
-      }
-
-   CHAR charTitle[100];
-   if(  GenericToAnsiCch( charTitle, VGetGameTitle(),  strlen( charTitle ) ) != S_OK )
-      {
-      ENG_ERROR( "Game title translation failed" );
-      }
+   
    if( !window )
       {
+      if( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
+         {
+         ENG_ERROR( SDL_GetError() );
+         return false;
+         }
+
+      CHAR charTitle[ 100 ];
+      if( GenericToAnsiCch( charTitle, VGetGameTitle(), strlen( charTitle ) ) != S_OK )
+         {
+         ENG_ERROR( "Game title translation failed" );
+         }
+
       m_pWindow = SDL_CreateWindow( charTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth,screenHeight, SDL_WINDOW_OPENGL );
       if ( !m_pWindow ) 
          {

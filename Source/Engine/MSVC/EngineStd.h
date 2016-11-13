@@ -117,7 +117,8 @@ extern const int SCREEN_HEIGHT;
 #define __LOC__ __FILE__ "("__STR1__(__LINE__)") : Warning Msg: "  
 
 #define ENG_ZERO_MEM( x ) memset(x, 0, sizeof( x ))
-#define ENG_ARRAY_SIZE_IN_ELEMENTS( x ) (sizeof( x )/sizeof(x[0]))
+#define ENG_ARRAY_SIZE( x ) ( sizeof( x ) )
+#define ENG_ARRAY_SIZE_IN_ELEMENTS( x ) ( sizeof( x ) / sizeof( x[ 0 ] ) )
 
 ///////////////////////
 //3rd party INCLUDES //

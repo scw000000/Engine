@@ -13,9 +13,7 @@
  */
 #include "EngineStd.h"
 
-//
-// Colors are discussed in Chapter 13, page 453
-//
+
 Color g_White( 1.0f, 1.0f, 1.0f, fOPAQUE );	
 Color g_Black( 0.0f, 0.0f, 0.0f, fOPAQUE );
 Color g_Cyan( 0.0f, 1.0f, 1.0f, fOPAQUE );	
@@ -28,9 +26,6 @@ Color g_Gray25( 0.25f, 0.25f, 0.25f, fOPAQUE );
 Color g_Gray65( 0.65f, 0.65f, 0.65f, fOPAQUE );
 Color g_Transparent (1.0f, 0.0f, 1.0f, fTRANSPARENT );
 
-// Note! If you change these direction vectors around to suit yourself
-// Make sure you change it so it retains a right handed
-// coordinate system 
 Vec3 g_Right(-1.0f, 0.0f, 0.0f);
 Vec3 g_Up(0.0f, 1.0f, 0.0f);
 Vec3 g_Forward(0.0f, 0.0f, 1.0f);
@@ -47,11 +42,6 @@ const int iTRANSPARENT = 0;
 const int MEGABYTE = 1024 * 1024;
 const float SIXTY_HERTZ = 16.66f;
 
-const int SCREEN_WIDTH = 800;
-const int SCREEN_HEIGHT = 600;
-
-
-// [rez] Uncomment this #define to dump every call to new to the output window
 //#define MEM_LOG
 #if defined(_DEBUG) && defined(MEM_LOG)
 

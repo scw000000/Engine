@@ -104,17 +104,22 @@ void LightManager::CalcLighting( Scene *pScene )
       CalcShadow( pActorGroup );
       }
 
-   
-   for( Lights::iterator lightIt = m_ActiveLights.begin( ); lightIt != m_ActiveLights.end( ); ++lightIt )
+   int i = 0;
+   for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt, ++i )
       {
       /*if( lightIt == m_ActiveLights.begin() )
          {
          m_LightAmbient = lightIt->get()->GetLightPropertiesPtr()->m_Diffuse * 0.2f;
          }*/
-      memcpy( m_LightPosWorldSpace, &lightIt->get()->VGetGlobalPosition( ), sizeof( Vec3 ) );
-      memcpy( m_LightDir, &lightIt->get()->VGetGlobalTransformPtr()->GetForward(), sizeof( Vec3 ) );
-      memcpy( m_LightPower, &lightIt->get( )->GetLightPropertiesPtr( )->m_Power, sizeof( float ) );
-      memcpy( m_LightColor, &lightIt->get()->GetLightPropertiesPtr()->m_Diffuse, sizeof( Color ) );
+      auto globalPos = lightIt->get()->VGetGlobalPosition();
+      memcpy( &m_LightPosWorldSpace[ i ], &globalPos, sizeof( Vec3 ) );
+      memcpy( &m_LightDir[ i ], &lightIt->get()->VGetGlobalTransformPtr()->GetForward(), sizeof( Vec3 ) );
+      memcpy( &m_LightPower[ i ], &lightIt->get()->GetLightPropertiesPtr()->m_Power, sizeof( float ) );
+      memcpy( &m_LightColor[ i ], &lightIt->get()->GetLightPropertiesPtr()->m_Diffuse, sizeof( Color ) );
+      auto shadowMapMatrix = lightIt->get()->VGetShadowMapMatrix();
+      memcpy( &m_ShadowMapMatrix[ i ], &shadowMapMatrix, sizeof( Mat4x4 ) );
+      auto shadowMapTexture = lightIt->get()->VGetShadowMapTexture();
+      memcpy( &m_ShadowMapTexture[ i ], &shadowMapTexture, sizeof( GLuint ) );
       }
    }  
 

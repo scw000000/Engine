@@ -76,6 +76,9 @@ class MeshSceneNode : public SceneNode
       GLuint            m_LightAmbientUni;
       GLuint            m_LightNumberUni;
 
+      GLuint            m_ShadowMapMatrixUni;
+      GLuint            m_ShadowMapTextureUni[ MAXIMUM_SHADOWMAP_TEXTURE_SUPPORTED ];
+
       GLuint            m_EyePosWorldSpaceUni;
 
       GLuint            m_MaterialAmbientUni;

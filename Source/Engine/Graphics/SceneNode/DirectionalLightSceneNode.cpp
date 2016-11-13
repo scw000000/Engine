@@ -1,5 +1,5 @@
 /*!
- * \file DirectLightSceneNode.cpp
+ * \file DirectionalLightSceneNode.cpp
  * \date 2016/10/29 17:21
  *
  * \author scw00
@@ -13,14 +13,14 @@
 */
 
 #include "EngineStd.h"
-#include "DirectLightSceneNode.h"
+#include "DirectionalLightSceneNode.h"
 
 const char* const FIRST_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DepthRTT.vertexshader";
 const char* const FIRST_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DepthRTT.fragmentshader";
 
 #define VERTEX_LOCATION    0
 
-DirectLightNode::DirectLightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform )
+DirectionalLightNode::DirectionalLightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform )
    : LightNode( actorId, pRenderComponent, pLightProps, pTransform ),
    m_FirstPassVertexShader( Resource( FIRST_PASS_VERTEX_SHADER_FILE_NAME ) ),
    m_FirstPassFragmentShader( Resource( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ) )
@@ -29,7 +29,7 @@ DirectLightNode::DirectLightNode( const ActorId actorId, IRenderComponent* pRend
    m_MVPUni = -1;
    }
 
-int DirectLightNode::VOnRestore( Scene *pScene )
+int DirectionalLightNode::VOnRestore( Scene *pScene )
    {
 
    m_FirstPassVertexShader.VOnRestore();
@@ -86,7 +86,7 @@ int DirectLightNode::VOnRestore( Scene *pScene )
    return S_OK; 
    }
 
-void DirectLightNode::VSetUpRenderShadowMap( void )
+void DirectionalLightNode::VSetUpRenderShadowMap( void )
    {
    glUseProgram( m_FirstPassProgram );
    glBindVertexArray( m_VAO );
@@ -98,7 +98,7 @@ void DirectLightNode::VSetUpRenderShadowMap( void )
    glCullFace( GL_BACK ); 
    }
 
-void DirectLightNode::VRenderShadowMap( const Mat4x4& vp, shared_ptr< ISceneNode > pNode )
+void DirectionalLightNode::VRenderShadowMap( const Mat4x4& vp, shared_ptr< ISceneNode > pNode )
    {
    auto& vertexInfo = pNode->VGetShadowVertexInfo();
 
@@ -110,6 +110,8 @@ void DirectLightNode::VRenderShadowMap( const Mat4x4& vp, shared_ptr< ISceneNode
    //glVertexArrayElementBuffer
    
    auto mvp = VGetVPMatrix();
+   //auto& worldPos = VGetGlobalTransformPtr()->GetToWorldPosition();
+   //auto view = Mat4x4::LookAt( worldPos, worldPos + VGetGlobalTransformPtr()->GetForward(), VGetGlobalTransformPtr()->GetUp() );
    //mvp = vp * pNode->VGetGlobalTransformPtr()->GetToWorld();
    mvp = mvp * pNode->VGetGlobalTransformPtr()->GetToWorld();
 
@@ -141,14 +143,15 @@ void DirectLightNode::VRenderShadowMap( const Mat4x4& vp, shared_ptr< ISceneNode
    glViewport( 0, 0, screenDimension.x, screenDimension.y );
    }
 
-void DirectLightNode::VPreRenderShadowMap( void )
+void DirectionalLightNode::VPreRenderShadowMap( void )
    {
    glBindFramebuffer( GL_FRAMEBUFFER, m_FrameBufferObj );
+ //  glClearColor( 0.f, 0.f, 0.f, 1.f );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    }
 
-int DirectLightNode::VDelegateUpdate( Scene *pScene, unsigned long elapsedMs )
+int DirectionalLightNode::VDelegateUpdate( Scene *pScene, unsigned long elapsedMs )
    {
    auto pCamera = pScene->GetCamera();
    auto cameraFrustum = pCamera->GetFrustum();
@@ -189,13 +192,13 @@ int DirectLightNode::VDelegateUpdate( Scene *pScene, unsigned long elapsedMs )
    return S_OK;
    }
 
-bool DirectLightNode::VIsInside( const Vec3& worldPos, float radius ) const
+bool DirectionalLightNode::VIsInside( const Vec3& worldPos, float radius ) const
    {
    Vec3 localPos = VGetGlobalTransformPtr()->GetFromWorld().Xform( worldPos );
    return m_Frustum.VInside( localPos, radius );
    }
 
-Mat4x4 DirectLightNode::VGetVPMatrix( void ) const
+Mat4x4 DirectionalLightNode::VGetVPMatrix( void ) const
    {
    auto& worldPos = VGetGlobalTransformPtr()->GetToWorldPosition();
 
@@ -203,4 +206,16 @@ Mat4x4 DirectLightNode::VGetVPMatrix( void ) const
    //auto projection = Mat4x4::Ortho( m_Frustum.m_Right, m_Frustum.m_Left, m_Frustum.m_Top, m_Frustum.m_Bottom, m_Frustum.m_FarDis, m_Frustum.m_NearDis );
    auto projection = Mat4x4::Ortho( -m_Frustum.m_Left, -m_Frustum.m_Right, m_Frustum.m_Top, m_Frustum.m_Bottom, m_Frustum.m_FarDis, m_Frustum.m_NearDis );
    return projection * view;
+   }
+
+Mat4x4 DirectionalLightNode::VGetShadowMapMatrix( void ) const
+   {
+   auto ret = VGetVPMatrix();
+   // This matrix is for mapping to shadow map texture, from [ +-1 ] to [ 0, 1 ]
+   return Mat4x4(
+      0.5, 0.0, 0.0, 0.0,
+      0.0, 0.5, 0.0, 0.0,
+      0.0, 0.0, 0.5, 0.0,
+      0.5, 0.5, 0.5, 1.0
+      ) * ret;
    }

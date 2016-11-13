@@ -55,22 +55,22 @@ SkeletalMeshSceneNode::SkeletalMeshSceneNode(
 
    ENG_ZERO_MEM( m_Buffers );
 
-   m_BoneTransformUni = 0;
-   m_MVPUni = 0;
+   m_BoneTransformUni = -1;
+   m_MVPUni = -1;
    m_MeshTextureObj = 0;
-   m_NeshTextureUni = 0;
-   m_VertexArrayObj = 0;
+   m_NeshTextureUni = -1;
+   m_VertexArrayObj = -1;
 
-   m_MUni = 0;
-   m_LightPosWorldSpaceUni = 0;
-   m_LigthDirWorldSpaceUni = 0;
-   m_LightColorUni = 0;
-   m_LightPowerUni = 0;
-   m_LightNumberUni = 0;
-   m_EyePosWorldSpaceUni = 0;
-   m_MaterialAmbientUni = 0;
-   m_MaterialDiffuseUni = 0;
-   m_MaterialSpecularUni = 0;
+   m_MUni = -1;
+   m_LightPosWorldSpaceUni = -1;
+   m_LigthDirWorldSpaceUni = -1;
+   m_LightColorUni = -1;
+   m_LightPowerUni = -1;
+   m_LightNumberUni = -1;
+   m_EyePosWorldSpaceUni = -1;
+   m_MaterialAmbientUni = -1;
+   m_MaterialDiffuseUni = -1;
+   m_MaterialSpecularUni = -1;
 
    m_VerticesIndexCount = 0;
    }
@@ -224,7 +224,6 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
    glUniform3fv( m_LightColorUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor() );
    glUniform1fv( m_LightPowerUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower() );
    glUniform1i( m_LightNumberUni, pLightManager->GetActiveLightCount() );
-
 
    glUniform3fv( m_EyePosWorldSpaceUni, 1, ( const GLfloat* ) &pScene->GetCamera()->GetToWorldPosition() );
 

@@ -50,7 +50,7 @@ class SkySceneNode : public SceneNode
 
    protected:
       bool					   m_IsActive;
-
+      Mat4x4               m_Projection; // This variable is modified from the projection matrix of current camera node by increasing far distance
 	   GLuint               m_Program;
       VertexShader		   m_VertexShader;
       FragmentShader		   m_FragmentShader;

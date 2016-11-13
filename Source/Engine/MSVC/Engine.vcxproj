@@ -127,7 +127,7 @@
     <ClCompile Include="..\Event\EventFactory.cpp" />
     <ClCompile Include="..\Graphics\Light.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
-    <ClCompile Include="..\Graphics\SceneNode\DirectLightSceneNode.cpp" />
+    <ClCompile Include="..\Graphics\SceneNode\DirectionalLightSceneNode.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\MeshSceneNode.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\SceneNodes.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\SkeletalMeshSceneNode.cpp" />
@@ -216,7 +216,7 @@
     <ClInclude Include="..\Event\EventFactory.h" />
     <ClInclude Include="..\Graphics\Light.h" />
     <ClInclude Include="..\Graphics\Material.h" />
-    <ClInclude Include="..\Graphics\SceneNode\DirectLightSceneNode.h" />
+    <ClInclude Include="..\Graphics\SceneNode\DirectionalLightSceneNode.h" />
     <ClInclude Include="..\Graphics\SceneNode\MeshSceneNode.h" />
     <ClInclude Include="..\Graphics\SceneNode\SceneNodes.h" />
     <ClInclude Include="..\Graphics\SceneNode\SkeletalMeshSceneNode.h" />

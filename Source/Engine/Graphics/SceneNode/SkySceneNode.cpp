@@ -101,10 +101,12 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    m_MVPMatrix          = glGetUniformLocation( m_Program, "MVP" );
    m_TextureUni         = glGetUniformLocation( m_Program, "myTextureSampler" );
 
-   // restore all of its children
-	SceneNode::VOnRestore( pScene );
+   // Reset projection matrix 
+   auto& cameraFrustum = pScene->GetCamera()->GetFrustum();
+   m_Projection.BuildProjection( cameraFrustum.m_Fov, cameraFrustum.m_Aspect, cameraFrustum.m_NearDis, 1000.0f );
 
-	return S_OK;
+   // restore all of its children
+	return SceneNode::VOnRestore( pScene );
    }
 
 int SkySceneNode::VRender( Scene *pScene )
@@ -114,14 +116,15 @@ int SkySceneNode::VRender( Scene *pScene )
    glBindVertexArray( m_VertexArrayObj );
 
    Mat4x4 globalToWorld = VGetGlobalTransformPtr()->GetToWorld();
-
    // Get the projection & view matrix from the camera class
-   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * globalToWorld;
+   
+   //Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * globalToWorld;
+   Mat4x4 mvp = m_Projection * pScene->GetCamera()->GetView() * globalToWorld;
 
 	// Send our transformation to the currently bound shader, 
 	// in the "MVP" uniform
    // 1-> how many matrix, GL_FALSE->should transpose or not
-	glUniformMatrix4fv( m_MVPMatrix, 1, GL_FALSE, &mWorldViewProjection[0][0]);
+	glUniformMatrix4fv( m_MVPMatrix, 1, GL_FALSE, &mvp[0][0]);
   
 	// Bind our texture in Texture Unit 0
 	glActiveTexture( GL_TEXTURE0 );

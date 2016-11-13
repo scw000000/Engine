@@ -4,5 +4,5 @@
 layout(location = 0) out float oFragmentdepth;
 
 void main(){
-	// oFragmentdepth = gl_FragCoord.z; // Do not need this, it will render to texture automatically
+	 oFragmentdepth = gl_FragCoord.z; // Do not need this, it will render to texture automatically
 }

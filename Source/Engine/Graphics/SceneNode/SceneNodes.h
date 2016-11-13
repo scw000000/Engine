@@ -48,7 +48,7 @@ struct ShadowVertexInfo
 class SceneNodeProperties
    {
    friend class SceneNode;
-   friend class DirectLightNode;
+   friend class DirectionalLightNode;
    public:
       SceneNodeProperties( void );
 

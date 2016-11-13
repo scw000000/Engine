@@ -16,6 +16,7 @@
 #include "OpenGLRenderer.h"
 
 #define MAXIMUM_LIGHTS_SUPPORTED (8)
+#define MAXIMUM_SHADOWMAP_TEXTURE_SUPPORTED (8)
 
 struct LightProperties;
 typedef shared_ptr<LightProperties> LightPropertiesPtr;
@@ -43,6 +44,8 @@ class LightNode : public SceneNode
       virtual void VPreRenderShadowMap( void ) = 0;
       virtual bool VIsInside( const Vec3& worldPos, float radius = 0.f ) const = 0;
       virtual Mat4x4 VGetVPMatrix( void ) const = 0;
+      virtual Mat4x4 VGetShadowMapMatrix( void ) const = 0;
+      virtual GLuint VGetShadowMapTexture( void ) const = 0;
 
    protected:
       LightPropertiesPtr m_pLightProps;
@@ -83,6 +86,8 @@ class LightManager
       Vec3* GetLightDirection( void ) { return m_LightDir; }
       float* GetLightPower( void ) { return m_LightPower; }
       Color* GetLightColor( void ) { return m_LightColor; }
+      Mat4x4* GetShadowMapMatrix( void ) { return m_ShadowMapMatrix; }
+      GLuint* GetShadowMaptexture( void ) { return m_ShadowMapTexture; }
       void NewSceneNodeDelegate( IEventPtr pEvent );
       void DestroySceneNodeDelegate( IEventPtr pEvent );
 
@@ -93,8 +98,10 @@ class LightManager
    protected:
       Lights	m_Lights;
       Lights   m_ActiveLights;
-      Vec3     m_LightPosWorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
-      Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
-      float     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Mat4x4   m_ShadowMapMatrix[ MAXIMUM_LIGHTS_SUPPORTED ];
+      GLuint   m_ShadowMapTexture[ MAXIMUM_LIGHTS_SUPPORTED ];
       Color		m_LightColor[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Vec3     m_LightPosWorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
+      float     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
    };

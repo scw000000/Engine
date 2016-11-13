@@ -9,7 +9,7 @@
                 <PitchYawRoll x="-0.000000" y="0.000000" z="0.000000" />
                 <Scale x="1.000000" y="1.000000" z="1.000000" />
             </Transform>
-            <Mesh path="art\cube.obj" />
+            <Mesh path="art\room_thickwalls.obj" />
             <Material>
                 <Texture path="art\cube.jpg" />
                 <Diffuse r="1.000000" g="1.000000" b="1.000000" a="1.000000" />

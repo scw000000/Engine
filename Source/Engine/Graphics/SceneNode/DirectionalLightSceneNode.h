@@ -1,6 +1,6 @@
 #pragma once
 /*!
- * \file DirectLightSceneNode.h
+ * \file DirectionalLightSceneNode.h
  * \date 2016/10/29 17:21
  *
  * \author scw00
@@ -15,10 +15,10 @@
 #include "..\Light.h"
 #include "..\Shaders.h"
 
-class DirectLightNode : public LightNode
+class DirectionalLightNode : public LightNode
    {
    public:
-   DirectLightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
+   DirectionalLightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
 
       virtual int VOnRestore( Scene *pScene ) override;
       virtual void VSetUpRenderShadowMap( void ) override;
@@ -28,6 +28,8 @@ class DirectLightNode : public LightNode
       virtual int VDelegateUpdate( Scene *pScene, unsigned long elapsedMs ) override;
       virtual bool VIsInside( const Vec3& worldPos, float radius = 0.f ) const override;
       virtual Mat4x4 VGetVPMatrix( void ) const override;
+      virtual Mat4x4 VGetShadowMapMatrix( void ) const override;
+      virtual GLuint VGetShadowMapTexture( void ) const override { return m_ShadowMapTextureObj; }
 
    protected:
       
@@ -48,7 +50,6 @@ class DirectLightNode : public LightNode
       GLuint         m_MVPUni;
 
       OrthogonalFrustum  m_Frustum;
-
    };
 
 

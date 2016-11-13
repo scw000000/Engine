@@ -66,7 +66,7 @@ int OpenGLTextureDrawer::OnRestore( void )
    // 1st attribute buffer : vertices
    glGenBuffers( 1, &m_Buffers[ Vertex_Buffer ] );
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
-   glBufferData( GL_ARRAY_BUFFER, ENG_ARRAY_SIZE_IN_ELEMENTS( QUAD_VERTEX_POSITION ) * sizeof( GLfloat ) * 2, QUAD_VERTEX_POSITION, GL_STATIC_DRAW );
+   glBufferData( GL_ARRAY_BUFFER, ENG_ARRAY_SIZE( QUAD_VERTEX_POSITION ), QUAD_VERTEX_POSITION, GL_STATIC_DRAW );
    glEnableVertexAttribArray( VERTEX_LOCATION );
    glVertexAttribPointer(
       VERTEX_LOCATION,                  // attribute
@@ -80,7 +80,7 @@ int OpenGLTextureDrawer::OnRestore( void )
    // 2nd attribute buffer : UVs
    glGenBuffers( 1, &m_Buffers[ UV_Buffer ] );
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
-   glBufferData( GL_ARRAY_BUFFER, ENG_ARRAY_SIZE_IN_ELEMENTS( QUAD_UV_POSITION ) * sizeof( GLfloat ) * 2, QUAD_UV_POSITION, GL_STATIC_DRAW );
+   glBufferData( GL_ARRAY_BUFFER, ENG_ARRAY_SIZE( QUAD_UV_POSITION ), QUAD_UV_POSITION, GL_STATIC_DRAW );
    glEnableVertexAttribArray( UV_LOCATION );
    glVertexAttribPointer(
       UV_LOCATION,                                // attribute
@@ -93,7 +93,7 @@ int OpenGLTextureDrawer::OnRestore( void )
 
    glGenBuffers( 1, &m_Buffers[ Index_Buffer ] );
    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ Index_Buffer ] );
-   glBufferData( GL_ELEMENT_ARRAY_BUFFER, ENG_ARRAY_SIZE_IN_ELEMENTS( QUAD_VERTEX_INDEX ) * sizeof( GLushort ), QUAD_VERTEX_INDEX, GL_STATIC_DRAW );
+   glBufferData( GL_ELEMENT_ARRAY_BUFFER, ENG_ARRAY_SIZE( QUAD_VERTEX_INDEX ), QUAD_VERTEX_INDEX, GL_STATIC_DRAW );
 
    m_TextureUni = glGetUniformLocation( m_Program, "uTexture" );
 

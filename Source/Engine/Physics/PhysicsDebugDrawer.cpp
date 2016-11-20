@@ -16,10 +16,19 @@
 #include "PhysicsDebugDrawer.h"
 #include "../UserInterface/HumanView.h"
 
+BulletDebugDrawer::BulletDebugDrawer( void )
+   {
+   m_DebugModes = btIDebugDraw::DBG_NoDebug;
+   }
+
 void BulletDebugDrawer::drawContactPoint( const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color )
    {
+   if( ( m_DebugModes & btIDebugDraw::DBG_DrawContactPoints ) == 0 )
+      {
+      return;
+      }
    // draw a line to represent the normal.  This only lasts one frame, and is hard to see.
-   //   it might help to linger this drawn object onscreen for a while to make it more noticeable
+   // it might help to linger this drawn object on screen for a while to make it more noticeable
 
    btVector3 const startPoint = PointOnB;
    btVector3 const endPoint = PointOnB + normalOnB * distance;
@@ -154,12 +163,17 @@ void BulletDebugDrawer::ReadOptions( )
 
 void BulletDebugDrawer::drawLine( const btVector3& from, const btVector3& to, const btVector3& lineColor )
    {
-   shared_ptr<Scene> pScene = g_pApp->m_pEngineLogic->m_pWrold;
-   shared_ptr<IRenderer> pRenderer = pScene->GetRenderer( );
+   if( ( m_DebugModes & btIDebugDraw::DBG_DrawWireframe ) == 0 )
+      {
+      return;
+      }
+
    Vec3 vec3From( from.x(), from.y(), from.z() );
    Vec3 vec3To( to.x(), to.y(), to.z() );
    Color color( lineColor.x( ), lineColor.y( ), lineColor.z( ) );
 
+   shared_ptr<Scene> pScene = g_pApp->m_pEngineLogic->m_pWrold;
+   shared_ptr<IRenderer> pRenderer = pScene->GetRenderer();
    pRenderer->VDrawLine( vec3From, vec3To, color );
    }
 

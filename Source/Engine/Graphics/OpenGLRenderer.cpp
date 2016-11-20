@@ -318,7 +318,7 @@ void OpenGLRenderer::VDrawLine( const Vec3& from, const Vec3& to, const Color& c
    Vec4 to_Proj = vp.Xform( to4 );
 
    glLineWidth( 2.5 );
-
+   // Draw in NDC space [-1, +1]
    glBegin( GL_LINES );
    glColor3f( color.m_Component.r, color.m_Component.g, color.m_Component.b );
    glVertex3f( from_Proj.x / from_Proj.w, from_Proj.y / from_Proj.w, from_Proj.z / from_Proj.w );

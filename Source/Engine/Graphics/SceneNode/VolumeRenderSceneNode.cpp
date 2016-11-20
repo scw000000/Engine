@@ -356,6 +356,7 @@ void VolumeRenderSceneNode::SetUpFrameBuffer( void )
    ENG_ASSERT( m_FrameBufferObj );
 
    glBindFramebuffer( GL_FRAMEBUFFER, m_FrameBufferObj );
+   // Set up rendering target
    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_RenderedTextureObj, 0 );
    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RenderDepthBufferObj );
    

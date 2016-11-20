@@ -11,7 +11,7 @@
             </Transform>
             <Mesh path="art\room_thickwalls.obj" />
             <Material>
-                <Texture path="art\cube.jpg" />
+                <Texture path="art\gray.jpg" />
                 <Diffuse r="1.000000" g="1.000000" b="1.000000" a="1.000000" />
                 <Ambient r="0.200000" g="0.200000" b="0.200000" a="1.000000" />
             </Material>

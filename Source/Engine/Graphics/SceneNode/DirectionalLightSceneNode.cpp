@@ -146,7 +146,6 @@ void DirectionalLightNode::VRenderShadowMap( const Mat4x4& vp, shared_ptr< IScen
 void DirectionalLightNode::VPreRenderShadowMap( void )
    {
    glBindFramebuffer( GL_FRAMEBUFFER, m_FrameBufferObj );
- //  glClearColor( 0.f, 0.f, 0.f, 1.f );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    }
@@ -210,12 +209,11 @@ Mat4x4 DirectionalLightNode::VGetVPMatrix( void ) const
 
 Mat4x4 DirectionalLightNode::VGetShadowMapMatrix( void ) const
    {
-   auto ret = VGetVPMatrix();
    // This matrix is for mapping to shadow map texture, from [ +-1 ] to [ 0, 1 ]
    return Mat4x4(
       0.5, 0.0, 0.0, 0.0,
       0.0, 0.5, 0.0, 0.0,
       0.0, 0.0, 0.5, 0.0,
       0.5, 0.5, 0.5, 1.0
-      ) * ret;
+      ) * VGetVPMatrix();
    }

@@ -219,7 +219,7 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
    auto screenSize = g_pApp->GetScreenSize();
    glEnable( GL_CULL_FACE );
    glCullFace( GL_FRONT );
-   // Use our shader
+
    glBindVertexArray( m_VAO );
    glBindFramebuffer( GL_DRAW_FRAMEBUFFER, m_FrameBufferObj );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -232,36 +232,12 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
 
    glUniformMatrix4fv( m_FirstPassMVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
    glDrawElements(
-      GL_TRIANGLES,     // mode
-      36,               // count
-      GL_UNSIGNED_INT,  // type
-      ( void* ) 0       // element array buffer offset
+      GL_TRIANGLES,     
+      36,
+      GL_UNSIGNED_INT,  
+      ( void* ) 0       
       );
-/*
-   glUniformMatrix4fv( m_ToWorldMatrix, 1, GL_FALSE, &pScene->GetTopMatrix()[ 0 ][ 0 ] );
 
-   auto pLightManager = pScene->GetLightManagerPtr();
-
-   glUniform3fv( m_LightPosWorldSpace, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPosWorldSpace() );
-   glUniform3fv( m_LigthDirection, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightDirection() );
-   glUniform3fv( m_LightColor, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor() );
-   glUniform1fv( m_LightPower, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower() );
-   glUniform3fv( m_LightAmbient, 1, ( const GLfloat* ) pLightManager->GetLightAmbient() );
-   glUniform1i( m_LightNumber, pLightManager->GetActiveLightCount() );
-
-
-   glUniform3fv( m_EyeDirWorldSpace, 1, ( const GLfloat* ) &pScene->GetCamera()->GetForward() );
-
-   glUniform4fv( m_MaterialDiffuse, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse() );
-   glUniform3fv( m_MaterialAmbient, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient() );*/
-
-   // Bind our texture in Texture Unit 0
-   /*glActiveTexture( GL_TEXTURE0 );
-   glBindTexture( GL_TEXTURE_2D, m_Texture );*/
-   // Set our "myTextureSampler" sampler to user Texture Unit 0
-   /*glUniform1i( m_TextureUni, 0 );*/
-   
-  // 
    glCullFace( GL_BACK );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 

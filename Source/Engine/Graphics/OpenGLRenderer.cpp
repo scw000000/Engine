@@ -61,8 +61,6 @@ void OpenGLRenderer::VShutdown( void )
 
 bool OpenGLRenderer::VPreRender( void )
    {
-   glClearDepth( 1.0 );
-   // use previously setted clearColr to draw background
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    return true;
    }
@@ -73,7 +71,7 @@ bool OpenGLRenderer::VPostRender( void )
    float xSize = 300.f;
    float ySize = xSize * ( float ) screensize.y / ( float ) screensize.x;
 
-   OpenGLRenderer::s_TextureDrawer.DrawTexture( 3, Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
+   OpenGLRenderer::s_TextureDrawer.DrawTexture( 1, Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
    SDL_GL_SwapWindow( g_pApp->GetWindow() );
    return true;
    }
@@ -202,6 +200,7 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
 
       verticesIndexOffset += pMesh->mNumVertices;
       }
+   ENG_ASSERT( pMeshExtra->m_NumVertices == verticesIndexOffset );
    if( pIndexBuffer )
       {
       glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, *pIndexBuffer );
@@ -210,6 +209,7 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
                        indexBuffer.size() * sizeof( indexBuffer[ 0 ] ),
                        &indexBuffer[ 0 ] );
       }
+   ENG_ASSERT( pMeshExtra->m_NumVertexIndex == indexBuffer.size() );
    }
 
 void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMeshResHandle )

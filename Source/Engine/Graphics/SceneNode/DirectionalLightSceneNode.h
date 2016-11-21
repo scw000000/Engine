@@ -22,7 +22,7 @@ class DirectionalLightNode : public LightNode
 
       virtual int VOnRestore( Scene *pScene ) override;
       virtual void VSetUpRenderShadowMap( void ) override;
-      virtual void VRenderShadowMap( const Mat4x4& vp, shared_ptr< ISceneNode > pNode ) override;
+      virtual void VRenderShadowMap( shared_ptr< ISceneNode > pNode ) override;
       virtual void VPreRenderShadowMap( void ) override;
       // Update Frustum size here       
       virtual int VDelegateUpdate( Scene *pScene, unsigned long elapsedMs ) override;

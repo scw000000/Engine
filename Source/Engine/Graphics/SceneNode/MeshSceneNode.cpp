@@ -131,7 +131,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_LightPowerUni         = glGetUniformLocation( m_Program, "uLightPower" );
    m_LightNumberUni        = glGetUniformLocation( m_Program, "uLightNumber" );
 
-   m_ShadowMapMatrixUni    = glGetUniformLocation( m_Program, "uShadowMapMatrix" );
+   /*m_ShadowMapMatrixUni    = glGetUniformLocation( m_Program, "uShadowMapMatrix" );
   
    for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
       {
@@ -139,7 +139,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       str.push_back( '0' + i );
       str.push_back( ']' );
       m_ShadowMapTextureUni[ i ] = glGetUniformLocation( m_Program, str.c_str() );
-      }
+      }*/
       
    m_EyePosWorldSpaceUni   = glGetUniformLocation( m_Program, "uEyePosition_WorldSpace" );
    
@@ -177,15 +177,15 @@ int MeshSceneNode::VRender( Scene *pScene )
    glUniform1fv( m_LightPowerUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower( ) );
    glUniform1i( m_LightNumberUni, pLightManager->GetActiveLightCount( ) );
 
-   auto shadowMapMatrix = pLightManager->GetShadowMapMatrix();
-   glUniformMatrix4fv( m_ShadowMapMatrixUni, MAXIMUM_LIGHTS_SUPPORTED, GL_FALSE, &pLightManager->GetShadowMapMatrix()[ 0 ][ 0 ][ 0 ] );
-   auto shadowMapTextureObj = pLightManager->GetShadowMaptexture();
-   for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
-      {
-      glActiveTexture( GL_TEXTURE1 + i );
-      glBindTexture( GL_TEXTURE_2D, shadowMapTextureObj[ i ] );
-      glUniform1i( m_ShadowMapTextureUni[ i ], i + 1 ); // the zero index is for mesh texture
-      }
+   //auto shadowMapMatrix = pLightManager->GetShadowMapMatrix();
+   //glUniformMatrix4fv( m_ShadowMapMatrixUni, MAXIMUM_LIGHTS_SUPPORTED, GL_FALSE, &pLightManager->GetShadowMapMatrix()[ 0 ][ 0 ][ 0 ] );
+   //auto shadowMapTextureObj = pLightManager->GetShadowMaptexture();
+   //for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
+   //   {
+   //   glActiveTexture( GL_TEXTURE1 + i );
+   //   glBindTexture( GL_TEXTURE_2D, shadowMapTextureObj[ i ] );
+   //   glUniform1i( m_ShadowMapTextureUni[ i ], i + 1 ); // the zero index is for mesh texture
+   //   }
 
    glUniform3fv( m_EyePosWorldSpaceUni, 1, ( const GLfloat* ) &pScene->GetCamera()->VGetGlobalPosition() );
    
@@ -208,6 +208,7 @@ int MeshSceneNode::VRender( Scene *pScene )
       );
 
    glBindVertexArray( 0 );
+   glUseProgram( 0 );
 
    return S_OK;
    }

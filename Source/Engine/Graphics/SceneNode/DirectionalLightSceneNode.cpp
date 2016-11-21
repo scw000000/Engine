@@ -89,12 +89,9 @@ void DirectionalLightNode::VSetUpRenderShadowMap( void )
 
    glBindFramebuffer( GL_FRAMEBUFFER, m_FrameBufferObj );
    glViewport( 0, 0, m_ShadowMapDimension.x, m_ShadowMapDimension.y );
-
-   glEnable( GL_CULL_FACE );
-   glCullFace( GL_BACK ); 
    }
 
-void DirectionalLightNode::VRenderShadowMap( const Mat4x4& vp, shared_ptr< ISceneNode > pNode )
+void DirectionalLightNode::VRenderShadowMap( shared_ptr< ISceneNode > pNode )
    {
    auto& vertexInfo = pNode->VGetShadowVertexInfo();
 
@@ -113,8 +110,9 @@ void DirectionalLightNode::VRenderShadowMap( const Mat4x4& vp, shared_ptr< IScen
 
    glUniformMatrix4fv( m_MVPUni, 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
 
-   glBindBuffer( GL_ARRAY_BUFFER, vertexInfo.m_Vertexbuffer );
    glEnableVertexAttribArray( VERTEX_LOCATION );
+   glBindBuffer( GL_ARRAY_BUFFER, vertexInfo.m_Vertexbuffer );
+   
    glVertexAttribPointer(
       VERTEX_LOCATION,  // The attribute we want to configure
       3,                  // size
@@ -133,6 +131,8 @@ void DirectionalLightNode::VRenderShadowMap( const Mat4x4& vp, shared_ptr< IScen
       ( void* ) 0           // element array buffer offset
       );
 
+   glDisableVertexAttribArray( 0 );
+   glUseProgram( 0 );
    glBindVertexArray( 0 );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    auto screenDimension = g_pApp->GetScreenSize();

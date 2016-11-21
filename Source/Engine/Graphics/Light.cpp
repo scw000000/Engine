@@ -85,9 +85,6 @@ void LightManager::RenderShadowMap( shared_ptr< LightNode > ) const
    
    }
 
-
-Mat4x4 gTest;
-
 void LightManager::CalcLighting( Scene *pScene )
    {
    m_DeferredShader.VPreRender();
@@ -101,7 +98,6 @@ void LightManager::CalcLighting( Scene *pScene )
       {
       //auto pStaticGroup = pScene->m_pRoot->m_Children[ RenderPass_Static ];
      // CalcShadow( pStaticGroup );
-      gTest = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView();
       auto pActorGroup = pScene->m_pRoot->m_Children[ RenderGroup_Actor ];
       auto& childrenList = pActorGroup->VGetChildrenSceneNodes();
       for( auto pChild : childrenList )
@@ -123,10 +119,10 @@ void LightManager::CalcLighting( Scene *pScene )
       memcpy( &m_LightDir[ i ], &lightIt->get()->VGetGlobalTransformPtr()->GetForward(), sizeof( Vec3 ) );
       memcpy( &m_LightPower[ i ], &lightIt->get()->GetLightPropertiesPtr()->m_Power, sizeof( float ) );
       memcpy( &m_LightColor[ i ], &lightIt->get()->GetLightPropertiesPtr()->m_Diffuse, sizeof( Color ) );
-      auto shadowMapMatrix = lightIt->get()->VGetShadowMapMatrix();
-      memcpy( &m_ShadowMapMatrix[ i ], &shadowMapMatrix, sizeof( Mat4x4 ) );
-      auto shadowMapTexture = lightIt->get()->VGetShadowMapTexture();
-      memcpy( &m_ShadowMapTexture[ i ], &shadowMapTexture, sizeof( GLuint ) );
+      // auto shadowMapMatrix = lightIt->get()->VGetShadowMapMatrix();
+      //  memcpy( &m_ShadowMapMatrix[ i ], &shadowMapMatrix, sizeof( Mat4x4 ) );
+    //  auto shadowMapTexture = lightIt->get()->VGetShadowMapTexture();
+    //  memcpy( &m_ShadowMapTexture[ i ], &shadowMapTexture, sizeof( GLuint ) );
       }
    }  
 
@@ -159,8 +155,8 @@ void LightManager::CalcShadow( Scene *pScene, shared_ptr< ISceneNode > pNode )
       auto nodeGlobalPos = pNode->VGetGlobalTransformPtr()->GetToWorldPosition();
       if( pNode->VGetProperties().GetEnableShadow() && lightIt->get()->VIsInside( nodeGlobalPos, pNode->VGetProperties().GetRadius() ) )
          {
-         lightIt->get()->VSetUpRenderShadowMap();
-         lightIt->get()->VRenderShadowMap( gTest, pNode );
+         //lightIt->get()->VSetUpRenderShadowMap();
+        // lightIt->get()->VRenderShadowMap( pNode );
          }
       }
    auto& childrenList = pNode->VGetChildrenSceneNodes();

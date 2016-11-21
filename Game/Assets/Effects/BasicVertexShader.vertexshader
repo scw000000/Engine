@@ -9,15 +9,15 @@ out vec2 vUV;
 out vec3 vPosition_WorldSpace;
 out vec3 vNormal_WorldSpace;
 out vec3 vEyeDirection_WorldSpace;
-out vec4 vShadowMapTexCoord[ MAXIMUM_LIGHTS_SUPPORTED ];
+//out vec4 vShadowMapTexCoord[ MAXIMUM_LIGHTS_SUPPORTED ];
 
 uniform mat4 	uMVP;
 uniform mat4 	uM;
 
 uniform vec3	uEyePosition_WorldSpace;
 
-uniform int     uLightNumber;
-uniform mat4    uShadowMapMatrix[ MAXIMUM_LIGHTS_SUPPORTED ];
+//uniform int     uLightNumber;
+//uniform mat4    uShadowMapMatrix[ MAXIMUM_LIGHTS_SUPPORTED ];
 
 void main()
 	{
@@ -26,17 +26,17 @@ void main()
     vec4 vertexPosition_WorldSpace = uM * vec4( iVertexPosition_Modelspace, 1 );
 	vPosition_WorldSpace = vertexPosition_WorldSpace.xyz;
 	
-	vEyeDirection_WorldSpace = uEyePosition_WorldSpace - vPosition_WorldSpace;
+	vEyeDirection_WorldSpace = normalize( uEyePosition_WorldSpace - vPosition_WorldSpace );
 	
 	// Normal of the the vertex, in camera space
     // Only correct if ModelMatrix does not scale the model ! Use its inverse transpose if not
-	vNormal_WorldSpace = ( uM * vec4( iVertexNormal_Modelspace, 0 ) ) .xyz;
+	vNormal_WorldSpace = normalize( ( uM * vec4( iVertexNormal_Modelspace, 0 ) ) .xyz );
 	
 	vUV = iVertexUV;
     
-    for( int i = 0; i < uLightNumber; ++i )
-        {
-        vShadowMapTexCoord[ i ] = ( uShadowMapMatrix[ i ] * vertexPosition_WorldSpace );
-        }
+    //for( int i = 0; i < uLightNumber; ++i )
+    //    {
+    //    vShadowMapTexCoord[ i ] = ( uShadowMapMatrix[ i ] * vertexPosition_WorldSpace );
+    //    }
 	}
 

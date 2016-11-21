@@ -1,18 +1,18 @@
 #version 400
 
 in vec3 vNormal;
-//in vec2 vUV;
+in vec2 vUV;
 
 uniform sampler2D   uMeshTexture;
 
 layout(location = 0) out vec3 normal;
-//layout(location = 1) out vec3 textureColor;
+layout(location = 1) out vec3 textureColor;
 
 void main(){
     normal = vNormal;
     
-    //textureColor = texture( uMeshTexture, vUV ).rgb;
-   //textureColor = vec3( vUV, 1 );
+    textureColor = texture( uMeshTexture, vUV ).rgb;
+   textureColor = vec3( vUV, 1 );
     //normal = vec3( 1, 0, 0 );
 	//color = vertexPos; 
     //color = vec4( 1, 0, 0, 1 );

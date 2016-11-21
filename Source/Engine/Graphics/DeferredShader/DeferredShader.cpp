@@ -104,18 +104,18 @@ int OpenGLDeferredShader::VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNo
       ( void* ) 0         
       );
 
-   //glBindBuffer( GL_VERTEX_ARRAY, bufferObj.m_UVBuffer );
-   //glEnableVertexAttribArray( GEOMETRY_PASS_UV_LOCATION );
-   //glVertexAttribPointer(
-   //   GEOMETRY_PASS_UV_LOCATION,
-   //   2,
-   //   GL_FLOAT,
-   //   GL_FALSE,
-   //   0,
-   //   ( void* ) 0
-   //   );
+   glBindBuffer( GL_VERTEX_ARRAY, bufferObj.m_UVBuffer );
+   glEnableVertexAttribArray( GEOMETRY_PASS_UV_LOCATION );
+   glVertexAttribPointer(
+      GEOMETRY_PASS_UV_LOCATION,
+      2,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      ( void* ) 0
+      );
 
-   /*glBindBuffer( GL_VERTEX_ARRAY, bufferObj.m_NormalBuffer );
+   glBindBuffer( GL_VERTEX_ARRAY, bufferObj.m_NormalBuffer );
    glEnableVertexAttribArray( GEOMETRY_PASS_NORMAL_LOCATION );
    glVertexAttribPointer(
       GEOMETRY_PASS_NORMAL_LOCATION,
@@ -124,13 +124,13 @@ int OpenGLDeferredShader::VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNo
       GL_FALSE,
       0,
       ( void* ) 0
-      );*/
+      );
 
    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, bufferObj.m_IndexBuffer );
 
-   //glActiveTexture( GL_TEXTURE0 );
-   //glBindTexture( GL_TEXTURE_2D, bufferObj.m_TextureObj );
-   //glUniform1i( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ], 0 );
+   glActiveTexture( GL_TEXTURE0 );
+   glBindTexture( GL_TEXTURE_2D, bufferObj.m_TextureObj );
+   glUniform1i( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ], 0 );
 
    glDrawElements(
       GL_TRIANGLES,    
@@ -194,37 +194,36 @@ int OpenGLDeferredShader::OnRestoreGeometryPass( void )
    glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_SST[ SST_Depth ], 0 );
 
    // Normal 
-  // glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Normal ] );
-  // glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, screenSize.x, screenSize.y, 0, GL_RGB, GL_FLOAT, NULL );
-  //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
-  //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
-  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-
-  // glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_SST[ SST_Normal ], 0 );
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Normal ] );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, screenSize.x, screenSize.y, 0, GL_RGB, GL_FLOAT, NULL );
+  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
+  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_SST[ SST_Normal ], 0 );
 
    // Texture
-  // glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Texture ] );
-  // glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, screenSize.x, screenSize.y, 0, GL_RGB, GL_FLOAT, NULL );
-  //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
-  //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
-  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-  // glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, m_SST[ SST_Texture ], 0 );
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Texture ] );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, screenSize.x, screenSize.y, 0, GL_RGB, GL_FLOAT, NULL );
+  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
+  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_SST[ SST_Texture ], 0 );
 
-   /*GLuint outputAttatchments[ 3 ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-   glDrawBuffers( 1, outputAttatchments );*/
+   GLuint outputAttatchments[ 3 ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+   glDrawBuffers( 2, outputAttatchments );
 
    m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMVP" );
    ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
 
-   /*m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uNMat" );
-   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] != -1 );*/
+   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uNMat" );
+   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] != -1 );
 
-   //m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMeshTexture" );
-   //ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ] != -1 );
+   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMeshTexture" );
+   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ] != -1 );
 
-   
+
 
    ENG_ASSERT( glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE && "Frame buffer error" );
 

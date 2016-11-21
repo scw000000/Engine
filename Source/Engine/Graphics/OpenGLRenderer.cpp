@@ -73,7 +73,7 @@ bool OpenGLRenderer::VPostRender( void )
    float xSize = 300.f;
    float ySize = xSize * ( float ) screensize.y / ( float ) screensize.x;
 
-   OpenGLRenderer::s_TextureDrawer.DrawTexture( 1, Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
+   OpenGLRenderer::s_TextureDrawer.DrawTexture( 3, Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
    SDL_GL_SwapWindow( g_pApp->GetWindow() );
    return true;
    }

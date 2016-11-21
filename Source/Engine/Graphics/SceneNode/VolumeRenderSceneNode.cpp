@@ -48,13 +48,13 @@ const Vec3 VolumeRenderSceneNode::s_BackFacePosition[] = {// Front face
 
 VolumeRenderSceneNode::VolumeRenderSceneNode( const ActorId actorId,
                                               IRenderComponent* pRenderComponent,
-                                              RenderPass renderPass,
+                                              RenderGroup renderGroup,
                                               TransformPtr pTransform,
                                               shared_ptr<Resource> pVolumeTextureResource,
                                               shared_ptr<Resource> pTransferFunctionResource,
                                               const Vec3& textureDiemension,
                                               const Vec3& cuboidDimension )
-                                              : SceneNode( actorId, pRenderComponent, renderPass, pTransform, shared_ptr< Material >( ENG_NEW Material() ) ),
+                                              : SceneNode( actorId, pRenderComponent, renderGroup, pTransform, shared_ptr< Material >( ENG_NEW Material() ) ),
                                               m_FirstPassVertexShader( Resource ( FIRST_PASS_VERTEX_SHADER_FILE_NAME ) ),
                                               m_FirstPassFragmentShader( Resource( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ) ),
                                               m_SecondPassVertexShader( Resource( SECOND_PASS_VERTEX_SHADER_FILE_NAME ) ),
@@ -178,7 +178,6 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT );
    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT );
    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT );
-   // pixel transfer happens here from client to OpenGL server
    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
    auto volumeTextureResHandle = g_pApp->m_pResCache->GetHandle( *m_pVolumeTextureResource );
    auto pRawBuffer = volumeTextureResHandle->GetBuffer();
@@ -360,11 +359,7 @@ void VolumeRenderSceneNode::SetUpFrameBuffer( void )
    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_RenderedTextureObj, 0 );
    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RenderDepthBufferObj );
    
-   GLenum result = glCheckFramebufferStatus( GL_FRAMEBUFFER );
-   if( result != GL_FRAMEBUFFER_COMPLETE )
-      {
-      ENG_ERROR( "Frame buffer setup failed" );
-      }
+   ENG_ASSERT( glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE && "Frame buffer error" );
    }
 
 void VolumeRenderSceneNode::SetUpNormalVolume( std::vector< Vec3 >& output, const char* pRawTexture )

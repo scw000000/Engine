@@ -209,14 +209,14 @@ class IResourceFile
 
 
 
-enum RenderPass
+enum RenderGroup
    {
-	RenderPass_0,
-	RenderPass_Static = RenderPass_0,
-	RenderPass_Actor,
-	RenderPass_Sky,
-	RenderPass_NotRendered,
-	RenderPass_Last
+	RenderGroup_0,
+	RenderGroup_Static = RenderGroup_0,
+	RenderGroup_Actor,
+	RenderGroup_Sky,
+	RenderGroup_NotRendered,
+	RenderGroup_Last
    };
 
 class Scene;
@@ -232,6 +232,7 @@ typedef std::list<shared_ptr<LightNode> > Lights;
 class IRenderer
    {
    public:
+      virtual ~IRenderer() {}
 	   virtual void VSetBackgroundColor( Color color ) = 0; 
 	   virtual GLuint VOnRestore( void ) = 0;
 	   virtual void VShutdown( void ) = 0;

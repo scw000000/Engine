@@ -1,0 +1,20 @@
+#version 400 
+
+layout(location = 0) in vec3 iVertexPosition_Modelspace;
+//layout(location = 1) in vec2 iUV;
+layout(location = 1) in vec3 iVertexNormal_Modelspace;
+
+uniform mat4 uMVP;
+uniform mat4 uNMat;
+
+out vec3 vNormal;
+//out vec2 vUV;
+
+void main(){
+	gl_Position =  uMVP * vec4( iVertexPosition_Modelspace, 1 );
+    
+    vNormal = ( uNMat * vec4( iVertexNormal_Modelspace, 0 ) ).xyz;
+    
+    //vUV = iUV;
+}
+

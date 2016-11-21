@@ -72,11 +72,7 @@ int DirectionalLightNode::VOnRestore( Scene *pScene )
    glDrawBuffer( GL_NONE );
 
    // Always check that our framebuffer is ok
-   auto result = glCheckFramebufferStatus( GL_FRAMEBUFFER );
-   if( result != GL_FRAMEBUFFER_COMPLETE )
-      {
-      ENG_ASSERT( 0 && "Frame buffer error" );
-      }
+   ENG_ASSERT( glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE && "Frame buffer error" );
 
    m_MVPUni = glGetUniformLocation( m_FirstPassProgram, "uMVP" );
 
@@ -103,7 +99,7 @@ void DirectionalLightNode::VRenderShadowMap( const Mat4x4& vp, shared_ptr< IScen
    auto& vertexInfo = pNode->VGetShadowVertexInfo();
 
    // not valid vertex info, return
-   if( vertexInfo.m_Vertexbuffer == 0 || vertexInfo.m_Elementbuffer == 0 || vertexInfo.m_VertexCount == 0 )
+   if( vertexInfo.m_Vertexbuffer == 0 || vertexInfo.m_IndexBuffer == 0 || vertexInfo.m_VertexCount == 0 )
       {
       return;
       }
@@ -128,7 +124,7 @@ void DirectionalLightNode::VRenderShadowMap( const Mat4x4& vp, shared_ptr< IScen
       ( void* ) 0            // array buffer offset
       );
 
-   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vertexInfo.m_Elementbuffer );
+   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, vertexInfo.m_IndexBuffer );
 
    glDrawElements(
       GL_TRIANGLES,      // mode

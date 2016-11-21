@@ -36,7 +36,7 @@ SkeletalMeshRenderComponent::SkeletalMeshRenderComponent( void ) : m_pSkeletalMe
 // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
 shared_ptr<SceneNode> SkeletalMeshRenderComponent::VCreateSceneNode( void )
    {
-   shared_ptr< SceneNode > pSKMeshSceneNode( ENG_NEW SkeletalMeshSceneNode( m_pOwner->GetId(), this, m_pSkeletalMeshResource, m_pAnimScriptResource, m_pMaterial, RenderPass::RenderPass_Actor, m_pTransform ) );
+   shared_ptr< SceneNode > pSKMeshSceneNode( ENG_NEW SkeletalMeshSceneNode( m_pOwner->GetId(), this, m_pSkeletalMeshResource, m_pAnimScriptResource, m_pMaterial, RenderGroup::RenderGroup_Actor, m_pTransform ) );
 
    return pSKMeshSceneNode;
    }

@@ -67,7 +67,7 @@ TiXmlElement* LightProperties::GenerateOverridesXML( TiXmlElement* pResource )
    }
 
 LightNode::LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& props, TransformPtr pTransform )
-   : SceneNode( actorId, pRenderComponent, RenderPass_NotRendered, pTransform )
+   : SceneNode( actorId, pRenderComponent, RenderGroup_NotRendered, pTransform )
    {
 	m_pLightProps = props;
    }
@@ -77,6 +77,7 @@ LightManager::LightManager( void )
    IEventManager* pEventMgr = IEventManager::GetSingleton();
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &LightManager::NewSceneNodeDelegate ), Event_New_Scene_Node::s_EventType );
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &LightManager::DestroySceneNodeDelegate ), Event_Destroy_Scene_Node::s_EventType );
+   m_DeferredShader.VOnRestore();
    }
 
 void LightManager::RenderShadowMap( shared_ptr< LightNode > ) const
@@ -89,6 +90,7 @@ Mat4x4 gTest;
 
 void LightManager::CalcLighting( Scene *pScene )
    {
+   m_DeferredShader.VPreRender();
    // Only calculate shadow for nodes in static and actor group
    for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt )
       {
@@ -100,8 +102,13 @@ void LightManager::CalcLighting( Scene *pScene )
       //auto pStaticGroup = pScene->m_pRoot->m_Children[ RenderPass_Static ];
      // CalcShadow( pStaticGroup );
       gTest = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView();
-      auto pActorGroup = pScene->m_pRoot->m_Children[ RenderPass_Actor ];
-      CalcShadow( pActorGroup );
+      auto pActorGroup = pScene->m_pRoot->m_Children[ RenderGroup_Actor ];
+      auto& childrenList = pActorGroup->VGetChildrenSceneNodes();
+      for( auto pChild : childrenList )
+         {
+         CalcShadow( pScene, pChild );
+         }
+    //  CalcShadow( pScene, pActorGroup );
       }
 
    int i = 0;
@@ -143,8 +150,9 @@ void LightManager::CalcLighting( SceneNode *pNode )
    }
 
 
-void LightManager::CalcShadow( shared_ptr< ISceneNode > pNode )
+void LightManager::CalcShadow( Scene *pScene, shared_ptr< ISceneNode > pNode )
    {
+   m_DeferredShader.VOnRender( pScene, pNode );
    for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt )
       {
       // If the node is inside the frustum of current light, then render it to current light's shadow map
@@ -158,7 +166,7 @@ void LightManager::CalcShadow( shared_ptr< ISceneNode > pNode )
    auto& childrenList = pNode->VGetChildrenSceneNodes();
    for( auto pChild : childrenList )
       {
-      CalcShadow( pChild );
+      CalcShadow( pScene, pChild );
       }
    }
 

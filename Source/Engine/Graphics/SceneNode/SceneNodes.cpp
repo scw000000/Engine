@@ -22,7 +22,7 @@ SceneNodeProperties::SceneNodeProperties( void ) : m_pTransform(), m_pGlobalTran
    {
    m_ActorId = INVALID_ACTOR_ID;
    m_Radius = 0;
-   m_RenderPass = RenderPass_0;
+   m_RenderGroup = RenderGroup_0;
    m_EnableShadow = false;
    }
 
@@ -53,12 +53,12 @@ float SceneNodeProperties::GetAlpha( void ) const
    return fOPAQUE; 
    }
 
-SceneNode::SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderPass renderPass, TransformPtr pNewTransform, MaterialPtr pMaterial )
+SceneNode::SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderGroup renderPass, TransformPtr pNewTransform, MaterialPtr pMaterial )
    {
    m_pParent = NULL;
 	m_Props.m_ActorId = actorId;
    m_Props.m_Name = ( pRenderComponent ) ? pRenderComponent->VGetName() : "SceneNode";
-	m_Props.m_RenderPass = renderPass;
+	m_Props.m_RenderGroup = renderPass;
 	//m_Props.m_AlphaType = AlphaOpaque;
    m_pRenderComponent = pRenderComponent;
    m_Props.m_pMaterial = pMaterial;
@@ -266,28 +266,28 @@ Vec3 SceneNode::VGetGlobalPosition( void ) const
    }
 
 
-RootNode::RootNode() : SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_0 )
+RootNode::RootNode() : SceneNode( INVALID_ACTOR_ID, NULL, RenderGroup_0 )
    {
-	m_Children.reserve(RenderPass_Last);
+	m_Children.reserve(RenderGroup_Last);
 
-   shared_ptr<SceneNode> staticGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_Static ) );
-	m_Children.push_back(staticGroup);	// RenderPass_Static = 0
+   shared_ptr<SceneNode> staticGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderGroup_Static ) );
+	m_Children.push_back(staticGroup);	// RenderGroup_Static = 0
 
-   shared_ptr<SceneNode> actorGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_Actor ) );
-	m_Children.push_back(actorGroup);	// RenderPass_Actor = 1
+   shared_ptr<SceneNode> actorGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderGroup_Actor ) );
+	m_Children.push_back(actorGroup);	// RenderGroup_Actor = 1
 
-   shared_ptr<SceneNode> skyGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_Sky ) );
-	m_Children.push_back(skyGroup);	// RenderPass_Sky = 2
+   shared_ptr<SceneNode> skyGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderGroup_Sky ) );
+	m_Children.push_back(skyGroup);	// RenderGroup_Sky = 2
 
-   shared_ptr<SceneNode> invisibleGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_NotRendered ) );
-	m_Children.push_back(invisibleGroup);	// RenderPass_NotRendered = 3
+   shared_ptr<SceneNode> invisibleGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderGroup_NotRendered ) );
+	m_Children.push_back(invisibleGroup);	// RenderGroup_NotRendered = 3
    }
    
 
-// add child into corresponded renderpass node
+// add child into corresponded render group node
 bool RootNode::VAddChild( shared_ptr<ISceneNode> child )
    {
-   RenderPass pass = child->VGetProperties().GetRenderPass();
+   RenderGroup pass = child->VGetProperties().GetRenderGroup();
 	if ( (unsigned)pass >= m_Children.size() || !m_Children[pass] )
 	   {
 		ENG_ASSERT(0 && _T("There is no such render pass"));
@@ -301,16 +301,16 @@ int RootNode::VRenderChildren( Scene *pScene )
    {
    // the child node of Root nodes are empty node, so there's no need calling VRender for them
    // only their children should be rendered
-   for (int pass = RenderPass_0; pass < RenderPass_Last; ++pass)
+   for (int pass = RenderGroup_0; pass < RenderGroup_Last; ++pass)
 	   {
 		switch(pass)
 		   {
-			case RenderPass_Static:
-			case RenderPass_Actor:
+			case RenderGroup_Static:
+			case RenderGroup_Actor:
  				m_Children[pass]->VRenderChildren(pScene);
 				break;
 
-			case RenderPass_Sky:
+			case RenderGroup_Sky:
 			   {
 				//shared_ptr<IRenderState> skyPass = pScene->GetRenderer()->VPrepareSkyBoxPass();
 				m_Children[pass]->VRenderChildren(pScene);
@@ -337,7 +337,7 @@ bool RootNode::VRemoveChild( ActorId id )
    }
 
 CameraNode::CameraNode( TransformPtr pTransform, PerspectiveFrustum const &frustum ) 
-	      : SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_0, pTransform ),
+	      : SceneNode( INVALID_ACTOR_ID, NULL, RenderGroup_0, pTransform ),
 	      m_Frustum( frustum ),
 	      m_IsActive( true ),
 	      m_IsDebugCamera( false ),
@@ -350,7 +350,7 @@ CameraNode::CameraNode( TransformPtr pTransform, PerspectiveFrustum const &frust
 CameraNode::CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, PerspectiveFrustum const &frustum ) 
 	      : SceneNode( INVALID_ACTOR_ID, 
                       NULL,
-                      RenderPass_0, 
+                      RenderGroup_0, 
                       TransformPtr( ENG_NEW Transform( Mat4x4::LookAtToTransform( eye, center, up ).Inverse() ) )
                       ),
             m_Frustum( frustum ),
@@ -387,8 +387,8 @@ int CameraNode::VOnRestore( Scene *pScene )
 void CameraNode::VSetTransform( const Transform& newTransform ) 
    { 
    SceneNode::VSetTransform( newTransform ); 
-   auto globalTransformPtr = VGetGlobalTransformPtr();
-   m_View = Mat4x4::LookAt( globalTransformPtr->GetToWorldPosition(), globalTransformPtr->GetToWorldPosition() + globalTransformPtr->GetForward(), globalTransformPtr->GetUp() );
+  // auto globalTransformPtr = VGetGlobalTransformPtr();
+   //m_View = Mat4x4::LookAt( globalTransformPtr->GetToWorldPosition(), globalTransformPtr->GetToWorldPosition() + globalTransformPtr->GetForward(), globalTransformPtr->GetUp() );
 
    }
 
@@ -402,6 +402,9 @@ void CameraNode::VSetTransform( const Transform& newTransform )
 // I think atWorld should be set by GetWorldPosition
 int CameraNode::SetViewTransform(  Scene *pScene )
    {
+   auto globalTransformPtr = VGetGlobalTransformPtr();
+   m_View = Mat4x4::LookAt( globalTransformPtr->GetToWorldPosition(), globalTransformPtr->GetToWorldPosition() + globalTransformPtr->GetForward(), globalTransformPtr->GetUp() );
+
    // this code simulates camera pole effect, camera is sticked to target's position +  m_CamOffsetVector
 	if( m_pTarget )
 	   {

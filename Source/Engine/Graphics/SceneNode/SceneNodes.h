@@ -32,16 +32,22 @@ enum AlphaType {
 struct ShadowVertexInfo
    {
    public:
-      ShadowVertexInfo( GLuint vertexBuffer = 0, GLuint elementBuffer = 0, unsigned int vertexCount = 0 )
+      ShadowVertexInfo( void )
          {
-         m_Vertexbuffer = vertexBuffer;
-         m_Elementbuffer = elementBuffer;
-         m_VertexCount = vertexCount;
+         m_Vertexbuffer = 0;
+         m_IndexBuffer = 0;
+         m_NormalBuffer = 0;
+         m_UVBuffer = 0;
+         m_TextureObj = 0;
+         m_VertexCount = 0;
          }
 
    public:
       GLuint m_Vertexbuffer;
-      GLuint m_Elementbuffer;
+      GLuint m_IndexBuffer;
+      GLuint m_NormalBuffer;
+      GLuint m_UVBuffer;
+      GLuint m_TextureObj;
       unsigned int m_VertexCount;
    };
 
@@ -64,7 +70,7 @@ class SceneNodeProperties
       void SetAlpha( const float alpha );
       float GetAlpha( void ) const;
 
-      RenderPass GetRenderPass( void ) const { return m_RenderPass; }
+      RenderGroup GetRenderGroup( void ) const { return m_RenderGroup; }
       float GetRadius( void ) const { return m_Radius; }
       
       MaterialPtr GetMaterialPtr( void ) const { return m_pMaterial; }
@@ -80,7 +86,7 @@ class SceneNodeProperties
       float m_Radius;
       MaterialPtr m_pMaterial;
       std::string m_Name;
-      RenderPass m_RenderPass;
+      RenderGroup m_RenderGroup;
       bool m_EnableShadow;
 
    private:
@@ -95,7 +101,7 @@ class SceneNode : public ISceneNode
    friend class LightManager;
 
    public:
-      SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderPass renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ), MaterialPtr pMaterial = MaterialPtr() );
+      SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderGroup renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ), MaterialPtr pMaterial = MaterialPtr() );
 
 	   virtual ~SceneNode();
 

@@ -30,7 +30,7 @@ class SkeletalMeshSceneNode : public SceneNode
                      shared_ptr<Resource> pMeshResouce,
                      shared_ptr<Resource> pAnimScriptResource,
                      MaterialPtr pMaterial,
-                     RenderPass renderPass,
+                     RenderGroup renderGroup,
                      TransformPtr pTransform );
       ~SkeletalMeshSceneNode( void );
       virtual int VOnRestore( Scene *pScene ) override;

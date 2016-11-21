@@ -26,8 +26,8 @@ const char* const VERTEX_SHADER_FILE_NAME = "Effects\\BasicVertexShader.vertexsh
 const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\BasicFragmentShader.fragmentshader";
 
 MeshSceneNode::MeshSceneNode( 
-   const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, MaterialPtr pMaterial, RenderPass renderPass, TransformPtr pTransform )
-   : SceneNode( actorId, pRenderComponent, renderPass, pTransform, pMaterial ),
+   const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, MaterialPtr pMaterial, RenderGroup renderGroup, TransformPtr pTransform )
+   : SceneNode( actorId, pRenderComponent, renderGroup, pTransform, pMaterial ),
    m_pMeshResource( pMeshResouce ),
    m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
    m_FragmentShader( Resource( FRAGMENT_SHADER_FILE_NAME ) )
@@ -160,9 +160,8 @@ int MeshSceneNode::VRender( Scene *pScene )
    glBindVertexArray( m_VAO );
 
    Mat4x4 globalToWorld = VGetGlobalTransformPtr()->GetToWorld();
-
    // Get the projection & view matrix from the camera class
-   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * globalToWorld;
+   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * VGetGlobalTransformPtr()->GetToWorld();
    // Send our transformation to the currently bound shader, 
    // in the "MVP" uniform
    // 1-> how many matrix, GL_FALSE->should transpose or not
@@ -212,6 +211,19 @@ int MeshSceneNode::VRender( Scene *pScene )
 
    return S_OK;
    }
+
+ShadowVertexInfo MeshSceneNode::VGetShadowVertexInfo( void ) const 
+   { 
+   ShadowVertexInfo ret;
+   ret.m_Vertexbuffer = m_Buffers[ Vertex_Buffer ];
+   ret.m_NormalBuffer = m_Buffers[ Normal_Buffer ];
+   ret.m_UVBuffer = m_Buffers[ UV_Buffer ];
+   ret.m_IndexBuffer = m_Buffers[ Index_Buffer ];
+   ret.m_VertexCount = m_VerticesIndexCount;
+   ret.m_TextureObj = m_MeshTextureObj;
+   return ret;
+   }
+
 
 void MeshSceneNode::ReleaseResource( void )
    {

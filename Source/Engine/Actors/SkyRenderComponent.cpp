@@ -57,7 +57,7 @@ shared_ptr<SceneNode> SkyRenderComponent::VCreateSceneNode( void )
                                                                 this, 
                                                                 m_pMeshResource, 
                                                                 m_pTextureResource, 
-                                                                RenderPass::RenderPass_Sky, 
+                                                                RenderGroup::RenderGroup_Sky, 
                                                                 m_pTransform ) );
             }
       default:

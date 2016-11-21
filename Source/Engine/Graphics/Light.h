@@ -14,6 +14,7 @@
  */
 #include ".\SceneNode\SceneNodes.h"
 #include "OpenGLRenderer.h"
+#include ".\DeferredShader\DeferredShader.h"
 
 #define MAXIMUM_LIGHTS_SUPPORTED (8)
 #define MAXIMUM_SHADOWMAP_TEXTURE_SUPPORTED (8)
@@ -92,7 +93,7 @@ class LightManager
       void DestroySceneNodeDelegate( IEventPtr pEvent );
 
    protected:
-      void CalcShadow( shared_ptr< ISceneNode > pNode );
+   void CalcShadow( Scene *pScene, shared_ptr< ISceneNode > pNode );
       void RenderShadowMap( shared_ptr< LightNode > ) const;
 
    protected:
@@ -104,4 +105,5 @@ class LightManager
       Vec3     m_LightPosWorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
       float     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
       Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
+      OpenGLDeferredShader m_DeferredShader;
    };

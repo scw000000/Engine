@@ -306,6 +306,9 @@ class Mat4x4 : public glm::mat4
       inline Vec3 GetXFormDirection( const Vec3& vec ) const;
 
       inline Mat4x4 Inverse( void ) const { return glm::inverse( *this ); }
+
+      inline Mat4x4 Transpose( void ) const { return glm::transpose( *this ); }
+
       // equal to M = M * T
       inline void AddTranslation( const Vec3 &pos ) { *this = glm::translate( *this, pos ); }
       inline void AddTranslation( const float x, const float y, const float z ) { AddTranslation( Vec3( x, y, z ) ); }

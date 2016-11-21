@@ -43,7 +43,7 @@ Quaternion aiQuateronionToQuat( const aiQuaternion& aiQuat )
 
 
 SkeletalMeshSceneNode::SkeletalMeshSceneNode(
-   const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, shared_ptr<Resource> pAnimScriptResource, MaterialPtr pMaterial, RenderPass renderPass, TransformPtr pTransform )
+   const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, shared_ptr<Resource> pAnimScriptResource, MaterialPtr pMaterial, RenderGroup renderPass, TransformPtr pTransform )
    : SceneNode( actorId, pRenderComponent, renderPass, pTransform, pMaterial ),
    m_pMeshResource( pMeshResouce ),
    m_pAnimScriptResource( pAnimScriptResource ),

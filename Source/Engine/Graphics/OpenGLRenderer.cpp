@@ -70,9 +70,10 @@ bool OpenGLRenderer::VPreRender( void )
 bool OpenGLRenderer::VPostRender( void )
    {
    auto screensize = g_pApp->GetScreenSize();
-   float ySize = 300.f * ( float ) screensize.y / ( float ) screensize.x;
+   float xSize = 300.f;
+   float ySize = xSize * ( float ) screensize.y / ( float ) screensize.x;
 
-   OpenGLRenderer::s_TextureDrawer.DrawTexture( 5, Point( 0, 0 ), Point( 300, ( Sint32 ) ( ySize ) ) ); // for testing
+   OpenGLRenderer::s_TextureDrawer.DrawTexture( 1, Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
    SDL_GL_SwapWindow( g_pApp->GetWindow() );
    return true;
    }
@@ -98,6 +99,7 @@ void OpenGLRenderer::LoadTexture2D( GLuint* textureId, const Resource& textureRe
 
    //"Bind" the newly created texture : all future texture functions will modify this texture
    glBindTexture( GL_TEXTURE_2D, *textureId );
+   // No worry for row size that is not evenly divided by 4
    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
    auto pSurface = TextureResourceLoader::LoadAndReturnSurface( textureResource );

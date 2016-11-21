@@ -23,7 +23,7 @@ class MeshSceneNode : public SceneNode
                      IRenderComponent* pRenderComponent,
                      shared_ptr<Resource> pMeshResouce, 
                      MaterialPtr pMaterial, 
-                     RenderPass renderPass,  
+                     RenderGroup renderGroup,
                      TransformPtr pTransform );
       ~MeshSceneNode( void );
 	   virtual int VOnRestore( Scene *pScene ) override;
@@ -39,7 +39,7 @@ class MeshSceneNode : public SceneNode
 	    */
 	    virtual int VRender( Scene *pScene )  override;
       GLuint GetProgram( void ) { return m_Program; };
-      virtual ShadowVertexInfo VGetShadowVertexInfo( void ) const override { return ShadowVertexInfo( m_Buffers[ Vertex_Buffer ], m_Buffers[ Index_Buffer ], m_VerticesIndexCount ); }
+      virtual ShadowVertexInfo VGetShadowVertexInfo( void ) const override;
 
    protected:
       void ReleaseResource( void );

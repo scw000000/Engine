@@ -25,7 +25,7 @@ class SkySceneNode : public SceneNode
                     IRenderComponent* pRenderComponent,
                     shared_ptr<Resource> pMeshResource,
                     shared_ptr<Resource> pTextureResource, 
-                    RenderPass renderPass,  
+                    RenderGroup renderGroup,
                     TransformPtr pTransform );
       ~SkySceneNode( void );
 	   virtual int VOnRestore( Scene *pScene ) override; ;

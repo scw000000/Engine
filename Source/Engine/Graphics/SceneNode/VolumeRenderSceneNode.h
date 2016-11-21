@@ -22,7 +22,7 @@ class VolumeRenderSceneNode : public SceneNode
    public:
       VolumeRenderSceneNode( const ActorId actorId,
                      IRenderComponent* pRenderComponent,
-                     RenderPass renderPass,
+                     RenderGroup renderGroup,
                      TransformPtr pTransform,
                      shared_ptr<Resource> pVolumeTextureResource,
                      shared_ptr<Resource> pTransferFunctionResource,

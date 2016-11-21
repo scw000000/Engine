@@ -20,6 +20,7 @@ class IShader
       virtual void VOnRestore( void ) = 0;
       virtual void VReleaseShader( GLuint program ) = 0;
       virtual GLuint VGetShaderObject( void ) const = 0;
+      virtual void VSetResource( const Resource& resource ) = 0;
    };
 
 class OpenGLShader : public IShader
@@ -29,6 +30,7 @@ class OpenGLShader : public IShader
       
       virtual void VReleaseShader( GLuint program ) override;
       virtual GLuint VGetShaderObject( void ) const override { return m_ShaderObj; };
+      virtual void VSetResource( const Resource& resource ) override { m_ShaderResource = resource; }
 
    protected:
       void CompileAndSetShader( GLuint shaderType );
@@ -42,7 +44,7 @@ class OpenGLShader : public IShader
 class VertexShader : public OpenGLShader
    {
    public:
-      VertexShader( const Resource& shaderResource );
+      VertexShader( const Resource& shaderResource = Resource( "" ) );
 	   ~VertexShader( void );
       // This function is called in SceneNode::Onrestore
       // reload and compile vertex shader
@@ -53,7 +55,7 @@ class VertexShader : public OpenGLShader
 class FragmentShader : public OpenGLShader
    {
    public:
-      FragmentShader( const Resource& shaderResource );
+      FragmentShader( const Resource& shaderResource = Resource( "" ) );
 	   ~FragmentShader( void );
       // This function is called in SceneNode::Onrestore
       // reload and compile fragment shader

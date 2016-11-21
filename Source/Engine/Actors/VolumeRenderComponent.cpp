@@ -26,7 +26,7 @@ VolumeRenderComponent::VolumeRenderComponent( void ) : m_pVolumeTextureResource(
 
 shared_ptr<SceneNode> VolumeRenderComponent::VCreateSceneNode( void ) 
    {
-   return shared_ptr< SceneNode >( ENG_NEW VolumeRenderSceneNode( m_pOwner->GetId(), this, RenderPass::RenderPass_Actor, m_pTransform, m_pVolumeTextureResource, m_pTransferFuncionResource, m_TextureDimension, m_CuboidDimension ) );
+   return shared_ptr< SceneNode >( ENG_NEW VolumeRenderSceneNode( m_pOwner->GetId(), this, RenderGroup::RenderGroup_Actor, m_pTransform, m_pVolumeTextureResource, m_pTransferFuncionResource, m_TextureDimension, m_CuboidDimension ) );
    }
 
 bool VolumeRenderComponent::VDelegateInit( TiXmlElement* pData ) 

@@ -30,7 +30,7 @@ XmlResourceLoader::XmlResourceLoader( void ) : ResourceLoader( std::vector< std:
    
    }
 
-bool XmlResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle )
+int XmlResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle )
    {
    if ( rawSize <= 0 )
       {
@@ -42,7 +42,7 @@ bool XmlResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, sh
 
     handle->SetExtraData( shared_ptr<XmlResourceExtraData>( pExtraData) );
 
-    return true;
+    return S_OK;
    }
 
 // The resource handle will be pushed into m_lruResHandleList until engine exist or swapped out

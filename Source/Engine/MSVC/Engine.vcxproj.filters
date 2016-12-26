@@ -52,8 +52,8 @@
     <Filter Include="Math">
       <UniqueIdentifier>{37154279-f676-4eeb-91ea-5156a40b4de9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Graphics\DeferredRenderer">
-      <UniqueIdentifier>{88982f36-ba14-4904-8867-4ce4bf07b99b}</UniqueIdentifier>
+    <Filter Include="Graphics\Renderer">
+      <UniqueIdentifier>{1a61e7fa-8a0f-4766-9b23-9597cf76e030}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -134,9 +134,6 @@
       <Filter>ResourceCache</Filter>
     </ClCompile>
     <ClCompile Include="..\Graphics\Shaders.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Graphics\OpenGLRenderer.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\Actors\RenderComponent.cpp">
@@ -277,8 +274,17 @@
     <ClCompile Include="..\Graphics\SceneNode\DirectionalLightSceneNode.cpp">
       <Filter>Graphics\SceneNode</Filter>
     </ClCompile>
-    <ClCompile Include="..\Graphics\DeferredRenderer\DeferredRenderer.cpp">
-      <Filter>Graphics\DeferredRenderer</Filter>
+    <ClCompile Include="..\Graphics\Renderer\DeferredRenderer.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\RenderManager.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\OpenGLRenderer.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\RendererLoader.cpp">
+      <Filter>Graphics\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -369,9 +375,6 @@
       <Filter>ResourceCache</Filter>
     </ClInclude>
     <ClInclude Include="..\Graphics\Shaders.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Graphics\OpenGLRenderer.h">
       <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\Actors\RenderComponent.h">
@@ -515,8 +518,17 @@
     <ClInclude Include="..\Graphics\SceneNode\DirectionalLightSceneNode.h">
       <Filter>Graphics\SceneNode</Filter>
     </ClInclude>
-    <ClInclude Include="..\Graphics\DeferredRenderer\DeferredRenderer.h">
-      <Filter>Graphics\DeferredRenderer</Filter>
+    <ClInclude Include="..\Graphics\Renderer\DeferredRenderer.h">
+      <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\RenderManager.h">
+      <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\OpenGLRenderer.h">
+      <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\RendererLoader.h">
+      <Filter>Graphics\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

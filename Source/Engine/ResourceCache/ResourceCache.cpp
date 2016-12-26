@@ -303,7 +303,7 @@ shared_ptr< ResHandle > ResourceCache::Load( const Resource& resource )
          SAFE_DELETE_ARRAY( pRawBuffer ); 
          }
       
-      if( !success ) // process raw file failed 
+      if( success != S_OK ) // process raw file failed 
          {
          ENG_ASSERT( success && "Loader VloadResource Failed" );
          return shared_ptr<ResHandle>();

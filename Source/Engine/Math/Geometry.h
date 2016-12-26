@@ -300,7 +300,8 @@ class Mat4x4 : public glm::mat4
          }
 
       inline Vec4 Xform( const Vec4 &v ) const { return (*this) * v; }
-      inline Vec3 Xform( const Vec3 &v ) const { return Vec3( Xform( Vec4( v ) ) ); }
+      inline Vec3 Xform( const Vec3 &v, float w = 1.0f ) const { return Vec3( Xform( Vec4( v.x, v.y, v.z, w ) ) ); }
+     // inline Vec3 Xform( const Vec3 &v ) const { return Vec3( Xform( Vec4( v ) ) ); }
 
       // get rotated vector without shift value
       inline Vec3 GetXFormDirection( const Vec3& vec ) const;

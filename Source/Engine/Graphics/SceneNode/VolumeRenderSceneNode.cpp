@@ -14,6 +14,7 @@ x
 */
 #include "EngineStd.h"
 #include "VolumeRenderSceneNode.h"
+#include "..\Graphics\Renderer\RendererLoader.h"
 #include "..\Material.h"
 
 const char* const FIRST_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\VolumeRenderingFirstPass.vertexshader";
@@ -117,7 +118,7 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    m_FirstPassVertexShader.VOnRestore();
    m_FirstPassFragmentShader.VOnRestore();
 
-   m_FirstPassProgram = OpenGLRenderer::GenerateProgram( m_FirstPassVertexShader.VGetShaderObject(), m_FirstPassFragmentShader.VGetShaderObject() );
+   m_FirstPassProgram = OpenGLRendererLoader::GenerateProgram( { m_FirstPassVertexShader.VGetShaderObject(), m_FirstPassFragmentShader.VGetShaderObject() } );
 
    m_FirstPassVertexShader.VReleaseShader( m_FirstPassProgram );
    m_FirstPassFragmentShader.VReleaseShader( m_FirstPassProgram );
@@ -164,7 +165,8 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    m_SecondPassVertexShader.VOnRestore();
    m_SecondPassFragmentShader.VOnRestore();
 
-   m_SecondPassProgram = OpenGLRenderer::GenerateProgram( m_SecondPassVertexShader.VGetShaderObject(), m_SecondPassFragmentShader.VGetShaderObject() );
+   m_SecondPassProgram = OpenGLRendererLoader::GenerateProgram( { m_SecondPassVertexShader.VGetShaderObject(), m_SecondPassFragmentShader.VGetShaderObject() } );
+   //m_SecondPassProgram = OpenGLRenderer::GenerateProgram( m_SecondPassVertexShader.VGetShaderObject(), m_SecondPassFragmentShader.VGetShaderObject() );
 
    m_SecondPassVertexShader.VReleaseShader( m_SecondPassProgram );
    m_SecondPassFragmentShader.VReleaseShader( m_SecondPassProgram );

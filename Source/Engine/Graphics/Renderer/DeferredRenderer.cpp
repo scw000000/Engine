@@ -13,18 +13,20 @@
 */
 #include "EngineStd.h"
 #include "DeferredRenderer.h"
+#include "RendererLoader.h"
+#include "RenderManager.h"
 
-#define TILE_WIDTH 16
-#define TILE_HEIGHT 16
+#define TILE_WIDTH 16u
+#define TILE_HEIGHT 16u
 
 #define GEOMETRY_PASS_VERTEX_LOCATION 0
 #define GEOMETRY_PASS_UV_LOCATION 2
 #define GEOMETRY_PASS_NORMAL_LOCATION 1
 
-const char* const TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME = "Effects\\tile.vertexshader";
+const char* const TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME = "Effects\\TileFrustumShader.cs.glsl";
 
-const char* const GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DeferredGeometry.vs";
-const char* const GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredGeometry.fs";
+const char* const GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DeferredGeometry.vs.glsl";
+const char* const GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredGeometry.fs.glsl";
 
 const char* const LIGHT_PASS_VERTEX_SHADER_FILE_NAME = "";
 const char* const LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME = "";
@@ -40,7 +42,17 @@ OpenGLDeferredRenderer::OpenGLDeferredRenderer( void )
    m_Uniforms = std::vector< std::vector< GLuint > >( RenderPass_Num );
    m_Uniforms[ RenderPass_Geometry ] = std::vector< GLuint >( GeometryPassUni_Num, -1 );
 
+   m_TileFrustumShader.VSetResource( Resource( TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME ) );
    m_TileFrustumSSBO = 0;
+
+
+   auto screenSize = g_pApp->GetScreenSize();
+   m_TileNum[ 0 ] = std::ceil( ( double ) screenSize.x / TILE_WIDTH );
+   m_TileNum[ 1 ] = std::ceil( ( double ) screenSize.y / TILE_HEIGHT );
+
+   ENG_ASSERT( m_TileNum[ 0 ] * TILE_WIDTH >= screenSize.x );
+   ENG_ASSERT( m_TileNum[ 1 ] * TILE_HEIGHT >= screenSize.y );
+   
    }
 
 void OpenGLDeferredRenderer::VPreRender( void )
@@ -55,6 +67,8 @@ int OpenGLDeferredRenderer::VOnRestore( void )
    ReleaseResource();
 
    OnRestoreSSBO();
+
+//   OnRestoreTileFrustum();
 
    if( OnRestoreGeometryPass() != S_OK )
       {
@@ -168,25 +182,30 @@ int OpenGLDeferredRenderer::OnRestoreSSBO( void )
    glGenBuffers( 1, &m_TileFrustumSSBO );
    ENG_ASSERT( m_TileFrustumSSBO );
 
+   ENG_ASSERT( sizeof( tileFrustum ) == 64 );
+
    glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_TileFrustumSSBO );
-
-      auto screenSize = g_pApp->GetScreenSize();
-      int tileNumX = std::ceil( ( double ) screenSize.x / TILE_WIDTH );
-      int tileNumY = std::ceil( ( double ) screenSize.y / TILE_HEIGHT );
-
-      ENG_ASSERT( tileNumX * TILE_WIDTH >= screenSize.x );
-      ENG_ASSERT( tileNumY * TILE_HEIGHT >= screenSize.y );
-      ENG_ASSERT( sizeof( tileFrustum ) == 64 );
-
-      glBufferData( GL_SHADER_STORAGE_BUFFER, sizeof( tileFrustum ) * tileNumX * tileNumY, NULL, GL_DYNAMIC_DRAW );
-
+      glBufferData( GL_SHADER_STORAGE_BUFFER, sizeof( tileFrustum ) * m_TileNum[ 0 ] * m_TileNum[ 1 ], NULL, GL_DYNAMIC_DRAW );
    glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
-   OpenGLRenderer::CheckError();
+   OpenGLRenderManager::CheckError();
    return S_OK;
    }
 
 int OpenGLDeferredRenderer::OnRestoreTileFrustum( void )
    {
+   m_TileFrustumShader.VOnRestore();
+   auto program = OpenGLRendererLoader::GenerateProgram( { m_TileFrustumShader.VGetShaderObject() } );
+   m_TileFrustumShader.VReleaseShader( program );
+
+   auto tileSizeUni = glGetUniformLocation( program, "uTileSize" );
+   glUniform2ui( tileSizeUni, TILE_WIDTH, TILE_HEIGHT );
+
+   auto invProj = g_pApp->m_pEngineLogic->m_pWrold->GetCamera()->GetProjection().Inverse();
+   auto invProjUni = glGetUniformLocation( program, "uInvProj" );
+   glUniformMatrix4fv( invProjUni, 1, GL_FALSE, &invProj[ 0 ][ 0 ] );
+
+   glUseProgram( program );
+   glDispatchCompute( m_TileNum[ 0 ], m_TileNum[ 1 ], 1u );
    return S_OK;
    }
 
@@ -196,7 +215,8 @@ int OpenGLDeferredRenderer::OnRestoreGeometryPass( void )
 
    m_FragmentShaders[ RenderPass_Geometry ].VOnRestore();
 
-   m_Programs[ RenderPass_Geometry ] = OpenGLRenderer::GenerateProgram( m_VertexShaders[ RenderPass_Geometry ].VGetShaderObject(), m_FragmentShaders[ RenderPass_Geometry ].VGetShaderObject() );
+   m_Programs[ RenderPass_Geometry ] = OpenGLRendererLoader::GenerateProgram( { m_VertexShaders[ RenderPass_Geometry ].VGetShaderObject(), m_FragmentShaders[ RenderPass_Geometry ].VGetShaderObject() } );
+ //  m_Programs[ RenderPass_Geometry ] = OpenGLRenderer::GenerateProgram( m_VertexShaders[ RenderPass_Geometry ].VGetShaderObject(), m_FragmentShaders[ RenderPass_Geometry ].VGetShaderObject() );
 
    m_VertexShaders[ RenderPass_Geometry ].VReleaseShader( m_Programs[ RenderPass_Geometry ] );
    m_FragmentShaders[ RenderPass_Geometry ].VReleaseShader( m_Programs[ RenderPass_Geometry ] );

@@ -49,21 +49,12 @@ bool SkyRenderComponent::VDelegateInit( TiXmlElement* pData )
 
 shared_ptr<SceneNode> SkyRenderComponent::VCreateSceneNode( void )
    {
-   switch( EngineApp::GetRendererImpl() )
-      {
-      case Renderer::Renderer_OpenGL:
-            {
-            return shared_ptr<SceneNode>( ENG_NEW SkySceneNode( m_pOwner->GetId(), 
-                                                                this, 
-                                                                m_pMeshResource, 
-                                                                m_pTextureResource, 
-                                                                RenderGroup::RenderGroup_Sky, 
-                                                                m_pTransform ) );
-            }
-      default:
-         ENG_ASSERT( 0 && "Unknown Renderer Implementation in GridRenderComponent" );
-      }
-
+   return shared_ptr<SceneNode>( ENG_NEW SkySceneNode( m_pOwner->GetId(),
+      this,
+      m_pMeshResource,
+      m_pTextureResource,
+      RenderGroup::RenderGroup_Sky,
+      m_pTransform ) );
    /*shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
    if( pTransformComponent )
       {
@@ -79,7 +70,7 @@ shared_ptr<SceneNode> SkyRenderComponent::VCreateSceneNode( void )
             ENG_ASSERT( 0 && "Unknown Renderer Implementation in GridRenderComponent" );
          }
       }*/
-   return shared_ptr<SceneNode>( );
+  // return shared_ptr<SceneNode>( );
    }
 
 void SkyRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )

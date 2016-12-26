@@ -61,3 +61,13 @@ class FragmentShader : public OpenGLShader
       // reload and compile fragment shader
       void VOnRestore( void ) override;
    };
+
+class ComputeShader : public OpenGLShader
+   {
+      public:
+      ComputeShader( const Resource& shaderResource = Resource( "" ) ) : OpenGLShader( shaderResource ) {};
+      ~ComputeShader( void ) {};
+      // This function is called in SceneNode::Onrestore
+      // reload and compile fragment shader
+      void VOnRestore( void ) override;
+   };

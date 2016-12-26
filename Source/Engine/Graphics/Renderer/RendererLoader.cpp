@@ -1,6 +1,6 @@
 /*!
- * \file OpenGLRenderer.cpp
- * \date 2016/11/11 11:38
+ * \file RendererLoader.cpp
+ * \date 2016/12/26 13:36
  *
  * \author scw00
  * Contact: user@company.com
@@ -13,85 +13,11 @@
 */
 
 #include "EngineStd.h"
-#include "OpenGLRenderer.h"
+#include "RendererLoader.h"
 #include "..\ResourceCache\TextureResource.h"
 #include "..\ResourceCache\MeshResource.h"
 
-OpenGLTextureDrawer OpenGLRenderer::s_TextureDrawer;
-
-void VertexToBoneMapping::AddBoneData( BoneId boneID, float boneWeight )
-   {
-   for( unsigned i = 0; i < MAXIMUM_BONES_PER_VEREX; i++ )
-      {
-      if( m_BoneWeights[ i ] == 0.0 )
-         {
-         m_BoneIDs[ i ] = boneID;
-         m_BoneWeights[ i ] = boneWeight;
-         return;
-         }
-      }
-
-   // should never get here - more bones than we have space for
-   ENG_ASSERT( 0 );
-   }
-
-OpenGLRenderer::OpenGLRenderer( void )
-   {
-
-   }
-
-OpenGLRenderer::~OpenGLRenderer( void )
-   {
-
-   }
-
-void OpenGLRenderer::VSetBackgroundColor( Color color )
-   {
-   glClearColor( color.m_Component.r, color.m_Component.g, color.m_Component.b, color.m_Component.a );
-   }
-
-GLuint OpenGLRenderer::VOnRestore( void )
-   {
-   s_TextureDrawer.OnRestore();
-   return GL_NO_ERROR;
-   }
-
-void OpenGLRenderer::VShutdown( void )
-   {}
-
-bool OpenGLRenderer::VPreRender( void )
-   {
-   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-   return true;
-   }
-
-bool OpenGLRenderer::VPostRender( void )
-   {
-   auto screensize = g_pApp->GetScreenSize();
-   float xSize = 300.f;
-   float ySize = xSize * ( float ) screensize.y / ( float ) screensize.x;
-
-   OpenGLRenderer::s_TextureDrawer.DrawTexture( 1, Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
-   SDL_GL_SwapWindow( g_pApp->GetWindow() );
-   return true;
-   }
-/*
-void OpenGLRenderer::VSetWorldTransform( const Mat4x4 *m )
-{
-
-}
-
-void OpenGLRenderer::VSetViewTransform( const Mat4x4 *m )
-{
-
-}
-
-void OpenGLRenderer::VSetProjectionTransform( const Mat4x4 *m )
-{
-
-}*/
-
-void OpenGLRenderer::LoadTexture2D( GLuint* textureId, const Resource& textureResource )
+void OpenGLRendererLoader::LoadTexture2D( GLuint* textureId, const Resource& textureResource )
    {
    glGenTextures( 1, textureId );
 
@@ -113,7 +39,7 @@ void OpenGLRenderer::LoadTexture2D( GLuint* textureId, const Resource& textureRe
 
    }
 
-void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint* pIndexBuffer, GLuint* pNormalBuffer, shared_ptr<ResHandle> pMeshResHandle )
+void OpenGLRendererLoader::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint* pIndexBuffer, GLuint* pNormalBuffer, shared_ptr<ResHandle> pMeshResHandle )
    {
    ENG_ASSERT( pVertexBuffer && pMeshResHandle );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
@@ -160,7 +86,7 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
                        verticesIndexOffset * sizeof( aiVector3t<float> ),
                        pMesh->mNumVertices * sizeof( aiVector3t<float> ),
                        &pMesh->mVertices[ 0 ] );
-      
+
       if( pUvBuffer )
          {
          aiVector2t<float> *uvVertices = NULL;
@@ -170,9 +96,9 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
             memcpy( &uvVertices[ vertex ], &pMesh->mTextureCoords[ 0 ][ vertex ], sizeof( aiVector2t<float> ) );
             }
          glBindBuffer( GL_ARRAY_BUFFER, *pUvBuffer );
-         glBufferSubData( GL_ARRAY_BUFFER, 
-                          verticesIndexOffset * sizeof( aiVector2t<float> ), 
-                          pMesh->mNumVertices * sizeof( aiVector2t<float> ), 
+         glBufferSubData( GL_ARRAY_BUFFER,
+                          verticesIndexOffset * sizeof( aiVector2t<float> ),
+                          pMesh->mNumVertices * sizeof( aiVector2t<float> ),
                           &uvVertices[ 0 ] );
          SAFE_DELETE_ARRAY( uvVertices );
          }
@@ -180,10 +106,10 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
       if( pNormalBuffer )
          {
          glBindBuffer( GL_ARRAY_BUFFER, *pNormalBuffer );
-         glBufferSubData( GL_ARRAY_BUFFER, 
-                          verticesIndexOffset * sizeof( aiVector3t<float> ), 
-                          pMesh->mNumVertices * sizeof( aiVector3t<float> ), 
-                          &pMesh->mNormals[ 0 ]);
+         glBufferSubData( GL_ARRAY_BUFFER,
+                          verticesIndexOffset * sizeof( aiVector3t<float> ),
+                          pMesh->mNumVertices * sizeof( aiVector3t<float> ),
+                          &pMesh->mNormals[ 0 ] );
          }
 
       if( pIndexBuffer )
@@ -212,7 +138,7 @@ void OpenGLRenderer::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint*
    ENG_ASSERT( pMeshExtra->m_NumVertexIndex == indexBuffer.size() );
    }
 
-void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMeshResHandle )
+void OpenGLRendererLoader::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMeshResHandle )
    {
    ENG_ASSERT( pBoneBuffer && pMeshResHandle );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
@@ -239,12 +165,47 @@ void OpenGLRenderer::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMesh
    glGenBuffers( 1, pBoneBuffer );
    glBindBuffer( GL_ARRAY_BUFFER, *pBoneBuffer );
    glBufferData( GL_ARRAY_BUFFER,
-                 vertexToBoneMappings.size() * sizeof( vertexToBoneMappings[0] ),
+                 vertexToBoneMappings.size() * sizeof( vertexToBoneMappings[ 0 ] ),
                  &vertexToBoneMappings[ 0 ],
                  GL_STATIC_DRAW );
    }
 
-GLuint OpenGLRenderer::GenerateProgram( GLuint vertexShader, GLuint fragmentShader )
+void OpenGLRendererLoader::CompileAndLoadShader( GLuint& shaderObj, const Resource& shaderRes, GLuint shaderType )
+   {
+   shaderObj = glCreateShader( shaderType );
+
+   shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( shaderRes );  // this actually loads the shader file from the zip file
+
+   if( !pResourceHandle )
+      {
+      ENG_ERROR( "Invalid shader file path" );
+      }
+   // Compile Vertex Shader
+   ENG_LOG( "Renderer", "Compiling shader: " + shaderRes.m_Name );
+
+   GLchar* p_shaderText = ( GLchar* ) pResourceHandle->GetBuffer();
+
+   glShaderSource( shaderObj, 1, &p_shaderText, NULL );
+   glCompileShader( shaderObj );
+
+   GLint result = GL_FALSE;
+
+   // Check Vertex Shader compiling
+   glGetShaderiv( shaderObj, GL_COMPILE_STATUS, &result );
+   if( result == GL_FALSE )
+      {
+      int infoLogLength;
+      glGetShaderiv( shaderObj, GL_INFO_LOG_LENGTH, &infoLogLength );
+      GLchar* p_ErrMsg = ENG_NEW GLchar[ infoLogLength + 1 ];
+      glGetShaderInfoLog( shaderObj, infoLogLength, NULL, p_ErrMsg );
+      ENG_ERROR( p_ErrMsg );
+      SAFE_DELETE_ARRAY( p_ErrMsg );
+      glDeleteShader( shaderObj ); // Don't leak the shader.
+      shaderObj = 0;
+      }
+   }
+
+GLuint OpenGLRendererLoader::GenerateProgram( const std::vector< GLuint >& shderObjs )
    {
    GLint result = GL_FALSE;
    GLuint program = glCreateProgram();
@@ -258,8 +219,12 @@ GLuint OpenGLRenderer::GenerateProgram( GLuint vertexShader, GLuint fragmentShad
       }
 
    // Link the program
-   glAttachShader( program, vertexShader );
-   glAttachShader( program, fragmentShader );
+   for( auto obj : shderObjs )
+      {
+      glAttachShader( program, obj );
+      }
+
+   // glAttachShader( program, fragmentShader );
    glLinkProgram( program );
 
    // Check the program
@@ -277,74 +242,4 @@ GLuint OpenGLRenderer::GenerateProgram( GLuint vertexShader, GLuint fragmentShad
       }
 
    return program;
-   }
-
-void OpenGLRenderer::CheckError( void )
-   {
-   GLenum errCode;
-   while( ( errCode = glGetError() ) != GL_NO_ERROR )
-      {
-      std::string errorStr;
-      switch( errCode )
-         {
-         case GL_INVALID_ENUM:                  errorStr = "INVALID_ENUM"; break;
-         case GL_INVALID_VALUE:                 errorStr = "INVALID_VALUE"; break;
-         case GL_INVALID_OPERATION:             errorStr = "INVALID_OPERATION"; break;
-         case GL_STACK_OVERFLOW:                errorStr = "STACK_OVERFLOW"; break;
-         case GL_STACK_UNDERFLOW:               errorStr = "STACK_UNDERFLOW"; break;
-         case GL_OUT_OF_MEMORY:                 errorStr = "OUT_OF_MEMORY"; break;
-         case GL_INVALID_FRAMEBUFFER_OPERATION: errorStr = "INVALID_FRAMEBUFFER_OPERATION"; break;
-         }
-      ENG_ASSERT( 0 && errorStr.c_str() );
-    //  std::cout << error << " | " << file << " (" << line << ")" << std::endl;
-      }
-   }
-
-void OpenGLRenderer::SetRenderAlpha( bool isAlpha )
-   {
-   if( isAlpha )
-      {
-      // Enable blending
-      glEnable( GL_BLEND );
-      glDisable( GL_CULL_FACE );
-      glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-      }
-   else
-      {
-      glDisable( GL_BLEND );
-      glEnable( GL_CULL_FACE );
-      glCullFace( GL_BACK );
-      glBlendFunc( GL_ONE, GL_ZERO );
-      }
-
-   }
-
-void OpenGLRenderer::VDrawLine( const Vec3& from, const Vec3& to, const Color& color ) const
-   {
-   shared_ptr<Scene> pScene = g_pApp->m_pEngineLogic->m_pWrold;
-
-   auto pCamera = pScene->GetCamera();
-   if( !pCamera )
-      {
-      return;
-      }
-   auto toCameraSpace = pCamera->VGetProperties().GetFromWorld();
-   if( !pCamera->GetFrustum().VInside( toCameraSpace.Xform( from ) ) && !pCamera->GetFrustum().VInside( toCameraSpace.Xform( to ) ) )
-      {
-      return;
-      }
-
-   Vec4 from4( from );
-   Vec4 to4( to );
-   Mat4x4 vp = ( pCamera->GetProjection() * pCamera->GetView() );
-   Vec4 from_Proj = vp.Xform( from4 );
-   Vec4 to_Proj = vp.Xform( to4 );
-
-   glLineWidth( 2.5 );
-   // Draw in NDC space [-1, +1]
-   glBegin( GL_LINES );
-   glColor3f( color.m_Component.r, color.m_Component.g, color.m_Component.b );
-   glVertex3f( from_Proj.x / from_Proj.w, from_Proj.y / from_Proj.w, from_Proj.z / from_Proj.w );
-   glVertex3f( to_Proj.x / to_Proj.w, to_Proj.y / to_Proj.w, to_Proj.z / to_Proj.w );
-   glEnd();
    }

@@ -21,7 +21,7 @@
 #include "..\ResourceCache\TextureResource.h"
 #include "..\Event\EventManager.h"
 #include "..\Event\Events.h"
-#include "..\Graphics\OpenGLRenderer.h"
+#include "..\Graphics\Renderer\OpenGLRenderer.h"
 #include "..\LuaScripting\LuaStateManager.h"
 #include "..\LuaScripting\ScriptExports.h"
 #include "..\Animation\AnimationClipNode.h"
@@ -59,6 +59,9 @@ Renderer EngineApp::GetRendererImpl( void )
    GLint minVer;
    glGetIntegerv( GL_MINOR_VERSION, &majVer );
    glGetIntegerv( GL_MAJOR_VERSION, &minVer );
+   std::stringstream  ss;
+   ss << "Renderer version: OpenGL " << majVer << "." << minVer;
+   ENG_LOG( "Renderer", ss.str() );
    return Renderer_OpenGL;
    }
 

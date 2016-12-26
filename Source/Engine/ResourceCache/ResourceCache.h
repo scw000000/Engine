@@ -71,7 +71,7 @@ class ResourceLoader : public IResourceLoader
 	   virtual bool VUseRawFile() = 0;
 	   virtual bool VDiscardRawBufferAfterLoad() = 0;
       virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize ) { return 0; };
-	   virtual bool VLoadResource(char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle) = 0;
+      virtual int VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) = 0;
 	   virtual const std::vector< std::string >& VGetPattern( void ) override { return m_Patterns; }
       virtual bool VUsePreAllocate( void ) override = 0;
       virtual bool VIsPatternMatch( const char* str ) override ;
@@ -90,7 +90,7 @@ class DefaultResourceLoader : public ResourceLoader
 	   virtual bool VUseRawFile() override { return true; }
 	   virtual bool VDiscardRawBufferAfterLoad() { return true; }
 	   virtual unsigned int VGetLoadedResourceSize(char *rawBuffer, unsigned int rawSize) override { return rawSize; }
-	   virtual bool VLoadResource (char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle) override { return true; }
+      virtual int VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) override { return S_OK; }
       virtual bool VUsePreAllocate( void ) override { return true; }
       virtual bool VAddNullZero( void ) override { return true; }
    };

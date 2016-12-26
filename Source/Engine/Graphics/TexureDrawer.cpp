@@ -14,9 +14,10 @@
 
 #include "EngineStd.h"
 #include "TexureDrawer.h"
+#include ".\Renderer\RendererLoader.h"
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureDrawer.vs";
-const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureDrawer.fs";
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureDrawer.vs.glsl";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureDrawer.fs.glsl";
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
@@ -58,7 +59,7 @@ int OpenGLTextureDrawer::OnRestore( void )
    m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
 
-   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
+   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() } );
 
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );

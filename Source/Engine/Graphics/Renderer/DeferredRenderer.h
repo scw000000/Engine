@@ -79,7 +79,8 @@ class OpenGLDeferredRenderer : public IDeferredRenderer
 
       GLuint m_MVPUni;
       GLuint m_MUni;
-
+      unsigned int m_TileNum[ 2 ];
+      ComputeShader m_TileFrustumShader;
       GLuint m_TileFrustumSSBO;
    };
 

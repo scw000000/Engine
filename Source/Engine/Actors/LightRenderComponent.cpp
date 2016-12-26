@@ -44,15 +44,7 @@ bool LightRenderComponent::VDelegateInit( TiXmlElement* pData )
 
 shared_ptr<SceneNode> LightRenderComponent::VCreateSceneNode( void )
    {
-   switch( EngineApp::GetRendererImpl() )
-      {
-      case Renderer::Renderer_OpenGL:
-            {
-            return shared_ptr<SceneNode>( ENG_NEW DirectionalLightNode( m_pOwner->GetId(), this, m_pLightProps, m_pTransform ) );
-            }
-      default:
-         ENG_ASSERT( 0 && "Unknown Renderer Implementation in GridRenderComponent" );
-      }
+   return shared_ptr<SceneNode>( ENG_NEW DirectionalLightNode( m_pOwner->GetId(), this, m_pLightProps, m_pTransform ) );
 
    /*shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
    if (pTransformComponent)
@@ -69,7 +61,7 @@ shared_ptr<SceneNode> LightRenderComponent::VCreateSceneNode( void )
    ENG_ASSERT( 0 && "Unknown Renderer Implementation in GridRenderComponent" );
    }
    }*/
-    return shared_ptr<SceneNode>();
+   // return shared_ptr<SceneNode>();
    }
 
 void LightRenderComponent::VDelegateGenerateXML( TiXmlElement *pBaseElement )

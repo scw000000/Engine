@@ -16,7 +16,7 @@
 #include "SkeletalMeshSceneNode.h"
 #include "..\ResourceCache\MeshResource.h"
 #include "..\ResourceCache\TextureResource.h"
-#include "..\OpenGLRenderer.h"
+#include "..\Renderer\RendererLoader.h"
 #include "..\ResourceCache\ScriptResource.h"
 #include "..\LuaScripting\LuaStateManager.h"
 #include "..\Animation\AnimationState.h"
@@ -28,8 +28,8 @@
 #define BONE_ID_LOCATION    3
 #define BONE_WEIGHT_LOCATION    4
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\SKMeshFragmentShader.vertexshader";
-const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\SKMeshFragmentShader.fragmentshader";
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\SKMeshShader.vs.glsl";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\SKMeshShader.fs.glsl";
 
 Vec3 aiVector3DToVec3( const aiVector3D& aiVector )
    {
@@ -91,12 +91,13 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
 
-   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
+   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() } );
+  // m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
 
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );
 
-   OpenGLRenderer::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
+   OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
 
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
@@ -104,8 +105,8 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
    SetRadius( pMeshExtra->m_Radius );
 
-   OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
-   OpenGLRenderer::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
+   OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
+   OpenGLRendererLoader::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
 
    shared_ptr<ResHandle> pScriptResHandle = g_pApp->m_pResCache->GetHandle( *m_pAnimScriptResource );
    if( pScriptResHandle )

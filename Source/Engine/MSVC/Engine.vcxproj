@@ -125,9 +125,12 @@
     <ClCompile Include="..\Event\PhysicsEvents.cpp" />
     <ClCompile Include="..\Event\ScriptEvent.cpp" />
     <ClCompile Include="..\Event\EventFactory.cpp" />
-    <ClCompile Include="..\Graphics\DeferredRenderer\DeferredRenderer.cpp" />
     <ClCompile Include="..\Graphics\Light.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
+    <ClCompile Include="..\Graphics\Renderer\DeferredRenderer.cpp" />
+    <ClCompile Include="..\Graphics\Renderer\OpenGLRenderer.cpp" />
+    <ClCompile Include="..\Graphics\Renderer\RendererLoader.cpp" />
+    <ClCompile Include="..\Graphics\Renderer\RenderManager.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\DirectionalLightSceneNode.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\MeshSceneNode.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\SceneNodes.cpp" />
@@ -136,7 +139,6 @@
     <ClCompile Include="..\Graphics\SceneNode\VolumeRenderSceneNode.cpp" />
     <ClCompile Include="..\Graphics\TexureDrawer.cpp" />
     <ClCompile Include="..\Graphics\TransformStack.cpp" />
-    <ClCompile Include="..\Graphics\OpenGLRenderer.cpp" />
     <ClCompile Include="..\Graphics\Scene.cpp" />
     <ClCompile Include="..\Graphics\Shaders.cpp" />
     <ClCompile Include="..\LuaScripting\LuaStateManager.cpp" />
@@ -215,9 +217,12 @@
     <ClInclude Include="..\Event\PhysicsEvents.h" />
     <ClInclude Include="..\Event\ScriptEvent.h" />
     <ClInclude Include="..\Event\EventFactory.h" />
-    <ClInclude Include="..\Graphics\DeferredRenderer\DeferredRenderer.h" />
     <ClInclude Include="..\Graphics\Light.h" />
     <ClInclude Include="..\Graphics\Material.h" />
+    <ClInclude Include="..\Graphics\Renderer\DeferredRenderer.h" />
+    <ClInclude Include="..\Graphics\Renderer\OpenGLRenderer.h" />
+    <ClInclude Include="..\Graphics\Renderer\RendererLoader.h" />
+    <ClInclude Include="..\Graphics\Renderer\RenderManager.h" />
     <ClInclude Include="..\Graphics\SceneNode\DirectionalLightSceneNode.h" />
     <ClInclude Include="..\Graphics\SceneNode\MeshSceneNode.h" />
     <ClInclude Include="..\Graphics\SceneNode\SceneNodes.h" />
@@ -226,7 +231,6 @@
     <ClInclude Include="..\Graphics\SceneNode\VolumeRenderSceneNode.h" />
     <ClInclude Include="..\Graphics\TexureDrawer.h" />
     <ClInclude Include="..\Graphics\TransformStack.h" />
-    <ClInclude Include="..\Graphics\OpenGLRenderer.h" />
     <ClInclude Include="..\Graphics\Scene.h" />
     <ClInclude Include="..\Graphics\Shaders.h" />
     <ClInclude Include="..\LuaScripting\LuaStateManager.h" />

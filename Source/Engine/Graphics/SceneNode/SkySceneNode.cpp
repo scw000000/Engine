@@ -15,14 +15,14 @@
 #include "EngineStd.h"
 #include "SkySceneNode.h"
 #include "..\ResourceCache\TextureResource.h"
-#include "..\OpenGLRenderer.h"
+#include "..\Renderer\RendererLoader.h"
 #include "..\ResourceCache\MeshResource.h"
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureVertexShader.vs";
-const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureFragmentShader.fs";
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureShader.vs.glsl";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureShader.fs.glsl";
 
 SkySceneNode::SkySceneNode( 
    const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResource, shared_ptr<Resource> ptextureResource, RenderGroup renderGroup, TransformPtr pTransform )
@@ -59,20 +59,21 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
 
-   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
+   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() } );
+  // m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
 
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );
 
 
-   OpenGLRenderer::LoadTexture2D( &m_Texture, *m_pTextureResource );
+   OpenGLRendererLoader::LoadTexture2D( &m_Texture, *m_pTextureResource );
    
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
    m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
 
-   OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], NULL, pMeshResHandle );
+   OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], NULL, pMeshResHandle );
 
    // 1rst attribute buffer : vertices
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );

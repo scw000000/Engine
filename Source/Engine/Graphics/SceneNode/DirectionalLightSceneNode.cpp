@@ -14,9 +14,10 @@
 
 #include "EngineStd.h"
 #include "DirectionalLightSceneNode.h"
+#include "..\Renderer\RendererLoader.h"
 
-const char* const FIRST_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DepthRTT.vs";
-const char* const FIRST_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DepthRTT.fs";
+const char* const FIRST_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DepthRTT.vs.glsl";
+const char* const FIRST_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DepthRTT.fs.glsl";
 
 #define VERTEX_LOCATION    0
 
@@ -35,7 +36,8 @@ int DirectionalLightNode::VOnRestore( Scene *pScene )
    m_FirstPassVertexShader.VOnRestore();
    m_FirstPassFragmentShader.VOnRestore();
 
-   m_FirstPassProgram = OpenGLRenderer::GenerateProgram( m_FirstPassVertexShader.VGetShaderObject(), m_FirstPassFragmentShader.VGetShaderObject() );
+   m_FirstPassProgram = OpenGLRendererLoader::GenerateProgram( { m_FirstPassVertexShader.VGetShaderObject(), m_FirstPassFragmentShader.VGetShaderObject() } );
+  // m_FirstPassProgram = OpenGLRenderer::GenerateProgram( m_FirstPassVertexShader.VGetShaderObject(), m_FirstPassFragmentShader.VGetShaderObject() );
 
    m_FirstPassVertexShader.VReleaseShader( m_FirstPassProgram );
    m_FirstPassFragmentShader.VReleaseShader( m_FirstPassProgram );

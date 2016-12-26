@@ -13,8 +13,8 @@
  * \note
  */
 #include ".\SceneNode\SceneNodes.h"
-#include "OpenGLRenderer.h"
-#include ".\DeferredRenderer\DeferredRenderer.h"
+#include ".\Renderer\OpenGLRenderer.h"
+#include ".\Renderer\DeferredRenderer.h"
 
 #define MAXIMUM_LIGHTS_SUPPORTED (8)
 #define MAXIMUM_SHADOWMAP_TEXTURE_SUPPORTED (8)

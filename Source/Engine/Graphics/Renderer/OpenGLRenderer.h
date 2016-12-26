@@ -51,20 +51,14 @@ class OpenGLRenderer : public IRenderer
 	   virtual GLuint VOnRestore( void ) override;
 	   virtual void VShutdown( void ) override;
       // This functino is called at the begin of HumanView::Render before calling Scene to Rendoer
-	   virtual bool VPreRender( void ) override;
+	   virtual int VPreRender( void ) override;
       // This functino is called at the end of HumanView::Render after calling Scene to Render
-	   virtual bool VPostRender( void ) override;
+	   virtual int VPostRender( void ) override;
 	   //virtual void VCalcLighting( Lights *lights, int maximumLights ) override;
 
-      static void LoadTexture2D( GLuint* textureId, const Resource& pTextureResource );
-      static void LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint* pIndexBuffer, GLuint* pNormalBuffer, shared_ptr<ResHandle> pMeshResHandle );
-      static void LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMeshResHandle );
-      
-      static GLuint GenerateProgram( GLuint vertexShader, GLuint fragmentShader );
-
       static void SetRenderAlpha( bool isAlpha );
-      static void CheckError( void );
-      virtual void VDrawLine( const Vec3& from,const Vec3& to,const Color& color ) const override;
+
+      virtual void VDrawLine( const Vec3& fromWS,const Vec3& toWS,const Color& color ) const override;
 
    public:
       static OpenGLTextureDrawer s_TextureDrawer;

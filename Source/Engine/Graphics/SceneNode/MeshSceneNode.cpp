@@ -16,14 +16,14 @@
 #include "MeshSceneNode.h"
 #include "..\ResourceCache\MeshResource.h"
 #include "..\ResourceCache\TextureResource.h"
-#include "..\OpenGLRenderer.h"
+#include "..\Renderer\RendererLoader.h"
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
 #define NORMAL_LOCATION    2
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\BasicVertexShader.vs";
-const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\BasicFragmentShader.fs";
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\MeshShader.vs.glsl";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\MeshShader.fs.glsl";
 
 MeshSceneNode::MeshSceneNode( 
    const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, MaterialPtr pMaterial, RenderGroup renderGroup, TransformPtr pTransform )
@@ -74,19 +74,19 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
 
-   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
+   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() } );
 
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );
 
-   OpenGLRenderer::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
+   OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
 
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
    m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
    SetRadius( pMeshExtra->m_Radius );
-   OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
+   OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
 
    // 1st attribute buffer : vertices
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );

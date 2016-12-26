@@ -15,8 +15,8 @@
 #include "EngineStd.h"
 #include "TexureDrawer.h"
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureDrawer.vertexshader";
-const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureDrawer.fragmentshader";
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureDrawer.vs";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureDrawer.fs";
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
@@ -102,7 +102,7 @@ int OpenGLTextureDrawer::OnRestore( void )
 
 void OpenGLTextureDrawer::DrawTexture( GLuint textureObj, const Point& offset, const Point& dimension )
    {
-   glViewport( 0, 0, dimension.x, dimension.y );
+   glViewport( offset.x, offset.y, dimension.x, dimension.y );
 
    glUseProgram( m_Program );
    glBindVertexArray( m_VAO );

@@ -12,20 +12,24 @@
  * \note
 */
 #include "EngineStd.h"
-#include "DeferredShader.h"
+#include "DeferredRenderer.h"
+
+#define TILE_WIDTH 16
+#define TILE_HEIGHT 16
 
 #define GEOMETRY_PASS_VERTEX_LOCATION 0
 #define GEOMETRY_PASS_UV_LOCATION 2
 #define GEOMETRY_PASS_NORMAL_LOCATION 1
 
+const char* const TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME = "Effects\\tile.vertexshader";
 
-const char* const GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\MRT.vertexshader";
-const char* const GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\MRT.fragmentshader";
+const char* const GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DeferredGeometry.vs";
+const char* const GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredGeometry.fs";
 
 const char* const LIGHT_PASS_VERTEX_SHADER_FILE_NAME = "";
 const char* const LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME = "";
 
-OpenGLDeferredShader::OpenGLDeferredShader( void )
+OpenGLDeferredRenderer::OpenGLDeferredRenderer( void )
    {
    m_VertexShaders[ RenderPass_Geometry ].VSetResource( Resource( GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME ) );
    m_FragmentShaders[ RenderPass_Geometry ].VSetResource( Resource( GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME ) );
@@ -36,18 +40,21 @@ OpenGLDeferredShader::OpenGLDeferredShader( void )
    m_Uniforms = std::vector< std::vector< GLuint > >( RenderPass_Num );
    m_Uniforms[ RenderPass_Geometry ] = std::vector< GLuint >( GeometryPassUni_Num, -1 );
 
+   m_TileFrustumSSBO = 0;
    }
 
-void OpenGLDeferredShader::VPreRender( void )
+void OpenGLDeferredRenderer::VPreRender( void )
    {
    glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    }
 
-int OpenGLDeferredShader::VOnRestore( void )
+int OpenGLDeferredRenderer::VOnRestore( void )
    {
    ReleaseResource();
+
+   OnRestoreSSBO();
 
    if( OnRestoreGeometryPass() != S_OK )
       {
@@ -64,7 +71,7 @@ int OpenGLDeferredShader::VOnRestore( void )
    return S_OK;
    }
 
-int OpenGLDeferredShader::VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode )
+int OpenGLDeferredRenderer::VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode )
    {
    glUseProgram( m_Programs[ RenderPass_Geometry ] );
    glBindVertexArray( m_VAOs[ RenderPass_Geometry ] );
@@ -115,7 +122,7 @@ int OpenGLDeferredShader::VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNo
       ( void* ) 0
       );*/
 
-   /*glBindBuffer( GL_ARRAY_BUFFER, bufferObj.m_NormalBuffer );
+   /*glBindBuffer( GL_VERTEX_ARRAY, bufferObj.m_NormalBuffer );
    glEnableVertexAttribArray( GEOMETRY_PASS_NORMAL_LOCATION );
    glVertexAttribPointer(
       GEOMETRY_PASS_NORMAL_LOCATION,
@@ -139,6 +146,8 @@ int OpenGLDeferredShader::VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNo
       ( void* ) 0        
       );
 
+   ENG_ASSERT( !glGetError() );
+
    glDisableVertexAttribArray( GEOMETRY_PASS_VERTEX_LOCATION );
    glUseProgram( 0 );
    glBindVertexArray( 0 );
@@ -147,14 +156,41 @@ int OpenGLDeferredShader::VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNo
    return S_OK;
    }
 
-void OpenGLDeferredShader::ReleaseResource( void ) 
+void OpenGLDeferredRenderer::ReleaseResource( void ) 
    {
    
 
-
+//   return S_OK;
    }
 
-int OpenGLDeferredShader::OnRestoreGeometryPass( void )
+int OpenGLDeferredRenderer::OnRestoreSSBO( void )
+   {
+   glGenBuffers( 1, &m_TileFrustumSSBO );
+   ENG_ASSERT( m_TileFrustumSSBO );
+
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_TileFrustumSSBO );
+
+      auto screenSize = g_pApp->GetScreenSize();
+      int tileNumX = std::ceil( ( double ) screenSize.x / TILE_WIDTH );
+      int tileNumY = std::ceil( ( double ) screenSize.y / TILE_HEIGHT );
+
+      ENG_ASSERT( tileNumX * TILE_WIDTH >= screenSize.x );
+      ENG_ASSERT( tileNumY * TILE_HEIGHT >= screenSize.y );
+      ENG_ASSERT( sizeof( tileFrustum ) == 64 );
+
+      glBufferData( GL_SHADER_STORAGE_BUFFER, sizeof( tileFrustum ) * tileNumX * tileNumY, NULL, GL_DYNAMIC_DRAW );
+
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
+   OpenGLRenderer::CheckError();
+   return S_OK;
+   }
+
+int OpenGLDeferredRenderer::OnRestoreTileFrustum( void )
+   {
+   return S_OK;
+   }
+
+int OpenGLDeferredRenderer::OnRestoreGeometryPass( void )
    {
    m_VertexShaders[ RenderPass_Geometry ].VOnRestore();
 
@@ -288,7 +324,7 @@ int OpenGLDeferredShader::OnRestoreGeometryPass( void )
    return S_OK;
    }
 
-int OpenGLDeferredShader::OnRestoreLightPass( void )
+int OpenGLDeferredRenderer::OnRestoreLightPass( void )
    {
    return S_OK;
    }

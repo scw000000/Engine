@@ -63,7 +63,7 @@ class OpenGLRenderer : public IRenderer
       static GLuint GenerateProgram( GLuint vertexShader, GLuint fragmentShader );
 
       static void SetRenderAlpha( bool isAlpha );
-
+      static void CheckError( void );
       virtual void VDrawLine( const Vec3& from,const Vec3& to,const Color& color ) const override;
 
    public:

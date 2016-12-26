@@ -21,8 +21,8 @@
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureVertexShader.vertexshader";
-const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureFragmentShader.fragmentshader";
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureVertexShader.vs";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureFragmentShader.fs";
 
 SkySceneNode::SkySceneNode( 
    const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResource, shared_ptr<Resource> ptextureResource, RenderGroup renderGroup, TransformPtr pTransform )

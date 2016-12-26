@@ -279,6 +279,27 @@ GLuint OpenGLRenderer::GenerateProgram( GLuint vertexShader, GLuint fragmentShad
    return program;
    }
 
+void OpenGLRenderer::CheckError( void )
+   {
+   GLenum errCode;
+   while( ( errCode = glGetError() ) != GL_NO_ERROR )
+      {
+      std::string errorStr;
+      switch( errCode )
+         {
+         case GL_INVALID_ENUM:                  errorStr = "INVALID_ENUM"; break;
+         case GL_INVALID_VALUE:                 errorStr = "INVALID_VALUE"; break;
+         case GL_INVALID_OPERATION:             errorStr = "INVALID_OPERATION"; break;
+         case GL_STACK_OVERFLOW:                errorStr = "STACK_OVERFLOW"; break;
+         case GL_STACK_UNDERFLOW:               errorStr = "STACK_UNDERFLOW"; break;
+         case GL_OUT_OF_MEMORY:                 errorStr = "OUT_OF_MEMORY"; break;
+         case GL_INVALID_FRAMEBUFFER_OPERATION: errorStr = "INVALID_FRAMEBUFFER_OPERATION"; break;
+         }
+      ENG_ASSERT( 0 && errorStr.c_str() );
+    //  std::cout << error << " | " << file << " (" << line << ")" << std::endl;
+      }
+   }
+
 void OpenGLRenderer::SetRenderAlpha( bool isAlpha )
    {
    if( isAlpha )

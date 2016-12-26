@@ -52,7 +52,7 @@
     <Filter Include="Math">
       <UniqueIdentifier>{37154279-f676-4eeb-91ea-5156a40b4de9}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Graphics\DeferredShader">
+    <Filter Include="Graphics\DeferredRenderer">
       <UniqueIdentifier>{88982f36-ba14-4904-8867-4ce4bf07b99b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -277,8 +277,8 @@
     <ClCompile Include="..\Graphics\SceneNode\DirectionalLightSceneNode.cpp">
       <Filter>Graphics\SceneNode</Filter>
     </ClCompile>
-    <ClCompile Include="..\Graphics\DeferredShader\DeferredShader.cpp">
-      <Filter>Graphics\DeferredShader</Filter>
+    <ClCompile Include="..\Graphics\DeferredRenderer\DeferredRenderer.cpp">
+      <Filter>Graphics\DeferredRenderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -515,8 +515,8 @@
     <ClInclude Include="..\Graphics\SceneNode\DirectionalLightSceneNode.h">
       <Filter>Graphics\SceneNode</Filter>
     </ClInclude>
-    <ClInclude Include="..\Graphics\DeferredShader\DeferredShader.h">
-      <Filter>Graphics\DeferredShader</Filter>
+    <ClInclude Include="..\Graphics\DeferredRenderer\DeferredRenderer.h">
+      <Filter>Graphics\DeferredRenderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

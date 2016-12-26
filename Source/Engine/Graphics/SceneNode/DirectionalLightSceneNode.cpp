@@ -15,8 +15,8 @@
 #include "EngineStd.h"
 #include "DirectionalLightSceneNode.h"
 
-const char* const FIRST_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DepthRTT.vertexshader";
-const char* const FIRST_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DepthRTT.fragmentshader";
+const char* const FIRST_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DepthRTT.vs";
+const char* const FIRST_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DepthRTT.fs";
 
 #define VERTEX_LOCATION    0
 

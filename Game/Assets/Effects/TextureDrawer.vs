@@ -7,7 +7,7 @@ out vec2 oUV;
 
 void main()
     {
-	gl_Position =  vec4( iVertexPos, 0.0, 1.0 );
+	gl_Position =  vec4( iVertexPos, -1.0, 1.0 );
 	oUV = iUV;
     }
 

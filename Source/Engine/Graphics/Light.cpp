@@ -25,7 +25,7 @@ bool LightProperties::Init( TiXmlElement* pData )
       {
       return false;
       }
-   if( !m_Diffuse.Init( pData->FirstChildElement( "Diffuse" ) ) )
+   if( !m_Color.Init( pData->FirstChildElement( "Diffuse" ) ) )
       {
       return false;
       }
@@ -41,7 +41,7 @@ TiXmlElement* LightProperties::GenerateXML( void )
    {
    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Light" );
 
-   TiXmlElement* pDiffuse = m_Diffuse.GenerateXML();
+   TiXmlElement* pDiffuse = m_Color.GenerateXML();
    pDiffuse->SetValue( "Diffuse" );
    pRetNode->LinkEndChild( pDiffuse );
 
@@ -54,7 +54,7 @@ TiXmlElement* LightProperties::GenerateOverridesXML( TiXmlElement* pResource )
    {
    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Light" );
 
-   TiXmlElement* pDiffuse = m_Diffuse.GenerateOverridesXML( pResource->FirstChildElement( "Diffuse" ) );
+   TiXmlElement* pDiffuse = m_Color.GenerateOverridesXML( pResource->FirstChildElement( "Diffuse" ) );
    pDiffuse->SetValue( "Diffuse" );
    pRetNode->LinkEndChild( pDiffuse );
 
@@ -118,7 +118,7 @@ void LightManager::CalcLighting( Scene *pScene )
       memcpy( &m_LightPosWorldSpace[ i ], &globalPos, sizeof( Vec3 ) );
       memcpy( &m_LightDir[ i ], &lightIt->get()->VGetGlobalTransformPtr()->GetForward(), sizeof( Vec3 ) );
       memcpy( &m_LightPower[ i ], &lightIt->get()->GetLightPropertiesPtr()->m_Power, sizeof( float ) );
-      memcpy( &m_LightColor[ i ], &lightIt->get()->GetLightPropertiesPtr()->m_Diffuse, sizeof( Color ) );
+      memcpy( &m_LightColor[ i ], &lightIt->get()->GetLightPropertiesPtr()->m_Color, sizeof( Color ) );
       // auto shadowMapMatrix = lightIt->get()->VGetShadowMapMatrix();
       //  memcpy( &m_ShadowMapMatrix[ i ], &shadowMapMatrix, sizeof( Mat4x4 ) );
     //  auto shadowMapTexture = lightIt->get()->VGetShadowMapTexture();

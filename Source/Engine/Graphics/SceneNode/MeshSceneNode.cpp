@@ -22,8 +22,8 @@
 #define UV_LOCATION        1
 #define NORMAL_LOCATION    2
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\BasicVertexShader.vertexshader";
-const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\BasicFragmentShader.fragmentshader";
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\BasicVertexShader.vs";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\BasicFragmentShader.fs";
 
 MeshSceneNode::MeshSceneNode( 
    const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, MaterialPtr pMaterial, RenderGroup renderGroup, TransformPtr pTransform )
@@ -209,7 +209,7 @@ int MeshSceneNode::VRender( Scene *pScene )
 
    glBindVertexArray( 0 );
    glUseProgram( 0 );
-
+   
    return S_OK;
    }
 

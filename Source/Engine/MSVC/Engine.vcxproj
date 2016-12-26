@@ -125,7 +125,7 @@
     <ClCompile Include="..\Event\PhysicsEvents.cpp" />
     <ClCompile Include="..\Event\ScriptEvent.cpp" />
     <ClCompile Include="..\Event\EventFactory.cpp" />
-    <ClCompile Include="..\Graphics\DeferredShader\DeferredShader.cpp" />
+    <ClCompile Include="..\Graphics\DeferredRenderer\DeferredRenderer.cpp" />
     <ClCompile Include="..\Graphics\Light.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\DirectionalLightSceneNode.cpp" />
@@ -215,7 +215,7 @@
     <ClInclude Include="..\Event\PhysicsEvents.h" />
     <ClInclude Include="..\Event\ScriptEvent.h" />
     <ClInclude Include="..\Event\EventFactory.h" />
-    <ClInclude Include="..\Graphics\DeferredShader\DeferredShader.h" />
+    <ClInclude Include="..\Graphics\DeferredRenderer\DeferredRenderer.h" />
     <ClInclude Include="..\Graphics\Light.h" />
     <ClInclude Include="..\Graphics\Material.h" />
     <ClInclude Include="..\Graphics\SceneNode\DirectionalLightSceneNode.h" />

@@ -14,7 +14,7 @@
  */
 #include ".\SceneNode\SceneNodes.h"
 #include "OpenGLRenderer.h"
-#include ".\DeferredShader\DeferredShader.h"
+#include ".\DeferredRenderer\DeferredRenderer.h"
 
 #define MAXIMUM_LIGHTS_SUPPORTED (8)
 #define MAXIMUM_SHADOWMAP_TEXTURE_SUPPORTED (8)
@@ -31,7 +31,7 @@ struct LightProperties
       TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
 
    public:
-      Color m_Diffuse;
+      Color m_Color;
       float m_Power;
    };
 
@@ -105,5 +105,5 @@ class LightManager
       Vec3     m_LightPosWorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
       float     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
       Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
-      OpenGLDeferredShader m_DeferredShader;
+      OpenGLDeferredRenderer m_DeferredShader;
    };

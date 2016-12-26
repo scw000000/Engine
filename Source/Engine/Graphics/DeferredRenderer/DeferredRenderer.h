@@ -14,28 +14,30 @@
 */
 #include "..\Shaders.h"
 
-class IDeferredShader
+class IDeferredRenderer
    {
    public:
-      virtual ~IDeferredShader( void ){ }
+      virtual ~IDeferredRenderer( void ){ }
       virtual void VPreRender( void ) = 0;
       virtual int VOnRestore( void ) = 0;
       virtual int VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode ) = 0;
    };
 
-class OpenGLDeferredShader : public IDeferredShader
+class OpenGLDeferredRenderer : public IDeferredRenderer
    {
    public:
-      OpenGLDeferredShader( void );
+      OpenGLDeferredRenderer( void );
       virtual void VPreRender( void ) override;
       virtual int VOnRestore( void ) override;
       virtual int VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode ) override;
    
    protected:
       void ReleaseResource( void );
+      int OnRestoreSSBO( void );
+      int OnRestoreTileFrustum( void );
       int OnRestoreGeometryPass( void );
       int OnRestoreLightPass( void );
-
+      
    private:
       enum RenderPass
          {
@@ -77,4 +79,12 @@ class OpenGLDeferredShader : public IDeferredShader
 
       GLuint m_MVPUni;
       GLuint m_MUni;
+
+      GLuint m_TileFrustumSSBO;
    };
+
+typedef struct tileFrustum
+   {
+   public:
+      Vec4 m_Planes[ 4 ];
+   }TileFrustum;

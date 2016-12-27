@@ -17,7 +17,7 @@
 
 OpenGLRenderManager::OpenGLRenderManager( void )
    {
-   m_pRenderer = ENG_NEW OpenGLRenderer();
+  // m_pRenderer = ENG_NEW MainRenderer();
    }
 
 int OpenGLRenderManager::VInit( void ) 
@@ -28,16 +28,19 @@ int OpenGLRenderManager::VInit( void )
 
 int OpenGLRenderManager::VOnRestore( void ) 
    {
+   m_MainRenderer.VOnRestore();
    return S_OK;
    }
 
 int OpenGLRenderManager::VPreRender( void ) 
    {
+   m_MainRenderer.VPreRender();
    return S_OK;
    }
 
 int OpenGLRenderManager::VPostRender( void ) 
    {
+   m_MainRenderer.VPostRender();
    return S_OK;
    }
 

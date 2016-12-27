@@ -12,9 +12,10 @@
  * \note
 */
 #include "EngineStd.h"
-#include "DeferredRenderer.h"
+#include "DeferredMainRenderer.h"
 #include "RendererLoader.h"
 #include "RenderManager.h"
+#include "..\..\Debugging\vsGLInfoLib.h"
 
 #define TILE_WIDTH 16u
 #define TILE_HEIGHT 16u
@@ -31,7 +32,7 @@ const char* const GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredGe
 const char* const LIGHT_PASS_VERTEX_SHADER_FILE_NAME = "";
 const char* const LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME = "";
 
-OpenGLDeferredRenderer::OpenGLDeferredRenderer( void )
+DeferredMainRenderer::DeferredMainRenderer( void )
    {
    m_VertexShaders[ RenderPass_Geometry ].VSetResource( Resource( GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME ) );
    m_FragmentShaders[ RenderPass_Geometry ].VSetResource( Resource( GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME ) );
@@ -55,20 +56,27 @@ OpenGLDeferredRenderer::OpenGLDeferredRenderer( void )
    
    }
 
-void OpenGLDeferredRenderer::VPreRender( void )
+void DeferredMainRenderer::VShutdown( void )
    {
+ 
+   }
+
+int DeferredMainRenderer::VPreRender( void )
+   {
+   MainRenderer::VPreRender();
    glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+   return S_OK;
    }
 
-int OpenGLDeferredRenderer::VOnRestore( void )
+int DeferredMainRenderer::VOnRestore( void )
    {
    ReleaseResource();
 
    OnRestoreSSBO();
 
-//   OnRestoreTileFrustum();
+   OnRestoreTileFrustum();
 
    if( OnRestoreGeometryPass() != S_OK )
       {
@@ -85,99 +93,99 @@ int OpenGLDeferredRenderer::VOnRestore( void )
    return S_OK;
    }
 
-int OpenGLDeferredRenderer::VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode )
-   {
-   glUseProgram( m_Programs[ RenderPass_Geometry ] );
-   glBindVertexArray( m_VAOs[ RenderPass_Geometry ] );
-   glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
+//int OpenGLDeferredRenderer::VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode )
+//   {
+//   glUseProgram( m_Programs[ RenderPass_Geometry ] );
+//   glBindVertexArray( m_VAOs[ RenderPass_Geometry ] );
+//   glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
+//
+//  /* glEnable( GL_CULL_FACE );
+//   glCullFace( GL_BACK );
+//   glEnable( GL_DEPTH_TEST );*/
+//  // auto viewTest = Mat4x4::LookAt( Vec3( 5, 5, 0 ), Vec3( 5, 5, 1 ), g_Up );
+//   auto view = pScene->GetCamera()->GetView();
+//   auto proj = pScene->GetCamera()->GetProjection();
+//   auto model = pNode->VGetGlobalTransformPtr()->GetToWorld();
+//   //auto mvp = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * pNode->VGetGlobalTransformPtr()->GetToWorld();
+//  // auto mvp = pScene->GetCamera()->GetProjection() * viewTest * pNode->VGetGlobalTransformPtr()->GetToWorld();
+//   auto mvp = proj * view * model;
+//   glUniformMatrix4fv( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ], 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
+//
+//   Mat4x4 normalMat = ( proj * view );
+//   normalMat = normalMat.Inverse().Transpose();
+//
+//  /* glUniformMatrix4fv( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ], 1, GL_FALSE, &normalMat[ 0 ][ 0 ] );*/
+//
+//   auto bufferObj = pNode->VGetShadowVertexInfo();
+//   if( !bufferObj.m_Vertexbuffer || !bufferObj.m_NormalBuffer || !bufferObj.m_IndexBuffer )
+//      {
+//      return S_OK;
+//      }
+//
+//   glBindBuffer( GL_ARRAY_BUFFER, bufferObj.m_Vertexbuffer );
+//   glEnableVertexAttribArray( GEOMETRY_PASS_VERTEX_LOCATION );
+//   glVertexAttribPointer(
+//      GEOMETRY_PASS_VERTEX_LOCATION, 
+//      3,                
+//      GL_FLOAT,           
+//      GL_FALSE,           
+//      0,               
+//      ( void* ) 0         
+//      );
+//
+//   /*glBindBuffer( GL_ARRAY_BUFFER, bufferObj.m_UVBuffer );
+//   glEnableVertexAttribArray( GEOMETRY_PASS_UV_LOCATION );
+//   glVertexAttribPointer(
+//      GEOMETRY_PASS_UV_LOCATION,
+//      2,
+//      GL_FLOAT,
+//      GL_FALSE,
+//      0,
+//      ( void* ) 0
+//      );*/
+//
+//   /*glBindBuffer( GL_VERTEX_ARRAY, bufferObj.m_NormalBuffer );
+//   glEnableVertexAttribArray( GEOMETRY_PASS_NORMAL_LOCATION );
+//   glVertexAttribPointer(
+//      GEOMETRY_PASS_NORMAL_LOCATION,
+//      3,
+//      GL_FLOAT,
+//      GL_FALSE,
+//      0,
+//      ( void* ) 0
+//      );*/
+//
+//   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, bufferObj.m_IndexBuffer );
+//
+//   /*glActiveTexture( GL_TEXTURE0 );
+//   glBindTexture( GL_TEXTURE_2D, bufferObj.m_TextureObj );
+//   glUniform1i( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ], 0 );*/
+//
+//   glDrawElements(
+//      GL_TRIANGLES,    
+//      bufferObj.m_VertexCount,   
+//      GL_UNSIGNED_INT, 
+//      ( void* ) 0        
+//      );
+//
+//   ENG_ASSERT( !glGetError() );
+//
+//   glDisableVertexAttribArray( GEOMETRY_PASS_VERTEX_LOCATION );
+//   glUseProgram( 0 );
+//   glBindVertexArray( 0 );
+//   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+//
+//   return S_OK;
+//   }
 
-  /* glEnable( GL_CULL_FACE );
-   glCullFace( GL_BACK );
-   glEnable( GL_DEPTH_TEST );*/
-  // auto viewTest = Mat4x4::LookAt( Vec3( 5, 5, 0 ), Vec3( 5, 5, 1 ), g_Up );
-   auto view = pScene->GetCamera()->GetView();
-   auto proj = pScene->GetCamera()->GetProjection();
-   auto model = pNode->VGetGlobalTransformPtr()->GetToWorld();
-   //auto mvp = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * pNode->VGetGlobalTransformPtr()->GetToWorld();
-  // auto mvp = pScene->GetCamera()->GetProjection() * viewTest * pNode->VGetGlobalTransformPtr()->GetToWorld();
-   auto mvp = proj * view * model;
-   glUniformMatrix4fv( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ], 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
-
-   Mat4x4 normalMat = ( proj * view );
-   normalMat = normalMat.Inverse().Transpose();
-
-  /* glUniformMatrix4fv( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ], 1, GL_FALSE, &normalMat[ 0 ][ 0 ] );*/
-
-   auto bufferObj = pNode->VGetShadowVertexInfo();
-   if( !bufferObj.m_Vertexbuffer || !bufferObj.m_NormalBuffer || !bufferObj.m_IndexBuffer )
-      {
-      return S_OK;
-      }
-
-   glBindBuffer( GL_ARRAY_BUFFER, bufferObj.m_Vertexbuffer );
-   glEnableVertexAttribArray( GEOMETRY_PASS_VERTEX_LOCATION );
-   glVertexAttribPointer(
-      GEOMETRY_PASS_VERTEX_LOCATION, 
-      3,                
-      GL_FLOAT,           
-      GL_FALSE,           
-      0,               
-      ( void* ) 0         
-      );
-
-   /*glBindBuffer( GL_ARRAY_BUFFER, bufferObj.m_UVBuffer );
-   glEnableVertexAttribArray( GEOMETRY_PASS_UV_LOCATION );
-   glVertexAttribPointer(
-      GEOMETRY_PASS_UV_LOCATION,
-      2,
-      GL_FLOAT,
-      GL_FALSE,
-      0,
-      ( void* ) 0
-      );*/
-
-   /*glBindBuffer( GL_VERTEX_ARRAY, bufferObj.m_NormalBuffer );
-   glEnableVertexAttribArray( GEOMETRY_PASS_NORMAL_LOCATION );
-   glVertexAttribPointer(
-      GEOMETRY_PASS_NORMAL_LOCATION,
-      3,
-      GL_FLOAT,
-      GL_FALSE,
-      0,
-      ( void* ) 0
-      );*/
-
-   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, bufferObj.m_IndexBuffer );
-
-   /*glActiveTexture( GL_TEXTURE0 );
-   glBindTexture( GL_TEXTURE_2D, bufferObj.m_TextureObj );
-   glUniform1i( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ], 0 );*/
-
-   glDrawElements(
-      GL_TRIANGLES,    
-      bufferObj.m_VertexCount,   
-      GL_UNSIGNED_INT, 
-      ( void* ) 0        
-      );
-
-   ENG_ASSERT( !glGetError() );
-
-   glDisableVertexAttribArray( GEOMETRY_PASS_VERTEX_LOCATION );
-   glUseProgram( 0 );
-   glBindVertexArray( 0 );
-   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-   return S_OK;
-   }
-
-void OpenGLDeferredRenderer::ReleaseResource( void ) 
+void DeferredMainRenderer::ReleaseResource( void ) 
    {
    
 
 //   return S_OK;
    }
 
-int OpenGLDeferredRenderer::OnRestoreSSBO( void )
+int DeferredMainRenderer::OnRestoreSSBO( void )
    {
    glGenBuffers( 1, &m_TileFrustumSSBO );
    ENG_ASSERT( m_TileFrustumSSBO );
@@ -188,14 +196,19 @@ int OpenGLDeferredRenderer::OnRestoreSSBO( void )
       glBufferData( GL_SHADER_STORAGE_BUFFER, sizeof( tileFrustum ) * m_TileNum[ 0 ] * m_TileNum[ 1 ], NULL, GL_DYNAMIC_DRAW );
    glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
    OpenGLRenderManager::CheckError();
+   VSGLInfoLib::getBufferInfo( GL_SHADER_STORAGE_BUFFER, m_TileFrustumSSBO );
    return S_OK;
    }
 
-int OpenGLDeferredRenderer::OnRestoreTileFrustum( void )
+int DeferredMainRenderer::OnRestoreTileFrustum( void )
    {
+
    m_TileFrustumShader.VOnRestore();
    auto program = OpenGLRendererLoader::GenerateProgram( { m_TileFrustumShader.VGetShaderObject() } );
    m_TileFrustumShader.VReleaseShader( program );
+   glUseProgram( program );
+
+   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 0, m_TileFrustumSSBO );
 
    auto tileSizeUni = glGetUniformLocation( program, "uTileSize" );
    glUniform2ui( tileSizeUni, TILE_WIDTH, TILE_HEIGHT );
@@ -204,12 +217,36 @@ int OpenGLDeferredRenderer::OnRestoreTileFrustum( void )
    auto invProjUni = glGetUniformLocation( program, "uInvProj" );
    glUniformMatrix4fv( invProjUni, 1, GL_FALSE, &invProj[ 0 ][ 0 ] );
 
-   glUseProgram( program );
    glDispatchCompute( m_TileNum[ 0 ], m_TileNum[ 1 ], 1u );
+   glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_TileFrustumSSBO );
+
+   GLfloat *ptr;
+   ptr = ( GLfloat * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );
+
+   for( int i = 0; i < m_TileNum[ 0 ] * m_TileNum[ 1 ]; i++ )
+      {
+      for( int j = 0; j < 4; ++j )
+         {
+         std::stringstream ss;
+         ss << "T: " << i << "P: " << j << ": " 
+            << ptr[ i * 16 + j * 4 + 0 ] << ", "
+            << ptr[ i * 16 + j * 4 + 1 ] << ", "
+            << ptr[ i * 16 + j * 4 + 2 ] << ", "
+            << ptr[ i * 16 + j * 4 + 3 ] << std::endl;
+         ENG_LOG( "Test", ss.str() );
+         }
+
+      }
+
+   glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
+
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
+   OpenGLRenderManager::CheckError();
    return S_OK;
    }
 
-int OpenGLDeferredRenderer::OnRestoreGeometryPass( void )
+int DeferredMainRenderer::OnRestoreGeometryPass( void )
    {
    m_VertexShaders[ RenderPass_Geometry ].VOnRestore();
 
@@ -344,7 +381,7 @@ int OpenGLDeferredRenderer::OnRestoreGeometryPass( void )
    return S_OK;
    }
 
-int OpenGLDeferredRenderer::OnRestoreLightPass( void )
+int DeferredMainRenderer::OnRestoreLightPass( void )
    {
    return S_OK;
    }

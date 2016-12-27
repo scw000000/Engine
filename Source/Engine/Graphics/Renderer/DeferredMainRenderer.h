@@ -13,23 +13,16 @@
  * \note
 */
 #include "..\Shaders.h"
+#include "MainRenderer.h"
 
-class IDeferredRenderer
+class DeferredMainRenderer : public MainRenderer
    {
    public:
-      virtual ~IDeferredRenderer( void ){ }
-      virtual void VPreRender( void ) = 0;
-      virtual int VOnRestore( void ) = 0;
-      virtual int VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode ) = 0;
-   };
-
-class OpenGLDeferredRenderer : public IDeferredRenderer
-   {
-   public:
-      OpenGLDeferredRenderer( void );
-      virtual void VPreRender( void ) override;
+      DeferredMainRenderer( void );
+      virtual void VShutdown( void ) override;
+      virtual int VPreRender( void ) override;
       virtual int VOnRestore( void ) override;
-      virtual int VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode ) override;
+    //  virtual int VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode ) override;
    
    protected:
       void ReleaseResource( void );

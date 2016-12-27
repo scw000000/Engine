@@ -21,7 +21,8 @@
 #include "..\ResourceCache\TextureResource.h"
 #include "..\Event\EventManager.h"
 #include "..\Event\Events.h"
-#include "..\Graphics\Renderer\OpenGLRenderer.h"
+#include "..\Graphics\Renderer\MainRenderer.h"
+#include "..\Graphics\Renderer\RenderManager.h"
 #include "..\LuaScripting\LuaStateManager.h"
 #include "..\LuaScripting\ScriptExports.h"
 #include "..\Animation\AnimationClipNode.h"
@@ -295,20 +296,22 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
     if( GetRendererImpl() == Renderer_OpenGL )
       {
-      m_pRenderer = shared_ptr<IRenderer>( ENG_NEW OpenGLRenderer() );
+     // m_pRenderer = shared_ptr< IMainRenderer >( ENG_NEW MainRenderer() );
+      m_pRenderManager = shared_ptr< IRenderManager >( ENG_NEW OpenGLRenderManager() );
       }
    else
       {
       ENG_ERROR( "Not supported renderer type" );
       }
-   m_pRenderer->VSetBackgroundColor( g_Black );
+    m_pRenderManager->VGetMainRenderer().VSetBackgroundColor( g_Black );
    glClearDepth( 1.0 );
 	glEnable( GL_DEPTH_TEST );
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc( GL_LESS ); 
    // Cull triangles which normal is not towards the camera
    glEnable( GL_CULL_FACE );
-   m_pRenderer->VOnRestore();
+   m_pRenderManager->VInit();
+  // m_pRenderer->VOnRestore();
    //--------------------------------- 
    // Set Renderer
    //--------------------------------- 
@@ -432,7 +435,7 @@ void EngineApp::MsgProc( void )
 
 BaseEngineLogic *EngineApp::VCreateLogic( void )
    {
-   m_pEngineLogic = ENG_NEW BaseEngineLogic( g_pApp->m_pRenderer );
+   m_pEngineLogic = ENG_NEW BaseEngineLogic( g_pApp->m_pRenderManager );
    m_pEngineLogic->Init();
 
 	return m_pEngineLogic;

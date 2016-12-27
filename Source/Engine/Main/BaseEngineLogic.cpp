@@ -33,16 +33,16 @@ void LevelManager::Init(void)
    pCurrentLevelRes.reset( ENG_NEW Resource( currentLevel[0] ) );
    }
 
-BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer ) : m_pGUIManager( ENG_NEW GUIManager )
+BaseEngineLogic::BaseEngineLogic( shared_ptr< IRenderManager > pRenderManager ) : m_pGUIManager( ENG_NEW GUIManager )
    {
    m_Lifetime = 0.f;
    m_LastActorId = 0;
    m_HasStarted = false;
 	m_pProcessManager = ENG_NEW ProcessManager;
-   if( pRenderer )
+   if( pRenderManager )
       {
-      m_pWrold.reset( ENG_NEW Scene( pRenderer ) );
-      m_pRenderer = pRenderer;
+      m_pWrold.reset( ENG_NEW Scene( pRenderManager ) );
+      m_pRenderManager = pRenderManager;
       }
    m_pActorFactory = ENG_NEW ActorFactory;
    m_pLevelManager = ENG_NEW LevelManager;
@@ -86,6 +86,8 @@ bool BaseEngineLogic::Init()
       g_pApp->AbortGame( );
       return false;
       }
+   // render manager need the information of camera to restore, which is in the scene
+   m_pRenderManager->VOnRestore();
    SetNextEngineState( BES_Ready );
    return true;  
    }
@@ -174,6 +176,8 @@ int BaseEngineLogic::VOnRestore( void )
       {
       pView->VOnRestore();
       }
+   // render manager need the information of camera to restore, which is in the scene
+   m_pRenderManager->VOnRestore();
    return S_OK;
    }
 
@@ -237,7 +241,7 @@ void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
 
 void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )
    {
-   m_pRenderer->VPreRender( );
+   m_pRenderManager->VPreRender( );
    for( auto pView : m_ViewList )
       {
       pView->VOnRender( fTime, fElapsedTime );
@@ -245,7 +249,7 @@ void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )
    //Render GUI last
    m_pGUIManager->OnRender( fTime, fElapsedTime );
    VRenderDiagnostics();
-   m_pRenderer->VPostRender( );
+   m_pRenderManager->VPostRender();
    }
 
 void BaseEngineLogic::VRenderDiagnostics( void ) const

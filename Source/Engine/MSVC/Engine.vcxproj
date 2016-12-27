@@ -120,6 +120,7 @@
     <ClCompile Include="..\Controller\EditorController.cpp" />
     <ClCompile Include="..\Controller\MovementController.cpp" />
     <ClCompile Include="..\Debugging\Logger.cpp" />
+    <ClCompile Include="..\Debugging\vsGLInfoLib.cpp" />
     <ClCompile Include="..\Event\EventManager.cpp" />
     <ClCompile Include="..\Event\Events.cpp" />
     <ClCompile Include="..\Event\PhysicsEvents.cpp" />
@@ -127,8 +128,8 @@
     <ClCompile Include="..\Event\EventFactory.cpp" />
     <ClCompile Include="..\Graphics\Light.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
-    <ClCompile Include="..\Graphics\Renderer\DeferredRenderer.cpp" />
-    <ClCompile Include="..\Graphics\Renderer\OpenGLRenderer.cpp" />
+    <ClCompile Include="..\Graphics\Renderer\DeferredMainRenderer.cpp" />
+    <ClCompile Include="..\Graphics\Renderer\MainRenderer.cpp" />
     <ClCompile Include="..\Graphics\Renderer\RendererLoader.cpp" />
     <ClCompile Include="..\Graphics\Renderer\RenderManager.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\DirectionalLightSceneNode.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="..\Controller\EditorController.h" />
     <ClInclude Include="..\Controller\MovementController.h" />
     <ClInclude Include="..\Debugging\Logger.h" />
+    <ClInclude Include="..\Debugging\vsGLInfoLib.h" />
     <ClInclude Include="..\Event\EventManager.h" />
     <ClInclude Include="..\Event\Events.h" />
     <ClInclude Include="..\Event\PhysicsEvents.h" />
@@ -219,8 +221,8 @@
     <ClInclude Include="..\Event\EventFactory.h" />
     <ClInclude Include="..\Graphics\Light.h" />
     <ClInclude Include="..\Graphics\Material.h" />
-    <ClInclude Include="..\Graphics\Renderer\DeferredRenderer.h" />
-    <ClInclude Include="..\Graphics\Renderer\OpenGLRenderer.h" />
+    <ClInclude Include="..\Graphics\Renderer\DeferredMainRenderer.h" />
+    <ClInclude Include="..\Graphics\Renderer\MainRenderer.h" />
     <ClInclude Include="..\Graphics\Renderer\RendererLoader.h" />
     <ClInclude Include="..\Graphics\Renderer\RenderManager.h" />
     <ClInclude Include="..\Graphics\SceneNode\DirectionalLightSceneNode.h" />

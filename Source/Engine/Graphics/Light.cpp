@@ -77,7 +77,7 @@ LightManager::LightManager( void )
    IEventManager* pEventMgr = IEventManager::GetSingleton();
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &LightManager::NewSceneNodeDelegate ), Event_New_Scene_Node::s_EventType );
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &LightManager::DestroySceneNodeDelegate ), Event_Destroy_Scene_Node::s_EventType );
-   m_DeferredShader.VOnRestore();
+ //  m_DeferredShader.VOnRestore();
    }
 
 void LightManager::RenderShadowMap( shared_ptr< LightNode > ) const
@@ -87,7 +87,7 @@ void LightManager::RenderShadowMap( shared_ptr< LightNode > ) const
 
 void LightManager::CalcLighting( Scene *pScene )
    {
-   m_DeferredShader.VPreRender();
+ //  m_DeferredShader.VPreRender();
    // Only calculate shadow for nodes in static and actor group
    for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt )
       {
@@ -148,7 +148,7 @@ void LightManager::CalcLighting( SceneNode *pNode )
 
 void LightManager::CalcShadow( Scene *pScene, shared_ptr< ISceneNode > pNode )
    {
-   m_DeferredShader.VOnRender( pScene, pNode );
+  // m_DeferredShader.VOnRender( pScene, pNode );
    for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt )
       {
       // If the node is inside the frustum of current light, then render it to current light's shadow map

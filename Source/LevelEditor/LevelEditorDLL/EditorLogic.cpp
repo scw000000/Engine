@@ -19,7 +19,7 @@
 #include <sstream>  
 #include "..\Actors\Actor.h"
 
-EditorLogic::EditorLogic( shared_ptr<IRenderer> pRenderer ) : BaseEngineLogic( pRenderer )
+EditorLogic::EditorLogic( shared_ptr< IRenderManager > pRenderManager ) : BaseEngineLogic( pRenderManager )
    {
    }
 

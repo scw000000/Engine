@@ -47,7 +47,7 @@ class BaseEngineLogic : public IEngineLogic
 
    public:
    
-	   BaseEngineLogic( shared_ptr<IRenderer> pRenderer );
+	   BaseEngineLogic( shared_ptr< IRenderManager > pRenderManager );
 	   virtual ~BaseEngineLogic();
       
       bool Init(void);
@@ -125,7 +125,7 @@ class BaseEngineLogic : public IEngineLogic
       bool m_RenderDiagnostics;
       bool m_HasStarted;
       float m_Lifetime;
-      shared_ptr<IRenderer> m_pRenderer;
+      shared_ptr< IRenderManager > m_pRenderManager;
       BaseEngineState m_EngineState;
 
    };

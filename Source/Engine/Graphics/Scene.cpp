@@ -17,9 +17,9 @@
 #include "..\Event\EventManager.h"
 #include "FastDelegate.h"
 
-Scene::Scene( shared_ptr<IRenderer> renderer ) : m_pRoot( ENG_NEW RootNode ), m_pLightManager( ENG_NEW LightManager )
+Scene::Scene( shared_ptr< IRenderManager > pRenderManager ) : m_pRoot( ENG_NEW RootNode ), m_pLightManager( ENG_NEW LightManager )
    {
-   m_pRenderer = renderer;
+   m_pRenderManager = pRenderManager;
 	
    IEventManager* pEventMgr = IEventManager::GetSingleton();
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::NewRenderComponentDelegate ), Event_New_Render_Root_Component::s_EventType );
@@ -174,8 +174,8 @@ bool Scene::RemoveChild( ActorId id )
 
 void Scene::RenderAlphaPass()
    {
-   //  shared_ptr<IRenderState> alphaPass = m_Renderer->VPrepareAlphaPass();
-   OpenGLRenderer::SetRenderAlpha( true );
+   m_pRenderManager->VGetMainRenderer().VSetRenderingAlpha( true );
+   //MainRenderer::VSetRenderAlpha( true );
    // This it not implemented yet!
 	m_AlphaSceneNodes.sort();
    // rendering from back to front in order to make visual effort of transparant objects
@@ -188,8 +188,7 @@ void Scene::RenderAlphaPass()
 	//	PopTransform();
 		m_AlphaSceneNodes.pop_back();
 	   }
-
-   OpenGLRenderer::SetRenderAlpha( false );
+   m_pRenderManager->VGetMainRenderer().VSetRenderingAlpha( false );
    }
 
 void Scene::NewRenderComponentDelegate( IEventPtr pEvent )

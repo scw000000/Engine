@@ -274,17 +274,20 @@
     <ClCompile Include="..\Graphics\SceneNode\DirectionalLightSceneNode.cpp">
       <Filter>Graphics\SceneNode</Filter>
     </ClCompile>
-    <ClCompile Include="..\Graphics\Renderer\DeferredRenderer.cpp">
-      <Filter>Graphics\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\Graphics\Renderer\RenderManager.cpp">
-      <Filter>Graphics\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Graphics\Renderer\OpenGLRenderer.cpp">
       <Filter>Graphics\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="..\Graphics\Renderer\RendererLoader.cpp">
       <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\MainRenderer.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\DeferredMainRenderer.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Debugging\vsGLInfoLib.cpp">
+      <Filter>Debugging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -518,17 +521,20 @@
     <ClInclude Include="..\Graphics\SceneNode\DirectionalLightSceneNode.h">
       <Filter>Graphics\SceneNode</Filter>
     </ClInclude>
-    <ClInclude Include="..\Graphics\Renderer\DeferredRenderer.h">
-      <Filter>Graphics\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\Graphics\Renderer\RenderManager.h">
-      <Filter>Graphics\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Graphics\Renderer\OpenGLRenderer.h">
       <Filter>Graphics\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\Graphics\Renderer\RendererLoader.h">
       <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\MainRenderer.h">
+      <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\DeferredMainRenderer.h">
+      <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Debugging\vsGLInfoLib.h">
+      <Filter>Debugging</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

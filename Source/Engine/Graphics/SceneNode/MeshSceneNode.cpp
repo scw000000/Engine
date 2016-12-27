@@ -25,8 +25,12 @@
 const char* const VERTEX_SHADER_FILE_NAME = "Effects\\MeshShader.vs.glsl";
 const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\MeshShader.fs.glsl";
 
-MeshSceneNode::MeshSceneNode( 
-   const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, MaterialPtr pMaterial, RenderGroup renderGroup, TransformPtr pTransform )
+MeshSceneNode::MeshSceneNode( const ActorId actorId, 
+                              IRenderComponent* pRenderComponent, 
+                              shared_ptr<Resource> pMeshResouce, 
+                              MaterialPtr pMaterial, 
+                              RenderGroup renderGroup, 
+                              TransformPtr pTransform )
    : SceneNode( actorId, pRenderComponent, renderGroup, pTransform, pMaterial ),
    m_pMeshResource( pMeshResouce ),
    m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
@@ -159,7 +163,7 @@ int MeshSceneNode::VRender( Scene *pScene )
 	glUseProgram( m_Program );
    glBindVertexArray( m_VAO );
 
-   Mat4x4 globalToWorld = VGetGlobalTransformPtr()->GetToWorld();
+   Mat4x4 modelToWorld = VGetGlobalTransformPtr()->GetToWorld();
    // Get the projection & view matrix from the camera class
    Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * VGetGlobalTransformPtr()->GetToWorld();
    // Send our transformation to the currently bound shader, 
@@ -167,7 +171,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    // 1-> how many matrix, GL_FALSE->should transpose or not
    glUniformMatrix4fv( m_MVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
 
-   glUniformMatrix4fv( m_MUni, 1, GL_FALSE, &( globalToWorld[ 0 ][ 0 ] ) );
+   glUniformMatrix4fv( m_MUni, 1, GL_FALSE, &( modelToWorld[ 0 ][ 0 ] ) );
 
    auto pLightManager = pScene->GetLightManagerPtr();
    

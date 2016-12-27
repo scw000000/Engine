@@ -17,6 +17,22 @@
 #include "..\ResourceCache\TextureResource.h"
 #include "..\ResourceCache\MeshResource.h"
 
+void VertexToBoneMapping::AddBoneData( BoneId boneID, float boneWeight )
+   {
+   for( unsigned i = 0; i < MAXIMUM_BONES_PER_VEREX; i++ )
+      {
+      if( m_BoneWeights[ i ] == 0.0 )
+         {
+         m_BoneIDs[ i ] = boneID;
+         m_BoneWeights[ i ] = boneWeight;
+         return;
+         }
+      }
+
+   // should never get here - more bones than we have space for
+   ENG_ASSERT( 0 );
+   }
+
 void OpenGLRendererLoader::LoadTexture2D( GLuint* textureId, const Resource& textureResource )
    {
    glGenTextures( 1, textureId );

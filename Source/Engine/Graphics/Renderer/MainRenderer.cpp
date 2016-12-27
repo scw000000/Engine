@@ -13,63 +13,47 @@
 */
 
 #include "EngineStd.h"
-#include "OpenGLRenderer.h"
+#include "MainRenderer.h"
 
-OpenGLTextureDrawer OpenGLRenderer::s_TextureDrawer;
+//OpenGLTextureDrawer MainRenderer::s_TextureDrawer;
 
-void VertexToBoneMapping::AddBoneData( BoneId boneID, float boneWeight )
-   {
-   for( unsigned i = 0; i < MAXIMUM_BONES_PER_VEREX; i++ )
-      {
-      if( m_BoneWeights[ i ] == 0.0 )
-         {
-         m_BoneIDs[ i ] = boneID;
-         m_BoneWeights[ i ] = boneWeight;
-         return;
-         }
-      }
-
-   // should never get here - more bones than we have space for
-   ENG_ASSERT( 0 );
-   }
-
-OpenGLRenderer::OpenGLRenderer( void )
+MainRenderer::MainRenderer( void )
    {
 
    }
 
-OpenGLRenderer::~OpenGLRenderer( void )
+MainRenderer::~MainRenderer( void )
    {
 
    }
 
-void OpenGLRenderer::VSetBackgroundColor( Color color )
+void MainRenderer::VSetBackgroundColor( const Color& color )
    {
    glClearColor( color.m_Component.r, color.m_Component.g, color.m_Component.b, color.m_Component.a );
    }
+//
+//int MainRenderer::VOnRestore( void )
+//   {
+//   s_TextureDrawer.OnRestore();
+//   return S_OK;
+//   }
+//
+//void MainRenderer::VShutdown( void )
+//   {}
 
-GLuint OpenGLRenderer::VOnRestore( void )
-   {
-   s_TextureDrawer.OnRestore();
-   return GL_NO_ERROR;
-   }
-
-void OpenGLRenderer::VShutdown( void )
-   {}
-
-int OpenGLRenderer::VPreRender( void )
+int MainRenderer::VPreRender( void )
    {
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    return S_OK;
    }
 
-int OpenGLRenderer::VPostRender( void )
+int MainRenderer::VPostRender( void )
    {
    auto screensize = g_pApp->GetScreenSize();
    float xSize = 300.f;
    float ySize = xSize * ( float ) screensize.y / ( float ) screensize.x;
 
-   OpenGLRenderer::s_TextureDrawer.DrawTexture( 1, Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
+  // MainRenderer::s_TextureDrawer.DrawTexture( 1, Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
    SDL_GL_SwapWindow( g_pApp->GetWindow() );
    return S_OK;
    }
@@ -89,7 +73,7 @@ void OpenGLRenderer::VSetProjectionTransform( const Mat4x4 *m )
 
 }*/
 
-void OpenGLRenderer::SetRenderAlpha( bool isAlpha )
+void MainRenderer::VSetRenderingAlpha( bool isAlpha )
    {
    if( isAlpha )
       {
@@ -108,7 +92,7 @@ void OpenGLRenderer::SetRenderAlpha( bool isAlpha )
 
    }
 
-void OpenGLRenderer::VDrawLine( const Vec3& fromWS, const Vec3& toWS, const Color& color ) const
+void MainRenderer::VDrawLine( const Vec3& fromWS, const Vec3& toWS, const Color& color ) const
    {
    shared_ptr<Scene> pScene = g_pApp->m_pEngineLogic->m_pWrold;
 

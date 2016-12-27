@@ -230,21 +230,24 @@ class IRenderer
    {
    public:
       virtual ~IRenderer() {}
-	   virtual void VSetBackgroundColor( Color color ) = 0; 
-	   virtual GLuint VOnRestore( void ) = 0;
+      //
+	   virtual int VOnRestore( void ) = 0;
 	   virtual void VShutdown( void ) = 0;
 	   virtual int VPreRender( void ) = 0;
       virtual int VPostRender( void ) = 0;
 	   //virtual void VCalcLighting( Lights *lights, int maximumLights ) = 0;
 	   
-      // Unnecessarry functions for OpenGL
-      //virtual void VSetWorldTransform( const Mat4x4 *m )=0;
-	   //virtual void VSetViewTransform( const Mat4x4 *m )=0;
-	   //virtual void VSetProjectionTransform( const Mat4x4 *m )=0;
-	   
       //virtual shared_ptr<IRenderState> VPrepareAlphaPass( void ) = 0;
 	   //virtual shared_ptr<IRenderState> VPrepareSkyBoxPass( void ) = 0;
-	   virtual void VDrawLine( const Vec3& from,const Vec3& to,const Color& color ) const = 0;
+      //
+   };
+
+class IMainRenderer : public IRenderer
+   {
+   public:
+      virtual void VDrawLine( const Vec3& from, const Vec3& to, const Color& color ) const = 0;
+      virtual void VSetBackgroundColor( const Color& color ) = 0;
+      virtual void VSetRenderingAlpha( bool isAplha ) = 0;
    };
 
 class IRenderManager
@@ -258,7 +261,7 @@ class IRenderManager
       virtual int VPreRender( void ) = 0;
       virtual int VPostRender( void ) = 0;
       virtual void VShutDown( void ) = 0;
-      virtual IRenderer* VGetRenderer( void ) const = 0;
+      virtual IMainRenderer& VGetMainRenderer( void ) = 0;
     //  virtual void VCheckError( void ) const = 0;
    };
 

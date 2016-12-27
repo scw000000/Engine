@@ -20,7 +20,7 @@ EditorApp editorApp;
 
 BaseEngineLogic* EditorApp::VCreateLogic()
    {
-   m_pEngineLogic = ENG_NEW EditorLogic( g_pApp->m_pRenderer );
+   m_pEngineLogic = ENG_NEW EditorLogic( g_pApp->m_pRenderManager );
    m_pEngineLogic->Init();
 
    return m_pEngineLogic;

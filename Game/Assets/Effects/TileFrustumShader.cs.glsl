@@ -12,7 +12,7 @@ uniform mat4 uInvProj;
 
 layout ( std430, binding = 0 ) writeonly buffer tileFrustumSSBO
     {
-    TileFrustum data[][];
+    TileFrustum data[];
     }TileFrustumSSBO;
 
  layout ( local_size_x = 1, local_size_y = 1, local_size_z = 1 ) in;
@@ -59,9 +59,14 @@ layout ( std430, binding = 0 ) writeonly buffer tileFrustumSSBO
     // Generate 4 frustum planes, pointing inward
     vec3 cameraPosVS = vec3( 0.0, 0.0, 0.0 );
     //uint tileIndex = gl_WorkGroupID.x + gl_WorkGroupID.y * gl_NumWorkGroups.x;
-    TileFrustumSSBO.data[ gl_WorkGroupID.x ][ gl_WorkGroupID.y ].m_Planes[ 0 ] = ComputePlane( cameraPosVS, frustumPosVS[ 0 ], frustumPosVS[ 3 ] ); // left plane
-    TileFrustumSSBO.data[ gl_WorkGroupID.x ][ gl_WorkGroupID.y ].m_Planes[ 1 ] = ComputePlane( cameraPosVS, frustumPosVS[ 1 ], frustumPosVS[ 0 ] ); // bottom plane
-    TileFrustumSSBO.data[ gl_WorkGroupID.x ][ gl_WorkGroupID.y ].m_Planes[ 2 ] = ComputePlane( cameraPosVS, frustumPosVS[ 2 ], frustumPosVS[ 1 ] ); // right plane
-    TileFrustumSSBO.data[ gl_WorkGroupID.x ][ gl_WorkGroupID.y ].m_Planes[ 3 ] = ComputePlane( cameraPosVS, frustumPosVS[ 3 ], frustumPosVS[ 2 ] ); // top plane
+  //  TileFrustumSSBO.data[ gl_WorkGroupID.x ][ gl_WorkGroupID.y ].m_Planes[ 0 ] = ComputePlane( cameraPosVS, frustumPosVS[ 0 ], frustumPosVS[ 3 ] ); // left plane
+  //  TileFrustumSSBO.data[ gl_WorkGroupID.x ][ gl_WorkGroupID.y ].m_Planes[ 1 ] = ComputePlane( cameraPosVS, frustumPosVS[ 1 ], frustumPosVS[ 0 ] ); // bottom plane
+  //  TileFrustumSSBO.data[ gl_WorkGroupID.x ][ gl_WorkGroupID.y ].m_Planes[ 2 ] = ComputePlane( cameraPosVS, frustumPosVS[ 2 ], frustumPosVS[ 1 ] ); // right plane
+  //  TileFrustumSSBO.data[ gl_WorkGroupID.x ][ gl_WorkGroupID.y ].m_Planes[ 3 ] = ComputePlane( cameraPosVS, frustumPosVS[ 3 ], frustumPosVS[ 2 ] ); // top plane
+    
+    TileFrustumSSBO.data[ gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y ].m_Planes[ 0 ] = vec4( 0.5, 0.6, 0.7, 0.8 ); // left plane
+    TileFrustumSSBO.data[ gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y ].m_Planes[ 1 ] = vec4( 0.5, 0.6, 0.7, 0.8 ); // left plane
+    TileFrustumSSBO.data[ gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y ].m_Planes[ 2 ] = vec4( 0.5, 0.6, 0.7, 0.8 ); // left plane
+    TileFrustumSSBO.data[ gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y ].m_Planes[ 3 ] = vec4( 0.5, 0.6, 0.7, 0.8 ); // left plane
     } 
     

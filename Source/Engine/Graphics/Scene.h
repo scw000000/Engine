@@ -24,7 +24,7 @@ class Scene
    {
    friend class LightManager;
    public:
-      Scene( shared_ptr<IRenderer> renderer );
+      Scene( shared_ptr< IRenderManager > pRenderManager );
       virtual ~Scene( void );
       int PreRender( void );
       int OnRender( void );
@@ -59,7 +59,7 @@ class Scene
 	   void AddAlphaSceneNode( AlphaSceneNode *asn ) { m_AlphaSceneNodes.push_back( asn ); }
       void NewRenderComponentDelegate( IEventPtr pEvent );
       void DestroyActorDelegate( IEventPtr pEvent );
-      shared_ptr<IRenderer> GetRenderer( void ) { return m_pRenderer; }
+     // shared_ptr<IRenderer> GetRenderer( void ) { return m_pRenderer; }
       shared_ptr<CameraNode> GetCamera( void ) { return m_pCamera; }
       shared_ptr<LightManager> GetLightManagerPtr( void ){ return m_pLightManager; }
 
@@ -67,9 +67,10 @@ class Scene
       void RenderAlphaPass();
       
    protected:
-      shared_ptr<SceneNode>         m_pRoot;
-      shared_ptr<CameraNode>        m_pCamera;
-      shared_ptr<IRenderer>         m_pRenderer;
+      shared_ptr< SceneNode >         m_pRoot;
+      shared_ptr< CameraNode >        m_pCamera;
+    //  shared_ptr< IRenderer >         m_pRenderer;
+      shared_ptr< IRenderManager >    m_pRenderManager;
      // TransformStack                m_TransformStack;
       AlphaSceneNodes               m_AlphaSceneNodes;
       ActorSceneMap                 m_ActorMap;

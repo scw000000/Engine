@@ -13,8 +13,7 @@
  * \note
  */
 #include ".\SceneNode\SceneNodes.h"
-#include ".\Renderer\OpenGLRenderer.h"
-#include ".\Renderer\DeferredRenderer.h"
+#include ".\Renderer\MainRenderer.h"
 
 #define MAXIMUM_LIGHTS_SUPPORTED (8)
 #define MAXIMUM_SHADOWMAP_TEXTURE_SUPPORTED (8)
@@ -105,5 +104,5 @@ class LightManager
       Vec3     m_LightPosWorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
       float     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
       Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
-      OpenGLDeferredRenderer m_DeferredShader;
+//      DeferredMainRenderer m_DeferredShader;
    };

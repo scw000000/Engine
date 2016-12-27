@@ -159,8 +159,6 @@ void BulletDebugDrawer::ReadOptions( )
 
    }
 
-
-
 void BulletDebugDrawer::drawLine( const btVector3& from, const btVector3& to, const btVector3& lineColor )
    {
    if( ( m_DebugModes & btIDebugDraw::DBG_DrawWireframe ) == 0 )
@@ -173,8 +171,7 @@ void BulletDebugDrawer::drawLine( const btVector3& from, const btVector3& to, co
    Color color( lineColor.x( ), lineColor.y( ), lineColor.z( ) );
 
    shared_ptr<Scene> pScene = g_pApp->m_pEngineLogic->m_pWrold;
-   shared_ptr<IRenderer> pRenderer = pScene->GetRenderer();
-   pRenderer->VDrawLine( vec3From, vec3To, color );
+   g_pApp->m_pRenderManager->VGetMainRenderer().VDrawLine( vec3From, vec3To, color );
    }
 
 

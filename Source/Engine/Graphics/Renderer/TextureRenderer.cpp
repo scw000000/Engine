@@ -1,5 +1,5 @@
 /*!
- * \file TexureDrawer.cpp
+ * \file TexureRenderer.cpp
  * \date 2016/10/29 20:09
  *
  * \author scw00
@@ -13,11 +13,11 @@
 */
 
 #include "EngineStd.h"
-#include "TexureDrawer.h"
-#include ".\Renderer\RendererLoader.h"
+#include "TextureRenderer.h"
+#include "RendererLoader.h"
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureDrawer.vs.glsl";
-const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureDrawer.fs.glsl";
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureRenderer.vs.glsl";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureRenderer.fs.glsl";
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
@@ -38,7 +38,7 @@ const GLfloat QUAD_UV_POSITION[] = {
 
 const unsigned short QUAD_VERTEX_INDEX[] = { 0, 1, 2, 0, 2, 3 };
 
-OpenGLTextureDrawer::OpenGLTextureDrawer( void ) : 
+TextureRenderer::TextureRenderer( void ) : 
    m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
    m_FragmentShader( Resource( FRAGMENT_SHADER_FILE_NAME ) )
    {
@@ -49,7 +49,13 @@ OpenGLTextureDrawer::OpenGLTextureDrawer( void ) :
    m_TextureUni = 0;
    }
 
-int OpenGLTextureDrawer::OnRestore( void )
+
+void TextureRenderer::VShutdown( void )
+   {
+   ReleaseResource();
+   }
+
+int TextureRenderer::VOnRestore( void )
    {
    ReleaseResource();
 
@@ -101,7 +107,16 @@ int OpenGLTextureDrawer::OnRestore( void )
    return S_OK;
    }
 
-void OpenGLTextureDrawer::DrawTexture( GLuint textureObj, const Point& offset, const Point& dimension )
+int TextureRenderer::VPreRender( void )
+   {
+   return S_OK;
+   }
+int TextureRenderer::VPostRender( void )
+   {
+   return S_OK;
+   }
+
+void TextureRenderer::DrawTexture( GLuint textureObj, const Point& offset, const Point& dimension )
    {
    glViewport( offset.x, offset.y, dimension.x, dimension.y );
 
@@ -124,7 +139,7 @@ void OpenGLTextureDrawer::DrawTexture( GLuint textureObj, const Point& offset, c
    glViewport( 0, 0, screenSize.x, screenSize.y );
    }
 
-void OpenGLTextureDrawer::ReleaseResource( void )
+void TextureRenderer::ReleaseResource( void )
    {
    glDeleteVertexArrays( 1, &m_VAO );
    m_VAO = 0;

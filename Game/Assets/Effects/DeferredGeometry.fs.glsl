@@ -1,17 +1,17 @@
 #version 400
 
-//in vec3 vNormal;
+in vec3 vNormalVS;
 //in vec2 vUV;
 in vec3 vPos;
 //uniform sampler2D   uMeshTexture;
 
-out float depth;
+//out float depth;
 //out vec3 position;
-//layout(location = 0) out vec3 normal;
+layout(location = 0) out vec3 oNormalVS;
 //layout(location = 1) out vec3 textureColor;
 
 void main(){
-    //normal = vNormal;
+    oNormalVS = vNormalVS;
     //position = vPos;
     //position = vec3( 1, 0, 0 );
    // textureColor = texture( uMeshTexture, vUV ).rgb;
@@ -19,5 +19,5 @@ void main(){
     //normal = vec3( 1, 0, 0 );
 	//color = vertexPos; 
     //color = vec4( 1, 0, 0, 1 );
-    depth = gl_FragCoord.z;
+   // depth = gl_FragCoord.z;
 }

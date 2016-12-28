@@ -231,8 +231,8 @@ class IRenderer
    public:
       virtual ~IRenderer() {}
       //
+      virtual void VShutdown( void ) = 0;
 	   virtual int VOnRestore( void ) = 0;
-	   virtual void VShutdown( void ) = 0;
 	   virtual int VPreRender( void ) = 0;
       virtual int VPostRender( void ) = 0;
 	   //virtual void VCalcLighting( Lights *lights, int maximumLights ) = 0;

@@ -12,7 +12,7 @@
  * \note
 */
 #include "DeferredMainRenderer.h"
-
+#include "TextureRenderer.h"
 
 class OpenGLRenderManager : public IRenderManager
    {
@@ -29,4 +29,5 @@ class OpenGLRenderManager : public IRenderManager
       static void CheckError( void );
    protected:
       DeferredMainRenderer m_MainRenderer;
+      TextureRenderer m_TextureDrawer;
    };

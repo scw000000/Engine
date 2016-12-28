@@ -13,7 +13,6 @@
  * \note
  */
 #include "..\ResourceCache\MeshResource.h"
-#include "TexureDrawer.h"
 struct aiScene;
 
 
@@ -37,7 +36,6 @@ class MainRenderer : public IMainRenderer
       virtual void VDrawLine( const Vec3& fromWS, const Vec3& toWS, const Color& color ) const override;
 
    public:
-   //   static OpenGLTextureDrawer s_TextureDrawer;
 
    private:
       

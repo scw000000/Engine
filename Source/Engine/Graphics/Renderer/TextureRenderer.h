@@ -1,6 +1,6 @@
 #pragma once
 /*!
- * \file TexureDrawer.h
+ * \file TexureRenderer.h
  * \date 2016/10/29 20:09
  *
  * \author scw00
@@ -12,13 +12,16 @@
  *
  * \note
 */
-#include "Shaders.h"
+#include "..\Shaders.h"
 
-class OpenGLTextureDrawer
+class TextureRenderer : public IRenderer
    {
    public:
-      OpenGLTextureDrawer( void );
-      int OnRestore( void );
+      TextureRenderer( void );
+      virtual int VOnRestore( void ) override;
+      virtual void VShutdown( void ) override;
+      virtual int VPreRender( void ) override;
+      virtual int VPostRender( void ) override;
       void DrawTexture( GLuint textureObj, const Point& offset, const Point& dimension );
 
    protected:
@@ -33,7 +36,7 @@ class OpenGLTextureDrawer
          };
 
    protected:
-
+      
       GLuint            m_Program;
       VertexShader		m_VertexShader;
       FragmentShader		m_FragmentShader;

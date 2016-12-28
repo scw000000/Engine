@@ -20,6 +20,7 @@ OpenGLRenderManager::OpenGLRenderManager( void )
   // m_pRenderer = ENG_NEW MainRenderer();
    }
 
+// Called in EngineApp::InitInstance
 int OpenGLRenderManager::VInit( void ) 
    {
 
@@ -29,24 +30,34 @@ int OpenGLRenderManager::VInit( void )
 int OpenGLRenderManager::VOnRestore( void ) 
    {
    m_MainRenderer.VOnRestore();
+   m_TextureDrawer.VOnRestore();
    return S_OK;
    }
 
 int OpenGLRenderManager::VPreRender( void ) 
    {
    m_MainRenderer.VPreRender();
+   m_TextureDrawer.VPreRender();
    return S_OK;
    }
 
 int OpenGLRenderManager::VPostRender( void ) 
    {
+   auto screensize = g_pApp->GetScreenSize();
+   float xSize = 300.f;
+   float ySize = xSize * ( float ) screensize.y / ( float ) screensize.x;
+   m_TextureDrawer.DrawTexture( 8, Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
+   m_TextureDrawer.DrawTexture( 9, Point( 300, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
+   m_TextureDrawer.VPostRender();
+
    m_MainRenderer.VPostRender();
    return S_OK;
    }
 
 void OpenGLRenderManager::VShutDown( void ) 
    {
-
+   m_TextureDrawer.VShutdown();
+   m_MainRenderer.VShutdown();
    }
 
 void OpenGLRenderManager::CheckError( void ) 

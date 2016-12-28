@@ -303,7 +303,6 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       {
       ENG_ERROR( "Not supported renderer type" );
       }
-    m_pRenderManager->VGetMainRenderer().VSetBackgroundColor( g_Black );
    glClearDepth( 1.0 );
 	glEnable( GL_DEPTH_TEST );
 	// Accept fragment if it closer to the camera than the former one
@@ -311,6 +310,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    // Cull triangles which normal is not towards the camera
    glEnable( GL_CULL_FACE );
    m_pRenderManager->VInit();
+   m_pRenderManager->VGetMainRenderer().VSetBackgroundColor( g_Black );
   // m_pRenderer->VOnRestore();
    //--------------------------------- 
    // Set Renderer

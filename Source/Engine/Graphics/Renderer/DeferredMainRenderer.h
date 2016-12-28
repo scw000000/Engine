@@ -17,6 +17,7 @@
 
 class DeferredMainRenderer : public MainRenderer
    {
+   friend class MeshSceneNode;
    public:
       DeferredMainRenderer( void );
       virtual void VShutdown( void ) override;
@@ -28,6 +29,7 @@ class DeferredMainRenderer : public MainRenderer
       void ReleaseResource( void );
       int OnRestoreSSBO( void );
       int OnRestoreTileFrustum( void );
+      int OnRestoreTextures( void );
       int OnRestoreGeometryPass( void );
       int OnRestoreLightPass( void );
       
@@ -48,11 +50,8 @@ class DeferredMainRenderer : public MainRenderer
       enum ScreenSpaceTextures
          {
          SST_Depth,
-         SST_Normal,
-         SST_Texture,
-         SST_Ambient,
-         SST_Diffuse,
-         SST_Specular,
+         SST_NormalSpecular,
+         SST_AlbedoMetalness,
          SST_Num
          };
 

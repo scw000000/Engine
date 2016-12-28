@@ -49,11 +49,6 @@ int MainRenderer::VPreRender( void )
 
 int MainRenderer::VPostRender( void )
    {
-   auto screensize = g_pApp->GetScreenSize();
-   float xSize = 300.f;
-   float ySize = xSize * ( float ) screensize.y / ( float ) screensize.x;
-
-  // MainRenderer::s_TextureDrawer.DrawTexture( 1, Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
    SDL_GL_SwapWindow( g_pApp->GetWindow() );
    return S_OK;
    }

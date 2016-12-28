@@ -15,6 +15,7 @@
 #include "SceneNodes.h"
 #include "..\Shaders.h"
 
+class DeferredMainRenderer;
 
 class MeshSceneNode : public SceneNode
    {
@@ -86,4 +87,6 @@ class MeshSceneNode : public SceneNode
       GLuint            m_MaterialSpecularUni;
 
       unsigned long     m_VerticesIndexCount;
+
+      DeferredMainRenderer *m_pDeferredMainRenderer;
    };

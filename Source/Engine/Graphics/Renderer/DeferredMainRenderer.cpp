@@ -78,17 +78,19 @@ int DeferredMainRenderer::VOnRestore( void )
 
    OnRestoreTileFrustum();
 
+   OnRestoreTextures();
+
    if( OnRestoreGeometryPass() != S_OK )
       {
       ENG_ASSERT( "Geometry Pass Restore Failed" );
       return S_FALSE;
       }
 
-   if( OnRestoreLightPass() != S_OK )
-      {
-      ENG_ASSERT( "Geometry Pass Restore Failed" );
-      return S_FALSE;
-      }
+   //if( OnRestoreLightPass() != S_OK )
+   //   {
+   //   ENG_ASSERT( "Geometry Pass Restore Failed" );
+   //   return S_FALSE;
+   //   }
    
    return S_OK;
    }
@@ -229,27 +231,87 @@ int DeferredMainRenderer::OnRestoreTileFrustum( void )
    GLfloat *ptr;
    ptr = ( GLfloat * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );
 
-   for( int i = 0; i < m_TileNum[ 0 ] * m_TileNum[ 1 ]; i++ )
-      {
-      for( int j = 0; j < 4; ++j )
-         {
-         if( i / m_TileNum[ 0 ] == 1 )
-               {
-               std::stringstream ss;
-               ss << "T: " << i << "P: " << j << ": "
-                  << ptr[ i * 16 + j * 4 + 0 ] << ", "
-                  << ptr[ i * 16 + j * 4 + 1 ] << ", "
-                  << ptr[ i * 16 + j * 4 + 2 ] << ", "
-                  << ptr[ i * 16 + j * 4 + 3 ] << std::endl;
-               ENG_LOG( "Test", ss.str() );
-               }
-         }
+   //for( int i = 0; i < m_TileNum[ 0 ] * m_TileNum[ 1 ]; i++ )
+   //   {
+   //   for( int j = 0; j < 4; ++j )
+   //      {
+   //      if( i / m_TileNum[ 0 ] == 1 )
+   //            {
+   //            std::stringstream ss;
+   //            ss << "T: " << i << "P: " << j << ": "
+   //               << ptr[ i * 16 + j * 4 + 0 ] << ", "
+   //               << ptr[ i * 16 + j * 4 + 1 ] << ", "
+   //               << ptr[ i * 16 + j * 4 + 2 ] << ", "
+   //               << ptr[ i * 16 + j * 4 + 3 ] << std::endl;
+   //            ENG_LOG( "Test", ss.str() );
+   //            }
+   //      }
 
-      }
+   //   }
 
    glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
 
    glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
+   OpenGLRenderManager::CheckError();
+   return S_OK;
+   }
+
+int DeferredMainRenderer::OnRestoreTextures( void )
+   {
+   auto screenSize = g_pApp->GetScreenSize();
+
+   // Create all textures at once
+   glGenTextures( SST_Num, m_SST );
+   for( int i = 0; i < SST_Num; ++i )
+      {
+      ENG_ASSERT( m_SST[ i ] );
+      }
+   // Normal texture
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalSpecular ] );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+   //glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_SST[ SST_Normal ], 0 );
+   
+   //   // Texture
+   //  // glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Texture ] );
+   //  // glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, screenSize.x, screenSize.y, 0, GL_RGB, GL_FLOAT, NULL );
+   //  //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
+   //  //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
+   //  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+   //  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+   //  // glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_SST[ SST_Texture ], 0 );
+   //
+   //   /*GLuint outputAttatchments[ 3 ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+   //   glDrawBuffers( 1, outputAttatchments );*/
+   //
+   //   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMVP" );
+   //   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
+   //
+   //   /*m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uNMat" );
+   //   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] != -1 );
+   //*/
+   //   /*m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMeshTexture" );
+   //   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ] != -1 );*/
+   //
+   //   ENG_ASSERT( glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE && "Frame buffer error" );
+
+   // glDrawBuffer( GL_NONE );
+   // Depth buffer
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenSize.x, screenSize.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL );
+
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+   // For depth test
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE );
+
+   // glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_ShadowMapTextureObj, 0 );
    OpenGLRenderManager::CheckError();
    return S_OK;
    }
@@ -272,15 +334,6 @@ int DeferredMainRenderer::OnRestoreGeometryPass( void )
    glGenFramebuffers( 1, &m_FBO[ RenderPass_Geometry ] );
    ENG_ASSERT( m_FBO[ RenderPass_Geometry ] );
    glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
-
-   auto screenSize = g_pApp->GetScreenSize();
-
-   // Create all textures at once
-    glGenTextures( SST_Num, m_SST );
-    for( int i = 0; i < SST_Num; ++i )
-       {
-       ENG_ASSERT( m_SST[ i ] );
-       }
 
 //   // Depth buffer
 //   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
@@ -329,34 +382,31 @@ int DeferredMainRenderer::OnRestoreGeometryPass( void )
 //   ENG_ASSERT( glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE && "Frame buffer error" );
 
   // glDrawBuffer( GL_NONE );
-    GLuint renderBuffer = 0;
-    glGenRenderbuffers( 1, &renderBuffer );
-    ENG_ASSERT( renderBuffer );
-    glBindRenderbuffer( GL_RENDERBUFFER, renderBuffer );
-    glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenSize.x, screenSize.y );
-
-    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, renderBuffer );
-
     // Depth buffer
     glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
+    //glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenSize.x, screenSize.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL );
 
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+    //// For depth test
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL );
+    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE );
 
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_SST[ SST_Depth ], 0 );
+    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_SST[ SST_Depth ], 0 );
+    
+   // glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_ShadowMapTextureObj, 0 );
 
-   
+    
     // Normal 
-    // glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Normal ] );
+    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalSpecular ] );
     // glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, screenSize.x, screenSize.y, 0, GL_RGB, GL_FLOAT, NULL );
     //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
     //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
     // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    // glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_SST[ SST_Normal ], 0 );
+    glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_SST[ SST_NormalSpecular ], 0 );
 
     // Texture
     // glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Texture ] );
@@ -367,15 +417,15 @@ int DeferredMainRenderer::OnRestoreGeometryPass( void )
     // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
     // glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_SST[ SST_Texture ], 0 );
 
-    GLuint outputAttatchments[ 3 ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+    GLuint outputAttatchments[ ] = { GL_COLOR_ATTACHMENT0/*, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2*/ };
     glDrawBuffers( 1, outputAttatchments );
-
+  //  glDrawBuffer( GL_NONE );
     m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMVP" );
     ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
 
-    /*m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uNMat" );
+    m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uNormal" );
     ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] != -1 );
-    */
+    
     /*m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMeshTexture" );
     ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ] != -1 );*/
     auto result = glCheckFramebufferStatus( GL_FRAMEBUFFER );

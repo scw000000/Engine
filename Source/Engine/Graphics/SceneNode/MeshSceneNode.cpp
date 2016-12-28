@@ -16,7 +16,9 @@
 #include "MeshSceneNode.h"
 #include "..\ResourceCache\MeshResource.h"
 #include "..\ResourceCache\TextureResource.h"
+#include "..\Renderer\RenderManager.h"
 #include "..\Renderer\RendererLoader.h"
+#include "..\Renderer\DeferredMainRenderer.h"
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
@@ -60,6 +62,9 @@ MeshSceneNode::MeshSceneNode( const ActorId actorId,
    m_VerticesIndexCount = 0;
 
    m_Props.SetEnableShadow( true );
+
+   m_pDeferredMainRenderer = dynamic_cast< DeferredMainRenderer* >( &g_pApp->m_pRenderManager->VGetMainRenderer() );
+   ENG_ASSERT( m_pDeferredMainRenderer );
    }
 
 MeshSceneNode::~MeshSceneNode( void )
@@ -159,6 +164,85 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 
 int MeshSceneNode::VRender( Scene *pScene )
    {
+   auto renderPass = DeferredMainRenderer::RenderPass_Geometry;
+   glUseProgram( m_pDeferredMainRenderer->m_Programs[ renderPass ] );
+
+   glBindVertexArray( m_pDeferredMainRenderer->m_VAOs[ renderPass ] );
+   glBindFramebuffer( GL_FRAMEBUFFER, m_pDeferredMainRenderer->m_FBO[ renderPass ] );
+   
+     /* glEnable( GL_CULL_FACE );
+      glCullFace( GL_BACK );
+      glEnable( GL_DEPTH_TEST );*/
+   auto view = pScene->GetCamera()->GetView();
+   auto proj = pScene->GetCamera()->GetProjection();
+   auto model = VGetGlobalTransformPtr()->GetToWorld();
+      //auto mvp = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * pNode->VGetGlobalTransformPtr()->GetToWorld();
+     // auto mvp = pScene->GetCamera()->GetProjection() * viewTest * pNode->VGetGlobalTransformPtr()->GetToWorld();
+   auto mvp = proj * view * model;
+   glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_MVP ], 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
+   
+   Mat4x4 normalMat = ( view * model );
+   normalMat = normalMat.Inverse().Transpose();
+   glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_NormalMat ], 1, GL_FALSE, &normalMat[ 0 ][ 0 ] );
+   
+      glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
+      glEnableVertexAttribArray( VERTEX_LOCATION );
+      glVertexAttribPointer(
+         VERTEX_LOCATION,
+         3,                
+         GL_FLOAT,           
+         GL_FALSE,           
+         0,               
+         ( void* ) 0         
+         );
+   
+      /*glBindBuffer( GL_ARRAY_BUFFER, bufferObj.m_UVBuffer );
+      glEnableVertexAttribArray( GEOMETRY_PASS_UV_LOCATION );
+      glVertexAttribPointer(
+         GEOMETRY_PASS_UV_LOCATION,
+         2,
+         GL_FLOAT,
+         GL_FALSE,
+         0,
+         ( void* ) 0
+         );*/
+   
+      glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Normal_Buffer ] );
+      glEnableVertexAttribArray( 1 );
+      glVertexAttribPointer(
+         1,
+         3,
+         GL_FLOAT,
+         GL_FALSE,
+         0,
+         ( void* ) 0
+         );
+   
+      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ Index_Buffer ] );
+   
+      /*glActiveTexture( GL_TEXTURE0 );
+      glBindTexture( GL_TEXTURE_2D, bufferObj.m_TextureObj );
+      glUniform1i( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ], 0 );*/
+   
+      glDrawElements(
+         GL_TRIANGLES,    
+         m_VerticesIndexCount,   
+         GL_UNSIGNED_INT, 
+         ( void* ) 0        
+         );
+  
+      OpenGLRenderManager::CheckError();
+//      ENG_ASSERT( !glGetError() );
+   
+    //  glDisableVertexAttribArray( GEOMETRY_PASS_VERTEX_LOCATION );
+      glUseProgram( 0 );
+      glBindVertexArray( 0 );
+      glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+ //  return S_OK;
+
+   //////////////////////////////////////////////////////////
+
 	// Use our shader
 	glUseProgram( m_Program );
    glBindVertexArray( m_VAO );

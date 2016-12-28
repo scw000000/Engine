@@ -6,7 +6,7 @@ struct TileFrustum
     };    
     
 uniform uvec2 uTileSize;
-uniform vec2 uScreenSize;
+uniform uvec2 uScreenSize;
 
 uniform mat4 uInvProj;
 
@@ -59,14 +59,18 @@ layout ( std430, binding = 0 ) writeonly buffer tileFrustumSSBO
     // Generate 4 frustum planes, pointing inward
     vec3 cameraPosVS = vec3( 0.0, 0.0, 0.0 );
     //uint tileIndex = gl_WorkGroupID.x + gl_WorkGroupID.y * gl_NumWorkGroups.x;
-  //  TileFrustumSSBO.data[ gl_WorkGroupID.x ][ gl_WorkGroupID.y ].m_Planes[ 0 ] = ComputePlane( cameraPosVS, frustumPosVS[ 0 ], frustumPosVS[ 3 ] ); // left plane
-  //  TileFrustumSSBO.data[ gl_WorkGroupID.x ][ gl_WorkGroupID.y ].m_Planes[ 1 ] = ComputePlane( cameraPosVS, frustumPosVS[ 1 ], frustumPosVS[ 0 ] ); // bottom plane
-  //  TileFrustumSSBO.data[ gl_WorkGroupID.x ][ gl_WorkGroupID.y ].m_Planes[ 2 ] = ComputePlane( cameraPosVS, frustumPosVS[ 2 ], frustumPosVS[ 1 ] ); // right plane
-  //  TileFrustumSSBO.data[ gl_WorkGroupID.x ][ gl_WorkGroupID.y ].m_Planes[ 3 ] = ComputePlane( cameraPosVS, frustumPosVS[ 3 ], frustumPosVS[ 2 ] ); // top plane
+    TileFrustumSSBO.data[ gl_NumWorkGroups.x * gl_WorkGroupID.y + gl_WorkGroupID.x ].m_Planes[ 0 ] = ComputePlane( cameraPosVS, frustumPosVS[ 0 ], frustumPosVS[ 3 ] ); // left plane
+    TileFrustumSSBO.data[ gl_NumWorkGroups.x * gl_WorkGroupID.y + gl_WorkGroupID.x ].m_Planes[ 1 ] = ComputePlane( cameraPosVS, frustumPosVS[ 1 ], frustumPosVS[ 0 ] ); // bottom plane
+    TileFrustumSSBO.data[ gl_NumWorkGroups.x * gl_WorkGroupID.y + gl_WorkGroupID.x ].m_Planes[ 2 ] = ComputePlane( cameraPosVS, frustumPosVS[ 2 ], frustumPosVS[ 1 ] ); // right plane
+    TileFrustumSSBO.data[ gl_NumWorkGroups.x * gl_WorkGroupID.y + gl_WorkGroupID.x ].m_Planes[ 3 ] = ComputePlane( cameraPosVS, frustumPosVS[ 3 ], frustumPosVS[ 2 ] ); // top plane
     
-    TileFrustumSSBO.data[ gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y ].m_Planes[ 0 ] = vec4( 0.5, 0.6, 0.7, 0.8 ); // left plane
-    TileFrustumSSBO.data[ gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y ].m_Planes[ 1 ] = vec4( 0.5, 0.6, 0.7, 0.8 ); // left plane
-    TileFrustumSSBO.data[ gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y ].m_Planes[ 2 ] = vec4( 0.5, 0.6, 0.7, 0.8 ); // left plane
-    TileFrustumSSBO.data[ gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y ].m_Planes[ 3 ] = vec4( 0.5, 0.6, 0.7, 0.8 ); // left plane
+  //  if( uScreenSize.x == 1095 )
+  //      {
+ //           TileFrustumSSBO.data[ gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y ].m_Planes[ 0 ] = vec4( 0.5, 0.6, 0.7, 0.8 ); // left plane
+  //  TileFrustumSSBO.data[ gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y ].m_Planes[ 1 ] = vec4( 0.5, 0.6, 0.7, 0.8 ); // left plane
+  //  TileFrustumSSBO.data[ gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y ].m_Planes[ 2 ] = vec4( 0.5, 0.6, 0.7, 0.8 ); // left plane
+  //  TileFrustumSSBO.data[ gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y ].m_Planes[ 3 ] = vec4( 0.5, 0.6, 0.7, 0.8 ); // left plane
+ //       }
+
     } 
     

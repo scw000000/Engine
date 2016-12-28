@@ -213,10 +213,15 @@ int DeferredMainRenderer::OnRestoreTileFrustum( void )
    auto tileSizeUni = glGetUniformLocation( program, "uTileSize" );
    glUniform2ui( tileSizeUni, TILE_WIDTH, TILE_HEIGHT );
 
+   auto screenSize = g_pApp->GetScreenSize();
+   auto screenSizeUni = glGetUniformLocation( program, "uScreenSize" );
+   glUniform2ui( screenSizeUni, ( GLuint ) screenSize.x, ( GLuint ) screenSize.y );
+
    auto invProj = g_pApp->m_pEngineLogic->m_pWrold->GetCamera()->GetProjection().Inverse();
    auto invProjUni = glGetUniformLocation( program, "uInvProj" );
    glUniformMatrix4fv( invProjUni, 1, GL_FALSE, &invProj[ 0 ][ 0 ] );
 
+   OpenGLRenderManager::CheckError();
    glDispatchCompute( m_TileNum[ 0 ], m_TileNum[ 1 ], 1u );
    glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
    glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_TileFrustumSSBO );
@@ -228,13 +233,16 @@ int DeferredMainRenderer::OnRestoreTileFrustum( void )
       {
       for( int j = 0; j < 4; ++j )
          {
-         std::stringstream ss;
-         ss << "T: " << i << "P: " << j << ": " 
-            << ptr[ i * 16 + j * 4 + 0 ] << ", "
-            << ptr[ i * 16 + j * 4 + 1 ] << ", "
-            << ptr[ i * 16 + j * 4 + 2 ] << ", "
-            << ptr[ i * 16 + j * 4 + 3 ] << std::endl;
-         ENG_LOG( "Test", ss.str() );
+         if( i / m_TileNum[ 0 ] == 1 )
+               {
+               std::stringstream ss;
+               ss << "T: " << i << "P: " << j << ": "
+                  << ptr[ i * 16 + j * 4 + 0 ] << ", "
+                  << ptr[ i * 16 + j * 4 + 1 ] << ", "
+                  << ptr[ i * 16 + j * 4 + 2 ] << ", "
+                  << ptr[ i * 16 + j * 4 + 3 ] << std::endl;
+               ENG_LOG( "Test", ss.str() );
+               }
          }
 
       }

@@ -167,7 +167,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    auto renderPass = DeferredMainRenderer::RenderPass_Geometry;
    glUseProgram( m_pDeferredMainRenderer->m_Programs[ renderPass ] );
 
-   glBindVertexArray( m_pDeferredMainRenderer->m_VAOs[ renderPass ] );
+ //  glBindVertexArray( m_pDeferredMainRenderer->m_VAOs[ renderPass ] );
    glBindFramebuffer( GL_FRAMEBUFFER, m_pDeferredMainRenderer->m_FBO[ renderPass ] );
    
      /* glEnable( GL_CULL_FACE );
@@ -185,9 +185,13 @@ int MeshSceneNode::VRender( Scene *pScene )
    normalMat = normalMat.Inverse().Transpose();
    glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_NormalMat ], 1, GL_FALSE, &normalMat[ 0 ][ 0 ] );
    
-      glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
-      glEnableVertexAttribArray( VERTEX_LOCATION );
-      glVertexAttribPointer(
+   glActiveTexture( GL_TEXTURE0 );
+   glBindTexture( GL_TEXTURE_2D, m_MeshTextureObj );
+   glUniform1i( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_AlbedoTexture ], 0 );
+
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
+   glEnableVertexAttribArray( VERTEX_LOCATION );
+   glVertexAttribPointer(
          VERTEX_LOCATION,
          3,                
          GL_FLOAT,           
@@ -196,20 +200,9 @@ int MeshSceneNode::VRender( Scene *pScene )
          ( void* ) 0         
          );
    
-      /*glBindBuffer( GL_ARRAY_BUFFER, bufferObj.m_UVBuffer );
-      glEnableVertexAttribArray( GEOMETRY_PASS_UV_LOCATION );
-      glVertexAttribPointer(
-         GEOMETRY_PASS_UV_LOCATION,
-         2,
-         GL_FLOAT,
-         GL_FALSE,
-         0,
-         ( void* ) 0
-         );*/
-   
-      glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Normal_Buffer ] );
-      glEnableVertexAttribArray( 1 );
-      glVertexAttribPointer(
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Normal_Buffer ] );
+   glEnableVertexAttribArray( 1 );
+   glVertexAttribPointer(
          1,
          3,
          GL_FLOAT,
@@ -218,26 +211,33 @@ int MeshSceneNode::VRender( Scene *pScene )
          ( void* ) 0
          );
    
-      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ Index_Buffer ] );
+   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ Index_Buffer ] );
+
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
+   glEnableVertexAttribArray( 2 );
+   glVertexAttribPointer(
+         2,
+         2,
+         GL_FLOAT,
+         GL_FALSE,
+         0,
+         ( void* ) 0
+         );
    
-      /*glActiveTexture( GL_TEXTURE0 );
-      glBindTexture( GL_TEXTURE_2D, bufferObj.m_TextureObj );
-      glUniform1i( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ], 0 );*/
-   
-      glDrawElements(
+   glDrawElements(
          GL_TRIANGLES,    
          m_VerticesIndexCount,   
          GL_UNSIGNED_INT, 
          ( void* ) 0        
          );
   
-      OpenGLRenderManager::CheckError();
+   OpenGLRenderManager::CheckError();
 //      ENG_ASSERT( !glGetError() );
    
     //  glDisableVertexAttribArray( GEOMETRY_PASS_VERTEX_LOCATION );
-      glUseProgram( 0 );
-      glBindVertexArray( 0 );
-      glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+   glUseProgram( 0 );
+   glBindVertexArray( 0 );
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
  //  return S_OK;
 
@@ -287,7 +287,6 @@ int MeshSceneNode::VRender( Scene *pScene )
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
    glUniform1i( m_MeshTextureUni, 0 );
 
-   // Draw the triangles !
    glDrawElements(
       GL_TRIANGLES,      // mode
       m_VerticesIndexCount,    // count

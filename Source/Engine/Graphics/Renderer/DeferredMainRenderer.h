@@ -63,7 +63,7 @@ class DeferredMainRenderer : public MainRenderer
          {
          GeometryPassUni_MVP,
          GeometryPassUni_NormalMat,
-         GeometryPassUni_Albedo,
+         GeometryPassUni_AlbedoTexture,
          GeometryPassUni_Num
          };
 

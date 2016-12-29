@@ -53,16 +53,16 @@ class PerspectiveFrustum : public BaseFrustum
    {
    public:
       PerspectiveFrustum( void );
-      void Init( const float fov, const float aspect, const float nearClipDis, const float farClipDis );
+      void Init( const float fovY, const float aspect, const float nearClipDis, const float farClipDis );
 
-      void SetFOV( float fov ) { m_Fov = fov; Init( m_Fov, m_Aspect, m_NearDis, m_FarDis ); }
-      void SetAspect( float aspect ) { m_Aspect = aspect; Init( m_Fov, m_Aspect, m_NearDis, m_FarDis ); }
-      void SetNear( float nearClip ) { m_NearDis = nearClip; Init( m_Fov, m_Aspect, m_NearDis, m_FarDis ); }
-      void SetFar( float farClip ) { m_FarDis = farClip; Init( m_Fov, m_Aspect, m_NearDis, m_FarDis ); }
+      void SetFovY( float fov ) { m_FovY = fov; Init( m_FovY, m_Aspect, m_NearDis, m_FarDis ); }
+      void SetAspect( float aspect ) { m_Aspect = aspect; Init( m_FovY, m_Aspect, m_NearDis, m_FarDis ); }
+      void SetNear( float nearClip ) { m_NearDis = nearClip; Init( m_FovY, m_Aspect, m_NearDis, m_FarDis ); }
+      void SetFar( float farClip ) { m_FarDis = farClip; Init( m_FovY, m_Aspect, m_NearDis, m_FarDis ); }
 
    public:
       // field of view in radians
-      float m_Fov;
+      float m_FovY;
       // width divided by height
       float m_Aspect;
       // near plane distance

@@ -7,8 +7,9 @@ struct TileFrustum
     
 uniform uvec2 uTileSize;
 uniform uvec2 uScreenSize;
-
-uniform mat4 uInvProj;
+uniform  vec2 uHalfSizeNearPlane;
+ 
+uniform mat4 uProj;
 
 layout ( std430, binding = 0 ) writeonly buffer tileFrustumSSBO
     {
@@ -23,37 +24,40 @@ layout ( std430, binding = 0 ) writeonly buffer tileFrustumSSBO
     ret.w = -dot( p0, ret.xyz );
     return ret;
     }
-    
- vec3 ScreenToView( vec2 p )
+ // transform from [ 0, 1 ] to view space
+ // Reference: https://www.khronos.org/opengl/wiki/Compute_eye_space_from_window_space
+ vec3 TexCoordinatesToView( vec2 p )
     {
-    p = p * vec2( 2.0, 2.0 ) - vec2( 1.0, 1.0 ); // to NDC space [ -1, +1 ]
-    vec4 ret = uInvProj * vec4( p.xy, -1.0, 1.0 );
-    ret = ret / ret.w;
-    return ret.xyz;
+    vec3 eyeDir = vec3( 2 * uHalfSizeNearPlane * p - uHalfSizeNearPlane, -1 );
+    // ndcZ = -1.0
+    float eyeZ = uProj[3][2] / ( ( uProj[2][3] * -1.0 ) - uProj[2][2] ); 
+    return eyeDir * eyeZ;
     }
  
  void main()
     {
     uvec2 tilePos = gl_WorkGroupID.xy;
+    // uvec2 tileCount = gl_NumWorkGroups.xy; 
     
+    // shift on screen pixels
     vec2 frustumShift[ 4 ];
     frustumShift[ 0 ] = vec2( 0.0, 0.0 ); // bottom left
     frustumShift[ 1 ] = vec2( uTileSize.x - 1, 0.0 ); // bottom right
     frustumShift[ 2 ] = vec2( uTileSize.x - 1, uTileSize.y - 1 ); // top right
     frustumShift[ 3 ] = vec2( 0.0, uTileSize.y - 1 ); // top left
     
-    vec2 frustumPosSS[ 4 ]; // screen space position
+    vec2 frustumPos[ 4 ]; // screen space position
     for( int i = 0; i < 4; ++i )
         {
-        frustumPosSS[ i ] = ( tilePos * uTileSize ) + frustumShift[ i ];
-        frustumPosSS[ i ] = vec2( min( frustumPosSS[ i ].x, uScreenSize.x ), min( frustumPosSS[ i ].y, uScreenSize.y ) );
-        frustumPosSS[ i ] /= uScreenSize;
+        frustumPos[ i ] = ( tilePos * uTileSize ) + frustumShift[ i ];
+        frustumPos[ i ] = vec2( min( frustumPos[ i ].x, uScreenSize.x ), min( frustumPos[ i ].y, uScreenSize.y ) );
+        frustumPos[ i ] /= uScreenSize;
         }
 
     vec3 frustumPosVS[ 4 ];
     for( int i = 0; i < 4; ++i )
         {
-        frustumPosVS[ i ] = ScreenToView( frustumPosSS[ i ] );
+        frustumPosVS[ i ] = TexCoordinatesToView( frustumPos[ i ] );
         }
         
     // Generate 4 frustum planes, pointing inward

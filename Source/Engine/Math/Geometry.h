@@ -421,9 +421,9 @@ inline Vec3 Mat4x4::GetPitchYawRollDeg() const
    return Vec3( RADIANS_TO_DEGREES( vec.x ), RADIANS_TO_DEGREES( vec.y ), RADIANS_TO_DEGREES( vec.z ) );
    }
 
-inline void Mat4x4::BuildProjection( float fovy, float aspect, float zNear, float zFar )
+inline void Mat4x4::BuildProjection( float fovY, float aspect, float zNear, float zFar )
    {
-   *this = glm::perspective( fovy, aspect, zNear, zFar);
+   *this = glm::perspective( fovY, aspect, zNear, zFar);
    }
 
 typedef struct ColorComponents

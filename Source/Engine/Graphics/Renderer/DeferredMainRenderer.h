@@ -50,7 +50,7 @@ class DeferredMainRenderer : public MainRenderer
       enum ScreenSpaceTextures
          {
          SST_Depth,
-         SST_NormalSpecular,
+         SST_NormalGlossiness,
          SST_AlbedoMetalness,
          SST_Num
          };
@@ -63,7 +63,7 @@ class DeferredMainRenderer : public MainRenderer
          {
          GeometryPassUni_MVP,
          GeometryPassUni_NormalMat,
-         GeometryPassUni_MeshTexture,
+         GeometryPassUni_Albedo,
          GeometryPassUni_Num
          };
 

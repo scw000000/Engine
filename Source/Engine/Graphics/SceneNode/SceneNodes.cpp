@@ -380,7 +380,7 @@ int CameraNode::VRender( Scene *pScene )
 int CameraNode::VOnRestore( Scene *pScene )
    {
    m_Frustum.SetAspect(  (float) g_pApp->GetScreenSize().GetX() / (float) g_pApp->GetScreenSize().GetY() );
-   m_Projection.BuildProjection( m_Frustum.m_Fov, m_Frustum.m_Aspect, m_Frustum.m_NearDis, m_Frustum.m_FarDis );
+   m_Projection.BuildProjection( m_Frustum.m_FovY, m_Frustum.m_Aspect, m_Frustum.m_NearDis, m_Frustum.m_FarDis );
 	return S_OK;
    }
 

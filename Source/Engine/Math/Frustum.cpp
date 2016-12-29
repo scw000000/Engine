@@ -40,20 +40,20 @@ bool BaseFrustum::VInside( const Vec3 &point, float radius ) const
 
 PerspectiveFrustum::PerspectiveFrustum( void )
    {
-   m_Fov = ENG_QUARTERPI;
+   m_FovY = ENG_QUARTERPI;
    m_Aspect = 4.0f / 3.0f;
    m_NearDis = 1.0f;
    m_FarDis = 1000.0f;
    }
 
-void PerspectiveFrustum::Init( const float fov, const float aspect, const float nearClipDis, const float farClipDis )
+void PerspectiveFrustum::Init( const float fovY, const float aspect, const float nearClipDis, const float farClipDis )
    {
-   m_Fov = fov;
+   m_FovY = fovY;
    m_Aspect = aspect;
    m_NearDis = nearClipDis;
    m_FarDis = farClipDis;
-   // Fov = 90 -> angle +- 45 degree
-   double tanFovOver2 = tan( fov / 2.0f );
+   // in half radius
+   double tanFovOver2 = tan( fovY / 2.0f );
    Vec3 nearRight = static_cast< float >( m_NearDis * tanFovOver2 * m_Aspect ) * g_Right;
    Vec3 farRight = static_cast< float >( m_FarDis * tanFovOver2 * m_Aspect ) * g_Right;
    Vec3 nearUp = static_cast< float >( m_NearDis * tanFovOver2 ) * g_Up;

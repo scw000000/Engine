@@ -104,7 +104,7 @@ int SkySceneNode::VOnRestore( Scene *pScene )
 
    // Reset projection matrix 
    auto& cameraFrustum = pScene->GetCamera()->GetFrustum();
-   m_Projection.BuildProjection( cameraFrustum.m_Fov, cameraFrustum.m_Aspect, cameraFrustum.m_NearDis, 1000.0f );
+   m_Projection.BuildProjection( cameraFrustum.m_FovY, cameraFrustum.m_Aspect, cameraFrustum.m_NearDis, 1000.0f );
 
    // restore all of its children
 	return SceneNode::VOnRestore( pScene );

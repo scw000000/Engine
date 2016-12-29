@@ -219,9 +219,19 @@ int DeferredMainRenderer::OnRestoreTileFrustum( void )
    auto screenSizeUni = glGetUniformLocation( program, "uScreenSize" );
    glUniform2ui( screenSizeUni, ( GLuint ) screenSize.x, ( GLuint ) screenSize.y );
 
-   auto invProj = g_pApp->m_pEngineLogic->m_pWrold->GetCamera()->GetProjection().Inverse();
-   auto invProjUni = glGetUniformLocation( program, "uInvProj" );
-   glUniformMatrix4fv( invProjUni, 1, GL_FALSE, &invProj[ 0 ][ 0 ] );
+   auto pCamera = g_pApp->m_pEngineLogic->m_pWrold->GetCamera();
+   float halfSizeNearPlaneY = std::tan( pCamera->GetFrustum().m_FovY / 2.0 );
+   float halfSizeNearPlaneX = halfSizeNearPlaneY * pCamera->GetFrustum().m_Aspect;
+   auto halfSizeNearPlaneUni = glGetUniformLocation( program, "uHalfSizeNearPlane" );
+   glUniform2f( halfSizeNearPlaneUni, halfSizeNearPlaneX, halfSizeNearPlaneY );
+
+   auto proj = pCamera->GetProjection();
+   auto uProjUni = glGetUniformLocation( program, "uProj" );
+   glUniformMatrix4fv( uProjUni, 1, GL_FALSE, &proj[ 0 ][ 0 ] );
+
+   //auto invProj = proj.Inverse();
+   //auto invProjUni = glGetUniformLocation( program, "uInvProj" );
+   //glUniformMatrix4fv( invProjUni, 1, GL_FALSE, &invProj[ 0 ][ 0 ] );
 
    OpenGLRenderManager::CheckError();
    glDispatchCompute( m_TileNum[ 0 ], m_TileNum[ 1 ], 1u );
@@ -231,23 +241,23 @@ int DeferredMainRenderer::OnRestoreTileFrustum( void )
    GLfloat *ptr;
    ptr = ( GLfloat * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );
 
-   //for( int i = 0; i < m_TileNum[ 0 ] * m_TileNum[ 1 ]; i++ )
-   //   {
-   //   for( int j = 0; j < 4; ++j )
-   //      {
-   //      if( i / m_TileNum[ 0 ] == 1 )
-   //            {
-   //            std::stringstream ss;
-   //            ss << "T: " << i << "P: " << j << ": "
-   //               << ptr[ i * 16 + j * 4 + 0 ] << ", "
-   //               << ptr[ i * 16 + j * 4 + 1 ] << ", "
-   //               << ptr[ i * 16 + j * 4 + 2 ] << ", "
-   //               << ptr[ i * 16 + j * 4 + 3 ] << std::endl;
-   //            ENG_LOG( "Test", ss.str() );
-   //            }
-   //      }
+   for( int i = 0; i < m_TileNum[ 0 ] * m_TileNum[ 1 ]; i++ )
+      {
+      for( int j = 0; j < 4; ++j )
+         {
+         if( i / m_TileNum[ 0 ] == 0 )
+               {
+               std::stringstream ss;
+               ss << "T: " << i << "P: " << j << ": "
+                  << ptr[ i * 16 + j * 4 + 0 ] << ", "
+                  << ptr[ i * 16 + j * 4 + 1 ] << ", "
+                  << ptr[ i * 16 + j * 4 + 2 ] << ", "
+                  << ptr[ i * 16 + j * 4 + 3 ] << std::endl;
+               ENG_LOG( "Test", ss.str() );
+               }
+         }
 
-   //   }
+      }
 
    glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
 
@@ -267,7 +277,7 @@ int DeferredMainRenderer::OnRestoreTextures( void )
       ENG_ASSERT( m_SST[ i ] );
       }
    // Normal texture
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalSpecular ] );
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalGlossiness ] );
    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
@@ -357,19 +367,6 @@ int DeferredMainRenderer::OnRestoreGeometryPass( void )
 //  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 //  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 //  // glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_SST[ SST_Normal ], 0 );
-//
-//   // Texture
-//  // glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Texture ] );
-//  // glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, screenSize.x, screenSize.y, 0, GL_RGB, GL_FLOAT, NULL );
-//  //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
-//  //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
-//  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-//  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-//  // glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_SST[ SST_Texture ], 0 );
-//
-//   /*GLuint outputAttatchments[ 3 ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-//   glDrawBuffers( 1, outputAttatchments );*/
-//
 //   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMVP" );
 //   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
 //
@@ -400,13 +397,13 @@ int DeferredMainRenderer::OnRestoreGeometryPass( void )
 
     
     // Normal 
-    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalSpecular ] );
+    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalGlossiness ] );
     // glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, screenSize.x, screenSize.y, 0, GL_RGB, GL_FLOAT, NULL );
     //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
     //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
     // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
     // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_SST[ SST_NormalSpecular ], 0 );
+    glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_SST[ SST_NormalGlossiness ], 0 );
 
     // Texture
     // glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Texture ] );

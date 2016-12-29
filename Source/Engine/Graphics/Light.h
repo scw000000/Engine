@@ -30,8 +30,21 @@ struct LightProperties
       TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
 
    public:
+       //--------------------------------------------------------------
       Color m_Color;
-      float m_Power;
+      //--------------------------------------------------------------
+      Vec3  m_PositionVS;
+      unsigned int m_Type;
+      //--------------------------------------------------------------
+      Vec3  m_DirectionVS;
+      unsigned int m_Enabled;
+      //--------------------------------------------------------------
+      Vec4  m_Attenuation;
+      //--------------------------------------------------------------
+      float  m_HalfConeAngle;
+      float  m_Padding[ 3 ];
+      //--------------------------------------------------------------
+
    };
 
 class LightNode : public SceneNode

@@ -24,7 +24,7 @@
 #define GEOMETRY_PASS_UV_LOCATION 2
 #define GEOMETRY_PASS_NORMAL_LOCATION 1
 
-const char* const TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME = "Effects\\TileFrustumShader.cs.glsl";
+const char* const TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME = "Effects\\TileFrustumGeneration.cs.glsl";
 
 const char* const GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DeferredGeometry.vs.glsl";
 const char* const GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredGeometry.fs.glsl";
@@ -258,6 +258,7 @@ int DeferredMainRenderer::OnRestoreTileFrustum( void )
    //      }
 
    //   }
+   glDeleteProgram( program );
 
    glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
 
@@ -328,52 +329,9 @@ int DeferredMainRenderer::OnRestoreGeometryPass( void )
    ENG_ASSERT( m_FBO[ RenderPass_Geometry ] );
    glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
 
-//   // Depth buffer
-//   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
-//   glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenSize.x, screenSize.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL );
-//
-//   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
-//   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
-//   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-//   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-//   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL );
-//   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE );
-//
-//   glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_SST[ SST_Depth ], 0 );
-//
-//   glBindTexture( GL_TEXTURE_2D, 0 );
-//   // Normal 
-//  // glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Normal ] );
-//  // glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, screenSize.x, screenSize.y, 0, GL_RGB, GL_FLOAT, NULL );
-//  //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
-//  //// glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
-//  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-//  // glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-//  // glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_SST[ SST_Normal ], 0 );
-//   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMVP" );
-//   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
-//
-//   /*m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uNMat" );
-//   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] != -1 );
-//*/
-//   /*m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMeshTexture" );
-//   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ] != -1 );*/
-//
-//   ENG_ASSERT( glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE && "Frame buffer error" );
-
   // glDrawBuffer( GL_NONE );
     // Depth buffer
     glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
-    //glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenSize.x, screenSize.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL );
-
-    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-    //// For depth test
-    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL );
-    //glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE );
-
     glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_SST[ SST_Depth ], 0 );
     
    // glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_ShadowMapTextureObj, 0 );
@@ -388,7 +346,7 @@ int DeferredMainRenderer::OnRestoreGeometryPass( void )
     glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_SST[ SST_AlbedoMetalness ], 0 );
 
     GLuint outputAttatchments[ ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, /*GL_COLOR_ATTACHMENT2*/ };
-    glDrawBuffers( 1, outputAttatchments );
+    glDrawBuffers( 2, outputAttatchments );
   //  glDrawBuffer( GL_NONE );
     m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMVP" );
     ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );

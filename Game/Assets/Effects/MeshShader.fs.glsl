@@ -10,7 +10,7 @@ in vec3 vEyeDirection_WorldSpace;
 uniform vec3 	    uLightPosition_WorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
 uniform vec3 	    uLighDirection_WorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
 uniform vec3	    uLightColor[ MAXIMUM_LIGHTS_SUPPORTED ];
-uniform float       uLightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
+//uniform float       uLightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
 uniform int         uLightNumber;
 
 //uniform sampler2D   uShadowMapTexture[ MAXIMUM_LIGHTS_SUPPORTED ];
@@ -54,11 +54,8 @@ void main()
 	 	//uMaterialAmbient + 
 	 	//textureColor * uMaterialDiffuse.xyz * uLightColor[ i ] * uLightPower[ i ] * cosTheta / distanceSqr +
 	 	//uMaterialSpecular * uLightColor[ i ] * uLightPower[ i ] * pow(cosAlpha,5) / distanceSqr );
-        
         color.xyz = ( color.xyz + 
 	 	textureColor * uMaterialAmbient + 
-	 	textureColor * uMaterialDiffuse.xyz * uLightColor[ i ] * uLightPower[ i ] * cosTheta / distanceSqr +
-	 	uMaterialSpecular * uLightColor[ i ] * uLightPower[ i ] * pow(cosAlpha,5) / distanceSqr );
         }
    // color.rgb = vec3( vUV, 1 );
     color.a = uMaterialDiffuse.a;

@@ -12,6 +12,6 @@ void main(){
     oMRT0.xyz = vNormalVS;
     oMRT0.w = 0.3;
     
-    oMRT0.xyz = texture( uAlbedoTex, vUV ).rgb;
-    oMRT0.w = 0.3;
+    oMRT1.xyz = texture( uAlbedoTex, vUV ).rgb;
+    oMRT1.w = 0.3;
 }

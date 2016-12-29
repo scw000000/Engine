@@ -73,7 +73,7 @@ class MeshSceneNode : public SceneNode
       GLuint            m_LightPosWorldSpaceUni;
       GLuint            m_LigthDirectionUni;
       GLuint            m_LightColorUni;
-      GLuint            m_LightPowerUni;
+    //  GLuint            m_LightPowerUni;
       GLuint            m_LightAmbientUni;
       GLuint            m_LightNumberUni;
 

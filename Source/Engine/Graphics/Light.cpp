@@ -29,10 +29,12 @@ bool LightProperties::Init( TiXmlElement* pData )
       {
       return false;
       }
-   if( TIXML_SUCCESS != pData->QueryFloatAttribute( "power", &m_Power ) )
+   /*if( TIXML_SUCCESS != pData->QueryFloatAttribute( "power", &m_Power ) )
       {
       return false;
-      }
+      }*/
+
+   ENG_ASSERT( sizeof( LightProperties ) % 16 == 0 );
 
    return true;
    }
@@ -45,7 +47,7 @@ TiXmlElement* LightProperties::GenerateXML( void )
    pDiffuse->SetValue( "Diffuse" );
    pRetNode->LinkEndChild( pDiffuse );
 
-   pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
+ //  pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
 
    return pRetNode;
    }
@@ -58,11 +60,11 @@ TiXmlElement* LightProperties::GenerateOverridesXML( TiXmlElement* pResource )
    pDiffuse->SetValue( "Diffuse" );
    pRetNode->LinkEndChild( pDiffuse );
 
-   pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
+   /*pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
    if( !strcmp( pRetNode->Attribute( "power" ), pResource->Attribute( "power" ) ) )
       {
       pRetNode->RemoveAttribute( "power" );
-      }
+      }*/
    return pRetNode;
    }
 
@@ -117,7 +119,7 @@ void LightManager::CalcLighting( Scene *pScene )
       auto globalPos = lightIt->get()->VGetGlobalPosition();
       memcpy( &m_LightPosWorldSpace[ i ], &globalPos, sizeof( Vec3 ) );
       memcpy( &m_LightDir[ i ], &lightIt->get()->VGetGlobalTransformPtr()->GetForward(), sizeof( Vec3 ) );
-      memcpy( &m_LightPower[ i ], &lightIt->get()->GetLightPropertiesPtr()->m_Power, sizeof( float ) );
+   //   memcpy( &m_LightPower[ i ], &lightIt->get()->GetLightPropertiesPtr()->m_Power, sizeof( float ) );
       memcpy( &m_LightColor[ i ], &lightIt->get()->GetLightPropertiesPtr()->m_Color, sizeof( Color ) );
       // auto shadowMapMatrix = lightIt->get()->VGetShadowMapMatrix();
       //  memcpy( &m_ShadowMapMatrix[ i ], &shadowMapMatrix, sizeof( Mat4x4 ) );

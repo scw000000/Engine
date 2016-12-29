@@ -51,7 +51,7 @@ MeshSceneNode::MeshSceneNode( const ActorId actorId,
    m_LightPosWorldSpaceUni = 0;
    m_LigthDirectionUni = 0;
    m_LightColorUni = 0;
-   m_LightPowerUni = 0;
+  // m_LightPowerUni = 0;
    m_LightNumberUni = 0;
    m_ShadowMapMatrixUni = -1;
    memset( m_ShadowMapTextureUni, -1, sizeof( m_ShadowMapTextureUni ) );
@@ -137,7 +137,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_LightPosWorldSpaceUni = glGetUniformLocation( m_Program, "uLightPosition_WorldSpace" );
    m_LigthDirectionUni     = glGetUniformLocation( m_Program, "uLighDirection_WorldSpace" );
    m_LightColorUni         = glGetUniformLocation( m_Program, "uLightColor" );
-   m_LightPowerUni         = glGetUniformLocation( m_Program, "uLightPower" );
+  // m_LightPowerUni         = glGetUniformLocation( m_Program, "uLightPower" );
    m_LightNumberUni        = glGetUniformLocation( m_Program, "uLightNumber" );
 
    /*m_ShadowMapMatrixUni    = glGetUniformLocation( m_Program, "uShadowMapMatrix" );
@@ -167,7 +167,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    auto renderPass = DeferredMainRenderer::RenderPass_Geometry;
    glUseProgram( m_pDeferredMainRenderer->m_Programs[ renderPass ] );
 
- //  glBindVertexArray( m_pDeferredMainRenderer->m_VAOs[ renderPass ] );
+   glBindVertexArray( 0 );
    glBindFramebuffer( GL_FRAMEBUFFER, m_pDeferredMainRenderer->m_FBO[ renderPass ] );
    
      /* glEnable( GL_CULL_FACE );
@@ -210,8 +210,6 @@ int MeshSceneNode::VRender( Scene *pScene )
          0,
          ( void* ) 0
          );
-   
-   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ Index_Buffer ] );
 
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
    glEnableVertexAttribArray( 2 );
@@ -224,6 +222,8 @@ int MeshSceneNode::VRender( Scene *pScene )
          ( void* ) 0
          );
    
+   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ Index_Buffer ] );
+
    glDrawElements(
          GL_TRIANGLES,    
          m_VerticesIndexCount,   
@@ -262,7 +262,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    glUniform3fv( m_LightPosWorldSpaceUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPosWorldSpace( ) );
    glUniform3fv( m_LigthDirectionUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightDirection( ) );
    glUniform3fv( m_LightColorUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor( ) );
-   glUniform1fv( m_LightPowerUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower( ) );
+ //  glUniform1fv( m_LightPowerUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower( ) );
    glUniform1i( m_LightNumberUni, pLightManager->GetActiveLightCount( ) );
 
    //auto shadowMapMatrix = pLightManager->GetShadowMapMatrix();

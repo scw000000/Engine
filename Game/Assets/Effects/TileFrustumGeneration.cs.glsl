@@ -26,11 +26,13 @@ layout ( std430, binding = 0 ) writeonly buffer tileFrustumSSBO
     }
  // transform from [ 0, 1 ] to view space
  // Reference: https://www.khronos.org/opengl/wiki/Compute_eye_space_from_window_space
+ // http://www.derschmale.com/2014/01/26/reconstructing-positions-from-the-depth-buffer/
+ // http://www.derschmale.com/2014/09/28/unprojections-explained/ (invprojection)
  vec3 TexCoordinatesToView( vec2 p )
     {
     vec3 eyeDir = vec3( 2 * uHalfSizeNearPlane * p - uHalfSizeNearPlane, -1 );
-    // ndcZ = -1.0
-    float eyeZ = uProj[3][2] / ( ( uProj[2][3] * -1.0 ) - uProj[2][2] ); 
+    // ndcZ = -1.0, uProj[2][3] = -1.0
+    float eyeZ = -uProj[3][2] / ( -1.0 + uProj[2][2] ); 
     return eyeDir * eyeZ;
     }
  

@@ -54,8 +54,11 @@ void main()
 	 	//uMaterialAmbient + 
 	 	//textureColor * uMaterialDiffuse.xyz * uLightColor[ i ] * uLightPower[ i ] * cosTheta / distanceSqr +
 	 	//uMaterialSpecular * uLightColor[ i ] * uLightPower[ i ] * pow(cosAlpha,5) / distanceSqr );
+        float power = 10.0;
         color.xyz = ( color.xyz + 
 	 	textureColor * uMaterialAmbient + 
+	 	textureColor * uMaterialDiffuse.xyz * uLightColor[ i ] * power * cosTheta / distanceSqr +
+	 	uMaterialSpecular * uLightColor[ i ] * power * pow(cosAlpha,5) / distanceSqr );
         }
    // color.rgb = vec3( vUV, 1 );
     color.a = uMaterialDiffuse.a;

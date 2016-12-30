@@ -27,6 +27,8 @@
 
 const char* const TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME = "Effects\\TileFrustumGeneration.cs.glsl";
 
+const char* const LIGHT_LIST_COMPUTE_SHADER_FILE_NAME = "Effects\\LightListGeneration.cs.glsl";
+
 const char* const GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DeferredGeometry.vs.glsl";
 const char* const GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredGeometry.fs.glsl";
 
@@ -45,6 +47,7 @@ DeferredMainRenderer::DeferredMainRenderer( void )
    m_Uniforms[ RenderPass_Geometry ] = std::vector< GLuint >( GeometryPassUni_Num, -1 );
 
    m_TileFrustumShader.VSetResource( Resource( TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME ) );
+   m_LightListShader.VSetResource( Resource( LIGHT_LIST_COMPUTE_SHADER_FILE_NAME ) );
    ENG_ZERO_MEM( m_SSBOs );
 
    auto screenSize = g_pApp->GetScreenSize();
@@ -95,21 +98,25 @@ int DeferredMainRenderer::VOnRestore( void )
    return S_OK;
    }
 
-void DeferredMainRenderer::VLoadLight( LightManager* pManager )
+void DeferredMainRenderer::VLoadLight( Lights& lights )
    {
-   ENG_ASSERT( pManager );
-
+  // ENG_ASSERT( pManager );
    glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_VisibleLight ] );
 
    LightProperties *ptr;
    ptr = ( LightProperties * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY );
-      pManager->LoadLight( ptr );
    glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
 
+   for( Lights::iterator lightIt = lights.begin(); lightIt != lights.end(); ++lightIt )
+      {
+      //   ptr = static_cast<char*>( ptr ) + sizeof( LightProperties );
+      memcpy( ptr, lightIt->get()->GetLightPropertiesPtr().get(), sizeof( LightProperties ) );
+      ++ptr;
+      }
 
    //ptr = ( LightProperties * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );
    //
-   ///*for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
+   //for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
    //   {
    //   std::stringstream ss;
    //   ENG_LOG( "Test", ToStr( ptr[ i ].m_Color ) );
@@ -119,11 +126,11 @@ void DeferredMainRenderer::VLoadLight( LightManager* pManager )
    //   ENG_LOG( "Test", ToStr( ptr[ i ].m_Enabled ) );
 
    //   ENG_LOG( "Test", ToStr( ptr[ i ].m_DirectionVS ) );
-   //   
-   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_Attenuation ) );
-   //   }*/
 
+   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_Attenuation ) );
+   //   }
    //glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
+
    glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
    OpenGLRenderManager::CheckError();
    }
@@ -248,6 +255,9 @@ int DeferredMainRenderer::OnRestoreSSBO( void )
 
 int DeferredMainRenderer::OnRestoreTileFrustum( void )
    {
+   m_LightListShader.VOnRestore();
+   auto ddd = OpenGLRendererLoader::GenerateProgram( { m_LightListShader.VGetShaderObject() } );
+   m_LightListShader.VReleaseShader( ddd );
 
    m_TileFrustumShader.VOnRestore();
    auto program = OpenGLRendererLoader::GenerateProgram( { m_TileFrustumShader.VGetShaderObject() } );

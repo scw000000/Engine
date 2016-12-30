@@ -93,7 +93,6 @@ class LightManager
       void CalcLighting( Scene *pScene );
       // copy all of lights that effects this node into constant buffer (Deprecated) 
       void CalcLighting( SceneNode *pNode );
-      void LoadLight( LightProperties* ptr );
       void RenderShadowMap( ISceneNode *pNode );
 
 	   int GetActiveLightCount( void ) const { return m_ActiveLights.size(); }

@@ -24,7 +24,7 @@ class DeferredMainRenderer : public MainRenderer
       virtual int VPreRender( void ) override;
       virtual int VOnRestore( void ) override;
     //  virtual int VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode ) override;
-      virtual void VLoadLight( LightManager* pManager ) override;
+      virtual void VLoadLight( Lights& lights ) override;
 
    protected:
       void ReleaseResource( void );
@@ -82,7 +82,7 @@ class DeferredMainRenderer : public MainRenderer
 
       unsigned int m_TileNum[ 2 ];
       ComputeShader m_TileFrustumShader;
-
+      ComputeShader m_LightListShader;
    };
 
 typedef struct tileFrustum

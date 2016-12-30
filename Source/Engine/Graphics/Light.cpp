@@ -207,16 +207,6 @@ void LightManager::CalcLighting( SceneNode *pNode )
 	   }*/
    }
 
-void LightManager::LoadLight( LightProperties* ptr )
-   {
-   for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt )
-      {
-   //   ptr = static_cast<char*>( ptr ) + sizeof( LightProperties );
-      memcpy( ptr, lightIt->get()->GetLightPropertiesPtr().get(), sizeof( LightProperties ) );
-      ++ptr;
-      }
-   }
-
 void LightManager::CalcShadow( Scene *pScene, shared_ptr< ISceneNode > pNode )
    {
   // m_DeferredShader.VOnRender( pScene, pNode );

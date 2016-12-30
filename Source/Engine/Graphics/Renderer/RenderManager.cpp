@@ -46,9 +46,9 @@ int OpenGLRenderManager::VPostRender( void )
    auto screensize = g_pApp->GetScreenSize();
    float xSize = 300.f;
    float ySize = xSize * ( float ) screensize.y / ( float ) screensize.x;
-   m_TextureDrawer.DrawTexture( 8, Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
-   m_TextureDrawer.DrawTexture( 9, Point( 300, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
-   m_TextureDrawer.DrawTexture( 10, Point( 600, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
+   m_TextureDrawer.DrawTexture( 9, Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) ); // for testing
+   m_TextureDrawer.DrawTexture( 10, Point( 300, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
+   m_TextureDrawer.DrawTexture( 11, Point( 600, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
    m_TextureDrawer.VPostRender();
 
    m_MainRenderer.VPostRender();

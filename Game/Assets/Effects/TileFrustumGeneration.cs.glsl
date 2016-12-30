@@ -11,6 +11,7 @@ uniform  vec2 uHalfSizeNearPlane;
  
 uniform mat4 uProj;
 
+// frustum facing inward
 layout ( std430, binding = 0 ) writeonly buffer tileFrustumSSBO
     {
     TileFrustum data[];

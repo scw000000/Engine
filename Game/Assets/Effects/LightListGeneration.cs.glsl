@@ -1,5 +1,7 @@
 #version 430
 
+#define MAXIMUM_LIGHTS_PER_TILE 1024
+
 struct Light
 {
     //--------------------------------------------------------------
@@ -21,15 +23,39 @@ struct Light
 
 };
 
-layout ( std430, binding = 0 ) readonly buffer lightSSBO
+struct TileFrustum
+    {
+    vec4 m_Planes[ 4 ];
+    };    
+
+layout ( std430, binding = 0 ) coherent buffer lightCountSSBO
+    {
+    uint count;
+    }LightCountSSBO;
+    
+layout ( std430, binding = 1 ) writeonly buffer lightMapSSBO
+    {
+    uint list[]; // a 1D array, length = MAX_LIGHT_SUPPORTED
+    uint grid[]; // a 2D array contains 2 uint per tile
+    }LightMapSSBO;
+    
+layout ( std430, binding = 2 ) readonly buffer lightPropsSSBO
     {
     Light data[];
-    }LightSSBO;
+    }LightPropsSSBO;
 
-layout ( std430, binding = 1 ) writeonly buffer lightListSSBO
+layout ( std430, binding = 3 ) readonly buffer tileFrustumSSBO
     {
-    uint data[];
-    }LightListSSBO;
+    TileFrustum data[];
+    }TileFrustumSSBO;
+   
+uniform sampler2D  uDepthTex;
+
+shared float sMinDepth;
+shared float sMaxDepth;
+shared float sLocalIdxCount;
+shared float sGlobalStoreOffset;
+shared float sLocalIdxList[ MAXIMUM_LIGHTS_PER_TILE ];
 
 void main()
     {

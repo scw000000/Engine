@@ -55,6 +55,7 @@ bool LightProperties::Init( TiXmlElement* pData )
       return false;
       }
 
+   // Reference: http://www.ogre3d.org/tikiwiki/-Point+Light+Attenuation
    if( !m_Attenuation.Init( pData->FirstChildElement( "Attenuation" ) ) )
       {
       return false;

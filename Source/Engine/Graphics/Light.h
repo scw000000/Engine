@@ -15,8 +15,12 @@
 #include ".\SceneNode\SceneNodes.h"
 #include ".\Renderer\MainRenderer.h"
 
-#define MAXIMUM_LIGHTS_SUPPORTED (8)
-#define MAXIMUM_SHADOWMAP_TEXTURE_SUPPORTED (8)
+#define MAXIMUM_LIGHTS_SUPPORTED             8
+#define MAXIMUM_SHADOWMAP_TEXTURE_SUPPORTED  8
+
+#define LIGHT_TYPE_UNDEFINED   0u
+#define LIGHT_TYPE_POINT       1u
+#define LIGHT_TYPE_DIRECTIONAL 2u
 
 struct LightProperties;
 typedef shared_ptr<LightProperties> LightPropertiesPtr;
@@ -25,24 +29,24 @@ typedef shared_ptr<LightProperties> LightPropertiesPtr;
 struct LightProperties
    {
    public:
+      LightProperties( void );
       bool Init( TiXmlElement* pData );
       TiXmlElement* GenerateXML( void );
-      TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
 
    public:
-       //--------------------------------------------------------------
-      Color m_Color;
       //--------------------------------------------------------------
-      Vec3  m_PositionVS;
+      Vec3  m_Color;
       unsigned int m_Type;
       //--------------------------------------------------------------
-      Vec3  m_DirectionVS;
+      Vec3  m_PositionVS;
       unsigned int m_Enabled;
+      //--------------------------------------------------------------
+      Vec3  m_DirectionVS;
+      float  m_HalfConeAngle;
       //--------------------------------------------------------------
       Vec4  m_Attenuation;
       //--------------------------------------------------------------
-      float  m_HalfConeAngle;
-      float  m_Padding[ 3 ];
+      //float  m_Padding[ 3 ];
       //--------------------------------------------------------------
 
    };
@@ -86,9 +90,10 @@ class LightManager
 	    * @param  pScene Scene * pScene
 	    * @return void
 	    */
-	   void CalcLighting( Scene *pScene );
+      void CalcLighting( Scene *pScene );
       // copy all of lights that effects this node into constant buffer (Deprecated) 
       void CalcLighting( SceneNode *pNode );
+      void LoadLight( LightProperties* ptr );
       void RenderShadowMap( ISceneNode *pNode );
 
 	   int GetActiveLightCount( void ) const { return m_ActiveLights.size(); }
@@ -105,7 +110,7 @@ class LightManager
       void DestroySceneNodeDelegate( IEventPtr pEvent );
 
    protected:
-   void CalcShadow( Scene *pScene, shared_ptr< ISceneNode > pNode );
+      void CalcShadow( Scene *pScene, shared_ptr< ISceneNode > pNode );
       void RenderShadowMap( shared_ptr< LightNode > ) const;
 
    protected:

@@ -72,6 +72,6 @@ void LightRenderComponent::VDelegateGenerateXML( TiXmlElement *pBaseElement )
 
 void LightRenderComponent::VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode )
    {
-   TiXmlElement* pLight = m_pLightProps->GenerateOverridesXML( pResourceNode->FirstChildElement( "Light" ) );
-   pBaseElement->LinkEndChild( pLight );
+//   TiXmlElement* pLight = m_pLightProps->GenerateOverridesXML( pResourceNode->FirstChildElement( "Light" ) );
+//   pBaseElement->LinkEndChild( pLight );
    }

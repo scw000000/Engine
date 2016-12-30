@@ -20,7 +20,7 @@
 
 #include <crtdbg.h>
 
-// C RunTime Header Files
+// C++ Header Files
 #include <stdlib.h>
 
 #include <malloc.h>

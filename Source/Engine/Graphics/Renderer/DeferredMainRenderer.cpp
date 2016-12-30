@@ -15,6 +15,7 @@
 #include "DeferredMainRenderer.h"
 #include "RendererLoader.h"
 #include "RenderManager.h"
+#include "..\Light.h"
 #include "..\..\Debugging\vsGLInfoLib.h"
 
 #define TILE_WIDTH 16u
@@ -44,8 +45,7 @@ DeferredMainRenderer::DeferredMainRenderer( void )
    m_Uniforms[ RenderPass_Geometry ] = std::vector< GLuint >( GeometryPassUni_Num, -1 );
 
    m_TileFrustumShader.VSetResource( Resource( TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME ) );
-   m_TileFrustumSSBO = 0;
-
+   ENG_ZERO_MEM( m_SSBOs );
 
    auto screenSize = g_pApp->GetScreenSize();
    m_TileNum[ 0 ] = std::ceil( ( double ) screenSize.x / TILE_WIDTH );
@@ -93,6 +93,39 @@ int DeferredMainRenderer::VOnRestore( void )
    //   }
    
    return S_OK;
+   }
+
+void DeferredMainRenderer::VLoadLight( LightManager* pManager )
+   {
+   ENG_ASSERT( pManager );
+
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_VisibleLight ] );
+
+   LightProperties *ptr;
+   ptr = ( LightProperties * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY );
+      pManager->LoadLight( ptr );
+   glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
+
+
+   //ptr = ( LightProperties * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );
+   //
+   ///*for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
+   //   {
+   //   std::stringstream ss;
+   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_Color ) );
+   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_Type ) );
+
+   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_PositionVS ) );
+   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_Enabled ) );
+
+   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_DirectionVS ) );
+   //   
+   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_Attenuation ) );
+   //   }*/
+
+   //glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
+   OpenGLRenderManager::CheckError();
    }
 
 //int OpenGLDeferredRenderer::VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode )
@@ -189,16 +222,27 @@ void DeferredMainRenderer::ReleaseResource( void )
 
 int DeferredMainRenderer::OnRestoreSSBO( void )
    {
-   glGenBuffers( 1, &m_TileFrustumSSBO );
-   ENG_ASSERT( m_TileFrustumSSBO );
+   glGenBuffers( 2, m_SSBOs );
+   for( int i = 0; i < SSBO_Num; ++i )
+      {
+      ENG_ASSERT( m_SSBOs[ i ] );
+      }
 
+   // Alignment checking
    ENG_ASSERT( sizeof( tileFrustum ) == 64 );
 
-   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_TileFrustumSSBO );
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_TileFrustum ] );
       glBufferData( GL_SHADER_STORAGE_BUFFER, sizeof( tileFrustum ) * m_TileNum[ 0 ] * m_TileNum[ 1 ], NULL, GL_DYNAMIC_DRAW );
+ //  glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
+
+   // Alignment checking
+   ENG_ASSERT( sizeof( LightProperties ) % 16 == 0 );
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_VisibleLight ] );
+      glBufferData( GL_SHADER_STORAGE_BUFFER, sizeof( LightProperties ) * MAXIMUM_LIGHTS_SUPPORTED, NULL, GL_DYNAMIC_DRAW );
    glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
+
    OpenGLRenderManager::CheckError();
-   VSGLInfoLib::getBufferInfo( GL_SHADER_STORAGE_BUFFER, m_TileFrustumSSBO );
+   VSGLInfoLib::getBufferInfo( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_VisibleLight ] );
    return S_OK;
    }
 
@@ -210,7 +254,7 @@ int DeferredMainRenderer::OnRestoreTileFrustum( void )
    m_TileFrustumShader.VReleaseShader( program );
    glUseProgram( program );
 
-   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 0, m_TileFrustumSSBO );
+   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 0, m_SSBOs[ SSBO_TileFrustum ] );
 
    auto tileSizeUni = glGetUniformLocation( program, "uTileSize" );
    glUniform2ui( tileSizeUni, TILE_WIDTH, TILE_HEIGHT );
@@ -236,7 +280,7 @@ int DeferredMainRenderer::OnRestoreTileFrustum( void )
    OpenGLRenderManager::CheckError();
    glDispatchCompute( m_TileNum[ 0 ], m_TileNum[ 1 ], 1u );
    glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
-   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_TileFrustumSSBO );
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_TileFrustum ] );
 
    GLfloat *ptr;
    ptr = ( GLfloat * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );

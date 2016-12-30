@@ -24,7 +24,8 @@ class DeferredMainRenderer : public MainRenderer
       virtual int VPreRender( void ) override;
       virtual int VOnRestore( void ) override;
     //  virtual int VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode ) override;
-   
+      virtual void VLoadLight( LightManager* pManager ) override;
+
    protected:
       void ReleaseResource( void );
       int OnRestoreSSBO( void );
@@ -37,6 +38,7 @@ class DeferredMainRenderer : public MainRenderer
       enum RenderPass
          {
          RenderPass_Geometry,
+         RenderPass_LightCull,
          RenderPass_Light,
          RenderPass_Num
          };
@@ -46,6 +48,15 @@ class DeferredMainRenderer : public MainRenderer
       FragmentShader m_FragmentShaders[ RenderPass_Num ];
 
       GLuint m_VAOs[ RenderPass_Num ];
+
+      enum SSBOs
+         {
+         SSBO_TileFrustum,
+         SSBO_VisibleLight,
+         SSBO_Num
+         };
+
+      GLuint m_SSBOs[ SSBO_Num ];
 
       enum ScreenSpaceTextures
          {
@@ -69,11 +80,9 @@ class DeferredMainRenderer : public MainRenderer
 
       std::vector< std::vector< GLuint > > m_Uniforms;
 
-      GLuint m_MVPUni;
-      GLuint m_MUni;
       unsigned int m_TileNum[ 2 ];
       ComputeShader m_TileFrustumShader;
-      GLuint m_TileFrustumSSBO;
+
    };
 
 typedef struct tileFrustum

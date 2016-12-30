@@ -77,7 +77,7 @@ int Scene::OnRender( void )
 		// matrix
 		m_pCamera->SetViewTransform( this );
 		m_pLightManager->CalcLighting( this );
-
+      m_pRenderManager->VGetMainRenderer().VLoadLight( m_pLightManager.get() );
 		if ( m_pRoot->VPreRender( this ) == S_OK )
 		   {
 			m_pRoot->VRender( this );

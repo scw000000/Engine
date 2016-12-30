@@ -115,6 +115,31 @@ TiXmlElement* Vec3::GenerateOverridesXML( TiXmlElement* pResource ) const
    return pRetNode;
    }
 
+bool Vec4::Init( TiXmlElement* pData )
+   {
+   if( !pData )
+      {
+      return false;
+      }
+   bool success = ( TIXML_SUCCESS == pData->QueryFloatAttribute( "x", &x ) )
+      | ( TIXML_SUCCESS == pData->QueryFloatAttribute( "y", &y ) )
+      | ( TIXML_SUCCESS == pData->QueryFloatAttribute( "z", &z ) )
+      | ( TIXML_SUCCESS == pData->QueryFloatAttribute( "w", &w ) );
+      
+   return success;
+   }
+
+TiXmlElement* Vec4::GernerateXML( void ) const
+   {
+   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Vector4" );
+   pRetNode->SetAttribute( "x", ToStr( x ).c_str() );
+   pRetNode->SetAttribute( "y", ToStr( y ).c_str() );
+   pRetNode->SetAttribute( "z", ToStr( z ).c_str() );
+   pRetNode->SetAttribute( "w", ToStr( w ).c_str() );
+
+   return pRetNode;
+   }
+
 bool Plane::Inside( Vec3 p ) const
    {
    return ( p.Dot( n ) + d >= 0.0f );

@@ -3,18 +3,19 @@
 struct Light
 {
     //--------------------------------------------------------------
-    vec4   m_Color;
-    //--------------------------------------------------------------
-    vec3   m_PositionVS;
+    vec3   m_Color;
     uint   m_Type;
     //--------------------------------------------------------------
-    vec3   m_DirectionVS;   // for directional light
+    vec3   m_PositionVS;
     uint   m_Enabled;
+    //--------------------------------------------------------------
+    vec3   m_DirectionVS;   // for directional light
+    float  m_HalfConeAngle; // for spot light
     //--------------------------------------------------------------
     vec4   m_Attenuation;   // for point and spot light
     //--------------------------------------------------------------
-    float  m_HalfConeAngle; // for spot light
-    float  m_Padding[3];
+    
+   // float  m_Padding[3];
     //--------------------------------------------------------------
    // bool    Selected;
 

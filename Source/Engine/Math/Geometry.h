@@ -166,6 +166,8 @@ class Vec4 : public glm::vec4
       Vec4( const glm::vec3 &v3 ) { x = v3.x; y = v3.y; z = v3.z; w = 1.0f; }
       Vec4( const float _x, const float _y, const float _z, const float _w ) { x = _x; y = _y; z = _z; w = _w; }
       Vec4( const double _x, const double _y, const double _z, const double _w ) { x = (float)_x; y = (float)_y; z = (float)_z; w = (float)_w; }
+      bool Init( TiXmlElement* pData );
+      TiXmlElement* GernerateXML( void ) const;
 
       inline float Length() { return glm::length<float, glm::highp, glm::tvec4>( *this ); }
       inline Vec4* Normalize() { *this = glm::normalize<float, glm::highp, glm::tvec4>( *this ); return this;  }

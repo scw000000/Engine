@@ -212,15 +212,21 @@ void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
    unsigned long deltaMs = unsigned long( elapsedTime * 1000.0f );
 	m_Lifetime += elapsedTime;
 
-   IGamePhysics::GetSingleton().VOnUpdate( elapsedTime );
-   IGamePhysics::GetSingleton().VSyncVisibleScene();
-
    m_pGUIManager->OnUpdate( deltaMs );
    // update all game views
    for ( ViewList::iterator it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
 	   {
 		(*it)->VOnUpdate( deltaMs );
 	   }
+
+   if( m_EnableActorUpdate )
+      {
+      // update game actors
+      for( ActorMap::const_iterator it = m_Actors.begin(); it != m_Actors.end(); ++it )
+         {
+         it->second->Update( deltaMs );
+         }
+      }
 
    if( m_EnableWorldUpdate )
       {
@@ -229,14 +235,8 @@ void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
 
    AnimationManager::GetSingleton().VUpdate( deltaMs );
 
-   if( m_EnableActorUpdate )
-      {
-      // update game actors
-      for( ActorMap::const_iterator it = m_Actors.begin( ); it != m_Actors.end( ); ++it )
-         {
-         it->second->Update( deltaMs );
-         }
-      }
+   IGamePhysics::GetSingleton().VOnUpdate( elapsedTime );
+   IGamePhysics::GetSingleton().VSyncVisibleScene();
    }
 
 void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )

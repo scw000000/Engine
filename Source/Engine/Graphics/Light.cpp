@@ -18,6 +18,11 @@
 #include "..\Event\Events.h"
 #include "..\Event\EventManager.h"
 
+LightProperties::LightProperties( void )
+   {
+   m_Type = LIGHT_TYPE_UNDEFINED;
+   m_Enabled = 0u;
+   }
 
 bool LightProperties::Init( TiXmlElement* pData )
    {
@@ -25,7 +30,32 @@ bool LightProperties::Init( TiXmlElement* pData )
       {
       return false;
       }
-   if( !m_Color.Init( pData->FirstChildElement( "Diffuse" ) ) )
+   Color color;
+   if( !color.Init( pData->FirstChildElement( "Color" ) ) )
+      {
+      return false;
+      }
+   m_Color.x = color.m_Component.r;
+   m_Color.y = color.m_Component.g;
+   m_Color.z = color.m_Component.b;
+
+   std::string lightType = pData->Attribute( "type" );
+
+   if( !lightType.compare( "point" ) )
+      {
+      m_Type = LIGHT_TYPE_POINT;
+      }
+   else if( !lightType.compare( "directional" ) )
+      {
+      m_Type = LIGHT_TYPE_DIRECTIONAL;
+      }
+   else
+      {
+      m_Type = LIGHT_TYPE_UNDEFINED;
+      return false;
+      }
+
+   if( !m_Attenuation.Init( pData->FirstChildElement( "Attenuation" ) ) )
       {
       return false;
       }
@@ -34,8 +64,6 @@ bool LightProperties::Init( TiXmlElement* pData )
       return false;
       }*/
 
-   ENG_ASSERT( sizeof( LightProperties ) % 16 == 0 );
-
    return true;
    }
 
@@ -43,30 +71,49 @@ TiXmlElement* LightProperties::GenerateXML( void )
    {
    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Light" );
 
-   TiXmlElement* pDiffuse = m_Color.GenerateXML();
-   pDiffuse->SetValue( "Diffuse" );
-   pRetNode->LinkEndChild( pDiffuse );
+   Color color( m_Color.x, m_Color.y, m_Color.z, 1.0f );
+   TiXmlElement* pColor = color.GenerateXML();
+   pColor->SetValue( "Color" );
+   pRetNode->LinkEndChild( pColor );
 
+   std::string typeStr;
+   switch( m_Type ) 
+      {
+      case LIGHT_TYPE_DIRECTIONAL:
+         typeStr = "directional";
+         break;
+      case LIGHT_TYPE_POINT :
+         typeStr = "point";
+         break;
+      default :
+         break;
+      };
+
+   pRetNode->SetAttribute( "type", typeStr.c_str() );
+
+   TiXmlElement* pAttenuation = m_Attenuation.GernerateXML();
+   pAttenuation->SetValue( "Attenuation" );
+   pRetNode->LinkEndChild( pAttenuation );
  //  pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
 
    return pRetNode;
    }
 
-TiXmlElement* LightProperties::GenerateOverridesXML( TiXmlElement* pResource ) 
-   {
-   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Light" );
-
-   TiXmlElement* pDiffuse = m_Color.GenerateOverridesXML( pResource->FirstChildElement( "Diffuse" ) );
-   pDiffuse->SetValue( "Diffuse" );
-   pRetNode->LinkEndChild( pDiffuse );
-
-   /*pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
-   if( !strcmp( pRetNode->Attribute( "power" ), pResource->Attribute( "power" ) ) )
-      {
-      pRetNode->RemoveAttribute( "power" );
-      }*/
-   return pRetNode;
-   }
+//TiXmlElement* LightProperties::GenerateOverridesXML( TiXmlElement* pResource ) 
+//   {
+//   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Light" );
+//
+//   TiXmlElement* pDiffuse = m_Color.GenerateOverridesXML( pResource->FirstChildElement( "Diffuse" ) );
+//   pDiffuse->SetValue( "Diffuse" );
+//   pRetNode->LinkEndChild( pDiffuse );
+//
+//   /*pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
+//   if( !strcmp( pRetNode->Attribute( "power" ), pResource->Attribute( "power" ) ) )
+//      {
+//      pRetNode->RemoveAttribute( "power" );
+//      }*/
+//   return pRetNode;
+//   }
 
 LightNode::LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& props, TransformPtr pTransform )
    : SceneNode( actorId, pRenderComponent, RenderGroup_NotRendered, pTransform )
@@ -79,7 +126,6 @@ LightManager::LightManager( void )
    IEventManager* pEventMgr = IEventManager::GetSingleton();
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &LightManager::NewSceneNodeDelegate ), Event_New_Scene_Node::s_EventType );
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &LightManager::DestroySceneNodeDelegate ), Event_Destroy_Scene_Node::s_EventType );
- //  m_DeferredShader.VOnRestore();
    }
 
 void LightManager::RenderShadowMap( shared_ptr< LightNode > ) const
@@ -89,11 +135,24 @@ void LightManager::RenderShadowMap( shared_ptr< LightNode > ) const
 
 void LightManager::CalcLighting( Scene *pScene )
    {
- //  m_DeferredShader.VPreRender();
    // Only calculate shadow for nodes in static and actor group
+   auto viewMat = pScene->GetCamera()->GetView();
    for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt )
       {
-      lightIt->get()->VPreRenderShadowMap();
+      auto lightNode = lightIt->get();
+      auto lightPtr = lightIt->get()->GetLightPropertiesPtr();
+      switch( lightPtr->m_Type )
+         {
+         case LIGHT_TYPE_POINT :
+            lightPtr->m_PositionVS = viewMat.Xform( lightNode->VGetGlobalPosition(), 1.0f );
+            break;
+         case LIGHT_TYPE_DIRECTIONAL :
+            lightPtr->m_DirectionVS = viewMat.Xform( lightNode->VGetGlobalTransformPtr()->GetForward(), 0.0f );
+            lightPtr->m_DirectionVS.Normalize();
+            break;
+         };
+
+     // lightIt->get()->VPreRenderShadowMap();
       }
 
    if( pScene->m_pRoot ) 
@@ -147,6 +206,15 @@ void LightManager::CalcLighting( SceneNode *pNode )
 	   }*/
    }
 
+void LightManager::LoadLight( LightProperties* ptr )
+   {
+   for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt )
+      {
+   //   ptr = static_cast<char*>( ptr ) + sizeof( LightProperties );
+      memcpy( ptr, lightIt->get()->GetLightPropertiesPtr().get(), sizeof( LightProperties ) );
+      ++ptr;
+      }
+   }
 
 void LightManager::CalcShadow( Scene *pScene, shared_ptr< ISceneNode > pNode )
    {

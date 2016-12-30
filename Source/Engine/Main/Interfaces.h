@@ -242,9 +242,12 @@ class IRenderer
       //
    };
 
+class LightManager;
+
 class IMainRenderer : public IRenderer
    {
    public:
+      virtual void VLoadLight( LightManager* pManager ) = 0;
       virtual void VDrawLine( const Vec3& from, const Vec3& to, const Color& color ) const = 0;
       virtual void VSetBackgroundColor( const Color& color ) = 0;
       virtual void VSetRenderingAlpha( bool isAplha ) = 0;

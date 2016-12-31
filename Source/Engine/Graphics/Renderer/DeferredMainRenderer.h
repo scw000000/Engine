@@ -15,9 +15,12 @@
 #include "..\Shaders.h"
 #include "MainRenderer.h"
 
+#define AVERAGE_OVERLAP_LIGHTS_PER_TILE 200u
+
 class DeferredMainRenderer : public MainRenderer
    {
    friend class MeshSceneNode;
+   friend class OpenGLRenderManager;
    public:
       DeferredMainRenderer( void );
       virtual void VShutdown( void ) override;
@@ -29,30 +32,35 @@ class DeferredMainRenderer : public MainRenderer
    protected:
       void ReleaseResource( void );
       int OnRestoreSSBO( void );
-      int OnRestoreTileFrustum( void );
       int OnRestoreTextures( void );
+      int OnRestoreTileFrustum( void );
       int OnRestoreGeometryPass( void );
-      int OnRestoreLightPass( void );
-      
+      int OnRestourLightCullPass( void );
+      int OnRestoreLightingPass( void );
+      void LightCulling( Scene* pScene );
+      void GenerateProgram( unsigned int renderPass );
+
    private:
       enum RenderPass
          {
          RenderPass_Geometry,
-         RenderPass_LightCull,
-         RenderPass_Light,
+         RenderPass_LightCulling,
+         RenderPass_Lighting,
          RenderPass_Num
          };
       GLuint m_Programs[ RenderPass_Num ];
       
-      VertexShader m_VertexShaders[ RenderPass_Num ];
-      FragmentShader m_FragmentShaders[ RenderPass_Num ];
+      std::vector< shared_ptr< OpenGLShader > > m_Shaders[ RenderPass_Num ];
 
-      GLuint m_VAOs[ RenderPass_Num ];
+    //  GLuint m_VAOs[ RenderPass_Num ];
 
       enum SSBOs
          {
          SSBO_TileFrustum,
-         SSBO_VisibleLight,
+         SSBO_LightIndexCount,
+         SSBO_LightIndexList,
+         SSBO_LightIndexGrid,
+         SSBO_LightProperties,
          SSBO_Num
          };
 
@@ -63,6 +71,7 @@ class DeferredMainRenderer : public MainRenderer
          SST_Depth,
          SST_NormalGlossiness,
          SST_AlbedoMetalness,
+         SST_TileDebugging,
          SST_Num
          };
 
@@ -78,11 +87,19 @@ class DeferredMainRenderer : public MainRenderer
          GeometryPassUni_Num
          };
 
-      std::vector< std::vector< GLuint > > m_Uniforms;
+      enum LightCullingPassUniforms
+         {
+         LightCullPassUni_DepthTex,
+         LightCullPassUni_Proj,
+         LightCullPassUni_ScreenSize,
+         LightCullPassUni_DebugTex,
+         LightCullPassUni_Num
+         };
+
+      std::vector< GLuint > m_Uniforms[ RenderPass_Num ];
 
       unsigned int m_TileNum[ 2 ];
       ComputeShader m_TileFrustumShader;
-      ComputeShader m_LightListShader;
    };
 
 typedef struct tileFrustum

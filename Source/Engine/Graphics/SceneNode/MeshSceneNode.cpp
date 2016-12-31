@@ -82,9 +82,8 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 
    m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
-
-   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() } );
-
+   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.GetShaderObject(), m_FragmentShader.GetShaderObject() } );
+   ENG_ASSERT( m_Program );
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );
 
@@ -132,6 +131,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       ( void* ) 0            // array buffer offset
       );
 
+   glUseProgram( m_Program );
    m_MVPUni          = glGetUniformLocation( m_Program, "uMVP" );
    m_MUni      = glGetUniformLocation( m_Program, "uM" );
    m_LightPosWorldSpaceUni = glGetUniformLocation( m_Program, "uLightPosition_WorldSpace" );
@@ -139,7 +139,6 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_LightColorUni         = glGetUniformLocation( m_Program, "uLightColor" );
   // m_LightPowerUni         = glGetUniformLocation( m_Program, "uLightPower" );
    m_LightNumberUni        = glGetUniformLocation( m_Program, "uLightNumber" );
-
    /*m_ShadowMapMatrixUni    = glGetUniformLocation( m_Program, "uShadowMapMatrix" );
   
    for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
@@ -149,16 +148,20 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       str.push_back( ']' );
       m_ShadowMapTextureUni[ i ] = glGetUniformLocation( m_Program, str.c_str() );
       }*/
-      
+
    m_EyePosWorldSpaceUni   = glGetUniformLocation( m_Program, "uEyePosition_WorldSpace" );
    
    m_MeshTextureUni     = glGetUniformLocation( m_Program, "uMeshTexture" );
+   glUniform1i( m_MeshTextureUni, 0 );
+
    m_MaterialDiffuseUni    = glGetUniformLocation( m_Program, "uMaterialDiffuse" );
    m_MaterialAmbientUni    = glGetUniformLocation( m_Program, "uMaterialAmbient" );
    m_MaterialSpecularUni   = glGetUniformLocation( m_Program, "uMaterialSpecular" );
+
+   glUseProgram( 0 );
    // restore all of its children
 	SceneNode::VOnRestore( pScene );
-
+   OpenGLRenderManager::CheckError();
 	return S_OK;
    }
 
@@ -285,7 +288,7 @@ int MeshSceneNode::VRender( Scene *pScene )
 	glActiveTexture( GL_TEXTURE0 );
 	glBindTexture( GL_TEXTURE_2D, m_MeshTextureObj );
 	// Set our "myTextureSampler" sampler to user Texture Unit 0
-   glUniform1i( m_MeshTextureUni, 0 );
+   //glUniform1i( m_MeshTextureUni, 0 );
 
    glDrawElements(
       GL_TRIANGLES,      // mode

@@ -19,7 +19,7 @@ class IShader
       virtual ~IShader( void ){ }
       virtual void VOnRestore( void ) = 0;
       virtual void VReleaseShader( GLuint program ) = 0;
-      virtual GLuint VGetShaderObject( void ) const = 0;
+    //  virtual GLuint VGetShaderObject( void ) const = 0;
       virtual void VSetResource( const Resource& resource ) = 0;
    };
 
@@ -29,7 +29,7 @@ class OpenGLShader : public IShader
       OpenGLShader( const Resource& shaderResource );
       
       virtual void VReleaseShader( GLuint program ) override;
-      virtual GLuint VGetShaderObject( void ) const override { return m_ShaderObj; };
+      virtual GLuint GetShaderObject( void ) const { return m_ShaderObj; };
       virtual void VSetResource( const Resource& resource ) override { m_ShaderResource = resource; }
 
    protected:

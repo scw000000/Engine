@@ -1,6 +1,7 @@
 #version 430
-#define MAXIMUM_LIGHTS_PER_FRAME 8u
+#define MAXIMUM_LIGHTS_SUPPORTED 8u
 #define MAXIMUM_LIGHTS_PER_TILE 1024u
+#define AVERAGE_OVERLAP_LIGHTS_PER_TILE 200u
 
 #define TILE_SIZE 16u
 
@@ -41,17 +42,17 @@ layout ( std430, binding = 0 ) coherent buffer lightIdxCountSSBO
     
 layout ( std430, binding = 1 ) buffer lightIdxListSSBO
     {
-    uint data[]; // a 1D array, length = MAXIMUM_LIGHTS_PER_FRAME
+    uint data[]; // a 1D array, length = AVERAGE_OVERLAP_LIGHTS_PER_TILE * tileNum.x * tileNum.y
     }LightIdxListSSBO;
     
-layout ( std430, binding = 2 ) writeonly buffer lightGridSSBO
+layout ( std430, binding = 2 ) writeonly buffer lightIdxGridSSBO
     {
-    uint data[]; // a 2D array contains 2 uint per tile, ( globalStoreOffset, IdxCount )
-    }LightGridSSBO;
+    uint data[]; // array contains 2 uint per tile, ( globalStoreOffset, IdxCount )
+    }LightIdxGridSSBO;
     
 layout ( std430, binding = 3 ) readonly buffer lightPropsSSBO
     {
-    Light data[];
+    Light data[]; // a 1D array, length = MAXIMUM_LIGHTS_SUPPORTED
     }LightPropsSSBO;
 
 layout ( std430, binding = 4 ) readonly buffer tileFrustumSSBO
@@ -65,6 +66,7 @@ uniform uvec2      uScreenSize;
 uniform uint       uInvokePerGroup = TILE_SIZE * TILE_SIZE;
 
 shared uint sTileIndex;
+shared uint sGlobalIdxListLength;
 
 shared uint sMinDepthU;
 shared uint sMaxDepthU;
@@ -112,6 +114,8 @@ void AppendLocalIdxList( uint lightIdx )
         }
     }
 
+layout ( rgba16 ) writeonly uniform image2D debugTex;
+    
 layout ( local_size_x = TILE_SIZE, local_size_y = TILE_SIZE, local_size_z = 1 ) in;
 
 void main()
@@ -127,19 +131,25 @@ void main()
         sLocalIdxCount = 0u;
         sGlobalStoreOffset = 0u;
         sTileIndex = gl_WorkGroupID.x + gl_NumWorkGroups.x * gl_WorkGroupID.y;
+        sGlobalIdxListLength = gl_NumWorkGroups.x * gl_NumWorkGroups.y * gl_NumWorkGroups.z * AVERAGE_OVERLAP_LIGHTS_PER_TILE;
         }
     
     barrier();
     // test min max depth
-
+    float fdepth = 0.0;
+    
     if( gl_GlobalInvocationID.x < uScreenSize.x && gl_GlobalInvocationID.y < uScreenSize.y ) // valid depth test position
         {
-        vec2 tc = gl_GlobalInvocationID.xy / uScreenSize;
+        vec2 tc = vec2( gl_GlobalInvocationID.xy ) / vec2( uScreenSize );
+        fdepth = texture( uDepthTex, tc ).r;
         uint depth = floatBitsToUint( texture( uDepthTex, tc ).r );
         atomicMin( sMinDepthU, depth );
         atomicMax( sMaxDepthU, depth );
         }
         
+    
+    //fdepth = -uProj[3][2] / ( fdepth + uProj[2][2] ); ;
+       
     barrier();
     // set min max depth and far near plane
     if( gl_LocalInvocationIndex == 0 )
@@ -148,8 +158,8 @@ void main()
         sMinDepth = uintBitsToFloat( sMinDepthU ) * 2.0 - 1.0;
         sMaxDepth = uintBitsToFloat( sMaxDepthU ) * 2.0 - 1.0;
         
-        sMinDepth = -uProj[3][2] / ( sMinDepth + uProj[2][2] ); ;
-        sMaxDepth = -uProj[3][2] / ( sMaxDepth + uProj[2][2] ); ;
+        sMinDepth = -uProj[3][2] / ( sMinDepth + uProj[2][2] );
+        sMaxDepth = -uProj[3][2] / ( sMaxDepth + uProj[2][2] );
         
         // if sMinDepth = -N, sMaxDepth = -F
         // ( 0, 0, -N, 1 ) dot vec4( 0.0, 0.0, -1.0, sMinDepth ) = N - N = 0
@@ -160,7 +170,7 @@ void main()
     barrier();
     
     // testing light culling
-    for( uint i= gl_LocalInvocationIndex; i < MAXIMUM_LIGHTS_PER_FRAME; i += uInvokePerGroup )
+    for( uint i= gl_LocalInvocationIndex; i < MAXIMUM_LIGHTS_SUPPORTED; i += uInvokePerGroup )
         {
         if( LightPropsSSBO.data[ i ].m_Enabled == 1u )
             {
@@ -194,15 +204,37 @@ void main()
     
     barrier();
         
-    for( uint i= gl_LocalInvocationIndex; i < sLocalIdxCount; i += uInvokePerGroup )
+    for( uint i= gl_LocalInvocationIndex; i < sLocalIdxCount && sGlobalStoreOffset + i < sGlobalIdxListLength; i += uInvokePerGroup )
         {
         LightIdxListSSBO.data[ sGlobalStoreOffset + i ] = sLocalIdxList[ i ];
         }
         
     if( gl_LocalInvocationIndex == 0 )
         {
-        LightGridSSBO.data[ sTileIndex * 2     ] = sGlobalStoreOffset;
-        LightGridSSBO.data[ sTileIndex * 2 + 1 ] = sLocalIdxCount;
-        }    
-    
+        LightIdxGridSSBO.data[ sTileIndex * 2     ] = sGlobalStoreOffset;
+        LightIdxGridSSBO.data[ sTileIndex * 2 + 1 ] = sLocalIdxCount;
+        }  
+
+    if( gl_GlobalInvocationID.x < uScreenSize.x && gl_GlobalInvocationID.y < uScreenSize.y ) // valid depth test position
+        {
+        if( sLocalIdxCount > 0 )
+            {
+            imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 1.0, 1.0, 1.0 ) );
+            }
+        else if( sLocalIdxCount == 0 )
+            {
+            imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
+            }
+            
+       // if( ( gl_WorkGroupID.x % 2u ) == 1 && ( gl_WorkGroupID.y % 2u ) == 1 )
+      //      {
+      //      imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 0.0, 0.0, 1.0 ) );
+          
+      //      }  
+      imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( fdepth, fdepth, fdepth, 1.0 ) );
+            
+      
+      //  imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( vec3( gl_WorkGroupID.xyz ) / vec3( gl_NumWorkGroups.xyz ), 1.0 ) );
+            
+        }
     }

@@ -37,22 +37,23 @@ const char* const LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME = "";
 
 DeferredMainRenderer::DeferredMainRenderer( void )
    {
-   m_VertexShaders[ RenderPass_Geometry ].VSetResource( Resource( GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME ) );
-   m_FragmentShaders[ RenderPass_Geometry ].VSetResource( Resource( GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME ) );
+   m_Shaders[ RenderPass_Geometry ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( Resource( GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME ) ) ) );
+   m_Shaders[ RenderPass_Geometry ].push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( Resource( GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ) );
 
-   m_VertexShaders[ RenderPass_Light ].VSetResource( Resource( LIGHT_PASS_VERTEX_SHADER_FILE_NAME ) );
-   m_FragmentShaders[ RenderPass_Light ].VSetResource( Resource( LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME ) );
+   m_Shaders[ RenderPass_LightCulling ].push_back( shared_ptr< OpenGLShader >( ENG_NEW ComputeShader( Resource( LIGHT_LIST_COMPUTE_SHADER_FILE_NAME ) ) ) );
+   //m_VertexShaders[ RenderPass_LightCalc ].VSetResource( Resource( LIGHT_PASS_VERTEX_SHADER_FILE_NAME ) );
+   //m_FragmentShaders[ RenderPass_LightCalc ].VSetResource( Resource( LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME ) );
 
-   m_Uniforms = std::vector< std::vector< GLuint > >( RenderPass_Num );
    m_Uniforms[ RenderPass_Geometry ] = std::vector< GLuint >( GeometryPassUni_Num, -1 );
+   m_Uniforms[ RenderPass_LightCulling ] = std::vector< GLuint >( LightCullPassUni_Num, -1 );
 
    m_TileFrustumShader.VSetResource( Resource( TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME ) );
-   m_LightListShader.VSetResource( Resource( LIGHT_LIST_COMPUTE_SHADER_FILE_NAME ) );
+
    ENG_ZERO_MEM( m_SSBOs );
 
    auto screenSize = g_pApp->GetScreenSize();
-   m_TileNum[ 0 ] = std::ceil( ( double ) screenSize.x / TILE_WIDTH );
-   m_TileNum[ 1 ] = std::ceil( ( double ) screenSize.y / TILE_HEIGHT );
+   m_TileNum[ 0 ] = ( unsigned int ) std::ceil( ( double ) screenSize.x / TILE_WIDTH );
+   m_TileNum[ 1 ] = ( unsigned int ) std::ceil( ( double ) screenSize.y / TILE_HEIGHT );
 
    ENG_ASSERT( m_TileNum[ 0 ] * TILE_WIDTH >= screenSize.x );
    ENG_ASSERT( m_TileNum[ 1 ] * TILE_HEIGHT >= screenSize.y );
@@ -79,9 +80,9 @@ int DeferredMainRenderer::VOnRestore( void )
 
    OnRestoreSSBO();
 
-   OnRestoreTileFrustum();
-
    OnRestoreTextures();
+
+   OnRestoreTileFrustum();
 
    if( OnRestoreGeometryPass() != S_OK )
       {
@@ -89,6 +90,11 @@ int DeferredMainRenderer::VOnRestore( void )
       return S_FALSE;
       }
 
+   if( OnRestourLightCullPass() != S_OK )
+      {
+      ENG_ASSERT( "Light Culling Pass Restore Failed" );
+      return S_FALSE;
+      }
    //if( OnRestoreLightPass() != S_OK )
    //   {
    //   ENG_ASSERT( "Geometry Pass Restore Failed" );
@@ -100,12 +106,10 @@ int DeferredMainRenderer::VOnRestore( void )
 
 void DeferredMainRenderer::VLoadLight( Lights& lights )
    {
-  // ENG_ASSERT( pManager );
-   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_VisibleLight ] );
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_LightProperties ] );
 
    LightProperties *ptr;
    ptr = ( LightProperties * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_WRITE_ONLY );
-   glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
 
    for( Lights::iterator lightIt = lights.begin(); lightIt != lights.end(); ++lightIt )
       {
@@ -113,6 +117,8 @@ void DeferredMainRenderer::VLoadLight( Lights& lights )
       memcpy( ptr, lightIt->get()->GetLightPropertiesPtr().get(), sizeof( LightProperties ) );
       ++ptr;
       }
+
+   glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
 
    //ptr = ( LightProperties * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );
    //
@@ -229,7 +235,7 @@ void DeferredMainRenderer::ReleaseResource( void )
 
 int DeferredMainRenderer::OnRestoreSSBO( void )
    {
-   glGenBuffers( 2, m_SSBOs );
+   glGenBuffers( SSBO_Num, m_SSBOs );
    for( int i = 0; i < SSBO_Num; ++i )
       {
       ENG_ASSERT( m_SSBOs[ i ] );
@@ -240,86 +246,29 @@ int DeferredMainRenderer::OnRestoreSSBO( void )
 
    glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_TileFrustum ] );
       glBufferData( GL_SHADER_STORAGE_BUFFER, sizeof( tileFrustum ) * m_TileNum[ 0 ] * m_TileNum[ 1 ], NULL, GL_DYNAMIC_DRAW );
- //  glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
+
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_LightIndexCount ] );
+      glBufferData( GL_SHADER_STORAGE_BUFFER, sizeof( GLuint ), NULL, GL_DYNAMIC_DRAW );
+
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_LightIndexList ] );
+      glBufferData( GL_SHADER_STORAGE_BUFFER, sizeof( GLuint ) * AVERAGE_OVERLAP_LIGHTS_PER_TILE * m_TileNum[ 0 ] * m_TileNum[ 1 ], NULL, GL_DYNAMIC_DRAW );
+
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_LightIndexGrid ] );
+      glBufferData( GL_SHADER_STORAGE_BUFFER, sizeof( GLuint ) * 2 * m_TileNum[ 0 ] * m_TileNum[ 1 ], NULL, GL_DYNAMIC_DRAW );
 
    // Alignment checking
    ENG_ASSERT( sizeof( LightProperties ) % 16 == 0 );
-   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_VisibleLight ] );
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_LightProperties ] );
       glBufferData( GL_SHADER_STORAGE_BUFFER, sizeof( LightProperties ) * MAXIMUM_LIGHTS_SUPPORTED, NULL, GL_DYNAMIC_DRAW );
+
    glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
 
+
    OpenGLRenderManager::CheckError();
-   VSGLInfoLib::getBufferInfo( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_VisibleLight ] );
+   //VSGLInfoLib::getBufferInfo( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_LightProperties ] );
    return S_OK;
    }
 
-int DeferredMainRenderer::OnRestoreTileFrustum( void )
-   {
-   m_LightListShader.VOnRestore();
-   auto ddd = OpenGLRendererLoader::GenerateProgram( { m_LightListShader.VGetShaderObject() } );
-   m_LightListShader.VReleaseShader( ddd );
-
-   m_TileFrustumShader.VOnRestore();
-   auto program = OpenGLRendererLoader::GenerateProgram( { m_TileFrustumShader.VGetShaderObject() } );
-   m_TileFrustumShader.VReleaseShader( program );
-   glUseProgram( program );
-
-   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 0, m_SSBOs[ SSBO_TileFrustum ] );
-
-   auto tileSizeUni = glGetUniformLocation( program, "uTileSize" );
-   glUniform2ui( tileSizeUni, TILE_WIDTH, TILE_HEIGHT );
-
-   auto screenSize = g_pApp->GetScreenSize();
-   auto screenSizeUni = glGetUniformLocation( program, "uScreenSize" );
-   glUniform2ui( screenSizeUni, ( GLuint ) screenSize.x, ( GLuint ) screenSize.y );
-
-   auto pCamera = g_pApp->m_pEngineLogic->m_pWrold->GetCamera();
-   float halfSizeNearPlaneY = std::tan( pCamera->GetFrustum().m_FovY / 2.0 );
-   float halfSizeNearPlaneX = halfSizeNearPlaneY * pCamera->GetFrustum().m_Aspect;
-   auto halfSizeNearPlaneUni = glGetUniformLocation( program, "uHalfSizeNearPlane" );
-   glUniform2f( halfSizeNearPlaneUni, halfSizeNearPlaneX, halfSizeNearPlaneY );
-
-   auto proj = pCamera->GetProjection();
-   auto uProjUni = glGetUniformLocation( program, "uProj" );
-   glUniformMatrix4fv( uProjUni, 1, GL_FALSE, &proj[ 0 ][ 0 ] );
-
-   //auto invProj = proj.Inverse();
-   //auto invProjUni = glGetUniformLocation( program, "uInvProj" );
-   //glUniformMatrix4fv( invProjUni, 1, GL_FALSE, &invProj[ 0 ][ 0 ] );
-
-   OpenGLRenderManager::CheckError();
-   glDispatchCompute( m_TileNum[ 0 ], m_TileNum[ 1 ], 1u );
-   glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
-   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_TileFrustum ] );
-
-   GLfloat *ptr;
-   ptr = ( GLfloat * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );
-
-   //for( int i = 0; i < m_TileNum[ 0 ] * m_TileNum[ 1 ]; i++ )
-   //   {
-   //   for( int j = 0; j < 4; ++j )
-   //      {
-   //      if( i / m_TileNum[ 0 ] == 0 )
-   //            {
-   //            std::stringstream ss;
-   //            ss << "T: " << i << "P: " << j << ": "
-   //               << ptr[ i * 16 + j * 4 + 0 ] << ", "
-   //               << ptr[ i * 16 + j * 4 + 1 ] << ", "
-   //               << ptr[ i * 16 + j * 4 + 2 ] << ", "
-   //               << ptr[ i * 16 + j * 4 + 3 ] << std::endl;
-   //            ENG_LOG( "Test", ss.str() );
-   //            }
-   //      }
-
-   //   }
-   glDeleteProgram( program );
-
-   glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
-
-   glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
-   OpenGLRenderManager::CheckError();
-   return S_OK;
-   }
 
 int DeferredMainRenderer::OnRestoreTextures( void )
    {
@@ -338,7 +287,7 @@ int DeferredMainRenderer::OnRestoreTextures( void )
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-   
+
    // MRT 1
    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_AlbedoMetalness ] );
    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
@@ -359,72 +308,204 @@ int DeferredMainRenderer::OnRestoreTextures( void )
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE );
 
+   // Tile debugging
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_TileDebugging ] );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA16, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
+
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+
+   glBindTexture( GL_TEXTURE_2D, 0 );
    // glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_ShadowMapTextureObj, 0 );
+   OpenGLRenderManager::CheckError();
+   return S_OK;
+   }
+
+int DeferredMainRenderer::OnRestoreTileFrustum( void )
+   {
+   m_TileFrustumShader.VOnRestore();
+   auto program = OpenGLRendererLoader::GenerateProgram( { m_TileFrustumShader.GetShaderObject() } );
+   m_TileFrustumShader.VReleaseShader( program );
+   glUseProgram( program );
+
+   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 0, m_SSBOs[ SSBO_TileFrustum ] );
+
+   auto tileSizeUni = glGetUniformLocation( program, "uTileSize" );
+   glUniform2ui( tileSizeUni, TILE_WIDTH, TILE_HEIGHT );
+
+   auto screenSize = g_pApp->GetScreenSize();
+   auto screenSizeUni = glGetUniformLocation( program, "uScreenSize" );
+   glUniform2ui( screenSizeUni, ( GLuint ) screenSize.x, ( GLuint ) screenSize.y );
+
+   auto pCamera = g_pApp->m_pEngineLogic->m_pWrold->GetCamera();
+   float halfSizeNearPlaneY = std::tan( pCamera->GetFrustum().m_FovY / 2.0f );
+   float halfSizeNearPlaneX = halfSizeNearPlaneY * pCamera->GetFrustum().m_Aspect;
+   auto halfSizeNearPlaneUni = glGetUniformLocation( program, "uHalfSizeNearPlane" );
+   glUniform2f( halfSizeNearPlaneUni, halfSizeNearPlaneX, halfSizeNearPlaneY );
+
+   auto proj = pCamera->GetProjection();
+   auto uProjUni = glGetUniformLocation( program, "uProj" );
+   glUniformMatrix4fv( uProjUni, 1, GL_FALSE, &proj[ 0 ][ 0 ] );
+
+   //auto invProj = proj.Inverse();
+   //auto invProjUni = glGetUniformLocation( program, "uInvProj" );
+   //glUniformMatrix4fv( invProjUni, 1, GL_FALSE, &invProj[ 0 ][ 0 ] );
+
+   OpenGLRenderManager::CheckError();
+   glDispatchCompute( m_TileNum[ 0 ], m_TileNum[ 1 ], 1u );
+   glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_TileFrustum ] );
+
+   // GLfloat *ptr;
+   // ptr = ( GLfloat * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );
+
+   //for( int i = 0; i < m_TileNum[ 0 ] * m_TileNum[ 1 ]; i++ )
+   //   {
+   //   for( int j = 0; j < 4; ++j )
+   //      {
+   //      if( i / m_TileNum[ 0 ] == 0 )
+   //            {
+   //            std::stringstream ss;
+   //            ss << "T: " << i << "P: " << j << ": "
+   //               << ptr[ i * 16 + j * 4 + 0 ] << ", "
+   //               << ptr[ i * 16 + j * 4 + 1 ] << ", "
+   //               << ptr[ i * 16 + j * 4 + 2 ] << ", "
+   //               << ptr[ i * 16 + j * 4 + 3 ] << std::endl;
+   //            ENG_LOG( "Test", ss.str() );
+   //            }
+   //      }
+
+   //   }
+   // glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
+
+   glDeleteProgram( program );
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
    OpenGLRenderManager::CheckError();
    return S_OK;
    }
 
 int DeferredMainRenderer::OnRestoreGeometryPass( void )
    {
-   m_VertexShaders[ RenderPass_Geometry ].VOnRestore();
+   GenerateProgram( RenderPass_Geometry );
 
-   m_FragmentShaders[ RenderPass_Geometry ].VOnRestore();
-
-   m_Programs[ RenderPass_Geometry ] = OpenGLRendererLoader::GenerateProgram( { m_VertexShaders[ RenderPass_Geometry ].VGetShaderObject(), m_FragmentShaders[ RenderPass_Geometry ].VGetShaderObject() } );
- //  m_Programs[ RenderPass_Geometry ] = OpenGLRenderer::GenerateProgram( m_VertexShaders[ RenderPass_Geometry ].VGetShaderObject(), m_FragmentShaders[ RenderPass_Geometry ].VGetShaderObject() );
-
-   m_VertexShaders[ RenderPass_Geometry ].VReleaseShader( m_Programs[ RenderPass_Geometry ] );
-   m_FragmentShaders[ RenderPass_Geometry ].VReleaseShader( m_Programs[ RenderPass_Geometry ] );
-
-   glGenVertexArrays( 1, &m_VAOs[ RenderPass_Geometry ] );
-   glBindVertexArray( m_VAOs[ RenderPass_Geometry ] );
+ //  glGenVertexArrays( 1, &m_VAOs[ RenderPass_Geometry ] );
+ //  glBindVertexArray( m_VAOs[ RenderPass_Geometry ] );
 
    glGenFramebuffers( 1, &m_FBO[ RenderPass_Geometry ] );
    ENG_ASSERT( m_FBO[ RenderPass_Geometry ] );
    glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
 
   // glDrawBuffer( GL_NONE );
-    // Depth buffer
-    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
-    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_SST[ SST_Depth ], 0 );
-    
-   // glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_ShadowMapTextureObj, 0 );
+   // Depth buffer
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
+   glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_SST[ SST_Depth ], 0 );
 
-    
-    // MRT 0 
-    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalGlossiness ] );
-    glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_SST[ SST_NormalGlossiness ], 0 );
+   // MRT 0 
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalGlossiness ] );
+   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_SST[ SST_NormalGlossiness ], 0 );
 
-    // MRT 1
-    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_AlbedoMetalness ] );
-    glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_SST[ SST_AlbedoMetalness ], 0 );
+   // MRT 1
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_AlbedoMetalness ] );
+   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_SST[ SST_AlbedoMetalness ], 0 );
 
-    GLuint outputAttatchments[ ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, /*GL_COLOR_ATTACHMENT2*/ };
-    glDrawBuffers( 2, outputAttatchments );
-  //  glDrawBuffer( GL_NONE );
-    m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMVP" );
-    ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
+   GLuint outputAttatchments[ ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, /*GL_COLOR_ATTACHMENT2*/ };
+   glDrawBuffers( 2, outputAttatchments );
 
-    m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uNormal" );
-    ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] != -1 );
-    
-    m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_AlbedoTexture ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uAlbedoTex" );
-    ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_AlbedoTexture ] != -1 );
-
-    auto result = glCheckFramebufferStatus( GL_FRAMEBUFFER );
-    ENG_ASSERT( glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE && "Frame buffer error" );
-   
-    OpenGLRenderManager::CheckError();
-
-    glBindTexture( GL_TEXTURE_2D, 0 );
-   glUseProgram( 0 );
-   glBindVertexArray( 0 );
+   glBindTexture( GL_TEXTURE_2D, 0 );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
+  //  glDrawBuffer( GL_NONE );
+   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMVP" );
+   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
+
+   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uNormal" );
+   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] != -1 );
+    
+   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_AlbedoTexture ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uAlbedoTex" );
+   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_AlbedoTexture ] != -1 );
+
+   auto result = glCheckFramebufferStatus( GL_FRAMEBUFFER );
+   ENG_ASSERT( glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE && "Frame buffer error" );
+
+   glBindVertexArray( 0 );
+   OpenGLRenderManager::CheckError();
    return S_OK;
    }
 
-int DeferredMainRenderer::OnRestoreLightPass( void )
+int DeferredMainRenderer::OnRestourLightCullPass( void )
+   {
+   GenerateProgram( RenderPass_LightCulling );
+
+   glUseProgram( m_Programs[ RenderPass_LightCulling ] );
+
+   m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_DepthTex ] = glGetUniformLocation( m_Programs[ RenderPass_LightCulling ], "uDepthTex" );
+   glUniform1i( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_DepthTex ], 0 );
+
+   m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_Proj ] = glGetUniformLocation( m_Programs[ RenderPass_LightCulling ], "uProj" );
+   
+   m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_ScreenSize ] = glGetUniformLocation( m_Programs[ RenderPass_LightCulling ], "uScreenSize" );
+   auto screenSize = g_pApp->GetScreenSize();
+   glUniform2ui( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_ScreenSize ], screenSize.x, screenSize.y );
+
+   m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_DebugTex ] = glGetUniformLocation( m_Programs[ RenderPass_LightCulling ], "debugTex" );
+   glUniform1i( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_DebugTex ], 1 );
+   
+   glUseProgram( 0 );
+   OpenGLRenderManager::CheckError();
+   return S_OK;
+   }
+
+int DeferredMainRenderer::OnRestoreLightingPass( void )
    {
    return S_OK;
+   }
+
+void DeferredMainRenderer::LightCulling( Scene* pScene )
+   {
+   glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
+
+   glUseProgram( m_Programs[ RenderPass_LightCulling ] );
+
+   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 0, m_SSBOs[ SSBO_LightIndexCount ] );
+
+   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 1, m_SSBOs[ SSBO_LightIndexList ] );
+
+   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 2, m_SSBOs[ SSBO_LightIndexGrid ] );
+
+   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 3, m_SSBOs[ SSBO_LightProperties ] );
+
+   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 4, m_SSBOs[ SSBO_TileFrustum ] );
+
+   glActiveTexture( GL_TEXTURE0 );
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
+
+   auto projMat = pScene->GetCamera()->GetProjection();
+   glUniformMatrix4fv( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_Proj ], 1, GL_FALSE, &projMat[ 0 ][ 0 ] );
+
+   glActiveTexture( GL_TEXTURE1 );
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_TileDebugging ] );
+   glBindImageTexture( 1, m_SST[ SST_TileDebugging ], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16 );
+
+   glDispatchCompute( m_TileNum[ 0 ], m_TileNum[ 1 ], 1u );
+
+   glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_SHADER_STORAGE_BUFFER );
+
+   OpenGLRenderManager::CheckError();
+   }
+
+void DeferredMainRenderer::GenerateProgram( unsigned int renderPass )
+   {
+   for( auto shader : m_Shaders[ renderPass ] )
+      {
+      shader->VOnRestore();
+      }
+
+   m_Programs[ renderPass ] = OpenGLRendererLoader::GenerateProgram( m_Shaders[ renderPass ] );
+
+   for( auto shader : m_Shaders[ renderPass ] )
+      {
+      shader->VReleaseShader( m_Programs[ renderPass ] );
+      }
    }

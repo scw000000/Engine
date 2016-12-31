@@ -22,6 +22,7 @@ class OpenGLRenderManager : public IRenderManager
       virtual int VInit( void ) override;
       virtual int VOnRestore( void ) override;
       virtual int VPreRender( void ) override;
+      virtual int VPostRenderNodes( Scene* pScene ) override;
       virtual int VPostRender( void ) override;
       virtual void VShutDown( void ) override;
       virtual IMainRenderer& VGetMainRenderer( void ) override { return m_MainRenderer; };

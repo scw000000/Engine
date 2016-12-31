@@ -17,6 +17,7 @@
 #include "..\ResourceCache\TextureResource.h"
 #include "..\ResourceCache\MeshResource.h"
 
+
 void VertexToBoneMapping::AddBoneData( BoneId boneID, float boneWeight )
    {
    for( unsigned i = 0; i < MAXIMUM_BONES_PER_VEREX; i++ )
@@ -226,7 +227,6 @@ GLuint OpenGLRendererLoader::GenerateProgram( const std::vector< GLuint >& shder
    GLint result = GL_FALSE;
    GLuint program = glCreateProgram();
 
-
    result = glGetError();
    if( result != GL_NO_ERROR )
       {
@@ -238,6 +238,43 @@ GLuint OpenGLRendererLoader::GenerateProgram( const std::vector< GLuint >& shder
    for( auto obj : shderObjs )
       {
       glAttachShader( program, obj );
+      }
+
+   // glAttachShader( program, fragmentShader );
+   glLinkProgram( program );
+
+   // Check the program
+   glGetProgramiv( program, GL_LINK_STATUS, &result );
+   if( result == GL_FALSE )
+      {
+      int infoLogLength;
+      glGetProgramiv( program, GL_INFO_LOG_LENGTH, &infoLogLength );
+      GLchar* p_ErrMsg = ENG_NEW GLchar[ infoLogLength + 1 ];
+      glGetProgramInfoLog( program, infoLogLength, NULL, p_ErrMsg );
+      ENG_ERROR( p_ErrMsg );
+      SAFE_DELETE_ARRAY( p_ErrMsg );
+      glDeleteProgram( program );
+      return 0;
+      }
+   return program;
+   }
+
+ GLuint OpenGLRendererLoader::GenerateProgram( const std::vector< shared_ptr< OpenGLShader > >& shderObjs )
+   {
+   GLint result = GL_FALSE;
+   GLuint program = glCreateProgram();
+
+   result = glGetError();
+   if( result != GL_NO_ERROR )
+      {
+      ENG_ASSERT( 0 && "Program create failed " );
+      return 0;
+      }
+
+   // Link the program
+   for( auto obj : shderObjs )
+      {
+      glAttachShader( program, obj->GetShaderObject() );
       }
 
    // glAttachShader( program, fragmentShader );

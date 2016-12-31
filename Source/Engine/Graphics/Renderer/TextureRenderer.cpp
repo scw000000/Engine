@@ -65,7 +65,7 @@ int TextureRenderer::VOnRestore( void )
    m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
 
-   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() } );
+   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.GetShaderObject(), m_FragmentShader.GetShaderObject() } );
 
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );

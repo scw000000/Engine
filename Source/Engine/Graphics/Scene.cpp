@@ -85,6 +85,7 @@ int Scene::OnRender( void )
 			m_pRoot->VPostRender( this );
 		   }
 		RenderAlphaPass();
+      m_pRenderManager->VPostRenderNodes( this );
 	   }
 	return S_OK;
    }

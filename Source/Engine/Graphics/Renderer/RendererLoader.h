@@ -11,6 +11,7 @@
  *
  * \note
 */
+#include "..\Shaders.h"
 
 struct VertexToBoneMapping
    {
@@ -35,4 +36,5 @@ class OpenGLRendererLoader
       static void LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMeshResHandle );
       static void CompileAndLoadShader( GLuint& shaderObj, const Resource& shaderRes, GLuint shaderType );
       static GLuint GenerateProgram( const std::vector< GLuint >& shderObjs );
+      static GLuint GenerateProgram( const std::vector< shared_ptr< OpenGLShader > >& shderObjs );
    };

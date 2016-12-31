@@ -59,7 +59,7 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
 
-   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() } );
+   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.GetShaderObject(), m_FragmentShader.GetShaderObject() } );
   // m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
 
    m_VertexShader.VReleaseShader( m_Program );

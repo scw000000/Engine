@@ -262,6 +262,7 @@ class IRenderManager
       virtual int VInit( void ) = 0;
       virtual int VOnRestore( void ) = 0;
       virtual int VPreRender( void ) = 0;
+      virtual int VPostRenderNodes( Scene* pScene ) = 0;
       virtual int VPostRender( void ) = 0;
       virtual void VShutDown( void ) = 0;
       virtual IMainRenderer& VGetMainRenderer( void ) = 0;

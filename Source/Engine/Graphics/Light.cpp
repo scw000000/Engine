@@ -21,7 +21,7 @@
 LightProperties::LightProperties( void )
    {
    m_Type = LIGHT_TYPE_UNDEFINED;
-   m_Enabled = 0u;
+   m_Enabled = 1u;
    }
 
 bool LightProperties::Init( TiXmlElement* pData )

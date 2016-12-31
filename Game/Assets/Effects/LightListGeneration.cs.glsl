@@ -152,6 +152,9 @@ void main()
        
     barrier();
     // set min max depth and far near plane
+    float fminDepth;
+    fdepth = uintBitsToFloat( sMaxDepthU );
+    fminDepth = uintBitsToFloat( sMinDepthU );
     if( gl_LocalInvocationIndex == 0 )
         {
         // to NDC space
@@ -231,7 +234,14 @@ void main()
       //      imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 0.0, 0.0, 1.0 ) );
           
       //      }  
-      imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( fdepth, fdepth, fdepth, 1.0 ) );
+    //  imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
+            
+    //    if( fdepth != fminDepth )
+    //       {
+    //        imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 1.0, 1.0, 1.0 ) );
+            
+      //      }
+    //  imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( fdepth, fdepth, fdepth, 1.0 ) );
             
       
       //  imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( vec3( gl_WorkGroupID.xyz ) / vec3( gl_NumWorkGroups.xyz ), 1.0 ) );

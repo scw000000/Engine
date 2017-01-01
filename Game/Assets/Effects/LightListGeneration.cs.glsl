@@ -60,10 +60,11 @@ layout ( std430, binding = 4 ) readonly buffer tileFrustumSSBO
     TileFrustum data[];
     }TileFrustumSSBO;
  
-uniform sampler2D  uDepthTex;
-uniform mat4       uProj;
-uniform uvec2      uScreenSize;
-uniform uint       uInvokePerGroup = TILE_SIZE * TILE_SIZE;
+uniform sampler2D   uDepthTex;
+uniform mat4        uProj;
+uniform uvec2       uScreenSize;
+uniform uint        uInvokePerGroup = TILE_SIZE * TILE_SIZE;
+uniform uint        uValidLightNum;
 
 shared uint sTileIndex;
 shared uint sGlobalIdxListLength;

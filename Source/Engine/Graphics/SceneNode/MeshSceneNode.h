@@ -13,8 +13,9 @@
  * \note
  */
 #include "SceneNodes.h"
-#include "Shaders.h"
+#include "..\Shaders.h"
 
+class DeferredMainRenderer;
 
 class MeshSceneNode : public SceneNode
    {
@@ -23,7 +24,7 @@ class MeshSceneNode : public SceneNode
                      IRenderComponent* pRenderComponent,
                      shared_ptr<Resource> pMeshResouce, 
                      MaterialPtr pMaterial, 
-                     RenderPass renderPass,  
+                     RenderGroup renderGroup,
                      TransformPtr pTransform );
       ~MeshSceneNode( void );
 	   virtual int VOnRestore( Scene *pScene ) override;
@@ -39,6 +40,7 @@ class MeshSceneNode : public SceneNode
 	    */
 	    virtual int VRender( Scene *pScene )  override;
       GLuint GetProgram( void ) { return m_Program; };
+      virtual ShadowVertexInfo VGetShadowVertexInfo( void ) const override;
 
    protected:
       void ReleaseResource( void );
@@ -50,7 +52,7 @@ class MeshSceneNode : public SceneNode
       VertexShader		m_VertexShader;
       FragmentShader		m_FragmentShader;
 
-      GLuint            m_VertexArrayObj;
+      GLuint            m_VAO;
 
       enum VB_TYPES
          {
@@ -71,9 +73,12 @@ class MeshSceneNode : public SceneNode
       GLuint            m_LightPosWorldSpaceUni;
       GLuint            m_LigthDirectionUni;
       GLuint            m_LightColorUni;
-      GLuint            m_LightPowerUni;
+    //  GLuint            m_LightPowerUni;
       GLuint            m_LightAmbientUni;
       GLuint            m_LightNumberUni;
+
+      GLuint            m_ShadowMapMatrixUni;
+      GLuint            m_ShadowMapTextureUni[ MAXIMUM_SHADOWMAP_TEXTURE_SUPPORTED ];
 
       GLuint            m_EyePosWorldSpaceUni;
 
@@ -82,4 +87,6 @@ class MeshSceneNode : public SceneNode
       GLuint            m_MaterialSpecularUni;
 
       unsigned long     m_VerticesIndexCount;
+
+      DeferredMainRenderer *m_pDeferredMainRenderer;
    };

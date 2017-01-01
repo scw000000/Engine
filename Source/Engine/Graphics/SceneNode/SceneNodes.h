@@ -19,7 +19,6 @@
 
 class RenderComponent;
 
-
 //   This enum defines the different types of alpha blending
 //   types that can be set on a scene node.
 enum AlphaType {
@@ -29,10 +28,33 @@ enum AlphaType {
    AlphaVertex
    };
 
-// TODO: implement rest graphic class such as material, alpha, render component.... 
+
+struct ShadowVertexInfo
+   {
+   public:
+      ShadowVertexInfo( void )
+         {
+         m_Vertexbuffer = 0;
+         m_IndexBuffer = 0;
+         m_NormalBuffer = 0;
+         m_UVBuffer = 0;
+         m_TextureObj = 0;
+         m_VertexCount = 0;
+         }
+
+   public:
+      GLuint m_Vertexbuffer;
+      GLuint m_IndexBuffer;
+      GLuint m_NormalBuffer;
+      GLuint m_UVBuffer;
+      GLuint m_TextureObj;
+      unsigned int m_VertexCount;
+   };
+
 class SceneNodeProperties
    {
    friend class SceneNode;
+   friend class DirectionalLightNode;
    public:
       SceneNodeProperties( void );
 
@@ -41,47 +63,45 @@ class SceneNodeProperties
       Mat4x4 GetFromWorld( void ) const { return m_pTransform->GetFromWorld(); }
       TransformPtr GetTransformPtr( void ) const;
 
-      /**
-       * @brief If you don't want to the change value of transform, call it instead of GetTransformPtr 
-       *
-       * @param   void
-       * @return const Transform&
-       */
-      const Transform& GetTransform( void ) const;
-      Transform GetTransform( void );
+      Transform GetLocalTransform( void ) const;
 
       const char* Name( void ) const { return m_Name.c_str(); }
 
       void SetAlpha( const float alpha );
       float GetAlpha( void ) const;
 
-      RenderPass GetRenderPass( void ) const { return m_RenderPass; }
+      RenderGroup GetRenderGroup( void ) const { return m_RenderGroup; }
       float GetRadius( void ) const { return m_Radius; }
       
-      MaterialPtr GetMaterialPtr( void ) { return m_pMaterial; }
+      MaterialPtr GetMaterialPtr( void ) const { return m_pMaterial; }
       void SetMaterialPtr( MaterialPtr pMaterial ) { pMaterial = m_pMaterial; }
+
+      bool GetEnableShadow( void ) const { return m_EnableShadow; }
+      void SetEnableShadow( bool isEnabled ) { m_EnableShadow = isEnabled; }
 
    protected:
       ActorId m_ActorId;
-      std::string m_Name;
       TransformPtr m_pTransform;
+      TransformPtr m_pGlobalTransform;
       float m_Radius;
-      RenderPass m_RenderPass;
       MaterialPtr m_pMaterial;
+      std::string m_Name;
+      RenderGroup m_RenderGroup;
+      bool m_EnableShadow;
 
    private:
 
    };
 
-typedef std::vector< std::shared_ptr< ISceneNode > > SceneNodeList;
+
 
 class SceneNode : public ISceneNode
    {
 	friend class Scene;
-   
+   friend class LightManager;
+
    public:
-      // TODO: finish constructor
-   SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderPass renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ), MaterialPtr pMaterial = MaterialPtr() );
+      SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderGroup renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ), MaterialPtr pMaterial = MaterialPtr() );
 
 	   virtual ~SceneNode();
 
@@ -93,14 +113,20 @@ class SceneNode : public ISceneNode
 	    * @return SceneNodeProperties&
 	    */
       virtual SceneNodeProperties& VGetProperties() override { 
-        return const_cast< SceneNodeProperties& >(static_cast< const SceneNode* >(this)->VGetProperties() );
+         return const_cast< SceneNodeProperties& >(static_cast< const SceneNode* >(this)->VGetProperties() );
          }
 
 	   virtual void VSetTransformPtr( TransformPtr pNewTransform ) override;
       virtual void VSetTransform( const Transform& newTransform ) override;
 
+      virtual TransformPtr VGetGlobalTransformPtr( void ) const override;
+
 	   virtual int VOnRestore( Scene *pScene ) override;
+
+      virtual int VPreUpdate( Scene *pScene ) override;
+
       virtual int VOnUpdate( Scene *pScene, unsigned long elapsedMs ) override;
+      virtual int VDelegateUpdate( Scene *pScene, unsigned long elapsedMs ) override { return S_OK; };
 
 	   virtual int VPreRender( Scene *pScene ) override;
 	   virtual bool VIsVisible( Scene *pScene ) override;
@@ -108,7 +134,7 @@ class SceneNode : public ISceneNode
 	   virtual int VRenderChildren( Scene *pScene ) override;
 	   virtual int VPostRender( Scene *pScene ) override;
 
-	   virtual bool VAddChild( shared_ptr<ISceneNode> child ) override;
+      virtual bool VAddChild( shared_ptr< ISceneNode > child ) override;
 	   virtual bool VRemoveChild( ActorId id ) override;
 	   virtual int VOnLostDevice( Scene *pScene ) override;
 	   //virtual int VPick(Scene *pScene, RayCast *pRayCast);
@@ -123,14 +149,14 @@ class SceneNode : public ISceneNode
 
       Vec3 GetForward( void ) const { return m_Props.m_pTransform->GetForward(); }
 
-      virtual Vec3 VGetWorldPosition( void ) const override final;
+      virtual Vec3 VGetGlobalPosition( void ) const override final;
 
 	   void SetRadius( float radius ) { m_Props.m_Radius = radius; }
 
       virtual void VSetParentNode( ISceneNode* pParent ) override { m_pParent = pParent; }
       virtual ISceneNode* VGetParentNode( void ) override { return m_pParent; };
-
-	   /*void SetMaterial( const Material& mat ) { m_Props.m_Material = mat; }*/
+      virtual SceneNodeList& VGetChildrenSceneNodes( void ) override { return m_Children; };
+      virtual ShadowVertexInfo VGetShadowVertexInfo( void ) const override { return ShadowVertexInfo(); };
 
    protected:
 	   SceneNodeList			m_Children;
@@ -144,7 +170,7 @@ class SceneNode : public ISceneNode
 struct AlphaSceneNode
    {
 	shared_ptr<ISceneNode> m_pNode;
-	Transform m_Concat;
+	Transform m_GlobalToWorld;
 	float m_ScreenZ;
 
 	// For the STL sort...
@@ -169,22 +195,22 @@ class RootNode : public SceneNode
 class CameraNode : public SceneNode
    {
    public:
-	   CameraNode( TransformPtr pTransform, Frustum const &frustum );
-      CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, Frustum const &frustum );
+	   CameraNode( TransformPtr pTransform, PerspectiveFrustum const &frustum );
+      CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, PerspectiveFrustum const &frustum );
 
 	   virtual int VRender( Scene *pScene ) override;
 	   virtual int VOnRestore( Scene *pScene ) override;
 	   virtual bool VIsVisible( Scene *pScene ) const { return m_IsActive; }
       virtual void VSetTransform( const Transform& newTransform ) override ;
 
-	   const Frustum &GetFrustum( void ) { return m_Frustum; }
-	   void SetTarget(shared_ptr<SceneNode> pTarget) { m_pTarget = pTarget; }
+	   const PerspectiveFrustum &GetFrustum( void ) { return m_Frustum; }
+	   void SetTarget( shared_ptr<SceneNode> pTarget ) { m_pTarget = pTarget; }
 	   void ClearTarget( void ) { m_pTarget = shared_ptr<SceneNode>(); }
 	   
       shared_ptr<SceneNode> GetTarget( void ) { return m_pTarget; }
 
-	   Mat4x4 GetWorldViewProjection(Scene *pScene);
-	   int SetViewTransform(Scene *pScene);
+	  // Mat4x4 GetWorldViewProjection( Scene *pScene );
+	   int SetViewTransform( Scene *pScene );
 
 	   Mat4x4 GetProjection() { return m_Projection; }
 	   Mat4x4 GetView( void ) { return m_View; }
@@ -200,7 +226,7 @@ class CameraNode : public SceneNode
        void GetScreenProjectPoint( Vec3& start, Vec3& end, const Point& screenPosition, float distance );
 
    protected:
-	   Frustum			m_Frustum;
+	   PerspectiveFrustum			m_Frustum;
       Mat4x4			m_Projection;
 	   Mat4x4			m_View;
 	   bool			m_IsActive;

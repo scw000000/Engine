@@ -13,7 +13,7 @@
  * \note
  */
 #include "RenderComponent.h"
-#include "..\Graphics\SceneNodes.h"
+#include "..\Graphics\SceneNode\SceneNodes.h"
 
 #pragma warning( push )
 #pragma warning( disable : 4250 )

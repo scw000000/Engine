@@ -14,7 +14,8 @@ x
 */
 #include "EngineStd.h"
 #include "VolumeRenderSceneNode.h"
-#include "Material.h"
+#include "..\Graphics\Renderer\RendererLoader.h"
+#include "..\Material.h"
 
 const char* const FIRST_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\VolumeRenderingFirstPass.vertexshader";
 const char* const FIRST_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\VolumeRenderingFirstPass.fragmentshader";
@@ -48,19 +49,19 @@ const Vec3 VolumeRenderSceneNode::s_BackFacePosition[] = {// Front face
 
 VolumeRenderSceneNode::VolumeRenderSceneNode( const ActorId actorId,
                                               IRenderComponent* pRenderComponent,
-                                              RenderPass renderPass,
+                                              RenderGroup renderGroup,
                                               TransformPtr pTransform,
                                               shared_ptr<Resource> pVolumeTextureResource,
                                               shared_ptr<Resource> pTransferFunctionResource,
                                               const Vec3& textureDiemension,
                                               const Vec3& cuboidDimension )
-                                              : SceneNode( actorId, pRenderComponent, renderPass, pTransform, shared_ptr< Material >( ENG_NEW Material() ) ),
+                                              : SceneNode( actorId, pRenderComponent, renderGroup, pTransform, shared_ptr< Material >( ENG_NEW Material() ) ),
                                               m_FirstPassVertexShader( Resource ( FIRST_PASS_VERTEX_SHADER_FILE_NAME ) ),
                                               m_FirstPassFragmentShader( Resource( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ) ),
                                               m_SecondPassVertexShader( Resource( SECOND_PASS_VERTEX_SHADER_FILE_NAME ) ),
                                               m_SecondPassFragmentShader( Resource( SECOND_PASS_FRAGMENT_SHADER_FILE_NAME ))
    {
-   m_Props.SetAlpha( 0.1f );
+   SetAlpha( 0.1f );
 
    m_pVolumeTextureResource = pVolumeTextureResource;
    m_pTransferFuncionResource = pTransferFunctionResource;
@@ -117,7 +118,7 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    m_FirstPassVertexShader.VOnRestore();
    m_FirstPassFragmentShader.VOnRestore();
 
-   m_FirstPassProgram = OpenGLRenderer::GenerateProgram( m_FirstPassVertexShader.VGetShaderObject(), m_FirstPassFragmentShader.VGetShaderObject() );
+   m_FirstPassProgram = OpenGLRendererLoader::GenerateProgram( { m_FirstPassVertexShader.GetShaderObject(), m_FirstPassFragmentShader.GetShaderObject() } );
 
    m_FirstPassVertexShader.VReleaseShader( m_FirstPassProgram );
    m_FirstPassFragmentShader.VReleaseShader( m_FirstPassProgram );
@@ -164,7 +165,8 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    m_SecondPassVertexShader.VOnRestore();
    m_SecondPassFragmentShader.VOnRestore();
 
-   m_SecondPassProgram = OpenGLRenderer::GenerateProgram( m_SecondPassVertexShader.VGetShaderObject(), m_SecondPassFragmentShader.VGetShaderObject() );
+   m_SecondPassProgram = OpenGLRendererLoader::GenerateProgram( { m_SecondPassVertexShader.GetShaderObject(), m_SecondPassFragmentShader.GetShaderObject() } );
+   //m_SecondPassProgram = OpenGLRenderer::GenerateProgram( m_SecondPassVertexShader.VGetShaderObject(), m_SecondPassFragmentShader.VGetShaderObject() );
 
    m_SecondPassVertexShader.VReleaseShader( m_SecondPassProgram );
    m_SecondPassFragmentShader.VReleaseShader( m_SecondPassProgram );
@@ -178,7 +180,6 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_REPEAT );
    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT );
    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT );
-   // pixel transfer happens here from client to OpenGL server
    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
    auto volumeTextureResHandle = g_pApp->m_pResCache->GetHandle( *m_pVolumeTextureResource );
    auto pRawBuffer = volumeTextureResHandle->GetBuffer();
@@ -220,46 +221,25 @@ int VolumeRenderSceneNode::VRender( Scene *pScene )
    auto screenSize = g_pApp->GetScreenSize();
    glEnable( GL_CULL_FACE );
    glCullFace( GL_FRONT );
-   // Use our shader
+
    glBindVertexArray( m_VAO );
    glBindFramebuffer( GL_DRAW_FRAMEBUFFER, m_FrameBufferObj );
    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
    glUseProgram( m_FirstPassProgram );
    
+   Mat4x4 globalToWorld = VGetGlobalTransformPtr()->GetToWorld();
+
    // Get the projection & view matrix from the camera class
-   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
+   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * globalToWorld;
+
    glUniformMatrix4fv( m_FirstPassMVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
    glDrawElements(
-      GL_TRIANGLES,     // mode
-      36,               // count
-      GL_UNSIGNED_INT,  // type
-      ( void* ) 0       // element array buffer offset
+      GL_TRIANGLES,     
+      36,
+      GL_UNSIGNED_INT,  
+      ( void* ) 0       
       );
-/*
-   glUniformMatrix4fv( m_ToWorldMatrix, 1, GL_FALSE, &pScene->GetTopMatrix()[ 0 ][ 0 ] );
 
-   auto pLightManager = pScene->GetLightManagerPtr();
-
-   glUniform3fv( m_LightPosWorldSpace, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPosWorldSpace() );
-   glUniform3fv( m_LigthDirection, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightDirection() );
-   glUniform3fv( m_LightColor, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor() );
-   glUniform1fv( m_LightPower, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower() );
-   glUniform3fv( m_LightAmbient, 1, ( const GLfloat* ) pLightManager->GetLightAmbient() );
-   glUniform1i( m_LightNumber, pLightManager->GetActiveLightCount() );
-
-
-   glUniform3fv( m_EyeDirWorldSpace, 1, ( const GLfloat* ) &pScene->GetCamera()->GetForward() );
-
-   glUniform4fv( m_MaterialDiffuse, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse() );
-   glUniform3fv( m_MaterialAmbient, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient() );*/
-
-   // Bind our texture in Texture Unit 0
-   /*glActiveTexture( GL_TEXTURE0 );
-   glBindTexture( GL_TEXTURE_2D, m_Texture );*/
-   // Set our "myTextureSampler" sampler to user Texture Unit 0
-   /*glUniform1i( m_TextureUni, 0 );*/
-   
-  // 
    glCullFace( GL_BACK );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
@@ -353,14 +333,11 @@ void VolumeRenderSceneNode::SetUpFrameBuffer( void )
    ENG_ASSERT( m_FrameBufferObj );
 
    glBindFramebuffer( GL_FRAMEBUFFER, m_FrameBufferObj );
+   // Set up rendering target
    glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_RenderedTextureObj, 0 );
    glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_RenderDepthBufferObj );
    
-   GLenum result = glCheckFramebufferStatus( GL_FRAMEBUFFER );
-   if( result != GL_FRAMEBUFFER_COMPLETE )
-      {
-      ENG_ERROR( "Frame buffer setup failed" );
-      }
+   ENG_ASSERT( glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE && "Frame buffer error" );
    }
 
 void VolumeRenderSceneNode::SetUpNormalVolume( std::vector< Vec3 >& output, const char* pRawTexture )

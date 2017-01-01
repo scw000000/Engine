@@ -22,14 +22,14 @@ ScriptResourceLoader::ScriptResourceLoader( void ) : ResourceLoader( std::vector
    
    }
 
-bool ScriptResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle )
+int ScriptResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle )
    {
    if( rawSize <= 0 )
       {
-      return false;
+      return S_FALSE;
       }
 
    LuaStateManager::GetSingleton().VExecuteString( rawBuffer );
      
-   return true;
+   return S_OK;
    }

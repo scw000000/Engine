@@ -15,18 +15,18 @@
 #include "EngineStd.h"
 #include "SkySceneNode.h"
 #include "..\ResourceCache\TextureResource.h"
-#include "OpenGLRenderer.h"
+#include "..\Renderer\RendererLoader.h"
 #include "..\ResourceCache\MeshResource.h"
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureVertexShader.vertexshader";
-const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureFragmentShader.fragmentshader";
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\TextureShader.vs.glsl";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\TextureShader.fs.glsl";
 
 SkySceneNode::SkySceneNode( 
-   const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResource, shared_ptr<Resource> ptextureResource, RenderPass renderPass, TransformPtr pTransform )
-   : SceneNode( actorId, pRenderComponent, renderPass, pTransform ),
+   const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResource, shared_ptr<Resource> ptextureResource, RenderGroup renderGroup, TransformPtr pTransform )
+   : SceneNode( actorId, pRenderComponent, renderGroup, pTransform ),
    m_pMeshResource( pMeshResource ),
    m_pTextureResource( ptextureResource ),
    m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
@@ -59,20 +59,21 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
 
-   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
+   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.GetShaderObject(), m_FragmentShader.GetShaderObject() } );
+  // m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
 
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );
 
 
-   OpenGLRenderer::LoadTexture2D( &m_Texture, *m_pTextureResource );
+   OpenGLRendererLoader::LoadTexture2D( &m_Texture, *m_pTextureResource );
    
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
    m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
 
-   OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], NULL, pMeshResHandle );
+   OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], NULL, pMeshResHandle );
 
    // 1rst attribute buffer : vertices
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
@@ -101,10 +102,12 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    m_MVPMatrix          = glGetUniformLocation( m_Program, "MVP" );
    m_TextureUni         = glGetUniformLocation( m_Program, "myTextureSampler" );
 
-   // restore all of its children
-	SceneNode::VOnRestore( pScene );
+   // Reset projection matrix 
+   auto& cameraFrustum = pScene->GetCamera()->GetFrustum();
+   m_Projection.BuildProjection( cameraFrustum.m_FovY, cameraFrustum.m_Aspect, cameraFrustum.m_NearDis, 1000.0f );
 
-	return S_OK;
+   // restore all of its children
+	return SceneNode::VOnRestore( pScene );
    }
 
 int SkySceneNode::VRender( Scene *pScene )
@@ -113,12 +116,16 @@ int SkySceneNode::VRender( Scene *pScene )
 	glUseProgram( m_Program );
    glBindVertexArray( m_VertexArrayObj );
 
+   Mat4x4 globalToWorld = VGetGlobalTransformPtr()->GetToWorld();
    // Get the projection & view matrix from the camera class
-	Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
+   
+   //Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * globalToWorld;
+   Mat4x4 mvp = m_Projection * pScene->GetCamera()->GetView() * globalToWorld;
+
 	// Send our transformation to the currently bound shader, 
 	// in the "MVP" uniform
    // 1-> how many matrix, GL_FALSE->should transpose or not
-	glUniformMatrix4fv( m_MVPMatrix, 1, GL_FALSE, &mWorldViewProjection[0][0]);
+	glUniformMatrix4fv( m_MVPMatrix, 1, GL_FALSE, &mvp[0][0]);
   
 	// Bind our texture in Texture Unit 0
 	glActiveTexture( GL_TEXTURE0 );

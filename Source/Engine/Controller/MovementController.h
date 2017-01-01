@@ -13,7 +13,7 @@
  * \note
  */
 
-#include "..\Graphics\SceneNodes.h"
+#include "..\Graphics\SceneNode\SceneNodes.h"
 
 class MovementController : public IController
    {

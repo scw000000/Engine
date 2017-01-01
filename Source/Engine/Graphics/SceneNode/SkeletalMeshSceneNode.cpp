@@ -16,7 +16,7 @@
 #include "SkeletalMeshSceneNode.h"
 #include "..\ResourceCache\MeshResource.h"
 #include "..\ResourceCache\TextureResource.h"
-#include "OpenGLRenderer.h"
+#include "..\Renderer\RendererLoader.h"
 #include "..\ResourceCache\ScriptResource.h"
 #include "..\LuaScripting\LuaStateManager.h"
 #include "..\Animation\AnimationState.h"
@@ -28,8 +28,8 @@
 #define BONE_ID_LOCATION    3
 #define BONE_WEIGHT_LOCATION    4
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\SKMeshFragmentShader.vertexshader";
-const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\SKMeshFragmentShader.fragmentshader";
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\SKMeshShader.vs.glsl";
+const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\SKMeshShader.fs.glsl";
 
 Vec3 aiVector3DToVec3( const aiVector3D& aiVector )
    {
@@ -43,7 +43,7 @@ Quaternion aiQuateronionToQuat( const aiQuaternion& aiQuat )
 
 
 SkeletalMeshSceneNode::SkeletalMeshSceneNode(
-   const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, shared_ptr<Resource> pAnimScriptResource, MaterialPtr pMaterial, RenderPass renderPass, TransformPtr pTransform )
+   const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, shared_ptr<Resource> pAnimScriptResource, MaterialPtr pMaterial, RenderGroup renderPass, TransformPtr pTransform )
    : SceneNode( actorId, pRenderComponent, renderPass, pTransform, pMaterial ),
    m_pMeshResource( pMeshResouce ),
    m_pAnimScriptResource( pAnimScriptResource ),
@@ -55,22 +55,22 @@ SkeletalMeshSceneNode::SkeletalMeshSceneNode(
 
    ENG_ZERO_MEM( m_Buffers );
 
-   m_BoneTransformUni = 0;
-   m_MVPUni = 0;
+   m_BoneTransformUni = -1;
+   m_MVPUni = -1;
    m_MeshTextureObj = 0;
-   m_NeshTextureUni = 0;
-   m_VertexArrayObj = 0;
+   m_NeshTextureUni = -1;
+   m_VertexArrayObj = -1;
 
-   m_MUni = 0;
-   m_LightPosWorldSpaceUni = 0;
-   m_LigthDirWorldSpaceUni = 0;
-   m_LightColorUni = 0;
-   m_LightPowerUni = 0;
-   m_LightNumberUni = 0;
-   m_EyePosWorldSpaceUni = 0;
-   m_MaterialAmbientUni = 0;
-   m_MaterialDiffuseUni = 0;
-   m_MaterialSpecularUni = 0;
+   m_MUni = -1;
+   m_LightPosWorldSpaceUni = -1;
+   m_LigthDirWorldSpaceUni = -1;
+   m_LightColorUni = -1;
+   m_LightPowerUni = -1;
+   m_LightNumberUni = -1;
+   m_EyePosWorldSpaceUni = -1;
+   m_MaterialAmbientUni = -1;
+   m_MaterialDiffuseUni = -1;
+   m_MaterialSpecularUni = -1;
 
    m_VerticesIndexCount = 0;
    }
@@ -91,12 +91,13 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
 
-   m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
+   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.GetShaderObject(), m_FragmentShader.GetShaderObject() } );
+  // m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
 
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );
 
-   OpenGLRenderer::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
+   OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
 
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
@@ -104,8 +105,8 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
    SetRadius( pMeshExtra->m_Radius );
 
-   OpenGLRenderer::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
-   OpenGLRenderer::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
+   OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
+   OpenGLRendererLoader::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
 
    shared_ptr<ResHandle> pScriptResHandle = g_pApp->m_pResCache->GetHandle( *m_pAnimScriptResource );
    if( pScriptResHandle )
@@ -165,7 +166,7 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       BONE_ID_LOCATION, 
       MAXIMUM_BONES_PER_VEREX,
       GL_UNSIGNED_INT, 
-      sizeof( OpenGLRenderer::VertexToBoneMapping ), 
+      sizeof( VertexToBoneMapping ), 
       ( const GLvoid* ) 0 );
 
    glEnableVertexAttribArray( BONE_WEIGHT_LOCATION );
@@ -173,7 +174,7 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       BONE_WEIGHT_LOCATION, 
       MAXIMUM_BONES_PER_VEREX,
       GL_FLOAT, GL_FALSE, 
-      sizeof( OpenGLRenderer::VertexToBoneMapping ), 
+      sizeof( VertexToBoneMapping ), 
       ( const GLvoid* ) ( sizeof( unsigned int ) * MAXIMUM_BONES_PER_VEREX ) );
 
    m_MVPUni = glGetUniformLocation( m_Program, "uMVP" );
@@ -206,14 +207,16 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
    glUseProgram( m_Program );
    glBindVertexArray( m_VertexArrayObj );
 
+   Mat4x4 globalToWorld = VGetGlobalTransformPtr()->GetToWorld();
+
    // Get the projection & view matrix from the camera class
-   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetWorldViewProjection( pScene );
+   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * globalToWorld;
    // Send our transformation to the currently bound shader, 
    // in the "MVP" uniform
    // 1-> how many matrix, GL_FALSE->should transpose or not
    glUniformMatrix4fv( m_MVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
 
-   glUniformMatrix4fv( m_MUni, 1, GL_FALSE, &pScene->GetTopMatrix()[ 0 ][ 0 ] );
+   glUniformMatrix4fv( m_MUni, 1, GL_FALSE, &( globalToWorld[ 0 ][ 0 ] ) );
 
    auto pLightManager = pScene->GetLightManagerPtr();
 
@@ -222,7 +225,6 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
    glUniform3fv( m_LightColorUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor() );
    glUniform1fv( m_LightPowerUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower() );
    glUniform1i( m_LightNumberUni, pLightManager->GetActiveLightCount() );
-
 
    glUniform3fv( m_EyePosWorldSpaceUni, 1, ( const GLfloat* ) &pScene->GetCamera()->GetToWorldPosition() );
 

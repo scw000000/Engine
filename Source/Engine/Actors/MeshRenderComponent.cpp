@@ -14,7 +14,7 @@
 
 #include "EngineStd.h"
 #include "MeshRenderComponent.h"
-#include "..\Graphics\MeshSceneNode.h"
+#include "..\Graphics\SceneNode\MeshSceneNode.h"
 #include "..\Physics\PhysicsAttributes.h"
 #include "..\ResourceCache\MeshResource.h"
 
@@ -36,7 +36,7 @@ MeshRenderComponent::MeshRenderComponent( void ) : m_pMeshResource( ENG_NEW Reso
 // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
 shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
    {
-   shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), this, m_pMeshResource, m_pMaterial, RenderPass::RenderPass_Actor, m_pTransform ) );
+   shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), this, m_pMeshResource, m_pMaterial, RenderGroup::RenderGroup_Actor, m_pTransform ) );
    //// get the transform component
    //shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
    //if ( !pTransformComponent )

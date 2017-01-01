@@ -33,16 +33,16 @@ void LevelManager::Init(void)
    pCurrentLevelRes.reset( ENG_NEW Resource( currentLevel[0] ) );
    }
 
-BaseEngineLogic::BaseEngineLogic( shared_ptr<IRenderer> pRenderer ) : m_pGUIManager( ENG_NEW GUIManager )
+BaseEngineLogic::BaseEngineLogic( shared_ptr< IRenderManager > pRenderManager ) : m_pGUIManager( ENG_NEW GUIManager )
    {
    m_Lifetime = 0.f;
    m_LastActorId = 0;
    m_HasStarted = false;
 	m_pProcessManager = ENG_NEW ProcessManager;
-   if( pRenderer )
+   if( pRenderManager )
       {
-      m_pWrold.reset( ENG_NEW Scene( pRenderer ) );
-      m_pRenderer = pRenderer;
+      m_pWrold.reset( ENG_NEW Scene( pRenderManager ) );
+      m_pRenderManager = pRenderManager;
       }
    m_pActorFactory = ENG_NEW ActorFactory;
    m_pLevelManager = ENG_NEW LevelManager;
@@ -77,16 +77,17 @@ bool BaseEngineLogic::Init()
    IGamePhysics::GetSingleton().VInitialize();
    m_pLevelManager->Init();
    m_pWrold->OnRestore();
+   m_pGUIManager->Init( g_pApp->m_EngineOptions.GetGUIDirectory() );
+   shared_ptr<IView> pView( ENG_NEW HumanView() );
+   VAddView( pView );
    if( !VLoadLevel() )
       {
       ENG_ERROR( "The game failed to load." );
       g_pApp->AbortGame( );
       return false;
       }
-   m_pGUIManager->Init( g_pApp->m_EngineOptions.GetGUIDirectory() );
-
-   shared_ptr<IView> pView( ENG_NEW HumanView( ) );
-   VAddView( pView );
+   // render manager need the information of camera to restore, which is in the scene
+   m_pRenderManager->VOnRestore( m_pWrold.get() );
    SetNextEngineState( BES_Ready );
    return true;  
    }
@@ -175,6 +176,8 @@ int BaseEngineLogic::VOnRestore( void )
       {
       pView->VOnRestore();
       }
+   // render manager need the information of camera to restore, which is in the scene
+   m_pRenderManager->VOnRestore( m_pWrold.get() );
    return S_OK;
    }
 
@@ -209,16 +212,6 @@ void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
    unsigned long deltaMs = unsigned long( elapsedTime * 1000.0f );
 	m_Lifetime += elapsedTime;
 
-   IGamePhysics::GetSingleton().VOnUpdate( elapsedTime );
-   IGamePhysics::GetSingleton().VSyncVisibleScene();
-
-   if( m_EnableWorldUpdate )
-      {
-      m_pWrold->OnUpdate( deltaMs );
-      }
-
-   AnimationManager::GetSingleton().VUpdate( deltaMs );
-
    m_pGUIManager->OnUpdate( deltaMs );
    // update all game views
    for ( ViewList::iterator it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
@@ -229,16 +222,26 @@ void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
    if( m_EnableActorUpdate )
       {
       // update game actors
-      for( ActorMap::const_iterator it = m_Actors.begin( ); it != m_Actors.end( ); ++it )
+      for( ActorMap::const_iterator it = m_Actors.begin(); it != m_Actors.end(); ++it )
          {
          it->second->Update( deltaMs );
          }
       }
+
+   if( m_EnableWorldUpdate )
+      {
+      m_pWrold->OnUpdate( deltaMs );
+      }
+
+   AnimationManager::GetSingleton().VUpdate( deltaMs );
+
+   IGamePhysics::GetSingleton().VOnUpdate( elapsedTime );
+   IGamePhysics::GetSingleton().VSyncVisibleScene();
    }
 
 void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )
    {
-   m_pRenderer->VPreRender( );
+   m_pRenderManager->VPreRender( );
    for( auto pView : m_ViewList )
       {
       pView->VOnRender( fTime, fElapsedTime );
@@ -246,7 +249,7 @@ void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )
    //Render GUI last
    m_pGUIManager->OnRender( fTime, fElapsedTime );
    VRenderDiagnostics();
-   m_pRenderer->VPostRender( );
+   m_pRenderManager->VPostRender();
    }
 
 void BaseEngineLogic::VRenderDiagnostics( void ) const
@@ -323,7 +326,7 @@ bool BaseEngineLogic::VLoadLevel()
       }
 
     // register script events from the engine
-	//   [mrmike] this was moved to the constructor post-press, since this function can be called when new levels are loaded by the game or editor
+	 // this was moved to the constructor post-press, since this function can be called when new levels are loaded by the game or editor
     // RegisterEngineScriptEventImps();
 
     // load the post-load script if there is one

@@ -68,7 +68,7 @@ aiAnimation* MeshResourceExtraData::FindAnimation( const std::string& animationN
    return NULL;
    }
 
-aiAnimation* MeshResourceExtraData::FindAnimation( int animIdx ) const
+aiAnimation* MeshResourceExtraData::FindAnimation( unsigned int animIdx ) const
    {
    ENG_ASSERT( animIdx < m_pScene->mNumAnimations );
    return m_pScene->mAnimations[ animIdx ];
@@ -90,7 +90,7 @@ unsigned int MeshResourceLoader::VGetLoadedResourceSize( char *rawBuffer, unsign
    return 0;
    }
 
-bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle )
+int MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle )
    {
    const char* p_Msg = NULL;
    //aiProcessPreset_TargetRealtime_Quality // aiProcess_JoinIdenticalVertices
@@ -130,7 +130,7 @@ bool MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, s
    struct aiMemoryInfo memInfo;
    aiGetMemoryRequirements( p_AiScene, &memInfo );
    handle->SetSize( memInfo.total );
-   return true;
+   return S_OK;
    }
 
 const aiScene* MeshResourceLoader::LoadAndReturnScene( const Resource& resource )

@@ -14,16 +14,16 @@
 
 #include "EngineStd.h"
 #include "SceneNodes.h"
-#include "Scene.h"
+#include "..\Scene.h"
 #include "..\Actors\ActorComponent.h"
 #include "..\Actors\RenderComponent.h"
 
-SceneNodeProperties::SceneNodeProperties( void ) : m_pTransform( ENG_NEW Transform() ), m_pMaterial()
+SceneNodeProperties::SceneNodeProperties( void ) : m_pTransform(), m_pGlobalTransform( ENG_NEW Transform() ), m_pMaterial()
    {
    m_ActorId = INVALID_ACTOR_ID;
    m_Radius = 0;
-   m_RenderPass = RenderPass_0;
-   
+   m_RenderGroup = RenderGroup_0;
+   m_EnableShadow = false;
    }
 
 TransformPtr SceneNodeProperties::GetTransformPtr( void ) const
@@ -31,12 +31,7 @@ TransformPtr SceneNodeProperties::GetTransformPtr( void ) const
    return m_pTransform;
    }
 
-const Transform& SceneNodeProperties::GetTransform( void ) const
-   {
-   return *m_pTransform;
-   }
-
-Transform SceneNodeProperties::GetTransform( void )
+Transform SceneNodeProperties::GetLocalTransform( void ) const
    {
    return *m_pTransform;
    }
@@ -58,17 +53,18 @@ float SceneNodeProperties::GetAlpha( void ) const
    return fOPAQUE; 
    }
 
-SceneNode::SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderPass renderPass, TransformPtr pNewTransform, MaterialPtr pMaterial )
+SceneNode::SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderGroup renderPass, TransformPtr pNewTransform, MaterialPtr pMaterial )
    {
-   m_pParent= NULL;
+   m_pParent = NULL;
 	m_Props.m_ActorId = actorId;
    m_Props.m_Name = ( pRenderComponent ) ? pRenderComponent->VGetName() : "SceneNode";
-	m_Props.m_RenderPass = renderPass;
+	m_Props.m_RenderGroup = renderPass;
 	//m_Props.m_AlphaType = AlphaOpaque;
    m_pRenderComponent = pRenderComponent;
    m_Props.m_pMaterial = pMaterial;
-	VSetTransformPtr( pNewTransform ); 
-	SetRadius( 0.0f );
+   m_Props.m_pTransform = pNewTransform;
+   *m_Props.m_pGlobalTransform = *pNewTransform; // copy value from local transform
+   m_Props.m_Radius = 0.f;
    }
 
 SceneNode::~SceneNode()
@@ -85,7 +81,17 @@ void SceneNode::VSetTransform( const Transform& newTransform )
    *m_Props.m_pTransform = newTransform;
    }
 
-
+TransformPtr SceneNode::VGetGlobalTransformPtr( void ) const
+   {
+   return m_Props.m_pGlobalTransform;
+   /*if( !m_pParent )
+      {
+      return m_Props.GetLocalTransform();
+      }
+   Transform& ret = m_pParent->VGetGlobalTransform();
+   ret = ret * m_Props.GetLocalTransform();
+   return ret;*/
+   }
 
 int SceneNode::VOnRestore( Scene *pScene )
    {
@@ -96,30 +102,67 @@ int SceneNode::VOnRestore( Scene *pScene )
    return S_OK;
    }
 
-int SceneNode::VOnUpdate( Scene* pScene, unsigned long deltaMs )
+int SceneNode::VPreUpdate( Scene *pScene )
    {
+   // No parent, copy its local transform to global transform directly
+   if( !m_pParent )
+      {
+      ( *m_Props.m_pGlobalTransform ) = ( *( m_Props.m_pTransform ) );
+      }
+   else
+      {
+      ( *m_Props.m_pGlobalTransform ) = ( *m_pParent->VGetGlobalTransformPtr() ) * ( *( m_Props.m_pTransform ) );
+      }
+
+   int ret = S_OK;
+
    for( auto it : m_Children )
       {
-      it->VOnUpdate( pScene, deltaMs );
+      ret = it->VPreUpdate( pScene );
+      if( ret != S_OK )
+         {
+         return ret;
+         }
+      }
+
+   return ret;
+   }
+
+int SceneNode::VOnUpdate( Scene* pScene, unsigned long deltaMs )
+   {
+   int ret = VDelegateUpdate( pScene, deltaMs );
+ 
+   if( ret != S_OK )
+      {
+      return ret;
+      }
+
+   for( auto it : m_Children )
+      {
+      ret = it->VOnUpdate( pScene, deltaMs );
+      if( ret != S_OK )
+         {
+         return ret;
+         }
       }
    return S_OK;
    }
 
 int SceneNode::VPreRender( Scene *pScene )
    {
-   pScene->PushAndSetTransform( VGetProperties().GetTransformPtr() );
+  // pScene->PushAndSetTransform( m_Props.m_pTransform );
    return S_OK;
    }
 
 bool SceneNode::VIsVisible( Scene *pScene )
    {
-   auto camTransform = pScene->GetCamera()->VGetProperties().GetTransform();
-   Vec3 nodeInCamWorldPos = VGetWorldPosition();
+   auto camTransform = pScene->GetCamera()->VGetGlobalTransformPtr();
+   Vec3 nodeInCamWorldPos = VGetGlobalPosition();
    // transform to camera's local space
-   nodeInCamWorldPos = camTransform.GetFromWorld().Xform( nodeInCamWorldPos );;
-   const Frustum &frustum = pScene->GetCamera()->GetFrustum();
+   nodeInCamWorldPos = camTransform->GetFromWorld().Xform( nodeInCamWorldPos );;
+   const PerspectiveFrustum &frustum = pScene->GetCamera()->GetFrustum();
    //return true;
-   return frustum.Inside( nodeInCamWorldPos, VGetProperties().GetRadius() );
+   return frustum.VInside( nodeInCamWorldPos, m_Props.GetRadius() );
    }
 
 
@@ -142,11 +185,11 @@ int SceneNode::VRenderChildren( Scene *pScene )
                AlphaSceneNode *asn = ENG_NEW AlphaSceneNode;
                ENG_ASSERT( asn );
                asn->m_pNode = it;
-               asn->m_Concat = pScene->GetTopTransform();
+               asn->m_GlobalToWorld = VGetGlobalTransformPtr()->GetToWorld();
 
-               Vec4 worldPos( asn->m_Concat.GetToWorldPosition() );
+               Vec4 worldPos( asn->m_GlobalToWorld.GetToWorldPosition() );
 
-               Mat4x4 fromWorld = pScene->GetCamera( )->VGetProperties().GetFromWorld();
+               Mat4x4 fromWorld = pScene->GetCamera()->VGetGlobalTransformPtr()->GetFromWorld();
 
                Vec4 screenPos = fromWorld.Xform( worldPos );
 
@@ -165,7 +208,7 @@ int SceneNode::VRenderChildren( Scene *pScene )
 
 int SceneNode::VPostRender( Scene *pScene )
    {
-   pScene->PopTransform();
+ //  pScene->PopTransform();
    return S_OK;
    }
 
@@ -205,7 +248,6 @@ int SceneNode::VOnLostDevice( Scene *pScene )
    return S_OK;
    }
 
-// TODO: finish implementation
 void SceneNode::SetAlpha( float alpha )
    {
    for( auto it : m_Children )
@@ -214,42 +256,38 @@ void SceneNode::SetAlpha( float alpha )
       shared_ptr<SceneNode> sceneNode = static_pointer_cast<SceneNode>( it );
       sceneNode->SetAlpha( alpha );
       }
+   m_Props.SetAlpha( alpha );
    }
 
 // Sum up relative position from child to root node in order to get position in world space
-Vec3 SceneNode::VGetWorldPosition( void ) const
+Vec3 SceneNode::VGetGlobalPosition( void ) const
    {
-   Vec3 pos = GetToWorldPosition();
-	if ( m_pParent )
-	   {
-		pos += m_pParent->VGetWorldPosition();
-	   }
-	return pos;
+   return VGetGlobalTransformPtr()->GetToWorldPosition();
    }
 
 
-RootNode::RootNode() : SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_0 )
+RootNode::RootNode() : SceneNode( INVALID_ACTOR_ID, NULL, RenderGroup_0 )
    {
-	m_Children.reserve(RenderPass_Last);
+	m_Children.reserve(RenderGroup_Last);
 
-   shared_ptr<SceneNode> staticGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_Static ) );
-	m_Children.push_back(staticGroup);	// RenderPass_Static = 0
+   shared_ptr<SceneNode> staticGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderGroup_Static ) );
+	m_Children.push_back(staticGroup);	// RenderGroup_Static = 0
 
-   shared_ptr<SceneNode> actorGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_Actor ) );
-	m_Children.push_back(actorGroup);	// RenderPass_Actor = 1
+   shared_ptr<SceneNode> actorGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderGroup_Actor ) );
+	m_Children.push_back(actorGroup);	// RenderGroup_Actor = 1
 
-   shared_ptr<SceneNode> skyGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_Sky ) );
-	m_Children.push_back(skyGroup);	// RenderPass_Sky = 2
+   shared_ptr<SceneNode> skyGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderGroup_Sky ) );
+	m_Children.push_back(skyGroup);	// RenderGroup_Sky = 2
 
-   shared_ptr<SceneNode> invisibleGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_NotRendered ) );
-	m_Children.push_back(invisibleGroup);	// RenderPass_NotRendered = 3
+   shared_ptr<SceneNode> invisibleGroup( ENG_NEW SceneNode( INVALID_ACTOR_ID, NULL, RenderGroup_NotRendered ) );
+	m_Children.push_back(invisibleGroup);	// RenderGroup_NotRendered = 3
    }
    
 
-// add child into corresponded renderpass node
+// add child into corresponded render group node
 bool RootNode::VAddChild( shared_ptr<ISceneNode> child )
    {
-   RenderPass pass = child->VGetProperties().GetRenderPass();
+   RenderGroup pass = child->VGetProperties().GetRenderGroup();
 	if ( (unsigned)pass >= m_Children.size() || !m_Children[pass] )
 	   {
 		ENG_ASSERT(0 && _T("There is no such render pass"));
@@ -259,21 +297,20 @@ bool RootNode::VAddChild( shared_ptr<ISceneNode> child )
 	return m_Children[pass]->VAddChild( child );
    }
 
-// TODO: finish implement
 int RootNode::VRenderChildren( Scene *pScene )
    {
    // the child node of Root nodes are empty node, so there's no need calling VRender for them
    // only their children should be rendered
-   for (int pass = RenderPass_0; pass < RenderPass_Last; ++pass)
+   for (int pass = RenderGroup_0; pass < RenderGroup_Last; ++pass)
 	   {
 		switch(pass)
 		   {
-			case RenderPass_Static:
-			case RenderPass_Actor:
+			case RenderGroup_Static:
+			case RenderGroup_Actor:
  				m_Children[pass]->VRenderChildren(pScene);
 				break;
 
-			case RenderPass_Sky:
+			case RenderGroup_Sky:
 			   {
 				//shared_ptr<IRenderState> skyPass = pScene->GetRenderer()->VPrepareSkyBoxPass();
 				m_Children[pass]->VRenderChildren(pScene);
@@ -299,8 +336,8 @@ bool RootNode::VRemoveChild( ActorId id )
 	return anythingRemoved;
    }
 
-CameraNode::CameraNode( TransformPtr pTransform, Frustum const &frustum ) 
-	      : SceneNode( INVALID_ACTOR_ID, NULL, RenderPass_0, pTransform ),
+CameraNode::CameraNode( TransformPtr pTransform, PerspectiveFrustum const &frustum ) 
+	      : SceneNode( INVALID_ACTOR_ID, NULL, RenderGroup_0, pTransform ),
 	      m_Frustum( frustum ),
 	      m_IsActive( true ),
 	      m_IsDebugCamera( false ),
@@ -310,10 +347,10 @@ CameraNode::CameraNode( TransformPtr pTransform, Frustum const &frustum )
    {
    }
 
-CameraNode::CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, Frustum const &frustum ) 
+CameraNode::CameraNode( const Vec3& eye, const Vec3& center, const Vec3& up, PerspectiveFrustum const &frustum ) 
 	      : SceneNode( INVALID_ACTOR_ID, 
                       NULL,
-                      RenderPass_0, 
+                      RenderGroup_0, 
                       TransformPtr( ENG_NEW Transform( Mat4x4::LookAtToTransform( eye, center, up ).Inverse() ) )
                       ),
             m_Frustum( frustum ),
@@ -343,27 +380,31 @@ int CameraNode::VRender( Scene *pScene )
 int CameraNode::VOnRestore( Scene *pScene )
    {
    m_Frustum.SetAspect(  (float) g_pApp->GetScreenSize().GetX() / (float) g_pApp->GetScreenSize().GetY() );
-   m_Projection.BuildProjection( m_Frustum.m_Fov, m_Frustum.m_Aspect, m_Frustum.m_NearDis, m_Frustum.m_FarDis );
+   m_Projection.BuildProjection( m_Frustum.m_FovY, m_Frustum.m_Aspect, m_Frustum.m_NearDis, m_Frustum.m_FarDis );
 	return S_OK;
    }
 
 void CameraNode::VSetTransform( const Transform& newTransform ) 
    { 
    SceneNode::VSetTransform( newTransform ); 
-   m_View = Mat4x4::LookAt( newTransform.GetToWorldPosition(), newTransform.GetToWorldPosition() + newTransform.GetForward(), newTransform.GetUp() );
+  // auto globalTransformPtr = VGetGlobalTransformPtr();
+   //m_View = Mat4x4::LookAt( globalTransformPtr->GetToWorldPosition(), globalTransformPtr->GetToWorldPosition() + globalTransformPtr->GetForward(), globalTransformPtr->GetUp() );
 
    }
 
-Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene )
-   {
-   const Mat4x4& world = pScene->GetTopMatrix();
-	return m_Projection * m_View * world;
-   }
+//Mat4x4 CameraNode::GetWorldViewProjection( Scene *pScene )
+//   {
+//   const Mat4x4& world = pScene->GetTopMatrix();
+//	return m_Projection * m_View * world;
+//   }
 
 // TODO: check if it's correct
 // I think atWorld should be set by GetWorldPosition
 int CameraNode::SetViewTransform(  Scene *pScene )
    {
+   auto globalTransformPtr = VGetGlobalTransformPtr();
+   m_View = Mat4x4::LookAt( globalTransformPtr->GetToWorldPosition(), globalTransformPtr->GetToWorldPosition() + globalTransformPtr->GetForward(), globalTransformPtr->GetUp() );
+
    // this code simulates camera pole effect, camera is sticked to target's position +  m_CamOffsetVector
 	if( m_pTarget )
 	   {

@@ -15,7 +15,7 @@
 
 #include "SceneNodes.h"
 
-#include "Shaders.h"
+#include "..\Shaders.h"
 
 
 class SkySceneNode : public SceneNode
@@ -25,7 +25,7 @@ class SkySceneNode : public SceneNode
                     IRenderComponent* pRenderComponent,
                     shared_ptr<Resource> pMeshResource,
                     shared_ptr<Resource> pTextureResource, 
-                    RenderPass renderPass,  
+                    RenderGroup renderGroup,
                     TransformPtr pTransform );
       ~SkySceneNode( void );
 	   virtual int VOnRestore( Scene *pScene ) override; ;
@@ -50,7 +50,7 @@ class SkySceneNode : public SceneNode
 
    protected:
       bool					   m_IsActive;
-
+      Mat4x4               m_Projection; // This variable is modified from the projection matrix of current camera node by increasing far distance
 	   GLuint               m_Program;
       VertexShader		   m_VertexShader;
       FragmentShader		   m_FragmentShader;

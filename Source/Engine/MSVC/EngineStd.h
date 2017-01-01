@@ -20,7 +20,7 @@
 
 #include <crtdbg.h>
 
-// C RunTime Header Files
+// C++ Header Files
 #include <stdlib.h>
 
 #include <malloc.h>
@@ -117,7 +117,8 @@ extern const int SCREEN_HEIGHT;
 #define __LOC__ __FILE__ "("__STR1__(__LINE__)") : Warning Msg: "  
 
 #define ENG_ZERO_MEM( x ) memset(x, 0, sizeof( x ))
-#define ENG_ARRAY_SIZE_IN_ELEMENTS( x ) (sizeof( x )/sizeof(x[0]))
+#define ENG_ARRAY_SIZE( x ) ( sizeof( x ) )
+#define ENG_ARRAY_SIZE_IN_ELEMENTS( x ) ( sizeof( x ) / sizeof( x[ 0 ] ) )
 
 ///////////////////////
 //3rd party INCLUDES //
@@ -135,7 +136,8 @@ extern const int SCREEN_HEIGHT;
 #include "..\Debugging\Logger.h"  // this should be the first of the gcc includes since it defines ENG_ASSERT()
 #include "..\Utilities\types.h"
 #include "..\Utilities\templates.h"
-#include "..\Graphics\Geometry.h"
+#include "..\Math\Geometry.h"
+#include "..\Math\Frustum.h"
 #include "..\Utilities\Math.h"
 #include "..\Utilities\String.h"
 #include "..\Utilities\XMLHelper.h"

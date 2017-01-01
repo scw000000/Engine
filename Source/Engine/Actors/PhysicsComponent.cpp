@@ -25,7 +25,7 @@ PhysicsComponent::PhysicsComponent( void )
 
 shared_ptr<SceneNode> PhysicsComponent::VCreateSceneNode( void )
    {
-   return shared_ptr<SceneNode>( ENG_NEW SceneNode( m_pOwner->GetId(), this, RenderPass::RenderPass_Actor, m_pTransform ) );
+   return shared_ptr<SceneNode>( ENG_NEW SceneNode( m_pOwner->GetId(), this, RenderGroup::RenderGroup_Actor, m_pTransform ) );
    }
 
 bool PhysicsComponent::VDelegateInit( TiXmlElement* pData )

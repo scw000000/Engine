@@ -21,11 +21,11 @@ EditorController::EditorController( shared_ptr<SceneNode> object,
                                         float initialYaw,
                                         float initialPitch,
                                         bool rotateWhenLButtonDown,
-                                        bool isMouseLocked,
-                                        float smoothness ) :
+                                        bool isMouseLocked, 
+                                        float smoothness) :
                                         Controller( isMouseLocked ),
                                         m_pControllingObject( object ),
-                                        m_pTransform( ENG_NEW Transform( object->VGetProperties().GetTransform() ) )
+                                        m_pTransform( ENG_NEW Transform( object->VGetProperties().GetLocalTransform() ) )
    {
    m_MaxSpeed = 40.0f / 1000.f;			// 40 meters per Ms
    m_CurrentSpeed = 0.0f;
@@ -41,8 +41,8 @@ void EditorController::VOnUpdate( unsigned long deltaMilliseconds )
    {
    if( !m_isRotateWhenLButtonDown || ( m_isRotateWhenLButtonDown && ( m_MouseButton[ SDL_BUTTON_LEFT ] ) ) )
       {
-      m_TargetRotShift.x += 0.001f * ( m_MouseShift.y );
-      m_TargetRotShift.y += 0.001f * ( -m_MouseShift.x );
+      m_TargetRotShift.x += 0.001f * ( (float) m_MouseShift.y );
+      m_TargetRotShift.y += -0.001f * ( ( float ) m_MouseShift.x );
       }
    if( m_isRotateWhenLButtonDown )
       {
@@ -82,7 +82,7 @@ void EditorController::VOnUpdate( unsigned long deltaMilliseconds )
       {
       if( m_KeyButton[ SDL_SCANCODE_UP ] )
          {
-         m_TargetRotShift.x += 0.05f * ( 1.0f );
+         m_TargetRotShift.x += 0.05f;
          }
       else
          {
@@ -95,19 +95,30 @@ void EditorController::VOnUpdate( unsigned long deltaMilliseconds )
       {
       if( m_KeyButton[ SDL_SCANCODE_LEFT ] )
          {
-         m_TargetRotShift.y += 0.05f * ( 1.0f );
+         m_TargetRotShift.y += 0.05f;
          }
       else
          {
-         m_TargetRotShift.y += 0.05f * ( -1.0f );
+         m_TargetRotShift.y += -0.05f;
          }
 
       }
-   Vec3 rotVal = m_TargetRotShift * ( 1 - m_Smoothness );
-   m_pTransform->AddFromWorldPitchYawRollRad( rotVal.x, 0.0f, rotVal.z );
-   m_pTransform->AddToWorldPitchYawRollRad( 0.0f, rotVal.y, 0.0f );
+      
+      m_pTransform->AddFromWorldPitchYawRollRad( m_TargetRotShift.x, 0.0f, m_TargetRotShift.z );
+      m_pTransform->AddToWorldPitchYawRollRad( 0.0f, m_TargetRotShift.y, 0.0f );
+      m_TargetRotShift = Vec3::g_Zero;
 
-   m_TargetRotShift *= m_Smoothness;
+      //Vec3 rotVal = m_TargetRotShift * ( 1.f - m_Smoothness );
+      //if( abs( rotVal.x ) >= 0.01f || abs( rotVal.y ) >= 0.01f )
+      //   {
+      //   
+      //   ENG_LOG( "Test", ToStr( rotVal ) );
+      //   m_TargetRotShift *= m_Smoothness;
+      //   }
+      //else
+      //   {
+      // //  m_TargetRotShift = Vec3::g_Zero;
+      //   }
 
    if( bTranslating )
       {

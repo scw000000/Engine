@@ -17,9 +17,9 @@
 #include "..\Event\EventManager.h"
 #include "FastDelegate.h"
 
-Scene::Scene( shared_ptr<IRenderer> renderer ) : m_Root( ENG_NEW RootNode ), m_pLightManager( ENG_NEW LightManager )
+Scene::Scene( shared_ptr< IRenderManager > pRenderManager ) : m_pRoot( ENG_NEW RootNode ), m_pLightManager( ENG_NEW LightManager )
    {
-   m_pRenderer = renderer;
+   m_pRenderManager = pRenderManager;
 	
    IEventManager* pEventMgr = IEventManager::GetSingleton();
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &Scene::NewRenderComponentDelegate ), Event_New_Render_Root_Component::s_EventType );
@@ -47,51 +47,81 @@ Scene::~Scene()
    
    }
 
-
-int Scene::OnRender()
+int Scene::PreRender( void )
    {
-   if ( m_Root && m_Camera )
+   //if( m_Root && m_pCamera )
+   //   {
+   //   // The scene root could be anything, but it
+   //   // is usually a SceneNode with the identity
+   //   // matrix
+   //   m_pCamera->SetViewTransform( this );
+   //   m_pLightManager->CalcLighting( this );
+
+   //   if( m_Root->VPreRender( this ) == S_OK )
+   //      {
+   //      m_Root->VRender( this );
+   //      m_Root->VRenderChildren( this );
+   //      m_Root->VPostRender( this );
+   //      }
+   //   RenderAlphaPass();
+   //   }
+   return S_OK;
+   }
+
+int Scene::OnRender( void )
+   {
+   if ( m_pRoot && m_pCamera )
 	   {
 		// The scene root could be anything, but it
 		// is usually a SceneNode with the identity
 		// matrix
-		m_Camera->SetViewTransform( this );
-
+		m_pCamera->SetViewTransform( this );
 		m_pLightManager->CalcLighting( this );
-
-		if ( m_Root->VPreRender( this ) == S_OK )
+      m_pRenderManager->VGetMainRenderer().VLoadLight( m_pLightManager->m_ActiveLights );
+		if ( m_pRoot->VPreRender( this ) == S_OK )
 		   {
-			m_Root->VRender( this );
-			m_Root->VRenderChildren( this );
-			m_Root->VPostRender( this );
+			m_pRoot->VRender( this );
+			m_pRoot->VRenderChildren( this );
+			m_pRoot->VPostRender( this );
 		   }
 		RenderAlphaPass();
+      m_pRenderManager->VPostRenderNodes( this );
 	   }
 	return S_OK;
    }
 
 int Scene::OnRestore()
    {
-   if (!m_Root)
+   if ( !m_pRoot )
 		return S_OK;
 
 	//m_Renderer->VOnRestore() ;
 
-	return m_Root->VOnRestore(this);
+	return m_pRoot->VOnRestore(this);
    }
 
 int Scene::OnLostDevice()
    {
-   if (m_Root)
+   if ( m_pRoot )
 	   {
-		return m_Root->VOnLostDevice(this);
+		return m_pRoot->VOnLostDevice(this);
 	   }
 	return S_OK;
    }
 
+int Scene::PreUpdate( void )
+   {
+   if( !m_pRoot )
+      return S_OK;
+
+   return m_pRoot->VPreUpdate( this );
+   }
+
 int Scene::OnUpdate( unsigned long deltaMs )
    {
-   if (!m_Root)
+   PreUpdate();
+
+   if ( !m_pRoot )
 		return S_OK;
 
    static double lastTime = GetGlobalTimer()->GetTime();
@@ -99,7 +129,7 @@ int Scene::OnUpdate( unsigned long deltaMs )
 	unsigned long elapsedTime = (unsigned long) ( ( now - lastTime )* 1000.0 );
 	lastTime = now;
 
-	return m_Root->VOnUpdate( this, elapsedTime );
+	return m_pRoot->VOnUpdate( this, elapsedTime );
    }
 
 shared_ptr< ISceneNode > Scene::FindSceneNode( ActorId id )
@@ -127,7 +157,7 @@ bool Scene::AddChild( ActorId id, shared_ptr< ISceneNode > pNode )
    //   return m_pLightManager->AddLightNode( pLight );
    //   }
 
-   return m_Root->VAddChild( pNode );
+   return m_pRoot->VAddChild( pNode );
    }
 
 
@@ -140,27 +170,26 @@ bool Scene::RemoveChild( ActorId id )
 
    shared_ptr<ISceneNode> childNode = FindSceneNode( id );
    m_ActorMap.erase( id );
-   return m_Root->VRemoveChild( id );
+   return m_pRoot->VRemoveChild( id );
    }
 
 void Scene::RenderAlphaPass()
    {
-   //  shared_ptr<IRenderState> alphaPass = m_Renderer->VPrepareAlphaPass();
-   OpenGLRenderer::SetRenderAlpha( true );
+   m_pRenderManager->VGetMainRenderer().VSetRenderingAlpha( true );
+   //MainRenderer::VSetRenderAlpha( true );
    // This it not implemented yet!
 	m_AlphaSceneNodes.sort();
    // rendering from back to front in order to make visual effort of transparant objects
 	while ( !m_AlphaSceneNodes.empty() )
 	   {
 		AlphaSceneNodes::reverse_iterator i = m_AlphaSceneNodes.rbegin();
-		PushAndSetTransform( (*i)->m_Concat );
+	//	PushAndSetTransform( (*i)->m_GlobalToWorld );
 		(*i)->m_pNode->VRender( this );
 		SAFE_DELETE( *i );
-		PopTransform();
+	//	PopTransform();
 		m_AlphaSceneNodes.pop_back();
 	   }
-
-   OpenGLRenderer::SetRenderAlpha( false );
+   m_pRenderManager->VGetMainRenderer().VSetRenderingAlpha( false );
    }
 
 void Scene::NewRenderComponentDelegate( IEventPtr pEvent )
@@ -170,8 +199,6 @@ void Scene::NewRenderComponentDelegate( IEventPtr pEvent )
     ActorId actorId = pDerivedEvent->GetActorId();
     shared_ptr<SceneNode> pSceneNode( pDerivedEvent->GetSceneNode() );
 
-    // TODO: implement and call VOnInit instead of VOnRestore
-    // because it will be called again in HumanView
     if ( pSceneNode->VOnRestore(this ) != S_OK )
       {
 		std::string error = "Failed to restore scene node to the scene for actorid " + ToStr(actorId);

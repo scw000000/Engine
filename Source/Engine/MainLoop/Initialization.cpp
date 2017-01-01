@@ -285,7 +285,7 @@ const TCHAR *GetSaveGameDirectory(HWND hWnd, const TCHAR *gameAppDirectory)
 	_tcscpy_s( m_SaveGameDirectory, userDataPath );
 	_tcscat_s( m_SaveGameDirectory, _T( "\\" ) );
 	_tcscat_s( m_SaveGameDirectory, gameAppDirectory );
-   ENG_LOG( "Test", ToStr( m_SaveGameDirectory ) );
+   ENG_LOG( "OS", std::string().append( "Same Game Dir: " ).append( ToStr( m_SaveGameDirectory ) ) );
 	// if it is not exist, create it
 	if (0xffffffff == GetFileAttributes(m_SaveGameDirectory))
 	   {

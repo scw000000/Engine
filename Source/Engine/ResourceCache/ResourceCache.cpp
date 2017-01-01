@@ -284,7 +284,7 @@ shared_ptr< ResHandle > ResourceCache::Load( const Resource& resource )
       // set buffer for handle
       handle = shared_ptr< ResHandle >( ENG_NEW ResHandle( resource, pBuffer, size, this ) );
       // loader store processed data into handle from pRawBuffer
-      bool success = loader->VLoadResource( pRawBuffer, allocSize, handle );
+      int success = loader->VLoadResource( pRawBuffer, allocSize, handle );
 
       if( !loader->VUsePreAllocate() )
          {
@@ -303,7 +303,7 @@ shared_ptr< ResHandle > ResourceCache::Load( const Resource& resource )
          SAFE_DELETE_ARRAY( pRawBuffer ); 
          }
       
-      if( !success ) // process raw file failed 
+      if( success != S_OK ) // process raw file failed 
          {
          ENG_ASSERT( success && "Loader VloadResource Failed" );
          return shared_ptr<ResHandle>();

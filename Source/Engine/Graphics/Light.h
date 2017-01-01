@@ -12,54 +12,61 @@
  *
  * \note
  */
-#include "SceneNodes.h"
-#include "OpenGLRenderer.h"
+#include ".\SceneNode\SceneNodes.h"
+#include ".\Renderer\MainRenderer.h"
 
-#define MAXIMUM_LIGHTS_SUPPORTED (8)
+#define MAXIMUM_LIGHTS_SUPPORTED             8u
+#define MAXIMUM_SHADOWMAP_TEXTURE_SUPPORTED  8u
+
+#define LIGHT_TYPE_UNDEFINED   0u
+#define LIGHT_TYPE_POINT       1u
+#define LIGHT_TYPE_DIRECTIONAL 2u
 
 struct LightProperties;
 typedef shared_ptr<LightProperties> LightPropertiesPtr;
 
-// Note: Light color is stored in the Material structure, which is already present in all SceneNodes.
 
 struct LightProperties
    {
-   Color m_Diffuse;
-   float m_Power;
-   bool Init( TiXmlElement* pData );
-   TiXmlElement* GenerateXML( void );
-   TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
+   public:
+      LightProperties( void );
+      bool Init( TiXmlElement* pData );
+      TiXmlElement* GenerateXML( void );
+
+   public:
+      //--------------------------------------------------------------
+      Vec3  m_Color;
+      unsigned int m_Type;
+      //--------------------------------------------------------------
+      Vec3  m_PositionVS;
+      unsigned int m_Enabled;
+      //--------------------------------------------------------------
+      Vec3  m_DirectionVS;
+      float  m_HalfConeAngle;
+      //--------------------------------------------------------------
+      Vec4  m_Attenuation;
+      //--------------------------------------------------------------
+      //float  m_Padding[ 3 ];
+      //--------------------------------------------------------------
+
    };
 
-
-//
-// class LightNode						- Chapter 16, page 551
-//
-//    Note: In the book this class implements the LightNode in D3D11, but here it is a base
-//    class. The derived classes make it possible to run the engine in D3D9 or D3D11.
-//
 class LightNode : public SceneNode
    {
-   protected:
-	   LightPropertiesPtr m_pLightProps;
-
    public:
-   LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
-
+      LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
       const LightPropertiesPtr& GetLightPropertiesPtr( void ) const { return m_pLightProps; };
+      virtual void VSetUpRenderShadowMap( void ) = 0;
+      virtual void VRenderShadowMap( shared_ptr< ISceneNode > pNode ) = 0;
+      virtual void VPreRenderShadowMap( void ) = 0;
+      virtual bool VIsInside( const Vec3& worldPos, float radius = 0.f ) const = 0;
+      virtual Mat4x4 VGetVPMatrix( void ) const = 0;
+      virtual Mat4x4 VGetShadowMapMatrix( void ) const = 0;
+      virtual GLuint VGetShadowMapTexture( void ) const = 0;
+
+   protected:
+      LightPropertiesPtr m_pLightProps;
    };
-
-class GLLightNode : public LightNode
-   {
-   public:
-   GLLightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform )
-      : LightNode( actorId, pRenderComponent, pLightProps, pTransform )
-      {}
-
-      virtual int VOnRestore( Scene *pScene ) override { return S_OK; } ;
-      virtual int VOnUpdate( Scene *, unsigned long deltaMs ) override;
-   };
-
 
 /*!
  * \class LightManager
@@ -83,9 +90,11 @@ class LightManager
 	    * @param  pScene Scene * pScene
 	    * @return void
 	    */
-	   void CalcLighting( Scene *pScene );
-      // copy all of lights that effects this node into 
+      void CalcLighting( Scene *pScene );
+      // copy all of lights that effects this node into constant buffer (Deprecated) 
       void CalcLighting( SceneNode *pNode );
+      void RenderShadowMap( ISceneNode *pNode );
+
 	   int GetActiveLightCount( void ) const { return m_ActiveLights.size(); }
 	   bool AddLightNode( shared_ptr<LightNode> pNewLight );   
       bool RemoveLightNode( shared_ptr<LightNode> pRemovedLight );
@@ -94,14 +103,23 @@ class LightManager
       Vec3* GetLightDirection( void ) { return m_LightDir; }
       float* GetLightPower( void ) { return m_LightPower; }
       Color* GetLightColor( void ) { return m_LightColor; }
+      Mat4x4* GetShadowMapMatrix( void ) { return m_ShadowMapMatrix; }
+      GLuint* GetShadowMaptexture( void ) { return m_ShadowMapTexture; }
       void NewSceneNodeDelegate( IEventPtr pEvent );
       void DestroySceneNodeDelegate( IEventPtr pEvent );
 
    protected:
+      void CalcShadow( Scene *pScene, shared_ptr< ISceneNode > pNode );
+      void RenderShadowMap( shared_ptr< LightNode > ) const;
+
+   protected:
       Lights	m_Lights;
       Lights   m_ActiveLights;
-      Vec3     m_LightPosWorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
-      Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
-      float     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Mat4x4   m_ShadowMapMatrix[ MAXIMUM_LIGHTS_SUPPORTED ];
+      GLuint   m_ShadowMapTexture[ MAXIMUM_LIGHTS_SUPPORTED ];
       Color		m_LightColor[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Vec3     m_LightPosWorldSpace[ MAXIMUM_LIGHTS_SUPPORTED ];
+      float     m_LightPower[ MAXIMUM_LIGHTS_SUPPORTED ];
+      Vec3		m_LightDir[ MAXIMUM_LIGHTS_SUPPORTED ];
+//      DeferredMainRenderer m_DeferredShader;
    };

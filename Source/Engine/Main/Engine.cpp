@@ -21,7 +21,8 @@
 #include "..\ResourceCache\TextureResource.h"
 #include "..\Event\EventManager.h"
 #include "..\Event\Events.h"
-#include "..\Graphics\OpenGLRenderer.h"
+#include "..\Graphics\Renderer\MainRenderer.h"
+#include "..\Graphics\Renderer\RenderManager.h"
 #include "..\LuaScripting\LuaStateManager.h"
 #include "..\LuaScripting\ScriptExports.h"
 #include "..\Animation\AnimationClipNode.h"
@@ -59,6 +60,9 @@ Renderer EngineApp::GetRendererImpl( void )
    GLint minVer;
    glGetIntegerv( GL_MINOR_VERSION, &majVer );
    glGetIntegerv( GL_MAJOR_VERSION, &minVer );
+   std::stringstream  ss;
+   ss << "Renderer version: OpenGL " << majVer << "." << minVer;
+   ENG_LOG( "Renderer", ss.str() );
    return Renderer_OpenGL;
    }
 
@@ -85,6 +89,8 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    /*auto test = std::vector< Vec2 >( { Vec2( 1.0f, 1.0f ), Vec2( 5.0f, 5.0f ), Vec2( 4.0f, 4.0f ), Vec2( 1.0f, -3.0f ) } );*/
    //auto test = std::vector< Vec2 >( { Vec2( 0.0f, 2.0f ), Vec2( 1.0f, 4.0f ), Vec2( 2.0f, 0.0f ), Vec2( 3.0f, 1.0f ), Vec2( 4.0f, 3.0f ) } );
    //Triangulation( test );
+
+
    // Check for existing instance of the same window
 	// Not sure if this feature is working normally.... 
    #ifndef _DEBUG
@@ -125,7 +131,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
 
 	//--------------------------------- 
-   //  Initialize ResCache, all assets are within a zip file
+   //  Initialize ResCache, all assets are within a zip file or a folder
    //--------------------------------- 
    IResourceFile *pFile = NULL;
    if( m_EngineOptions.GetIsUsingDevDirectory() )
@@ -204,19 +210,21 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
    // Initiate window & SDL, glew
    //--------------------------------- 
-   if ( SDL_Init(SDL_INIT_EVERYTHING) != 0 )
-      {
-      ENG_ERROR( SDL_GetError() );
-      return false;
-      }
-
-   CHAR charTitle[100];
-   if(  GenericToAnsiCch( charTitle, VGetGameTitle(),  strlen( charTitle ) ) != S_OK )
-      {
-      ENG_ERROR( "Game title translation failed" );
-      }
+   
    if( !window )
       {
+      if( SDL_Init( SDL_INIT_EVERYTHING ) != 0 )
+         {
+         ENG_ERROR( SDL_GetError() );
+         return false;
+         }
+
+      CHAR charTitle[ 100 ];
+      if( GenericToAnsiCch( charTitle, VGetGameTitle(), strlen( charTitle ) ) != S_OK )
+         {
+         ENG_ERROR( "Game title translation failed" );
+         }
+
       m_pWindow = SDL_CreateWindow( charTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth,screenHeight, SDL_WINDOW_OPENGL );
       if ( !m_pWindow ) 
          {
@@ -288,20 +296,22 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
     if( GetRendererImpl() == Renderer_OpenGL )
       {
-      m_pRenderer = shared_ptr<IRenderer>( ENG_NEW OpenGLRenderer() );
+     // m_pRenderer = shared_ptr< IMainRenderer >( ENG_NEW MainRenderer() );
+      m_pRenderManager = shared_ptr< IRenderManager >( ENG_NEW OpenGLRenderManager() );
       }
    else
       {
       ENG_ERROR( "Not supported renderer type" );
       }
-   m_pRenderer->VSetBackgroundColor( g_Black );
-   // Enable depth test
+   glClearDepth( 1.0 );
 	glEnable( GL_DEPTH_TEST );
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc( GL_LESS ); 
    // Cull triangles which normal is not towards the camera
    glEnable( GL_CULL_FACE );
-   m_pRenderer->VOnRestore();
+   m_pRenderManager->VInit();
+   m_pRenderManager->VGetMainRenderer().VSetBackgroundColor( g_Black );
+  // m_pRenderer->VOnRestore();
    //--------------------------------- 
    // Set Renderer
    //--------------------------------- 
@@ -425,7 +435,7 @@ void EngineApp::MsgProc( void )
 
 BaseEngineLogic *EngineApp::VCreateLogic( void )
    {
-   m_pEngineLogic = ENG_NEW BaseEngineLogic( g_pApp->m_pRenderer );
+   m_pEngineLogic = ENG_NEW BaseEngineLogic( g_pApp->m_pRenderManager );
    m_pEngineLogic->Init();
 
 	return m_pEngineLogic;
@@ -580,12 +590,12 @@ int EngineApp::PumpUntilMessage( Uint32& eventEnd, Sint32& code )
 			// Remember this is a modal screen.
 			if ( m_pEngineLogic )
 			   {
-				double fAppTime = 0.0;
-            double fAbsoluteTime = 0.0;
+				double appTime = 0.0;
+            double absoluteTime = 0.0;
             float  fElapasedTime = 0.0f;
-            GetGlobalTimer()->GetTimeValues( &fAppTime, &fAbsoluteTime, &fElapasedTime );
-            m_pEngineLogic->VOnUpdate( fAppTime, fElapasedTime );
-				OnFrameRender( fAppTime, fElapasedTime );
+            GetGlobalTimer()->GetTimeValues( &appTime, &absoluteTime, &fElapasedTime );
+            m_pEngineLogic->VOnUpdate( ( float ) appTime, fElapasedTime );
+            OnFrameRender( appTime, fElapasedTime );
 			   }
 		   }
 	}

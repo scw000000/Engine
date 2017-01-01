@@ -53,11 +53,11 @@ bool AnimationClipNode::VDelegateVInit( void )
    if( m_pAnimResHandle )
       {
       shared_ptr<MeshResourceExtraData> pMeshAnimExtra = static_pointer_cast< MeshResourceExtraData >( m_pAnimResHandle->GetExtraData() );
-      m_pAnimation = pMeshAnimExtra->FindAnimation( 0 );
+      m_pAnimation = pMeshAnimExtra->FindAnimation( 0u );
       }
    else
       {
-      m_pAnimation = m_pMeshExtraData->FindAnimation( 0 );
+      m_pAnimation = m_pMeshExtraData->FindAnimation( 0u );
       }
 
    if( !m_pAnimation )

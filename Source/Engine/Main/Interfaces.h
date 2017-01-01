@@ -189,7 +189,7 @@ class IResourceLoader
 	   virtual bool VDiscardRawBufferAfterLoad( void ) = 0;
       virtual bool VAddNullZero( void ) { return false; }
 	   virtual unsigned int VGetLoadedResourceSize(char *rawBuffer, unsigned int rawSize) = 0;
-	   virtual bool VLoadResource(char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) = 0;
+	   virtual int VLoadResource(char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) = 0;
       virtual bool VUsePreAllocate( void ) = 0;
       virtual bool VIsPatternMatch( const char* str ) = 0;
    };
@@ -209,14 +209,14 @@ class IResourceFile
 
 
 
-enum RenderPass
+enum RenderGroup
    {
-	RenderPass_0,
-	RenderPass_Static = RenderPass_0,
-	RenderPass_Actor,
-	RenderPass_Sky,
-	RenderPass_NotRendered,
-	RenderPass_Last
+	RenderGroup_0,
+	RenderGroup_Static = RenderGroup_0,
+	RenderGroup_Actor,
+	RenderGroup_Sky,
+	RenderGroup_NotRendered,
+	RenderGroup_Last
    };
 
 class Scene;
@@ -226,28 +226,53 @@ typedef shared_ptr<Material> MaterialPtr;
 class LightNode;
 typedef std::list<shared_ptr<LightNode> > Lights;
 
-
-
-
 class IRenderer
    {
    public:
-	   virtual void VSetBackgroundColor( Color color ) = 0; 
-	   virtual GLuint VOnRestore( void ) = 0;
-	   virtual void VShutdown( void ) = 0;
-	   virtual bool VPreRender( void ) = 0;
-	   virtual bool VPostRender( void ) = 0;
+      virtual ~IRenderer() {}
+      //
+      virtual void VShutdown( void ) = 0;
+      virtual int VOnRestore( Scene* pScene ) = 0;
+	   virtual int VPreRender( void ) = 0;
+      virtual int VPostRender( void ) = 0;
 	   //virtual void VCalcLighting( Lights *lights, int maximumLights ) = 0;
-	   
-      // Unnecessarry functions for OpenGL
-      //virtual void VSetWorldTransform( const Mat4x4 *m )=0;
-	   //virtual void VSetViewTransform( const Mat4x4 *m )=0;
-	   //virtual void VSetProjectionTransform( const Mat4x4 *m )=0;
 	   
       //virtual shared_ptr<IRenderState> VPrepareAlphaPass( void ) = 0;
 	   //virtual shared_ptr<IRenderState> VPrepareSkyBoxPass( void ) = 0;
-	   virtual void VDrawLine( const Vec3& from,const Vec3& to,const Color& color ) const = 0;
+      //
    };
+
+class LightManager;
+
+class IMainRenderer : public IRenderer
+   {
+   public:
+      virtual void VLoadLight( Lights& lights ) = 0;
+      virtual void VDrawLine( const Vec3& from, const Vec3& to, const Color& color ) const = 0;
+      virtual void VSetBackgroundColor( const Color& color ) = 0;
+      virtual void VSetRenderingAlpha( bool isAplha ) = 0;
+   };
+
+class IRenderManager
+   {
+   public:
+      ~IRenderManager( void ) { }
+
+   public:
+      virtual int VInit( void ) = 0;
+      virtual int VOnRestore( Scene* pScene ) = 0;
+      virtual int VPreRender( void ) = 0;
+      virtual int VPostRenderNodes( Scene* pScene ) = 0;
+      virtual int VPostRender( void ) = 0;
+      virtual void VShutDown( void ) = 0;
+      virtual IMainRenderer& VGetMainRenderer( void ) = 0;
+    //  virtual void VCheckError( void ) const = 0;
+   };
+
+class ISceneNode;
+struct ShadowVertexInfo;
+
+typedef std::vector< std::shared_ptr< ISceneNode > > SceneNodeList;
 
 class ISceneNode
    {
@@ -259,8 +284,13 @@ class ISceneNode
 
 	   virtual void VSetTransformPtr( TransformPtr pNewTransform ) = 0;
       virtual void VSetTransform( const Transform& newTransform ) = 0;
+      virtual TransformPtr VGetGlobalTransformPtr( void ) const = 0;
+
+      virtual int VPreUpdate( Scene *pScene ) = 0;
 
 	   virtual int VOnUpdate( Scene *pScene, unsigned long deltaMs ) = 0;
+      virtual int VDelegateUpdate( Scene *pScene, unsigned long elapsedMs ) = 0;
+
 	   virtual int VOnRestore( Scene *pScene ) = 0;
 
 	   virtual int VPreRender( Scene *pScene ) = 0;
@@ -271,14 +301,17 @@ class ISceneNode
 
       virtual Vec3 GetToWorldPosition( void ) const = 0;
       virtual void SetToWorldPosition( const Vec3& pos ) = 0;
-      virtual Vec3 VGetWorldPosition( void ) const = 0;
+      virtual Vec3 VGetGlobalPosition( void ) const = 0;
 
-	   virtual bool VAddChild( shared_ptr<ISceneNode> kid )=0;
+	   virtual bool VAddChild( shared_ptr< ISceneNode > kid )=0;
 	   virtual bool VRemoveChild( ActorId id ) = 0;
 	   virtual int VOnLostDevice( Scene *pScene ) = 0;
 
       virtual void VSetParentNode( ISceneNode* pParent ) = 0;
       virtual ISceneNode* VGetParentNode( void ) = 0;
+      virtual SceneNodeList& VGetChildrenSceneNodes( void ) = 0;
+
+      virtual ShadowVertexInfo VGetShadowVertexInfo( void ) const = 0;
    };
 
 class IScriptManager

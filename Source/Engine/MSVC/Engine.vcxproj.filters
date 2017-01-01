@@ -46,6 +46,15 @@
     <Filter Include="Animation">
       <UniqueIdentifier>{cda0ca72-5e0c-430b-9f63-76a9021baa77}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Graphics\SceneNode">
+      <UniqueIdentifier>{1c14dfcb-1ba7-4575-8bc8-7221bd2a39c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{37154279-f676-4eeb-91ea-5156a40b4de9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Graphics\Renderer">
+      <UniqueIdentifier>{1a61e7fa-8a0f-4766-9b23-9597cf76e030}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
@@ -76,9 +85,6 @@
     <ClCompile Include="..\Actors\Actor.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
-    <ClCompile Include="..\Graphics\Geometry.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Actors\TransformComponent.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
@@ -97,17 +103,11 @@
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp">
       <Filter>ResourceCache</Filter>
     </ClCompile>
-    <ClCompile Include="..\Utilities\Math.cpp">
-      <Filter>Utilities</Filter>
-    </ClCompile>
     <ClCompile Include="..\UserInterface\GUIManager.cpp">
       <Filter>UserInterface</Filter>
     </ClCompile>
     <ClCompile Include="..\ResourceCache\XmlResource.cpp">
       <Filter>ResourceCache</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Graphics\SceneNodes.cpp">
-      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\Graphics\Scene.cpp">
       <Filter>Graphics</Filter>
@@ -136,17 +136,11 @@
     <ClCompile Include="..\Graphics\Shaders.cpp">
       <Filter>Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\Graphics\OpenGLRenderer.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Actors\RenderComponent.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
     <ClCompile Include="..\ResourceCache\MeshResource.cpp">
       <Filter>ResourceCache</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Graphics\MeshSceneNode.cpp">
-      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\Graphics\TransformStack.cpp">
       <Filter>Graphics</Filter>
@@ -156,9 +150,6 @@
     </ClCompile>
     <ClCompile Include="..\Actors\LightRenderComponent.cpp">
       <Filter>Actors</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Graphics\SkySceneNode.cpp">
-      <Filter>Graphics</Filter>
     </ClCompile>
     <ClCompile Include="..\Actors\SkyRenderComponent.cpp">
       <Filter>Actors</Filter>
@@ -220,9 +211,6 @@
     <ClCompile Include="..\Actors\PhysicsComponent.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
-    <ClCompile Include="..\Graphics\SkeletalMeshSceneNode.cpp">
-      <Filter>Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Actors\MeshRenderComponent.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
@@ -256,8 +244,50 @@
     <ClCompile Include="..\Actors\VolumeRenderComponent.cpp">
       <Filter>Actors</Filter>
     </ClCompile>
-    <ClCompile Include="..\Graphics\VolumeRenderSceneNode.cpp">
-      <Filter>Graphics</Filter>
+    <ClCompile Include="..\Utilities\Math.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Math\Geometry.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Math\Frustum.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNode\MeshSceneNode.cpp">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNode\SceneNodes.cpp">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNode\SkeletalMeshSceneNode.cpp">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNode\SkySceneNode.cpp">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNode\VolumeRenderSceneNode.cpp">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\SceneNode\DirectionalLightSceneNode.cpp">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\RenderManager.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\RendererLoader.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\MainRenderer.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\DeferredMainRenderer.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Debugging\vsGLInfoLib.cpp">
+      <Filter>Debugging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\TextureRenderer.cpp">
+      <Filter>Graphics\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -273,9 +303,6 @@
     </ClInclude>
     <ClInclude Include="..\UserInterface\HumanView.h">
       <Filter>UserInterface</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Utilities\Math.h">
-      <Filter>Utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\Memory\MemoryPool.h">
       <Filter>Memory</Filter>
@@ -305,9 +332,6 @@
     <ClInclude Include="..\Actors\TransformComponent.h">
       <Filter>Actors</Filter>
     </ClInclude>
-    <ClInclude Include="..\Graphics\Geometry.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\MainLoop\Process.h">
       <Filter>MainLoop</Filter>
     </ClInclude>
@@ -328,9 +352,6 @@
     </ClInclude>
     <ClInclude Include="..\ResourceCache\XmlResource.h">
       <Filter>ResourceCache</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Graphics\SceneNodes.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\Graphics\Scene.h">
       <Filter>Graphics</Filter>
@@ -359,17 +380,11 @@
     <ClInclude Include="..\Graphics\Shaders.h">
       <Filter>Graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\Graphics\OpenGLRenderer.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\Actors\RenderComponent.h">
       <Filter>Actors</Filter>
     </ClInclude>
     <ClInclude Include="..\ResourceCache\MeshResource.h">
       <Filter>ResourceCache</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Graphics\MeshSceneNode.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\Graphics\TransformStack.h">
       <Filter>Graphics</Filter>
@@ -379,9 +394,6 @@
     </ClInclude>
     <ClInclude Include="..\Actors\LightRenderComponent.h">
       <Filter>Actors</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Graphics\SkySceneNode.h">
-      <Filter>Graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\Actors\SkyRenderComponent.h">
       <Filter>Actors</Filter>
@@ -443,9 +455,6 @@
     <ClInclude Include="..\Actors\PhysicsComponent.h">
       <Filter>Physics</Filter>
     </ClInclude>
-    <ClInclude Include="..\Graphics\SkeletalMeshSceneNode.h">
-      <Filter>Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="..\Actors\MeshRenderComponent.h">
       <Filter>Actors</Filter>
     </ClInclude>
@@ -482,8 +491,50 @@
     <ClInclude Include="..\Actors\VolumeRenderComponent.h">
       <Filter>Actors</Filter>
     </ClInclude>
-    <ClInclude Include="..\Graphics\VolumeRenderSceneNode.h">
-      <Filter>Graphics</Filter>
+    <ClInclude Include="..\Utilities\Math.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Math\Geometry.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Math\Frustum.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNode\MeshSceneNode.h">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNode\SceneNodes.h">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNode\SkeletalMeshSceneNode.h">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNode\SkySceneNode.h">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNode\VolumeRenderSceneNode.h">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\SceneNode\DirectionalLightSceneNode.h">
+      <Filter>Graphics\SceneNode</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\RenderManager.h">
+      <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\RendererLoader.h">
+      <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\MainRenderer.h">
+      <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\DeferredMainRenderer.h">
+      <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Debugging\vsGLInfoLib.h">
+      <Filter>Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\TextureRenderer.h">
+      <Filter>Graphics\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

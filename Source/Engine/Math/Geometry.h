@@ -166,6 +166,8 @@ class Vec4 : public glm::vec4
       Vec4( const glm::vec3 &v3 ) { x = v3.x; y = v3.y; z = v3.z; w = 1.0f; }
       Vec4( const float _x, const float _y, const float _z, const float _w ) { x = _x; y = _y; z = _z; w = _w; }
       Vec4( const double _x, const double _y, const double _z, const double _w ) { x = (float)_x; y = (float)_y; z = (float)_z; w = (float)_w; }
+      bool Init( TiXmlElement* pData );
+      TiXmlElement* GernerateXML( void ) const;
 
       inline float Length() { return glm::length<float, glm::highp, glm::tvec4>( *this ); }
       inline Vec4* Normalize() { *this = glm::normalize<float, glm::highp, glm::tvec4>( *this ); return this;  }
@@ -300,12 +302,16 @@ class Mat4x4 : public glm::mat4
          }
 
       inline Vec4 Xform( const Vec4 &v ) const { return (*this) * v; }
-      inline Vec3 Xform( const Vec3 &v ) const { return Vec3( Xform( Vec4( v ) ) ); }
+      inline Vec3 Xform( const Vec3 &v, float w = 1.0f ) const { return Vec3( Xform( Vec4( v.x, v.y, v.z, w ) ) ); }
+     // inline Vec3 Xform( const Vec3 &v ) const { return Vec3( Xform( Vec4( v ) ) ); }
 
       // get rotated vector without shift value
       inline Vec3 GetXFormDirection( const Vec3& vec ) const;
 
       inline Mat4x4 Inverse( void ) const { return glm::inverse( *this ); }
+
+      inline Mat4x4 Transpose( void ) const { return glm::transpose( *this ); }
+
       // equal to M = M * T
       inline void AddTranslation( const Vec3 &pos ) { *this = glm::translate( *this, pos ); }
       inline void AddTranslation( const float x, const float y, const float z ) { AddTranslation( Vec3( x, y, z ) ); }
@@ -346,6 +352,8 @@ class Mat4x4 : public glm::mat4
       // Caution! this matrix is not the same as glm::lookat, the whole direction
       // is reversed, target = eye + inversed forward = eye - ( center - eye )
       static Mat4x4 LookAtToTransform( const Vec3& eye, const Vec3& center, const Vec3& up ) { return LookAt( eye, 2.0f * eye - center, up ); }
+
+      static Mat4x4 Ortho( float left, float right, float up, float bottom, float farDis, float nearDis ) { return Mat4x4( glm::ortho( left, right, bottom, up, nearDis, farDis ) ); }
 
    public: 
       static const Mat4x4 g_Identity;
@@ -415,9 +423,9 @@ inline Vec3 Mat4x4::GetPitchYawRollDeg() const
    return Vec3( RADIANS_TO_DEGREES( vec.x ), RADIANS_TO_DEGREES( vec.y ), RADIANS_TO_DEGREES( vec.z ) );
    }
 
-inline void Mat4x4::BuildProjection( float fovy, float aspect, float zNear, float zFar )
+inline void Mat4x4::BuildProjection( float fovY, float aspect, float zNear, float zFar )
    {
-   *this = glm::perspective( fovy, aspect, zNear, zFar);
+   *this = glm::perspective( fovY, aspect, zNear, zFar);
    }
 
 typedef struct ColorComponents
@@ -532,6 +540,7 @@ class Plane
       Plane( void ) { n = g_Up; d = 0.f; };
       // To make a plane with normal vector points upward, The order of the points 
       //should be counter clockwise for right handed system 
+      // d is distance to origin (If the normal vector is normalized )
       void Init( const Vec3& p0, const Vec3& p1, const Vec3& p2 )
          {
          n = glm::cross( p1 - p0, p2 - p0 );
@@ -552,53 +561,6 @@ class Plane
       Vec3 n;
       // distance
       float d;
-   };
-
-class Frustum
-   {
-   public:
-      Frustum( void );
-      void Init( const float fov, const float aspect, const float nearClipDis, const float farClipDis );
-      /**
-       * @brief Return if a single point is inside the frustum, point should be in Frustum's local space
-       *
-       * @param  point const Vec3 & point
-       * @return bool
-       */
-      bool Inside( const Vec3 &point ) const ;
-
-      /**
-       * @brief return if a shpere is inside the frustum, point should be in Frustum's local space
-       *
-       * @param  point const Vec3 & point
-       * @param  radius float radius
-       * @return bool
-       */
-      bool Inside( const Vec3 &point, float radius ) const ;
-      
-      void SetFOV(float fov) { m_Fov=fov; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
-	   void SetAspect(float aspect) { m_Aspect=aspect; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
-	   void SetNear(float nearClip) { m_NearDis=nearClip; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
-	   void SetFar(float farClip) { m_FarDis=farClip; Init(m_Fov, m_Aspect, m_NearDis, m_FarDis); }
-
-   public:
-      enum Side { Near, Far, Top, Right, Bottom, Left, NumPlanes };
-
-      Plane m_Planes[ NumPlanes ];
-      // represent four vertices for near plane rectangle
-      Vec3 m_NearPlaneVerts[4];
-      // represenr four vertices for far plane rectangle 
-      Vec3 m_FarPlaneVerts[4];
-
-      // field of view in radians
-      float m_Fov;
-      // width divided by height
-      float m_Aspect;
-      // near plane distance
-      float m_NearDis;
-      // far plane distance
-      float m_FarDis;
-
    };
 
  class Transform

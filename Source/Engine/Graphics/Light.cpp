@@ -18,6 +18,11 @@
 #include "..\Event\Events.h"
 #include "..\Event\EventManager.h"
 
+LightProperties::LightProperties( void )
+   {
+   m_Type = LIGHT_TYPE_UNDEFINED;
+   m_Enabled = 1u;
+   }
 
 bool LightProperties::Init( TiXmlElement* pData )
    {
@@ -25,14 +30,40 @@ bool LightProperties::Init( TiXmlElement* pData )
       {
       return false;
       }
-   if( !m_Diffuse.Init( pData->FirstChildElement( "Diffuse" ) ) )
+   Color color;
+   if( !color.Init( pData->FirstChildElement( "Color" ) ) )
       {
       return false;
       }
-   if( TIXML_SUCCESS != pData->QueryFloatAttribute( "power", &m_Power ) )
+   m_Color.x = color.m_Component.r;
+   m_Color.y = color.m_Component.g;
+   m_Color.z = color.m_Component.b;
+
+   std::string lightType = pData->Attribute( "type" );
+
+   if( !lightType.compare( "point" ) )
+      {
+      m_Type = LIGHT_TYPE_POINT;
+      }
+   else if( !lightType.compare( "directional" ) )
+      {
+      m_Type = LIGHT_TYPE_DIRECTIONAL;
+      }
+   else
+      {
+      m_Type = LIGHT_TYPE_UNDEFINED;
+      return false;
+      }
+
+   // Reference: http://www.ogre3d.org/tikiwiki/-Point+Light+Attenuation
+   if( !m_Attenuation.Init( pData->FirstChildElement( "Attenuation" ) ) )
       {
       return false;
       }
+   /*if( TIXML_SUCCESS != pData->QueryFloatAttribute( "power", &m_Power ) )
+      {
+      return false;
+      }*/
 
    return true;
    }
@@ -41,54 +72,54 @@ TiXmlElement* LightProperties::GenerateXML( void )
    {
    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Light" );
 
-   TiXmlElement* pDiffuse = m_Diffuse.GenerateXML();
-   pDiffuse->SetValue( "Diffuse" );
-   pRetNode->LinkEndChild( pDiffuse );
+   Color color( m_Color.x, m_Color.y, m_Color.z, 1.0f );
+   TiXmlElement* pColor = color.GenerateXML();
+   pColor->SetValue( "Color" );
+   pRetNode->LinkEndChild( pColor );
 
-   pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
-
-   /*TiXmlElement* pDiffuse = ENG_NEW TiXmlElement( "Diffuse" );
-   pDiffuse->SetAttribute( "r", ToStr( m_Diffuse.m_Component.r ).c_str() );
-   pDiffuse->SetAttribute( "g", ToStr( m_Diffuse.m_Component.g ).c_str() );
-   pDiffuse->SetAttribute( "b", ToStr( m_Diffuse.m_Component.b ).c_str() );
-   pDiffuse->SetAttribute( "a", ToStr( m_Diffuse.m_Component.a ).c_str() );
-   pBaseElement->LinkEndChild( pDiffuse );
-
-   TiXmlElement* pPower = ENG_NEW TiXmlElement( "Power" );
-   pPower->SetAttribute( "magnitude", ToStr( m_Power ).c_str() );
-   pBaseElement->LinkEndChild( pPower );*/
-
-   return pRetNode;
-   }
-
-TiXmlElement* LightProperties::GenerateOverridesXML( TiXmlElement* pResource ) 
-   {
-   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Light" );
-
-   TiXmlElement* pDiffuse = m_Diffuse.GenerateOverridesXML( pResource->FirstChildElement( "Diffuse" ) );
-   pDiffuse->SetValue( "Diffuse" );
-   pRetNode->LinkEndChild( pDiffuse );
-
-   pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
-   if( !strcmp( pRetNode->Attribute( "power" ), pResource->Attribute( "power" ) ) )
+   std::string typeStr;
+   switch( m_Type ) 
       {
-      pRetNode->RemoveAttribute( "power" );
-      }
+      case LIGHT_TYPE_DIRECTIONAL:
+         typeStr = "directional";
+         break;
+      case LIGHT_TYPE_POINT :
+         typeStr = "point";
+         break;
+      default :
+         break;
+      };
+
+   pRetNode->SetAttribute( "type", typeStr.c_str() );
+
+   TiXmlElement* pAttenuation = m_Attenuation.GernerateXML();
+   pAttenuation->SetValue( "Attenuation" );
+   pRetNode->LinkEndChild( pAttenuation );
+ //  pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
+
    return pRetNode;
    }
+
+//TiXmlElement* LightProperties::GenerateOverridesXML( TiXmlElement* pResource ) 
+//   {
+//   TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Light" );
+//
+//   TiXmlElement* pDiffuse = m_Color.GenerateOverridesXML( pResource->FirstChildElement( "Diffuse" ) );
+//   pDiffuse->SetValue( "Diffuse" );
+//   pRetNode->LinkEndChild( pDiffuse );
+//
+//   /*pRetNode->SetAttribute( "power", ToStr( m_Power ).c_str() );
+//   if( !strcmp( pRetNode->Attribute( "power" ), pResource->Attribute( "power" ) ) )
+//      {
+//      pRetNode->RemoveAttribute( "power" );
+//      }*/
+//   return pRetNode;
+//   }
 
 LightNode::LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& props, TransformPtr pTransform )
-   : SceneNode( actorId, pRenderComponent, RenderPass_NotRendered, pTransform )
+   : SceneNode( actorId, pRenderComponent, RenderGroup_NotRendered, pTransform )
    {
 	m_pLightProps = props;
-   }
-
-int GLLightNode::VOnUpdate( Scene *, const unsigned long deltaMs )
-   { 
-	// light color can change anytime! Check the BaseRenderComponent!
-	//LightRenderComponent* lrc = static_cast<LightRenderComponent*>( m_pRenderComponent );
-	/*m_Props.GetMaterial().SetDiffuse( lrc->GetLightProperties().m_Color );*/
-	return S_OK; 
    }
 
 LightManager::LightManager( void )
@@ -98,23 +129,62 @@ LightManager::LightManager( void )
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &LightManager::DestroySceneNodeDelegate ), Event_Destroy_Scene_Node::s_EventType );
    }
 
+void LightManager::RenderShadowMap( shared_ptr< LightNode > ) const
+   {
+   
+   }
+
 void LightManager::CalcLighting( Scene *pScene )
    {
-	//// LATER: There might be all kinds of things you'd want to do here for optimization, especially turning off lights on actors that can't be seen, etc.
+   // Only calculate shadow for nodes in static and actor group
+   auto viewMat = pScene->GetCamera()->GetView();
+   for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt )
+      {
+      auto lightNode = lightIt->get();
+      auto lightPtr = lightIt->get()->GetLightPropertiesPtr();
+      switch( lightPtr->m_Type )
+         {
+         case LIGHT_TYPE_POINT :
+            lightPtr->m_PositionVS = viewMat.Xform( lightNode->VGetGlobalPosition(), 1.0f );
+            break;
+         case LIGHT_TYPE_DIRECTIONAL :
+            lightPtr->m_DirectionVS = viewMat.Xform( lightNode->VGetGlobalTransformPtr()->GetForward(), 0.0f );
+            lightPtr->m_DirectionVS.Normalize();
+            break;
+         };
 
+     // lightIt->get()->VPreRenderShadowMap();
+      }
 
-	ENG_ASSERT( m_ActiveLights.size() <= MAXIMUM_LIGHTS_SUPPORTED );
+   if( pScene->m_pRoot ) 
+      {
+      //auto pStaticGroup = pScene->m_pRoot->m_Children[ RenderPass_Static ];
+     // CalcShadow( pStaticGroup );
+      auto pActorGroup = pScene->m_pRoot->m_Children[ RenderGroup_Actor ];
+      auto& childrenList = pActorGroup->VGetChildrenSceneNodes();
+      for( auto pChild : childrenList )
+         {
+         CalcShadow( pScene, pChild );
+         }
+    //  CalcShadow( pScene, pActorGroup );
+      }
 
-   for( Lights::iterator lightIt = m_ActiveLights.begin( ); lightIt != m_ActiveLights.end( ); ++lightIt )
+   int i = 0;
+   for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt, ++i )
       {
       /*if( lightIt == m_ActiveLights.begin() )
          {
          m_LightAmbient = lightIt->get()->GetLightPropertiesPtr()->m_Diffuse * 0.2f;
          }*/
-      memcpy( m_LightPosWorldSpace, &lightIt->get( )->VGetWorldPosition( ), sizeof( Vec3 ) );
-      memcpy( m_LightDir, &lightIt->get( )->GetForward( ), sizeof( Vec3 ) );
-      memcpy( m_LightPower, &lightIt->get( )->GetLightPropertiesPtr( )->m_Power, sizeof( float ) );
-      memcpy( m_LightColor, &lightIt->get()->GetLightPropertiesPtr()->m_Diffuse, sizeof( Color ) );
+      auto globalPos = lightIt->get()->VGetGlobalPosition();
+      memcpy( &m_LightPosWorldSpace[ i ], &globalPos, sizeof( Vec3 ) );
+      memcpy( &m_LightDir[ i ], &lightIt->get()->VGetGlobalTransformPtr()->GetForward(), sizeof( Vec3 ) );
+   //   memcpy( &m_LightPower[ i ], &lightIt->get()->GetLightPropertiesPtr()->m_Power, sizeof( float ) );
+      memcpy( &m_LightColor[ i ], &lightIt->get()->GetLightPropertiesPtr()->m_Color, sizeof( Color ) );
+      // auto shadowMapMatrix = lightIt->get()->VGetShadowMapMatrix();
+      //  memcpy( &m_ShadowMapMatrix[ i ], &shadowMapMatrix, sizeof( Mat4x4 ) );
+    //  auto shadowMapTexture = lightIt->get()->VGetShadowMapTexture();
+    //  memcpy( &m_ShadowMapTexture[ i ], &shadowMapTexture, sizeof( GLuint ) );
       }
    }  
 
@@ -135,6 +205,31 @@ void LightManager::CalcLighting( SceneNode *pNode )
 		memcpy(pLighting->m_vLightDiffuse, GetLightDiffuse(pNode), sizeof( Vec4 ) * count);
 		pLighting->m_nNumLights = count;
 	   }*/
+   }
+
+void LightManager::CalcShadow( Scene *pScene, shared_ptr< ISceneNode > pNode )
+   {
+  // m_DeferredShader.VOnRender( pScene, pNode );
+   for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt )
+      {
+      // If the node is inside the frustum of current light, then render it to current light's shadow map
+      auto nodeGlobalPos = pNode->VGetGlobalTransformPtr()->GetToWorldPosition();
+      if( pNode->VGetProperties().GetEnableShadow() && lightIt->get()->VIsInside( nodeGlobalPos, pNode->VGetProperties().GetRadius() ) )
+         {
+         //lightIt->get()->VSetUpRenderShadowMap();
+        // lightIt->get()->VRenderShadowMap( pNode );
+         }
+      }
+   auto& childrenList = pNode->VGetChildrenSceneNodes();
+   for( auto pChild : childrenList )
+      {
+      CalcShadow( pScene, pChild );
+      }
+   }
+
+void LightManager::RenderShadowMap( ISceneNode *pNode )
+   {
+ 
    }
 
 bool LightManager::AddLightNode( shared_ptr<LightNode> pNewLight )

@@ -32,9 +32,9 @@ layout ( std430, binding = 0 ) writeonly buffer tileFrustumSSBO
  vec3 TexCoordinatesToView( vec2 p )
     {
     vec3 eyeDir = vec3( 2 * uHalfSizeNearPlane * p - uHalfSizeNearPlane, -1 );
-    // ndcZ = -1.0, uProj[2][3] = -1.0
-    float eyeZ = -uProj[3][2] / ( -1.0 + uProj[2][2] ); 
-    return eyeDir * eyeZ;
+    // ndcZ = -1.0, uProj[2][3] = -1.0, and we need positive value of depth value
+    float eyeZLength = uProj[3][2] / ( -1.0 + uProj[2][2] ); 
+    return eyeDir * eyeZLength;
     }
  
  void main()

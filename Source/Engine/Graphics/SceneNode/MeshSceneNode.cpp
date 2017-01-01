@@ -172,10 +172,7 @@ int MeshSceneNode::VRender( Scene *pScene )
 
    glBindVertexArray( 0 );
    glBindFramebuffer( GL_FRAMEBUFFER, m_pDeferredMainRenderer->m_FBO[ renderPass ] );
-   
-     /* glEnable( GL_CULL_FACE );
-      glCullFace( GL_BACK );
-      glEnable( GL_DEPTH_TEST );*/
+
    auto view = pScene->GetCamera()->GetView();
    auto proj = pScene->GetCamera()->GetProjection();
    auto model = VGetGlobalTransformPtr()->GetToWorld();
@@ -193,9 +190,9 @@ int MeshSceneNode::VRender( Scene *pScene )
    glUniform1i( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_AlbedoTexture ], 0 );
 
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
-   glEnableVertexAttribArray( VERTEX_LOCATION );
+   glEnableVertexAttribArray( 0 );
    glVertexAttribPointer(
-         VERTEX_LOCATION,
+         0,
          3,                
          GL_FLOAT,           
          GL_FALSE,           
@@ -235,11 +232,8 @@ int MeshSceneNode::VRender( Scene *pScene )
          );
   
    OpenGLRenderManager::CheckError();
-//      ENG_ASSERT( !glGetError() );
    
-    //  glDisableVertexAttribArray( GEOMETRY_PASS_VERTEX_LOCATION );
    glUseProgram( 0 );
-   glBindVertexArray( 0 );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
  //  return S_OK;
@@ -247,55 +241,55 @@ int MeshSceneNode::VRender( Scene *pScene )
    //////////////////////////////////////////////////////////
 
 	// Use our shader
-	glUseProgram( m_Program );
-   glBindVertexArray( m_VAO );
+	//glUseProgram( m_Program );
+ //  glBindVertexArray( m_VAO );
 
-   Mat4x4 modelToWorld = VGetGlobalTransformPtr()->GetToWorld();
-   // Get the projection & view matrix from the camera class
-   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * VGetGlobalTransformPtr()->GetToWorld();
-   // Send our transformation to the currently bound shader, 
-   // in the "MVP" uniform
-   // 1-> how many matrix, GL_FALSE->should transpose or not
-   glUniformMatrix4fv( m_MVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
+ //  Mat4x4 modelToWorld = VGetGlobalTransformPtr()->GetToWorld();
+ //  // Get the projection & view matrix from the camera class
+ //  Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * VGetGlobalTransformPtr()->GetToWorld();
+ //  // Send our transformation to the currently bound shader, 
+ //  // in the "MVP" uniform
+ //  // 1-> how many matrix, GL_FALSE->should transpose or not
+ //  glUniformMatrix4fv( m_MVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
 
-   glUniformMatrix4fv( m_MUni, 1, GL_FALSE, &( modelToWorld[ 0 ][ 0 ] ) );
+ //  glUniformMatrix4fv( m_MUni, 1, GL_FALSE, &( modelToWorld[ 0 ][ 0 ] ) );
 
-   auto pLightManager = pScene->GetLightManagerPtr();
-   
-   glUniform3fv( m_LightPosWorldSpaceUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPosWorldSpace( ) );
-   glUniform3fv( m_LigthDirectionUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightDirection( ) );
-   glUniform3fv( m_LightColorUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor( ) );
- //  glUniform1fv( m_LightPowerUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower( ) );
-   glUniform1i( m_LightNumberUni, pLightManager->GetActiveLightCount( ) );
+ //  auto pLightManager = pScene->GetLightManagerPtr();
+ //  
+ //  glUniform3fv( m_LightPosWorldSpaceUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPosWorldSpace( ) );
+ //  glUniform3fv( m_LigthDirectionUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightDirection( ) );
+ //  glUniform3fv( m_LightColorUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor( ) );
+ ////  glUniform1fv( m_LightPowerUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower( ) );
+ //  glUniform1i( m_LightNumberUni, pLightManager->GetActiveLightCount( ) );
 
-   //auto shadowMapMatrix = pLightManager->GetShadowMapMatrix();
-   //glUniformMatrix4fv( m_ShadowMapMatrixUni, MAXIMUM_LIGHTS_SUPPORTED, GL_FALSE, &pLightManager->GetShadowMapMatrix()[ 0 ][ 0 ][ 0 ] );
-   //auto shadowMapTextureObj = pLightManager->GetShadowMaptexture();
-   //for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
-   //   {
-   //   glActiveTexture( GL_TEXTURE1 + i );
-   //   glBindTexture( GL_TEXTURE_2D, shadowMapTextureObj[ i ] );
-   //   glUniform1i( m_ShadowMapTextureUni[ i ], i + 1 ); // the zero index is for mesh texture
-   //   }
+ //  //auto shadowMapMatrix = pLightManager->GetShadowMapMatrix();
+ //  //glUniformMatrix4fv( m_ShadowMapMatrixUni, MAXIMUM_LIGHTS_SUPPORTED, GL_FALSE, &pLightManager->GetShadowMapMatrix()[ 0 ][ 0 ][ 0 ] );
+ //  //auto shadowMapTextureObj = pLightManager->GetShadowMaptexture();
+ //  //for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
+ //  //   {
+ //  //   glActiveTexture( GL_TEXTURE1 + i );
+ //  //   glBindTexture( GL_TEXTURE_2D, shadowMapTextureObj[ i ] );
+ //  //   glUniform1i( m_ShadowMapTextureUni[ i ], i + 1 ); // the zero index is for mesh texture
+ //  //   }
 
-   glUniform3fv( m_EyePosWorldSpaceUni, 1, ( const GLfloat* ) &pScene->GetCamera()->VGetGlobalPosition() );
-   
-   glUniform4fv( m_MaterialDiffuseUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse( ) );
-   glUniform3fv( m_MaterialAmbientUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient( ) );
-   glUniform3fv( m_MaterialSpecularUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetSpecular() );
+ //  glUniform3fv( m_EyePosWorldSpaceUni, 1, ( const GLfloat* ) &pScene->GetCamera()->VGetGlobalPosition() );
+ //  
+ //  glUniform4fv( m_MaterialDiffuseUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse( ) );
+ //  glUniform3fv( m_MaterialAmbientUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient( ) );
+ //  glUniform3fv( m_MaterialSpecularUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetSpecular() );
 
-	// Bind our texture in Texture Unit 0
-	glActiveTexture( GL_TEXTURE0 );
-	glBindTexture( GL_TEXTURE_2D, m_MeshTextureObj );
-	// Set our "myTextureSampler" sampler to user Texture Unit 0
-   //glUniform1i( m_MeshTextureUni, 0 );
+	//// Bind our texture in Texture Unit 0
+	//glActiveTexture( GL_TEXTURE0 );
+	//glBindTexture( GL_TEXTURE_2D, m_MeshTextureObj );
+	//// Set our "myTextureSampler" sampler to user Texture Unit 0
+ //  //glUniform1i( m_MeshTextureUni, 0 );
 
-   glDrawElements(
-      GL_TRIANGLES,      // mode
-      m_VerticesIndexCount,    // count
-      GL_UNSIGNED_INT,   // type
-      ( void* ) 0           // element array buffer offset
-      );
+   //glDrawElements(
+   //   GL_TRIANGLES,      // mode
+   //   m_VerticesIndexCount,    // count
+   //   GL_UNSIGNED_INT,   // type
+   //   ( void* ) 0           // element array buffer offset
+   //   );
 
    glBindVertexArray( 0 );
    glUseProgram( 0 );

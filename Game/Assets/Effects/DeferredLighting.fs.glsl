@@ -64,8 +64,8 @@ vec3 ToViewSpace( vec3 p )
     p = p * 2.0 - vec3( 1.0, 1.0, 1.0 ); // to NDC space
     p.xy = uHalfSizeNearPlane * p.xy;
     vec3 eyeDir = vec3( p.xy, -1 );
-    float eyeZ = -uProj[3][2] / ( p.z + uProj[2][2] ); 
-    return eyeDir * eyeZ;
+    float positiveDepthVS = uProj[3][2] / ( p.z + uProj[2][2] ); 
+    return eyeDir * positiveDepthVS;
     }
 
 vec3 GetNormal( vec4 mrt0 )
@@ -95,12 +95,13 @@ float GetShininess( float glossiness )
     
 vec3 GetDiffuse( vec3 albedo, float metalness )
     {
+   // return vec3( 1.0, 0.0, 0.0 );
 	return albedo * ( 1.0 - metalness );
     }
 
 vec3 GetSpecular( vec3 albedo, float metalness )
     {
-	return mix( vec3( 0.04 ), albedo, vec3( metalness ) );
+	return mix( vec3( 0.04 ), albedo, metalness );
     }
     
 float GetSpecularNormalizeFactor( float shininess )
@@ -123,11 +124,12 @@ vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 diffuse, vec3 s
     {
     Light light = LightPropsSSBO.data[ lightIdx ];
     // float distance, 
-    float dist;
-    float distSqr;
-	float luminosity;
-    vec3 viewDir = -meshPosVS; //????check
-    vec3 lightDir;
+    float dist = 0.0;
+    float distSqr = 0.0;
+	float luminosity = 0.0;
+    vec3 viewDir = -meshPosVS; 
+    vec3 lightDir = vec3( 0.0 ); 
+    
     switch ( light.m_Type )
         {
         case LIGHT_TYPE_POINT:
@@ -163,7 +165,7 @@ vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 diffuse, vec3 s
     specular = specularNormalFac 
                 * GetDistribution( halfway, normal, shininess )
 				* GetFresnel( lightDir, halfway, specular );
-    //return vec3( 0.0, 0.0, 0.0 );            
+    
     return max( ( diffuse + specular ) * ( nDotL * luminosity ), vec3( 0.0 ) ) * light.m_Color.rgb;
     }
     
@@ -195,18 +197,18 @@ void main()
     // get light gird index
     uvec2 tileCoord = uvec2( gl_FragCoord.xy / TILE_SIZE );
     tileCoord = min( tileCoord, uTileNum - uvec2( 1u, 1u ) );
-    uint tileIdx = uTileNum.x + uTileNum.y * uTileNum.x;
+    uint tileIdx = tileCoord.x + tileCoord.y * uTileNum.x;
     // get light list offset and count
     uint listOffset = LightIdxGridSSBO.data[ tileIdx * 2u ];
     uint listLength = LightIdxGridSSBO.data[ tileIdx * 2u + 1u ];
-    
-    
+
     oColor = vec4( 0.0, 0.0, 0.0, 1.0 );
+
     // calculate each light in light index
     for( uint i = 0u; i < listLength; ++i )
         {
         //Light light = LightPropsSSBO.data[ LightIdxListSSBO.data[ listOffset + i ] ];
-        oColor += CalcLight(    LightIdxListSSBO.data[ listOffset + i ], 
+        oColor.xyz += CalcLight(    LightIdxListSSBO.data[ listOffset + i ], 
                                 meshPosVS, 
                                 normal, 
                                 diffuse, 
@@ -214,9 +216,12 @@ void main()
                                 specularNormalFac, 
                                 shininess );
     
-
         }
-        
+    oColor.xyz += albedo * 0.2;
+  //  oColor.xyz += vec3( 0.2 );
+  // oColor.xyz = diffuse;
+   // oColor = vec4( vUV * 2.0 - vec2( 1.0, 1.0), 0.0, 1.0 );
+  // oColor = vec4( meshPosVS.xyz, 1.0 );
     oColor.a = 1.0;
     }
 

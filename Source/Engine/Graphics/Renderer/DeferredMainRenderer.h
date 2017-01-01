@@ -38,7 +38,7 @@ class DeferredMainRenderer : public MainRenderer
       int OnRestourLightCullPass( Scene* pScene );
       int OnRestoreLightingPass( Scene* pScene );
       void LightCulling( Scene* pScene );
-      void CalculateLighting( Scene* pScene );
+      void CalculateLighting( void );
       void GenerateProgram( unsigned int renderPass );
 
    private:
@@ -113,6 +113,17 @@ class DeferredMainRenderer : public MainRenderer
 
       unsigned int m_TileNum[ 2 ];
       ComputeShader m_TileFrustumShader;
+
+      enum VBOs
+         {
+         VBOs_Vertex,
+         VBOs_UV,
+         VBOs_Index,
+         VBOs_Num
+         };
+      GLuint            m_Buffers[ VBOs_Num ];
+
+      GLuint m_LightingVAO;
    };
 
 typedef struct tileFrustum

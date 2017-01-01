@@ -71,8 +71,8 @@ int TextureRenderer::VOnRestore( Scene* pScene )
    m_FragmentShader.VReleaseShader( m_Program );
 
    // 1st attribute buffer : vertices
-   glGenBuffers( 1, &m_Buffers[ Vertex_Buffer ] );
-   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
+   glGenBuffers( 1, &m_Buffers[ VBOs_Vertex ] );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ VBOs_Vertex ] );
    glBufferData( GL_ARRAY_BUFFER, ENG_ARRAY_SIZE( QUAD_VERTEX_POSITION ), QUAD_VERTEX_POSITION, GL_STATIC_DRAW );
    glEnableVertexAttribArray( VERTEX_LOCATION );
    glVertexAttribPointer(
@@ -85,8 +85,8 @@ int TextureRenderer::VOnRestore( Scene* pScene )
       );
 
    // 2nd attribute buffer : UVs
-   glGenBuffers( 1, &m_Buffers[ UV_Buffer ] );
-   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
+   glGenBuffers( 1, &m_Buffers[ VBOs_UV ] );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ VBOs_UV ] );
    glBufferData( GL_ARRAY_BUFFER, ENG_ARRAY_SIZE( QUAD_UV_POSITION ), QUAD_UV_POSITION, GL_STATIC_DRAW );
    glEnableVertexAttribArray( UV_LOCATION );
    glVertexAttribPointer(
@@ -98,11 +98,14 @@ int TextureRenderer::VOnRestore( Scene* pScene )
       ( void* ) 0                          // array buffer offset
       );
 
-   glGenBuffers( 1, &m_Buffers[ Index_Buffer ] );
-   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ Index_Buffer ] );
+   glGenBuffers( 1, &m_Buffers[ VBOs_Index ] );
+   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ VBOs_Index ] );
    glBufferData( GL_ELEMENT_ARRAY_BUFFER, ENG_ARRAY_SIZE( QUAD_VERTEX_INDEX ), QUAD_VERTEX_INDEX, GL_STATIC_DRAW );
 
+   glUseProgram( m_Program );
    m_TextureUni = glGetUniformLocation( m_Program, "uTexture" );
+   glUniform1i( m_TextureUni, 0 );
+   glUseProgram( 0 );
 
    return S_OK;
    }
@@ -125,8 +128,7 @@ void TextureRenderer::DrawTexture( GLuint textureObj, const Point& offset, const
 
    glActiveTexture( GL_TEXTURE0 );
    glBindTexture( GL_TEXTURE_2D, textureObj );
-   glUniform1i( m_TextureUni, 0 );
-
+   
    glDrawElements(
       GL_TRIANGLES,      // mode
       ENG_ARRAY_SIZE_IN_ELEMENTS( QUAD_VERTEX_INDEX ),    // count

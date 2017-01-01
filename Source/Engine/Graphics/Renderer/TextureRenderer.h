@@ -27,14 +27,6 @@ class TextureRenderer : public IRenderer
    protected:
       void ReleaseResource( void );
 
-      enum VB_TYPES
-         {
-         Vertex_Buffer,
-         UV_Buffer,
-         Index_Buffer,
-         Num_Buffers
-         };
-
    protected:
       
       GLuint            m_Program;
@@ -42,6 +34,13 @@ class TextureRenderer : public IRenderer
       FragmentShader		m_FragmentShader;
 
       GLuint            m_VAO;
-      GLuint            m_Buffers[ Num_Buffers ];
+      enum VBOs
+         {
+         VBOs_Vertex,
+         VBOs_UV,
+         VBOs_Index,
+         VBOs_Num
+         };
+      GLuint            m_Buffers[ VBOs_Num ];
       GLuint            m_TextureUni;
    };

@@ -25,6 +25,9 @@
 #define GEOMETRY_PASS_UV_LOCATION 2
 #define GEOMETRY_PASS_NORMAL_LOCATION 1
 
+#define LIGHT_PASS_VERTEX_LOCATION    0
+#define LIGHT_PASS_UV_LOCATION        1
+
 const char* const TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME = "Effects\\TileFrustumGeneration.cs.glsl";
 
 const char* const LIGHT_CULL_COMPUTE_SHADER_FILE_NAME = "Effects\\LightCulling.cs.glsl";
@@ -34,6 +37,22 @@ const char* const GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredGe
 
 const char* const LIGHT_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DeferredLighting.vs.glsl";
 const char* const LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredLighting.fs.glsl";
+
+const GLfloat QUAD_VERTEX_POSITION[] = {
+   -1.0f, -1.0f, // bottom left
+   1.0f, -1.0f, // bottom right
+   1.0f, 1.0f, // top right
+   -1.0f, 1.0f // top left
+   };
+
+const GLfloat QUAD_UV_POSITION[] = {
+   0.0f, 0.0f, // bottom left
+   1.0f, 0.0f, // bottom right
+   1.0f, 1.0f, // top right
+   0.0f, 1.0f // top left
+   };
+
+const unsigned short QUAD_VERTEX_INDEX[] = { 0, 1, 2, 0, 2, 3 };
 
 DeferredMainRenderer::DeferredMainRenderer( void )
    {
@@ -499,6 +518,43 @@ int DeferredMainRenderer::OnRestoreLightingPass( Scene* pScene )
    glUniformMatrix4fv( m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_Proj ], 1, GL_FALSE, &proj[ 0 ][ 0 ] );
 
    glUseProgram( 0 );
+
+   glGenVertexArrays( 1, &m_LightingVAO );
+   glBindVertexArray( m_LightingVAO );
+   // 1st attribute buffer : vertices
+   glGenBuffers( 1, &m_Buffers[ VBOs_Vertex ] );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ VBOs_Vertex ] );
+   glBufferData( GL_ARRAY_BUFFER, ENG_ARRAY_SIZE( QUAD_VERTEX_POSITION ), QUAD_VERTEX_POSITION, GL_STATIC_DRAW );
+   glEnableVertexAttribArray( LIGHT_PASS_VERTEX_LOCATION );
+   glVertexAttribPointer(
+      LIGHT_PASS_VERTEX_LOCATION,                  // attribute
+      2,                  // size
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      ( void* ) 0            // array buffer offset
+      );
+
+   // 2nd attribute buffer : UVs
+   glGenBuffers( 1, &m_Buffers[ VBOs_UV ] );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ VBOs_UV ] );
+   glBufferData( GL_ARRAY_BUFFER, ENG_ARRAY_SIZE( QUAD_UV_POSITION ), QUAD_UV_POSITION, GL_STATIC_DRAW );
+   glEnableVertexAttribArray( LIGHT_PASS_UV_LOCATION );
+   glVertexAttribPointer(
+      LIGHT_PASS_UV_LOCATION,                                // attribute
+      2,                                // size
+      GL_FLOAT,                         // type
+      GL_FALSE,                         // normalized?
+      0,                                // stride
+      ( void* ) 0                          // array buffer offset
+      );
+
+   glGenBuffers( 1, &m_Buffers[ VBOs_Index ] );
+   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ VBOs_Index ] );
+   glBufferData( GL_ELEMENT_ARRAY_BUFFER, ENG_ARRAY_SIZE( QUAD_VERTEX_INDEX ), QUAD_VERTEX_INDEX, GL_STATIC_DRAW );
+
+   glBindVertexArray( 0 );
+
    OpenGLRenderManager::CheckError();
    return S_OK;
    }
@@ -530,10 +586,12 @@ void DeferredMainRenderer::LightCulling( Scene* pScene )
 
    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_SHADER_STORAGE_BUFFER );
 
+   glUseProgram( 0 );
+
    OpenGLRenderManager::CheckError();
    }
 
-void DeferredMainRenderer::CalculateLighting( Scene* pScene )
+void DeferredMainRenderer::CalculateLighting( void )
    {
    glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
 
@@ -554,14 +612,18 @@ void DeferredMainRenderer::CalculateLighting( Scene* pScene )
    glActiveTexture( GL_TEXTURE2 );
    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_AlbedoMetalness ] );
 
-   //uniform sampler2D   uDepthTex;
-   //uniform sampler2D   uMRT0;
-   //uniform sampler2D   uMRT1;
-   //uniform uvec2       uTileNum;
-   //uniform uvec2       uHalfSizeNearPlane;
-   //uniform mat4        uProj;
+   glBindVertexArray( m_LightingVAO );
 
+   glDrawElements(
+      GL_TRIANGLES,      // mode
+      ENG_ARRAY_SIZE_IN_ELEMENTS( QUAD_VERTEX_INDEX ),    // count
+      GL_UNSIGNED_SHORT,   // type
+      ( void* ) 0           // element array buffer offset
+      );
 
+   glBindVertexArray( 0 );
+
+   glUseProgram( 0 );
    OpenGLRenderManager::CheckError();
    }
 

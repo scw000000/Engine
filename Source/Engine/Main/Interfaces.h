@@ -232,7 +232,7 @@ class IRenderer
       virtual ~IRenderer() {}
       //
       virtual void VShutdown( void ) = 0;
-	   virtual int VOnRestore( void ) = 0;
+      virtual int VOnRestore( Scene* pScene ) = 0;
 	   virtual int VPreRender( void ) = 0;
       virtual int VPostRender( void ) = 0;
 	   //virtual void VCalcLighting( Lights *lights, int maximumLights ) = 0;
@@ -260,7 +260,7 @@ class IRenderManager
 
    public:
       virtual int VInit( void ) = 0;
-      virtual int VOnRestore( void ) = 0;
+      virtual int VOnRestore( Scene* pScene ) = 0;
       virtual int VPreRender( void ) = 0;
       virtual int VPostRenderNodes( Scene* pScene ) = 0;
       virtual int VPostRender( void ) = 0;

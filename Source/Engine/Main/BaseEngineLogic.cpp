@@ -87,7 +87,7 @@ bool BaseEngineLogic::Init()
       return false;
       }
    // render manager need the information of camera to restore, which is in the scene
-   m_pRenderManager->VOnRestore();
+   m_pRenderManager->VOnRestore( m_pWrold.get() );
    SetNextEngineState( BES_Ready );
    return true;  
    }
@@ -177,7 +177,7 @@ int BaseEngineLogic::VOnRestore( void )
       pView->VOnRestore();
       }
    // render manager need the information of camera to restore, which is in the scene
-   m_pRenderManager->VOnRestore();
+   m_pRenderManager->VOnRestore( m_pWrold.get() );
    return S_OK;
    }
 

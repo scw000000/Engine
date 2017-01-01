@@ -27,25 +27,30 @@
 
 const char* const TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME = "Effects\\TileFrustumGeneration.cs.glsl";
 
-const char* const LIGHT_LIST_COMPUTE_SHADER_FILE_NAME = "Effects\\LightListGeneration.cs.glsl";
+const char* const LIGHT_CULL_COMPUTE_SHADER_FILE_NAME = "Effects\\LightCulling.cs.glsl";
 
 const char* const GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DeferredGeometry.vs.glsl";
 const char* const GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredGeometry.fs.glsl";
 
-const char* const LIGHT_PASS_VERTEX_SHADER_FILE_NAME = "";
-const char* const LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME = "";
+const char* const LIGHT_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DeferredLighting.vs.glsl";
+const char* const LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredLighting.fs.glsl";
 
 DeferredMainRenderer::DeferredMainRenderer( void )
    {
    m_Shaders[ RenderPass_Geometry ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( Resource( GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME ) ) ) );
    m_Shaders[ RenderPass_Geometry ].push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( Resource( GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ) );
 
-   m_Shaders[ RenderPass_LightCulling ].push_back( shared_ptr< OpenGLShader >( ENG_NEW ComputeShader( Resource( LIGHT_LIST_COMPUTE_SHADER_FILE_NAME ) ) ) );
+   m_Shaders[ RenderPass_LightCulling ].push_back( shared_ptr< OpenGLShader >( ENG_NEW ComputeShader( Resource( LIGHT_CULL_COMPUTE_SHADER_FILE_NAME ) ) ) );
+   
+   m_Shaders[ RenderPass_Lighting ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( Resource( LIGHT_PASS_VERTEX_SHADER_FILE_NAME ) ) ) );
+   m_Shaders[ RenderPass_Lighting ].push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( Resource( LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ) );
+
    //m_VertexShaders[ RenderPass_LightCalc ].VSetResource( Resource( LIGHT_PASS_VERTEX_SHADER_FILE_NAME ) );
    //m_FragmentShaders[ RenderPass_LightCalc ].VSetResource( Resource( LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME ) );
 
    m_Uniforms[ RenderPass_Geometry ] = std::vector< GLuint >( GeometryPassUni_Num, -1 );
    m_Uniforms[ RenderPass_LightCulling ] = std::vector< GLuint >( LightCullPassUni_Num, -1 );
+   m_Uniforms[ RenderPass_Lighting ] = std::vector< GLuint >( LightingPassUni_Num, -1 );
 
    m_TileFrustumShader.VSetResource( Resource( TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME ) );
 
@@ -74,7 +79,7 @@ int DeferredMainRenderer::VPreRender( void )
    return S_OK;
    }
 
-int DeferredMainRenderer::VOnRestore( void )
+int DeferredMainRenderer::VOnRestore( Scene* pScene )
    {
    ReleaseResource();
 
@@ -82,7 +87,7 @@ int DeferredMainRenderer::VOnRestore( void )
 
    OnRestoreTextures();
 
-   OnRestoreTileFrustum();
+   OnRestoreTileFrustum( pScene );
 
    if( OnRestoreGeometryPass() != S_OK )
       {
@@ -90,16 +95,17 @@ int DeferredMainRenderer::VOnRestore( void )
       return S_FALSE;
       }
 
-   if( OnRestourLightCullPass() != S_OK )
+   if( OnRestourLightCullPass( pScene ) != S_OK )
       {
       ENG_ASSERT( "Light Culling Pass Restore Failed" );
       return S_FALSE;
       }
-   //if( OnRestoreLightPass() != S_OK )
-   //   {
-   //   ENG_ASSERT( "Geometry Pass Restore Failed" );
-   //   return S_FALSE;
-   //   }
+
+   if( OnRestoreLightingPass( pScene ) != S_OK )
+      {
+      ENG_ASSERT( "Geometry Pass Restore Failed" );
+      return S_FALSE;
+      }
    
    return S_OK;
    }
@@ -120,6 +126,9 @@ void DeferredMainRenderer::VLoadLight( Lights& lights )
 
    glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
 
+   glUseProgram( m_Programs[ RenderPass_LightCulling ] );
+      glUniform1ui( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_ValidLightNum ], std::min( lights.size(), MAXIMUM_LIGHTS_SUPPORTED ) );
+   glUseProgram( 0 );
    //ptr = ( LightProperties * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );
    //
    //for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
@@ -323,7 +332,7 @@ int DeferredMainRenderer::OnRestoreTextures( void )
    return S_OK;
    }
 
-int DeferredMainRenderer::OnRestoreTileFrustum( void )
+int DeferredMainRenderer::OnRestoreTileFrustum( Scene* pScene )
    {
    m_TileFrustumShader.VOnRestore();
    auto program = OpenGLRendererLoader::GenerateProgram( { m_TileFrustumShader.GetShaderObject() } );
@@ -339,7 +348,7 @@ int DeferredMainRenderer::OnRestoreTileFrustum( void )
    auto screenSizeUni = glGetUniformLocation( program, "uScreenSize" );
    glUniform2ui( screenSizeUni, ( GLuint ) screenSize.x, ( GLuint ) screenSize.y );
 
-   auto pCamera = g_pApp->m_pEngineLogic->m_pWrold->GetCamera();
+   auto pCamera = pScene->GetCamera();
    float halfSizeNearPlaneY = std::tan( pCamera->GetFrustum().m_FovY / 2.0f );
    float halfSizeNearPlaneX = halfSizeNearPlaneY * pCamera->GetFrustum().m_Aspect;
    auto halfSizeNearPlaneUni = glGetUniformLocation( program, "uHalfSizeNearPlane" );
@@ -434,7 +443,7 @@ int DeferredMainRenderer::OnRestoreGeometryPass( void )
    return S_OK;
    }
 
-int DeferredMainRenderer::OnRestourLightCullPass( void )
+int DeferredMainRenderer::OnRestourLightCullPass( Scene* pScene )
    {
    GenerateProgram( RenderPass_LightCulling );
 
@@ -444,10 +453,14 @@ int DeferredMainRenderer::OnRestourLightCullPass( void )
    glUniform1i( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_DepthTex ], 0 );
 
    m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_Proj ] = glGetUniformLocation( m_Programs[ RenderPass_LightCulling ], "uProj" );
-   
+   auto projMat = pScene->GetCamera()->GetProjection();
+   glUniformMatrix4fv( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_Proj ], 1, GL_FALSE, &projMat[ 0 ][ 0 ] );
+
    m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_ScreenSize ] = glGetUniformLocation( m_Programs[ RenderPass_LightCulling ], "uScreenSize" );
    auto screenSize = g_pApp->GetScreenSize();
    glUniform2ui( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_ScreenSize ], screenSize.x, screenSize.y );
+
+   m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_ValidLightNum ] = glGetUniformLocation( m_Programs[ RenderPass_LightCulling ], "uValidLightNum" );
 
    m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_DebugTex ] = glGetUniformLocation( m_Programs[ RenderPass_LightCulling ], "debugTex" );
    glUniform1i( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_DebugTex ], 1 );
@@ -457,8 +470,36 @@ int DeferredMainRenderer::OnRestourLightCullPass( void )
    return S_OK;
    }
 
-int DeferredMainRenderer::OnRestoreLightingPass( void )
+int DeferredMainRenderer::OnRestoreLightingPass( Scene* pScene )
    {
+   GenerateProgram( RenderPass_Lighting );
+
+   glUseProgram( m_Programs[ RenderPass_Lighting ] );
+
+   m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_DepthTex ] = glGetUniformLocation( m_Programs[ RenderPass_Lighting ], "uDepthTex" );
+   glUniform1i( m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_DepthTex ], 0 );
+
+   m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_MRT0 ] = glGetUniformLocation( m_Programs[ RenderPass_Lighting ], "uMRT0" );
+   glUniform1i( m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_MRT0 ], 1 );
+
+   m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_MRT1 ] = glGetUniformLocation( m_Programs[ RenderPass_Lighting ], "uMRT1" );
+   glUniform1i( m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_MRT1 ], 2 );
+
+   m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_TileNum ] = glGetUniformLocation( m_Programs[ RenderPass_Lighting ], "uTileNum" );
+   glUniform2ui( m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_TileNum ], m_TileNum[ 0 ], m_TileNum[ 1 ] );
+
+   m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_HalfSizeNearPlane ] = glGetUniformLocation( m_Programs[ RenderPass_Lighting ], "uHalfSizeNearPlane" );
+   auto pCamera = pScene->GetCamera();
+   float halfSizeNearPlaneY = std::tan( pCamera->GetFrustum().m_FovY / 2.0f );
+   float halfSizeNearPlaneX = halfSizeNearPlaneY * pCamera->GetFrustum().m_Aspect;
+   glUniform2f( m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_HalfSizeNearPlane ], halfSizeNearPlaneX, halfSizeNearPlaneY );
+
+   m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_Proj ] = glGetUniformLocation( m_Programs[ RenderPass_Lighting ], "uProj" );
+   auto proj = pCamera->GetProjection();
+   glUniformMatrix4fv( m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_Proj ], 1, GL_FALSE, &proj[ 0 ][ 0 ] );
+
+   glUseProgram( 0 );
+   OpenGLRenderManager::CheckError();
    return S_OK;
    }
 
@@ -481,9 +522,6 @@ void DeferredMainRenderer::LightCulling( Scene* pScene )
    glActiveTexture( GL_TEXTURE0 );
    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
 
-   auto projMat = pScene->GetCamera()->GetProjection();
-   glUniformMatrix4fv( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_Proj ], 1, GL_FALSE, &projMat[ 0 ][ 0 ] );
-
    glActiveTexture( GL_TEXTURE1 );
    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_TileDebugging ] );
    glBindImageTexture( 1, m_SST[ SST_TileDebugging ], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16 );
@@ -491,6 +529,38 @@ void DeferredMainRenderer::LightCulling( Scene* pScene )
    glDispatchCompute( m_TileNum[ 0 ], m_TileNum[ 1 ], 1u );
 
    glMemoryBarrier( GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_SHADER_STORAGE_BUFFER );
+
+   OpenGLRenderManager::CheckError();
+   }
+
+void DeferredMainRenderer::CalculateLighting( Scene* pScene )
+   {
+   glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
+
+   glUseProgram( m_Programs[ RenderPass_Lighting ] );
+
+   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 0, m_SSBOs[ SSBO_LightIndexList ] );
+
+   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 1, m_SSBOs[ SSBO_LightIndexGrid ] );
+
+   glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 2, m_SSBOs[ SSBO_LightProperties ] );
+
+   glActiveTexture( GL_TEXTURE0 );
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
+
+   glActiveTexture( GL_TEXTURE1 );
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalGlossiness ] );
+
+   glActiveTexture( GL_TEXTURE2 );
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_AlbedoMetalness ] );
+
+   //uniform sampler2D   uDepthTex;
+   //uniform sampler2D   uMRT0;
+   //uniform sampler2D   uMRT1;
+   //uniform uvec2       uTileNum;
+   //uniform uvec2       uHalfSizeNearPlane;
+   //uniform mat4        uProj;
+
 
    OpenGLRenderManager::CheckError();
    }

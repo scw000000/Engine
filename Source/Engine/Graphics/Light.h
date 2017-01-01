@@ -15,8 +15,8 @@
 #include ".\SceneNode\SceneNodes.h"
 #include ".\Renderer\MainRenderer.h"
 
-#define MAXIMUM_LIGHTS_SUPPORTED             8
-#define MAXIMUM_SHADOWMAP_TEXTURE_SUPPORTED  8
+#define MAXIMUM_LIGHTS_SUPPORTED             8u
+#define MAXIMUM_SHADOWMAP_TEXTURE_SUPPORTED  8u
 
 #define LIGHT_TYPE_UNDEFINED   0u
 #define LIGHT_TYPE_POINT       1u

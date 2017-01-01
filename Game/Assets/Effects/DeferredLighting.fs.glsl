@@ -51,7 +51,8 @@ uniform sampler2D   uDepthTex;
 uniform sampler2D   uMRT0;
 uniform sampler2D   uMRT1;
 uniform uvec2       uTileNum;
-uniform uvec2       uHalfSizeNearPlane;
+uniform vec2       uHalfSizeNearPlane;
+uniform mat4        uProj;
 
 in vec2 vUV;
 
@@ -92,14 +93,14 @@ float GetShininess( float glossiness )
 	return pow( MAX_SHININESS, glossiness );
     }
     
-vec3 GetDiffuse( float3 albedo, float metalness )
+vec3 GetDiffuse( vec3 albedo, float metalness )
     {
-	return albedo * ( 1 - metalness );
+	return albedo * ( 1.0 - metalness );
     }
 
-vec3 GetSpecular( float3 albedo, float metalness )
+vec3 GetSpecular( vec3 albedo, float metalness )
     {
-	return lerp( 0.04, albedo, metalness );
+	return mix( vec3( 0.04 ), albedo, vec3( metalness ) );
     }
     
 float GetSpecularNormalizeFactor( float shininess )
@@ -107,15 +108,15 @@ float GetSpecularNormalizeFactor( float shininess )
 	return ( shininess + 2.0 ) / 8.0;
     }
     
-vec3 GetFresnel( vec3 light_vec, vec3 halfway, specular )
+vec3 GetFresnel( vec3 lightDir, vec3 halfway, vec3 specular )
     {
-	float e_n = saturate( dot( light_vec, halfway ) ) ;
-	return specular > 0 ? specular + ( 1 - specular ) * exp2( -( 5.55473f * e_n + 6.98316f) * e_n ) : 0;
+    float eDotN = clamp( dot( lightDir, halfway ), 0.0, 1.0 );
+	return dot( specular, vec3( 1.0 ) ) > 0 ? specular + ( 1 - specular ) * exp2( -( 5.55473f * eDotN + 6.98316f) * eDotN ) : vec3( 0 );
     }
 
 vec3 GetDistribution( vec3 halfway, vec3 normal, float shininess)
     {
-	return exp( ( shininess + 0.775f ) * ( max( dot( halfway, normal ), 0.0f ) - 1) );
+	return vec3( exp( ( shininess + 0.775f ) * ( max( dot( halfway, normal ), 0.0f ) - 1) ) );
     }
     
 vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 diffuse, vec3 specular, float specularNormalFac, float shininess )
@@ -126,6 +127,7 @@ vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 diffuse, vec3 s
     float distSqr;
 	float luminosity;
     vec3 viewDir = -meshPosVS; //????check
+    vec3 lightDir;
     switch ( light.m_Type )
         {
         case LIGHT_TYPE_POINT:
@@ -161,17 +163,17 @@ vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 diffuse, vec3 s
     specular = specularNormalFac 
                 * GetDistribution( halfway, normal, shininess )
 				* GetFresnel( lightDir, halfway, specular );
-                
-    return = max( ( diffuse + specular ) * ( nDotL * luminosity ), 0.0 ) * light.m_Color.rgb;
+    //return vec3( 0.0, 0.0, 0.0 );            
+    return max( ( diffuse + specular ) * ( nDotL * luminosity ), vec3( 0.0 ) ) * light.m_Color.rgb;
     }
     
-void main
+void main()
     {
     // sample depth texture
-    float depth = texture( uDepthTex, vUV );
+    float depth = texture( uDepthTex, vUV ).r;
     
     // transfrom depth back to view space
-    vec3 meshPosVS = ToViewSpace( vec3( vUV, p ) );
+    vec3 meshPosVS = ToViewSpace( vec3( vUV, depth ) );
     
     vec4 mrt0 = texture( uMRT0, vUV );
     vec4 mrt1 = texture( uMRT1, vUV );
@@ -191,29 +193,28 @@ void main
     float specularNormalFac = GetSpecularNormalizeFactor( shininess );
     
     // get light gird index
-    uvec2 tileCoord = uvec2( gl_FragCoord.xy / TILE_SIZE ) );
+    uvec2 tileCoord = uvec2( gl_FragCoord.xy / TILE_SIZE );
     tileCoord = min( tileCoord, uTileNum - uvec2( 1u, 1u ) );
     uint tileIdx = uTileNum.x + uTileNum.y * uTileNum.x;
     // get light list offset and count
     uint listOffset = LightIdxGridSSBO.data[ tileIdx * 2u ];
     uint listLength = LightIdxGridSSBO.data[ tileIdx * 2u + 1u ];
     
+    
+    oColor = vec4( 0.0, 0.0, 0.0, 1.0 );
     // calculate each light in light index
     for( uint i = 0u; i < listLength; ++i )
         {
-        Light light = LightPropsSSBO.data[ LightIdxListSSBO.data[ listOffset + i ] ];
-        if( !light.m_Enabled )
-            {
-            continue;
-            }
-        switch ( light.m_Type )
-            {
-            case LIGHT_TYPE_POINT:
-                
-                break;
-            case LIGHT_TYPE_POINT:
-                break;
-            };
+        //Light light = LightPropsSSBO.data[ LightIdxListSSBO.data[ listOffset + i ] ];
+        oColor += CalcLight(    LightIdxListSSBO.data[ listOffset + i ], 
+                                meshPosVS, 
+                                normal, 
+                                diffuse, 
+                                specular, 
+                                specularNormalFac, 
+                                shininess );
+    
+
         }
         
     oColor.a = 1.0;

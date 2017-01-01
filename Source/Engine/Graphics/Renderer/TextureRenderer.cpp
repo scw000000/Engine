@@ -55,7 +55,7 @@ void TextureRenderer::VShutdown( void )
    ReleaseResource();
    }
 
-int TextureRenderer::VOnRestore( void )
+int TextureRenderer::VOnRestore( Scene* pScene )
    {
    ReleaseResource();
 

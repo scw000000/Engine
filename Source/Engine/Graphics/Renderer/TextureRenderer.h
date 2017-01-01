@@ -18,7 +18,7 @@ class TextureRenderer : public IRenderer
    {
    public:
       TextureRenderer( void );
-      virtual int VOnRestore( void ) override;
+      virtual int VOnRestore( Scene* pScene ) override;
       virtual void VShutdown( void ) override;
       virtual int VPreRender( void ) override;
       virtual int VPostRender( void ) override;

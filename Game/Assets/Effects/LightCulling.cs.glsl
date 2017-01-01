@@ -52,7 +52,7 @@ layout ( std430, binding = 2 ) writeonly buffer lightIdxGridSSBO
     
 layout ( std430, binding = 3 ) readonly buffer lightPropsSSBO
     {
-    Light data[]; // a 1D array, length = MAXIMUM_LIGHTS_SUPPORTED
+    Light data[]; // a 1D array, length = std::min( lights.size(), MAXIMUM_LIGHTS_SUPPORTED )
     }LightPropsSSBO;
 
 layout ( std430, binding = 4 ) readonly buffer tileFrustumSSBO
@@ -63,8 +63,8 @@ layout ( std430, binding = 4 ) readonly buffer tileFrustumSSBO
 uniform sampler2D   uDepthTex;
 uniform mat4        uProj;
 uniform uvec2       uScreenSize;
-uniform uint        uInvokePerGroup = TILE_SIZE * TILE_SIZE;
 uniform uint        uValidLightNum;
+uniform uint        uInvokePerGroup = TILE_SIZE * TILE_SIZE;
 
 shared uint sTileIndex;
 shared uint sGlobalIdxListLength;
@@ -172,9 +172,9 @@ void main()
         }
         
     barrier();
-    
+
     // testing light culling
-    for( uint i= gl_LocalInvocationIndex; i < MAXIMUM_LIGHTS_SUPPORTED; i += uInvokePerGroup )
+    for( uint i= gl_LocalInvocationIndex; i < uValidLightNum; i += uInvokePerGroup )
         {
         if( LightPropsSSBO.data[ i ].m_Enabled == 1u )
             {

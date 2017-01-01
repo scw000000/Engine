@@ -27,10 +27,10 @@ int OpenGLRenderManager::VInit( void )
    return S_OK;
    }
 
-int OpenGLRenderManager::VOnRestore( void ) 
+int OpenGLRenderManager::VOnRestore( Scene* pScene )
    {
-   m_MainRenderer.VOnRestore();
-   m_TextureDrawer.VOnRestore();
+   m_MainRenderer.VOnRestore( pScene );
+   m_TextureDrawer.VOnRestore( pScene );
    return S_OK;
    }
 

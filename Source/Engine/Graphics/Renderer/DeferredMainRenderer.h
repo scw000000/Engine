@@ -25,7 +25,7 @@ class DeferredMainRenderer : public MainRenderer
       DeferredMainRenderer( void );
       virtual void VShutdown( void ) override;
       virtual int VPreRender( void ) override;
-      virtual int VOnRestore( void ) override;
+      virtual int VOnRestore( Scene* pScene ) override;
     //  virtual int VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode ) override;
       virtual void VLoadLight( Lights& lights ) override;
 
@@ -33,11 +33,12 @@ class DeferredMainRenderer : public MainRenderer
       void ReleaseResource( void );
       int OnRestoreSSBO( void );
       int OnRestoreTextures( void );
-      int OnRestoreTileFrustum( void );
+      int OnRestoreTileFrustum( Scene* pScene );
       int OnRestoreGeometryPass( void );
-      int OnRestourLightCullPass( void );
-      int OnRestoreLightingPass( void );
+      int OnRestourLightCullPass( Scene* pScene );
+      int OnRestoreLightingPass( Scene* pScene );
       void LightCulling( Scene* pScene );
+      void CalculateLighting( Scene* pScene );
       void GenerateProgram( unsigned int renderPass );
 
    private:
@@ -92,8 +93,20 @@ class DeferredMainRenderer : public MainRenderer
          LightCullPassUni_DepthTex,
          LightCullPassUni_Proj,
          LightCullPassUni_ScreenSize,
+         LightCullPassUni_ValidLightNum,
          LightCullPassUni_DebugTex,
          LightCullPassUni_Num
+         };
+
+      enum LightingPassUniforms
+         {
+         LightingPassUni_DepthTex,
+         LightingPassUni_MRT0,
+         LightingPassUni_MRT1,
+         LightingPassUni_TileNum,
+         LightingPassUni_HalfSizeNearPlane,
+         LightingPassUni_Proj,
+         LightingPassUni_Num
          };
 
       std::vector< GLuint > m_Uniforms[ RenderPass_Num ];

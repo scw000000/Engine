@@ -20,7 +20,7 @@ class OpenGLRenderManager : public IRenderManager
       OpenGLRenderManager( void );
 
       virtual int VInit( void ) override;
-      virtual int VOnRestore( void ) override;
+      virtual int VOnRestore( Scene* pScene ) override;
       virtual int VPreRender( void ) override;
       virtual int VPostRenderNodes( Scene* pScene ) override;
       virtual int VPostRender( void ) override;

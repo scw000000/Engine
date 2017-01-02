@@ -28,5 +28,29 @@
                 </Light>
             </Data>
         </LightRenderComponent>
+        <LightRenderComponent>
+            <Data>
+                <Transform>
+                    <Position />
+                    <PitchYawRoll />
+                    <Scale />
+                </Transform>
+                <Light>
+                    <Diffuse />
+                </Light>
+            </Data>
+        </LightRenderComponent>
+        <LightRenderComponent>
+            <Data>
+                <Transform>
+                    <Position />
+                    <PitchYawRoll />
+                    <Scale />
+                </Transform>
+                <Light>
+                    <Diffuse />
+                </Light>
+            </Data>
+        </LightRenderComponent>
     </MeshRenderComponent>
 </ActorInstance>

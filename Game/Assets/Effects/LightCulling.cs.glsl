@@ -137,25 +137,18 @@ void main()
     
     barrier();
     // test min max depth
-    float fdepth = 0.0;
     
     if( gl_GlobalInvocationID.x < uScreenSize.x && gl_GlobalInvocationID.y < uScreenSize.y ) // valid depth test position
         {
         vec2 tc = vec2( gl_GlobalInvocationID.xy ) / vec2( uScreenSize );
-        fdepth = texture( uDepthTex, tc ).r;
         uint depth = floatBitsToUint( texture( uDepthTex, tc ).r );
         atomicMin( sMinDepthU, depth );
         atomicMax( sMaxDepthU, depth );
         }
-        
-    
-    //fdepth = -uProj[3][2] / ( fdepth + uProj[2][2] ); ;
-       
+               
     barrier();
     // set min max depth and far near plane
-    float fminDepth;
-    fdepth = uintBitsToFloat( sMaxDepthU );
-    fminDepth = uintBitsToFloat( sMinDepthU );
+
     if( gl_LocalInvocationIndex == 0 )
         {
         // to NDC space
@@ -219,15 +212,29 @@ void main()
         LightIdxGridSSBO.data[ sTileIndex * 2 + 1 ] = sLocalIdxCount;
         }  
 
+    barrier();
+    
     if( gl_GlobalInvocationID.x < uScreenSize.x && gl_GlobalInvocationID.y < uScreenSize.y ) // valid depth test position
         {
-        if( sLocalIdxCount > 0 )
+         imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
+            
+        if( sLocalIdxCount == 1 )
             {
-            imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 1.0, 1.0, 1.0 ) );
+            imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 1.0, 0.0, 1.0 ) );
             }
         else if( sLocalIdxCount == 0 )
             {
             imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
+            }
+        if( sLocalIdxCount == 2 )
+            {
+            // sGlobalIdxListLength = 510600
+            if( sGlobalStoreOffset + 1 >= sGlobalIdxListLength )
+                {
+                imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 1.0, 1.0 ) );
+                
+                }
+            imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 0.0, 0.0, 1.0 ) );
             }
             
        // if( ( gl_WorkGroupID.x % 2u ) == 1 && ( gl_WorkGroupID.y % 2u ) == 1 )
@@ -236,15 +243,7 @@ void main()
           
       //      }  
     //  imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
-            
-    //    if( fdepth != fminDepth )
-    //       {
-    //        imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 1.0, 1.0, 1.0 ) );
-            
-      //      }
-    //  imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( fdepth, fdepth, fdepth, 1.0 ) );
-            
-      
+
       //  imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( vec3( gl_WorkGroupID.xyz ) / vec3( gl_NumWorkGroups.xyz ), 1.0 ) );
             
         }

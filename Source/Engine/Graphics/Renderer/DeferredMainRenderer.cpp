@@ -145,6 +145,10 @@ void DeferredMainRenderer::VLoadLight( Lights& lights )
 
    glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
 
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_LightIndexCount ] );
+      glClearBufferData( GL_SHADER_STORAGE_BUFFER, GL_R32UI, GL_RED, GL_UNSIGNED_INT, NULL );
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
+
    glUseProgram( m_Programs[ RenderPass_LightCulling ] );
       glUniform1ui( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_ValidLightNum ], std::min( lights.size(), MAXIMUM_LIGHTS_SUPPORTED ) );
    glUseProgram( 0 );
@@ -165,7 +169,7 @@ void DeferredMainRenderer::VLoadLight( Lights& lights )
    //   }
    //glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
 
-   glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
+   
    OpenGLRenderManager::CheckError();
    }
 
@@ -624,6 +628,25 @@ void DeferredMainRenderer::CalculateLighting( void )
    glBindVertexArray( 0 );
 
    glUseProgram( 0 );
+
+   /*static bool shouldTest = false;
+   if( shouldTest )
+   {
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_LightProperties ] );
+   LightProperties* ptr = ( LightProperties * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );
+   for( int i = 0; i < 2; ++i )
+   {
+   std::cout << ToStr( ptr[ i ].m_Color ) << std::endl;
+   std::cout << ToStr( ptr[ i ].m_Enabled ) << std::endl;
+   std::cout << ToStr( ptr[ i ].m_PositionVS ) << std::endl;
+   std::cout << ToStr( ptr[ i ].m_DirectionVS ) << std::endl;
+   std::cout << ToStr( ptr[ i ].m_Type ) << std::endl;
+   std::cout << ToStr( ptr[ i ].m_Attenuation ) << std::endl;
+   }
+
+   glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
+   }*/
+
    OpenGLRenderManager::CheckError();
    }
 

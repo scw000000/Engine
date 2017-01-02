@@ -140,6 +140,7 @@ vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 diffuse, vec3 s
             luminosity = 1.0 / dot( light.m_Attenuation.xyz, vec3( 1.0, dist, distSqr ) );
             break;
         case LIGHT_TYPE_DIRECTIONAL:
+            return vec3( 0.0, 1.0, 0.0 );  
             lightDir = light.m_DirectionVS;
             dist = -1.0;
             luminosity = 1.0;
@@ -204,9 +205,14 @@ void main()
 
     oColor = vec4( 0.0, 0.0, 0.0, 1.0 );
 
-    // calculate each light in light index
-    for( uint i = 0u; i < listLength; ++i )
+    // calculate each light in light list
+    for( uint i = 0; i < listLength; ++i )
         {
+       // if( LightIdxListSSBO.data[ listOffset + i ] > 0 )
+        //    {
+          //  oColor.xyz = vec3( 0.0, 1.0, 0.0 );
+        //    break;
+        //    }
         //Light light = LightPropsSSBO.data[ LightIdxListSSBO.data[ listOffset + i ] ];
         oColor.xyz += CalcLight(    LightIdxListSSBO.data[ listOffset + i ], 
                                 meshPosVS, 
@@ -218,6 +224,10 @@ void main()
     
         }
     oColor.xyz += albedo * 0.2;
+   // if( listLength == 2 )
+  //      {
+    //    oColor.xyz = vec3( 0.0, 1.0, 0.0 );
+   //     }
   //  oColor.xyz += vec3( 0.2 );
   // oColor.xyz = diffuse;
    // oColor = vec4( vUV * 2.0 - vec2( 1.0, 1.0), 0.0, 1.0 );

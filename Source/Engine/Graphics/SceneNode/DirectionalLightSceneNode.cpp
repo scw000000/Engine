@@ -23,7 +23,7 @@ const char* const FIRST_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DepthRTT.fs.g
 #define VERTEX_LOCATION    0
 
 DirectionalLightNode::DirectionalLightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform )
-   : LightNode( actorId, pRenderComponent, pLightProps, pTransform ),
+   : ILightNode( actorId, pRenderComponent, pLightProps, pTransform ),
    m_FirstPassVertexShader( Resource( FIRST_PASS_VERTEX_SHADER_FILE_NAME ) ),
    m_FirstPassFragmentShader( Resource( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ) )
    {

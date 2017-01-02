@@ -67,10 +67,10 @@ class MeshResourceLoader : public ResourceLoader
    {
    public:
       MeshResourceLoader( void );
-	   virtual bool VUseRawFile() override { return false; }
-	   virtual bool VDiscardRawBufferAfterLoad() override { return true; }
+      virtual bool VUseRawFile() const override { return false; }
+      virtual bool VDiscardRawBufferAfterLoad() const override { return true; }
 	   virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize ) override ;
 	   virtual int VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) override ;
-      virtual bool VUsePreAllocate( void ) override { return false; }
+      virtual bool VUsePreAllocate( void ) const override { return false; }
       static const aiScene* LoadAndReturnScene( const Resource& resource );
    };

@@ -14,6 +14,10 @@
 
 #include "EngineStd.h"
 #include "ResourceCache.h"
+#include "XmlResource.h"
+#include "MeshResource.h"
+#include "ScriptResource.h"
+#include "TextureResource.h"
 
 #include <list>
 #include <map>
@@ -86,14 +90,14 @@ ResHandle::ResHandle( const Resource &resource, char *buffer, unsigned int size,
 	m_pResCache = pResCache;
    }
 
-// The destructor truely free the allocated memory to resource cache
+// The destructor truly free the allocated memory to resource cache
 ResHandle::~ResHandle()
    {
    SAFE_DELETE_ARRAY( m_pBuffer );
    m_pResCache->MemoryHasBeenFreed( m_Size );
    }
 
-bool ResourceLoader::VIsPatternMatch( const char* str )  
+bool ResourceLoader::VIsPatternMatch( const char* str ) const  
    {
    for( auto pattern : m_Patterns )
       {
@@ -127,15 +131,18 @@ ResourceCache::~ResourceCache()
       SAFE_DELETE( m_pResourceFile );
    }
 
-bool ResourceCache::Init()
+int ResourceCache::Init()
    {
-   bool ret = false;
    if( m_pResourceFile->VOpen() )
       {
       RegisterLoader< DefaultResourceLoader >();
-      ret = true;
+     // return S_FALSE;
       }
-   return ret;
+   RegisterLoader< XmlResourceLoader >();
+   RegisterLoader< MeshResourceLoader >();
+   RegisterLoader< TextureResourceLoader >();
+   RegisterLoader< ScriptResourceLoader >();
+   return S_OK;
    }
 
 // This function is callled by ResCache::preload to 
@@ -172,7 +179,7 @@ int ResourceCache::Preload( const std::string pattern, void (*progressCallback)(
       // load the file if pattern is matched
       if( WildcardMatch( pattern.c_str(), resource.m_Name.c_str() ) )
          {
-         shared_ptr< ResHandle > handle = g_pApp->m_pResCache->GetHandle( resource ); // use resource cache to load resource
+         shared_ptr< ResHandle > handle = GetHandle( resource ); // use resource cache to load resource
          ++loaded;
          }
       if( progressCallback )
@@ -183,9 +190,7 @@ int ResourceCache::Preload( const std::string pattern, void (*progressCallback)(
    return loaded;
    }
 
-//
-// ResCache::Flush									- not described in the book
-//
+
 //    Frees every handle in the cache - this would be good to call if you are loading a new
 //    level, or if you wanted to force a refresh of all the data in the cache - which might be 
 //    good in a development environment.

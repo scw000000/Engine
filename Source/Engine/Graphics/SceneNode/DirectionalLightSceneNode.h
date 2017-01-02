@@ -15,7 +15,7 @@
 #include "..\Light.h"
 #include "..\Shaders.h"
 
-class DirectionalLightNode : public LightNode
+class DirectionalLightNode : public ILightNode
    {
    public:
    DirectionalLightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );

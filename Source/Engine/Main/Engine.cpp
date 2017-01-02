@@ -16,9 +16,6 @@
 #include "..\UserInterface/GUIManager.h"
 #include "..\ResourceCache\DevResourceFile.h"
 #include "..\ResourceCache\XmlResource.h"
-#include "..\ResourceCache\MeshResource.h"
-#include "..\ResourceCache\ScriptResource.h"
-#include "..\ResourceCache\TextureResource.h"
 #include "..\Event\EventManager.h"
 #include "..\Event\Events.h"
 #include "..\Graphics\Renderer\MainRenderer.h"
@@ -37,6 +34,7 @@ EngineApp *g_pApp = NULL;
 EngineApp::EngineApp( void )
    {
    g_pApp = this;
+   m_pResCache = NULL;
    m_pEngineLogic = NULL;
 
    m_bQuitting = false;
@@ -44,6 +42,7 @@ EngineApp::EngineApp( void )
    m_bIsRunning = false;
 
    m_pWindow = NULL;
+   m_pVideoResCache = NULL;
    m_ShutDownEventType = 0;
    m_pEventManager = NULL;
    
@@ -144,17 +143,14 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       }
    m_pResCache = ENG_NEW ResourceCache( 50, pFile );
 
-	if ( !m_pResCache->Init() )
+	if ( m_pResCache->Init() != S_OK )
 	   {
       ENG_ERROR("Failed to initialize resource cache!  Are your paths set up correctly?");
 		return false;
 	   }
 
  //  extern shared_ptr<IResourceLoader> CreateWAVResourceLoader();
-   m_pResCache->RegisterLoader< XmlResourceLoader >();
-   m_pResCache->RegisterLoader< MeshResourceLoader >();
-   m_pResCache->RegisterLoader< TextureResourceLoader >();
-   m_pResCache->RegisterLoader< ScriptResourceLoader >();
+   
 
    if( !LoadStrings("English") )
 	   {
@@ -316,12 +312,25 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    // Set Renderer
    //--------------------------------- 
 
+   //--------------------------------- 
+   // Init video resource cache
+   //--------------------------------- 
+   m_pVideoResCache = ENG_NEW VideoResourceCache( 0, m_pResCache );
+   if( m_pVideoResCache->Init() != S_OK )
+      {
+      ENG_ERROR( "Failed to initialize video resource cache! " );
+      return false;
+      }
 
+   //--------------------------------- 
+   // Init video resource cache
+   //--------------------------------- 
    // Start global timer
    GetGlobalTimer()->Reset();
 
    // initialize the directory location you can store save game files
 	_tcscpy_s( m_saveGameDirectory, GetSaveGameDirectory( GetHwnd(), VGetGameAppDirectory() ) );
+
    //--------------------------------- 
    // Create game & view
    //--------------------------------- 
@@ -731,6 +740,7 @@ void EngineApp::OnClose()
 	// release all the game systems in reverse order from which they were created
    ENG_LOG( "Test", "On close" );
 	SAFE_DELETE( m_pEngineLogic );
+   SAFE_DELETE( m_pVideoResCache );
    IMG_Quit();
    SDL_DestroyWindow( m_pWindow );
    SDL_Quit();

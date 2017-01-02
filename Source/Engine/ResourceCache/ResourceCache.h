@@ -32,13 +32,7 @@ class Resource
       std::string m_Name;
    };
 
-class IResourceExtraData
-   {
-   public:
-	   //virtual std::string VToString()=0;
-   };
-
-// an expansion class of resrouce
+// an expansion class of resource
 // you should not derive this class, instead, you should 
 // derive IResourceExtraData instead
 class ResHandle
@@ -67,14 +61,10 @@ class ResHandle
 class ResourceLoader : public IResourceLoader
    {
    public:
-      ResourceLoader( std::vector< std::string > patterns ) : m_Patterns( patterns ) { };
-	   virtual bool VUseRawFile() = 0;
-	   virtual bool VDiscardRawBufferAfterLoad() = 0;
+      ResourceLoader( std::vector< std::string > patterns ) : m_Patterns( patterns ) {};
       virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize ) { return 0; };
-      virtual int VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) = 0;
-	   virtual const std::vector< std::string >& VGetPattern( void ) override { return m_Patterns; }
-      virtual bool VUsePreAllocate( void ) override = 0;
-      virtual bool VIsPatternMatch( const char* str ) override ;
+      virtual const std::vector< std::string >& VGetPattern( void ) const override { return m_Patterns; }
+      virtual bool VIsPatternMatch( const char* str ) const override;
 
    protected:
       std::vector< std::string > m_Patterns;
@@ -87,12 +77,12 @@ class DefaultResourceLoader : public ResourceLoader
    {
    public:
       DefaultResourceLoader( void );
-	   virtual bool VUseRawFile() override { return true; }
-	   virtual bool VDiscardRawBufferAfterLoad() { return true; }
+      virtual bool VUseRawFile() const override { return true; }
+	   virtual bool VDiscardRawBufferAfterLoad() const override { return true; }
 	   virtual unsigned int VGetLoadedResourceSize(char *rawBuffer, unsigned int rawSize) override { return rawSize; }
       virtual int VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) override { return S_OK; }
-      virtual bool VUsePreAllocate( void ) override { return true; }
-      virtual bool VAddNullZero( void ) override { return true; }
+      virtual bool VUsePreAllocate( void ) const override { return true; }
+      virtual bool VAddNullZero( void ) const override { return true; }
    };
 
 typedef std::list< shared_ptr< ResHandle > > ResHandleList;
@@ -109,7 +99,7 @@ class ResourceCache
       ResourceCache( const unsigned int sizeInMb, IResourceFile *resFile );
       ~ResourceCache();
 
-      bool Init();
+      int Init();
       // Note that the DefaultResourceLoader is last one in the list, so any loader will match before it if the file format is supported
       template< typename T > void RegisterLoader( void );
 
@@ -134,7 +124,7 @@ class ResourceCache
 
    protected:
       ResHandleList m_lruResHandleList; // least recently used list
-      ResHandleMap m_Resources;
+      ResHandleMap m_Resources; // map file name to resource handle to speed up searching, instead of finding in handle list
       ResourceLoaders m_ResourceLoaders;
       // this menber stores zip file 
       IResourceFile *m_pResourceFile;

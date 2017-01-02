@@ -55,6 +55,9 @@
     <Filter Include="Graphics\Renderer">
       <UniqueIdentifier>{1a61e7fa-8a0f-4766-9b23-9597cf76e030}</UniqueIdentifier>
     </Filter>
+    <Filter Include="VideoResource">
+      <UniqueIdentifier>{da1dfe81-aad3-4a45-92b4-d279173fbefb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Main\main.cpp">
@@ -288,6 +291,12 @@
     </ClCompile>
     <ClCompile Include="..\Graphics\Renderer\TextureRenderer.cpp">
       <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VideoResourceCache\VideoResourceCache.cpp">
+      <Filter>VideoResource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\VideoResourceCache\VideoTextureResource.cpp">
+      <Filter>VideoResource</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -535,6 +544,12 @@
     </ClInclude>
     <ClInclude Include="..\Graphics\Renderer\TextureRenderer.h">
       <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VideoResourceCache\VideoResourceCache.h">
+      <Filter>VideoResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VideoResourceCache\VideoTextureResource.h">
+      <Filter>VideoResource</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

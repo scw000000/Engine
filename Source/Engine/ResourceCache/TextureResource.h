@@ -15,8 +15,6 @@
 
 #include "ResourceCache.h"
 
-// 
-// TODO: check if openGL need to resotre smaple state
 class SDLTextureResourceExtraData : public IResourceExtraData
    {
 	friend class TextureResourceLoader;
@@ -32,17 +30,14 @@ class SDLTextureResourceExtraData : public IResourceExtraData
    };
 
 
-// 
-//  class TextureResourceLoader				- Chapter 14, page 492
-//
 class TextureResourceLoader : public ResourceLoader
 {
 public:
    TextureResourceLoader( void );
-	virtual bool VUseRawFile() { return false; }
-	virtual bool VDiscardRawBufferAfterLoad() { return true; }
+	virtual bool VUseRawFile() const override { return false; }
+   virtual bool VDiscardRawBufferAfterLoad() const override { return true; }
 	virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize );
    virtual int VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle );
-   virtual bool VUsePreAllocate( void ) override { return false; }
+   virtual bool VUsePreAllocate( void ) const override { return false; }
    static SDL_Surface* LoadAndReturnSurface( const Resource& resource );
 };

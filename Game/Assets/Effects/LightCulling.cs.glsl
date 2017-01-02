@@ -212,7 +212,7 @@ void main()
         LightIdxGridSSBO.data[ sTileIndex * 2 + 1 ] = sLocalIdxCount;
         }  
 
-    barrier();
+    // barrier();
     
     if( gl_GlobalInvocationID.x < uScreenSize.x && gl_GlobalInvocationID.y < uScreenSize.y ) // valid depth test position
         {

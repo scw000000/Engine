@@ -17,10 +17,10 @@ class ScriptResourceLoader : public ResourceLoader
    {
    public:
       ScriptResourceLoader( void );
-      virtual bool VUseRawFile() override { return false; }
-      virtual bool VDiscardRawBufferAfterLoad() override { return true; }
-      virtual bool VAddNullZero() override { return true; }
+      virtual bool VUseRawFile() const override { return false; }
+      virtual bool VDiscardRawBufferAfterLoad() const override { return true; }
+      virtual bool VAddNullZero() const override { return true; }
       virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize ) override { return 0; }
       virtual int VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) override;
-      virtual bool VUsePreAllocate( void ) override { return true; }
+      virtual bool VUsePreAllocate( void ) const override { return true; }
    };

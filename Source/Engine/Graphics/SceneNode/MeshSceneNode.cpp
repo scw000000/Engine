@@ -16,6 +16,7 @@
 #include "MeshSceneNode.h"
 #include "..\ResourceCache\MeshResource.h"
 #include "..\ResourceCache\TextureResource.h"
+#include "..\VideoResourceCache\VideoTextureResource.h"
 #include "..\Renderer\RenderManager.h"
 #include "..\Renderer\RendererLoader.h"
 #include "..\Renderer\DeferredMainRenderer.h"
@@ -87,7 +88,8 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );
 
-   OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
+   m_MeshTextureObj = VideoTextureResourceLoader::LoadAndReturnTextureObject( m_Props.GetMaterialPtr()->GetTextureResource() );
+ //  OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
 
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );

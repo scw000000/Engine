@@ -105,7 +105,7 @@ extern const int SCREEN_HEIGHT;
 #define __STR2__(x) #x
 // Reference: https://gcc.gnu.org/onlinedocs/cpp/Stringification.html#Stringification
 // Macro arguments are completely macro-expanded before they are substituted into a macro body, unless they are stringified or pasted with other tokens.
-// This macro is for retrieving the value of x, if x is a macro
+// This macro is for retrieving the value of x, if x is a variable
 // Ex: #define foo 4
 //    __STR2__( foo )
 //       == > "foo"
@@ -143,6 +143,7 @@ extern const int SCREEN_HEIGHT;
 #include "..\Utilities\XMLHelper.h"
 #include "..\Main\Interfaces.h"
 #include "..\ResourceCache\ResourceCache.h"
+#include "..\VideoResourceCache\VideoResourceCache.h"
 #include "..\MainLoop\Timer.h"
 #include "..\Event\EventFactory.h"
 #include "..\Graphics\Scene.h"

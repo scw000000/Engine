@@ -179,22 +179,46 @@ class Resource;
 class IResourceFile;
 class ResHandle;
 
+class IResourceExtraData
+   {
+      public:
+      virtual ~IResourceExtraData() {}
+      //virtual std::string VToString()=0;
+   };
+
+class IVideoResourceExtraData
+   {
+      public:
+      virtual ~IVideoResourceExtraData() {}
+      //virtual std::string VToString()=0;
+   };
+
 // The resource loader is responsible for manipulate handle and setting its extra data
 // when calling VLoadResource
 class IResourceLoader
    {
    public:
-	   virtual const std::vector< std::string >& VGetPattern( void ) = 0;
-	   virtual bool VUseRawFile( void ) = 0;
-	   virtual bool VDiscardRawBufferAfterLoad( void ) = 0;
-      virtual bool VAddNullZero( void ) { return false; }
+	   virtual const std::vector< std::string >& VGetPattern( void ) const = 0;
+      virtual bool VUseRawFile( void ) const = 0;
+      virtual bool VDiscardRawBufferAfterLoad( void ) const = 0;
+      virtual bool VAddNullZero( void ) const { return false; }
 	   virtual unsigned int VGetLoadedResourceSize(char *rawBuffer, unsigned int rawSize) = 0;
 	   virtual int VLoadResource(char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) = 0;
-      virtual bool VUsePreAllocate( void ) = 0;
-      virtual bool VIsPatternMatch( const char* str ) = 0;
+      virtual bool VUsePreAllocate( void ) const = 0;
+      virtual bool VIsPatternMatch( const char* str ) const = 0;
    };
 
-// Each resource file may contains many ressources
+class VideoResourceHandle;
+
+class IVideoResourceLoader
+   {
+   public:
+      virtual const std::vector< std::string >& VGetPattern( void ) const = 0;
+      virtual int VLoadResource( shared_ptr<ResHandle> handle, shared_ptr< VideoResourceHandle > videoHandle ) = 0;
+      virtual bool VIsPatternMatch( const char* str ) const = 0;
+   };
+
+// Each resource file may contains many resources
 class IResourceFile
    {
    public:
@@ -206,8 +230,6 @@ class IResourceFile
       virtual bool VIsUsingDevelopmentDirectories(void) const = 0;
 	   virtual ~IResourceFile() { }
    };
-
-
 
 enum RenderGroup
    {
@@ -223,8 +245,8 @@ class Scene;
 class SceneNodeProperties;
 class Material;
 typedef shared_ptr<Material> MaterialPtr;
-class LightNode;
-typedef std::list<shared_ptr<LightNode> > Lights;
+class ILightNode;
+typedef std::list<shared_ptr<ILightNode> > Lights;
 
 class IRenderer
    {

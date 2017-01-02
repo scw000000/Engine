@@ -51,10 +51,10 @@ struct LightProperties
 
    };
 
-class LightNode : public SceneNode
+class ILightNode : public SceneNode
    {
    public:
-      LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
+      ILightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform );
       const LightPropertiesPtr& GetLightPropertiesPtr( void ) const { return m_pLightProps; };
       virtual void VSetUpRenderShadowMap( void ) = 0;
       virtual void VRenderShadowMap( shared_ptr< ISceneNode > pNode ) = 0;
@@ -96,8 +96,8 @@ class LightManager
       void RenderShadowMap( ISceneNode *pNode );
 
 	   int GetActiveLightCount( void ) const { return m_ActiveLights.size(); }
-	   bool AddLightNode( shared_ptr<LightNode> pNewLight );   
-      bool RemoveLightNode( shared_ptr<LightNode> pRemovedLight );
+	   bool AddLightNode( shared_ptr<ILightNode> pNewLight );   
+      bool RemoveLightNode( shared_ptr<ILightNode> pRemovedLight );
 
       Vec3* GetLightPosWorldSpace( void ) { return m_LightPosWorldSpace; }
       Vec3* GetLightDirection( void ) { return m_LightDir; }
@@ -110,7 +110,7 @@ class LightManager
 
    protected:
       void CalcShadow( Scene *pScene, shared_ptr< ISceneNode > pNode );
-      void RenderShadowMap( shared_ptr< LightNode > ) const;
+      void RenderShadowMap( shared_ptr< ILightNode > ) const;
 
    protected:
       Lights	m_Lights;

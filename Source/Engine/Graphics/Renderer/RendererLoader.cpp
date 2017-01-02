@@ -45,12 +45,23 @@ void OpenGLRendererLoader::LoadTexture2D( GLuint* textureId, const Resource& tex
 
    auto pSurface = TextureResourceLoader::LoadAndReturnSurface( textureResource );
 
-   int Mode = GL_RGB;
-   if( pSurface->format->BytesPerPixel == 4 )
+   GLenum textureFormat = GL_RGB;
+   switch( pSurface->format->format )
       {
-      Mode = GL_RGBA;
-      }
-   glTexImage2D( GL_TEXTURE_2D, 0, Mode, pSurface->w, pSurface->h, 0, Mode, GL_UNSIGNED_BYTE, pSurface->pixels );
+      case SDL_PIXELFORMAT_RGB24:
+         textureFormat = GL_RGB;
+         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB8, pSurface->w, pSurface->h, 0, textureFormat, GL_UNSIGNED_BYTE, pSurface->pixels );
+         break;
+      case SDL_PIXELFORMAT_RGBA8888:
+         textureFormat = GL_RGBA;
+         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, pSurface->w, pSurface->h, 0, textureFormat, GL_UNSIGNED_BYTE, pSurface->pixels );
+         break;
+      default:
+         ENG_ASSERT( 0 && "Not supported image format" );
+         break;
+      };
+
+   
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 

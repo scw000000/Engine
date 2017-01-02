@@ -15,7 +15,7 @@
 #include "TextureResource.h"
 #include "SDL_image.h"
 
-const char *TEXTURE_LOADER_PATTERNS[] = { "*.bmp", "*.jpg", "*.png" };
+const char *TEXTURE_LOADER_PATTERNS[] = { "*.bmp", "*.jpg", "*.png", "*.tga", "*.tif", "*.tiff" };
 
 SDLTextureResourceExtraData::SDLTextureResourceExtraData() : m_pSurface(NULL) 
    {	

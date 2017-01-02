@@ -116,10 +116,10 @@ TiXmlElement* LightProperties::GenerateXML( void )
 //   return pRetNode;
 //   }
 
-LightNode::LightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& props, TransformPtr pTransform )
+ILightNode::ILightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& props, TransformPtr pTransform )
    : SceneNode( actorId, pRenderComponent, RenderGroup_NotRendered, pTransform )
+   , m_pLightProps( props )
    {
-	m_pLightProps = props;
    }
 
 LightManager::LightManager( void )
@@ -129,7 +129,7 @@ LightManager::LightManager( void )
    pEventMgr->VAddListener( fastdelegate::MakeDelegate( this, &LightManager::DestroySceneNodeDelegate ), Event_Destroy_Scene_Node::s_EventType );
    }
 
-void LightManager::RenderShadowMap( shared_ptr< LightNode > ) const
+void LightManager::RenderShadowMap( shared_ptr< ILightNode > ) const
    {
    
    }
@@ -232,7 +232,7 @@ void LightManager::RenderShadowMap( ISceneNode *pNode )
  
    }
 
-bool LightManager::AddLightNode( shared_ptr<LightNode> pNewLight )
+bool LightManager::AddLightNode( shared_ptr<ILightNode> pNewLight )
    {
  
    m_Lights.push_back( pNewLight );
@@ -243,7 +243,7 @@ bool LightManager::AddLightNode( shared_ptr<LightNode> pNewLight )
    return true;
    }
 
-bool LightManager::RemoveLightNode( shared_ptr<LightNode> pRemovedLight )
+bool LightManager::RemoveLightNode( shared_ptr<ILightNode> pRemovedLight )
    {
    m_ActiveLights.remove( pRemovedLight );
    m_Lights.remove( pRemovedLight );
@@ -253,7 +253,7 @@ bool LightManager::RemoveLightNode( shared_ptr<LightNode> pRemovedLight )
 void LightManager::NewSceneNodeDelegate( IEventPtr pEvent )
    {
    shared_ptr< Event_New_Scene_Node > pNewSceneNodeEvt = dynamic_pointer_cast< Event_New_Scene_Node >( pEvent );
-   shared_ptr< LightNode > pLightNode = dynamic_pointer_cast< LightNode >( pNewSceneNodeEvt->GetSceneNode().lock() );
+   shared_ptr< ILightNode > pLightNode = dynamic_pointer_cast< ILightNode >( pNewSceneNodeEvt->GetSceneNode().lock() );
    if( pLightNode )
       {
       AddLightNode( pLightNode );
@@ -263,7 +263,7 @@ void LightManager::NewSceneNodeDelegate( IEventPtr pEvent )
 void LightManager::DestroySceneNodeDelegate( IEventPtr pEvent )
    {
    shared_ptr< Event_Destroy_Scene_Node > pDerivedEvt = dynamic_pointer_cast< Event_Destroy_Scene_Node >( pEvent );
-   shared_ptr< LightNode > pLightNode = dynamic_pointer_cast< LightNode >( pDerivedEvt->GetSceneNodePtr().lock() );
+   shared_ptr< ILightNode > pLightNode = dynamic_pointer_cast< ILightNode >( pDerivedEvt->GetSceneNodePtr().lock() );
    if( pLightNode )
       {
       RemoveLightNode( pLightNode );

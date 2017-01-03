@@ -40,7 +40,7 @@
                 <Light type="point">
                     <Color r="1.000000" g="0.000000" b="0.000000" a="0.00000"/>
                   <!--  <Attenuation x="3.000000" y="3.045" z="4.0075" w="100"/>-->
-                    <Attenuation x="1.000000" y="0.045" z="0.0075" w="10.0"/> 
+                    <Attenuation x="1.000000" y="0.045" z="0.0075" w="100.0"/> 
                 </Light>
             </Data>
         </LightRenderComponent>

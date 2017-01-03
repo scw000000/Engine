@@ -314,7 +314,7 @@ int DeferredMainRenderer::OnRestoreTextures( void )
       }
    // MRT 0
    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalGlossiness ] );
-   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
@@ -322,7 +322,7 @@ int DeferredMainRenderer::OnRestoreTextures( void )
 
    // MRT 1
    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_AlbedoMetalness ] );
-   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA32F, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
@@ -342,7 +342,7 @@ int DeferredMainRenderer::OnRestoreTextures( void )
 
    // Tile debugging
    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_TileDebugging ] );
-   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA16, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB16, screenSize.x, screenSize.y, 0, GL_RGB, GL_FLOAT, NULL );
 
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );

@@ -1,3 +1,4 @@
+#pragma once
 /*!
  * \file VIdeoTextureResource.h
  * \date 2017/01/02 10:42
@@ -12,8 +13,6 @@
  * \note
 */
 #include "VideoResourceCache.h"
-
-
 
 class VideoTextureResourceExtraData : public IVideoResourceExtraData
    {

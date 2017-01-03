@@ -298,6 +298,9 @@
     <ClCompile Include="..\VideoResourceCache\VideoTextureResource.cpp">
       <Filter>VideoResource</Filter>
     </ClCompile>
+    <ClCompile Include="..\VideoResourceCache\VideoMeshResource.cpp">
+      <Filter>VideoResource</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -549,6 +552,9 @@
       <Filter>VideoResource</Filter>
     </ClInclude>
     <ClInclude Include="..\VideoResourceCache\VideoTextureResource.h">
+      <Filter>VideoResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\VideoResourceCache\VideoMeshResource.h">
       <Filter>VideoResource</Filter>
     </ClInclude>
   </ItemGroup>

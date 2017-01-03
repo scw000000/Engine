@@ -52,7 +52,7 @@ VideoResourceCache::~VideoResourceCache()
 
 int VideoResourceCache::Init()
    {
-   this->RegisterLoader< VideoTextureResourceLoader >();
+   RegisterLoader< VideoTextureResourceLoader >();
    return S_OK;
    }
 

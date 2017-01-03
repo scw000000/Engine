@@ -182,6 +182,7 @@
     <ClCompile Include="..\Utilities\Random.cpp" />
     <ClCompile Include="..\Utilities\String.cpp" />
     <ClCompile Include="..\Utilities\XMLHelper.cpp" />
+    <ClCompile Include="..\VideoResourceCache\VideoMeshResource.cpp" />
     <ClCompile Include="..\VideoResourceCache\VideoResourceCache.cpp" />
     <ClCompile Include="..\VideoResourceCache\VideoTextureResource.cpp" />
     <ClCompile Include="EngineStd.cpp">
@@ -274,6 +275,7 @@
     <ClInclude Include="..\Utilities\templates.h" />
     <ClInclude Include="..\Utilities\Types.h" />
     <ClInclude Include="..\Utilities\XMLHelper.h" />
+    <ClInclude Include="..\VideoResourceCache\VideoMeshResource.h" />
     <ClInclude Include="..\VideoResourceCache\VideoResourceCache.h" />
     <ClInclude Include="..\VideoResourceCache\VideoTextureResource.h" />
     <ClInclude Include="EngineStd.h" />

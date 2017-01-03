@@ -96,7 +96,7 @@ int MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, sh
    //aiProcessPreset_TargetRealtime_Quality // aiProcess_JoinIdenticalVertices
    const struct aiScene *p_AiScene = aiImportFileFromMemory( rawBuffer, 
                                                            rawSize, 
-                                                           aiProcess_Triangulate | aiProcess_LimitBoneWeights/*| aiProcessPreset_TargetRealtime_Quality | aiProcess_SortByPType*/,
+                                                           aiProcess_Triangulate | aiProcess_LimitBoneWeights/*| aiProcessPreset_TargetRealtime_Fast | aiProcess_SortByPType*/,
                                                            p_Msg );
    if( !p_AiScene )
       {

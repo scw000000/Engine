@@ -39,7 +39,7 @@ class VideoResourceLoader : public IVideoResourceLoader
       virtual bool VIsPatternMatch( const char* str ) const override;
 
    protected:
-      const std::vector< std::string > m_Patterns;
+      const std::vector< std::string >& m_Patterns;
    };
 
 typedef std::list< shared_ptr< VideoResourceHandle > > VideoResHandleList;

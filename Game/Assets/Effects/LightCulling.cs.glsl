@@ -234,7 +234,7 @@ void main()
                 imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 1.0, 1.0 ) );
                 
                 }
-            imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 0.0, 0.0, 1.0 ) );
+            imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 1.0, 0.0, 1.0 ) );
             }
             
        // if( ( gl_WorkGroupID.x % 2u ) == 1 && ( gl_WorkGroupID.y % 2u ) == 1 )

@@ -17,7 +17,7 @@
 #include "..\ResourceCache\TextureResource.h"
 
 //const char* TEXTURE_LOADER_PATTERNS[] = { "*.bmp", "*.jpg", "*.png", "*.tga", "*.tif", "*.tiff" };
-const std::vector< std::string > TEXTURE_LOADER_PATTERNS = { "*.bmp", "*.jpg", "*.png", "*.tga", "*.tif", "*.tiff" };
+const std::vector< std::string > TEXTURE_LOADER_PATTERNS ( { "*.bmp", "*.jpg", "*.png", "*.tga", "*.tif", "*.tiff" } );
 
 VideoTextureResourceExtraData::~VideoTextureResourceExtraData( void )
    {
@@ -33,6 +33,8 @@ VideoTextureResourceLoader::VideoTextureResourceLoader( void ) : VideoResourceLo
 int VideoTextureResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared_ptr< VideoResourceHandle > videoHandle )
    {
    VideoTextureResourceExtraData* pData = ENG_NEW VideoTextureResourceExtraData();
+   shared_ptr< IVideoResourceExtraData > pExtraData( pData );
+
    pData->m_TexObj = 0;
    glGenTextures( 1, &pData->m_TexObj );
    
@@ -62,7 +64,7 @@ int VideoTextureResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, sha
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 
    
-   videoHandle->SetExtraData( shared_ptr< IVideoResourceExtraData >( pData ) );
+   videoHandle->SetExtraData( shared_ptr< IVideoResourceExtraData >( pExtraData ) );
    return S_OK;
    }
 

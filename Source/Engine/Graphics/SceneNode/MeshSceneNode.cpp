@@ -17,9 +17,11 @@
 #include "..\ResourceCache\MeshResource.h"
 #include "..\ResourceCache\TextureResource.h"
 #include "..\VideoResourceCache\VideoTextureResource.h"
+#include "..\VideoResourceCache\VideoMeshResource.h"
 #include "..\Renderer\RenderManager.h"
 #include "..\Renderer\RendererLoader.h"
 #include "..\Renderer\DeferredMainRenderer.h"
+
 
 #define VERTEX_LOCATION    0
 #define UV_LOCATION        1
@@ -78,9 +80,6 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    {
    ReleaseResource();
 
-	glGenVertexArrays( 1, &m_VAO );
-	glBindVertexArray( m_VAO );
-
    m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
    m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.GetShaderObject(), m_FragmentShader.GetShaderObject() } );
@@ -94,9 +93,19 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
-   m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
+   //m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
    SetRadius( pMeshExtra->m_Radius );
-   OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
+   //OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
+
+   auto pMeshResData = VideoMeshResourceLoader::LoadAndReturnMeshResourceExtraData( *m_pMeshResource );
+   m_VerticesIndexCount = pMeshResData->m_MeshCount[ 0 ][ VideoMeshResourceExtraData::MeshCount_Index ];
+   m_Buffers[ Vertex_Buffer ] = pMeshResData->m_BufferObjects[ 0 ][ VideoMeshResourceExtraData::MeshBufferData_Vertex ];
+   m_Buffers[ UV_Buffer ] = pMeshResData->m_BufferObjects[ 0 ][ VideoMeshResourceExtraData::MeshBufferData_UV ];
+   m_Buffers[ Index_Buffer ] = pMeshResData->m_BufferObjects[ 0 ][ VideoMeshResourceExtraData::MeshBufferData_Index ];
+   m_Buffers[ Normal_Buffer ] = pMeshResData->m_BufferObjects[ 0 ][ VideoMeshResourceExtraData::MeshBufferData_Normal ];
+
+   glGenVertexArrays( 1, &m_VAO );
+   glBindVertexArray( m_VAO );
 
    // 1st attribute buffer : vertices
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );

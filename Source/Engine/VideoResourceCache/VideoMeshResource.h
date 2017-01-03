@@ -17,19 +17,26 @@
 class VideoMeshResourceExtraData : public IVideoResourceExtraData
    {
    public:
-      VideoMeshResourceExtraData( void ) { ENG_ZERO_MEM( m_MeshBuffers ); }
+   VideoMeshResourceExtraData( unsigned int size );
       ~VideoMeshResourceExtraData( void );
 
    public:
       enum MeshBufferData
          {
-         MeshBufferData_Vretex,
+         MeshBufferData_Vertex,
          MeshBufferData_Normal,
          MeshBufferData_UV,
          MeshBufferData_Index,
          MeshBufferData_Num
          };
-      GLuint m_MeshBuffers[ MeshBufferData_Num ];
+      std::vector< GLuint[ MeshBufferData_Num ] > m_BufferObjects;
+      enum MeshCount
+         {
+         MeshCount_Vertex,
+         MeshCount_Index,
+         MeshCount_Num
+         };
+      std::vector< unsigned int[ MeshCount_Num ] > m_MeshCount;
    };
 
 class VideoMeshResourceLoader : public VideoResourceLoader
@@ -37,5 +44,5 @@ class VideoMeshResourceLoader : public VideoResourceLoader
       public:
       VideoMeshResourceLoader( void );
       virtual int VLoadResource( shared_ptr<ResHandle> handle, shared_ptr< VideoResourceHandle > videoHandle ) override;
-    //  static shared_ptr< VideoMeshResourceExtraData > LoadAndReturnTextureObject( const Resource& resource );
+      static VideoMeshResourceExtraData* LoadAndReturnMeshResourceExtraData( const Resource& resource );
    };

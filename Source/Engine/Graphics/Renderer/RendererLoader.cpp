@@ -100,6 +100,7 @@ void OpenGLRendererLoader::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, G
       }
 
    unsigned int verticesIndexOffset = 0;
+   unsigned int indexOffset = 0;
    std::vector< unsigned int > indexBuffer;
    if( pIndexBuffer )
       {
@@ -117,7 +118,7 @@ void OpenGLRendererLoader::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, G
 
       if( pUvBuffer )
          {
-         aiVector2t<float> *uvVertices = NULL;
+         /*aiVector2t<float> *uvVertices = NULL;
          uvVertices = ENG_NEW aiVector2t<float>[ pMesh->mNumVertices ];
          for( unsigned int vertex = 0; vertex < pMesh->mNumVertices; vertex++ )
             {
@@ -128,7 +129,16 @@ void OpenGLRendererLoader::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, G
                           verticesIndexOffset * sizeof( aiVector2t<float> ),
                           pMesh->mNumVertices * sizeof( aiVector2t<float> ),
                           &uvVertices[ 0 ] );
-         SAFE_DELETE_ARRAY( uvVertices );
+         SAFE_DELETE_ARRAY( uvVertices );*/
+
+         glBindBuffer( GL_ARRAY_BUFFER, *pUvBuffer );
+         for( unsigned int i = 0; i < pMesh->mNumVertices; i++ )
+            {
+            glBufferSubData( GL_ARRAY_BUFFER,
+                             ( verticesIndexOffset + i ) * sizeof( aiVector2D ),
+                             sizeof( aiVector2D ),
+                             &pMesh->mTextureCoords[ 0 ][ i ] );
+            }
          }
 
       if( pNormalBuffer )
@@ -150,18 +160,30 @@ void OpenGLRendererLoader::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, G
             indexBuffer.push_back( face.mIndices[ 1 ] + verticesIndexOffset );
             indexBuffer.push_back( face.mIndices[ 2 ] + verticesIndexOffset );
             }
+
+         unsigned int indexsSize = sizeof( unsigned int );
+         for( unsigned int faceIdx = 0; faceIdx < pMesh->mNumFaces; ++faceIdx )
+            {
+            const aiFace& face = pMesh->mFaces[ faceIdx ];
+
+            glBufferSubData( GL_ELEMENT_ARRAY_BUFFER,
+                             ( indexOffset + faceIdx ) * 3u * indexsSize,
+                             3u * indexsSize,
+                             face.mIndices );
+            }
          }
 
       verticesIndexOffset += pMesh->mNumVertices;
+      indexOffset += pMesh->mNumFaces * 3u;
       }
    ENG_ASSERT( pMeshExtra->m_NumVertices == verticesIndexOffset );
    if( pIndexBuffer )
       {
-      glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, *pIndexBuffer );
+      /*glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, *pIndexBuffer );
       glBufferSubData( GL_ELEMENT_ARRAY_BUFFER,
                        0,
                        indexBuffer.size() * sizeof( indexBuffer[ 0 ] ),
-                       &indexBuffer[ 0 ] );
+                       &indexBuffer[ 0 ] );*/
       }
    ENG_ASSERT( pMeshExtra->m_NumVertexIndex == indexBuffer.size() );
    }

@@ -14,7 +14,8 @@
 
 #include "EngineStd.h"
 #include "VideoResourceCache.h"
-#include "VIdeoTextureResource.h"
+#include "VideoTextureResource.h"
+#include "VideoMeshResource.h"
 
 VideoResourceHandle::VideoResourceHandle( const Resource &resource, unsigned int size, VideoResourceCache *pResCache ) :
    m_Resource( resource ),
@@ -53,6 +54,7 @@ VideoResourceCache::~VideoResourceCache()
 int VideoResourceCache::Init()
    {
    RegisterLoader< VideoTextureResourceLoader >();
+   RegisterLoader< VideoMeshResourceLoader >();
    return S_OK;
    }
 

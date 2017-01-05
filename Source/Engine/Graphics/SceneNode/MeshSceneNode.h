@@ -46,6 +46,7 @@ class MeshSceneNode : public SceneNode
       void ReleaseResource( void );
 
    protected:
+      shared_ptr< Material > m_pMaterial;
       shared_ptr<Resource>	 m_pMeshResource;
       
       GLuint            m_Program;

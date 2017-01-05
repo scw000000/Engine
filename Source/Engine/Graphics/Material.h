@@ -46,12 +46,15 @@ class Material
       TiXmlElement* GenerateXML( void );
       TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
 
+      void SetMeshIndex( unsigned int idx ) { m_MeshIndex = idx; }
+      unsigned int GetMeshIndex( void ) const { return m_MeshIndex; }
    private:
-      Resource m_TextureResource;
       Color    m_Diffuse;       
       Color    m_Ambient;      
       Color    m_Specular;      
       Color    m_Emissive;      
       float    m_Shininess;     
       AlphaType m_AlphaType;
+      unsigned int m_MeshIndex;
+      Resource m_TextureResource;
    };

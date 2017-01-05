@@ -22,6 +22,7 @@ layout ( std430, binding = 0 ) writeonly buffer tileFrustumSSBO
  vec4 ComputePlane( vec3 p0, vec3 p1, vec3 p2 )
     {
     vec4 ret = vec4( normalize( cross( p1 - p0, p2 - p0 ) ), 0.0 );
+    // dot( p0, normal ) + d = 0 -> d = -dot( p0, normal ) 
     ret.w = -dot( p0, ret.xyz );
     return ret;
     }
@@ -33,8 +34,8 @@ layout ( std430, binding = 0 ) writeonly buffer tileFrustumSSBO
     {
     vec3 eyeDir = vec3( 2 * uHalfSizeNearPlane * p - uHalfSizeNearPlane, -1 );
     // ndcZ = -1.0, uProj[2][3] = -1.0, and we need positive value of depth value
-    float eyeZLength = uProj[3][2] / ( -1.0 + uProj[2][2] ); 
-    return eyeDir * eyeZLength;
+    float eyeDirScale = uProj[3][2] / ( -1.0 + uProj[2][2] ); 
+    return eyeDir * eyeDirScale;
     }
  
  void main()

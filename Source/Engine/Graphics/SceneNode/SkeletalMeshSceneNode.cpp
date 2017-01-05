@@ -44,9 +44,10 @@ Quaternion aiQuateronionToQuat( const aiQuaternion& aiQuat )
 
 SkeletalMeshSceneNode::SkeletalMeshSceneNode(
    const ActorId actorId, IRenderComponent* pRenderComponent, shared_ptr<Resource> pMeshResouce, shared_ptr<Resource> pAnimScriptResource, MaterialPtr pMaterial, RenderGroup renderPass, TransformPtr pTransform )
-   : SceneNode( actorId, pRenderComponent, renderPass, pTransform, pMaterial ),
+   : SceneNode( actorId, pRenderComponent, renderPass, pTransform ),
    m_pMeshResource( pMeshResouce ),
    m_pAnimScriptResource( pAnimScriptResource ),
+   m_pMaterial( pMaterial ),
    // m_pMaterial(  ),
    m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
    m_FragmentShader( Resource( FRAGMENT_SHADER_FILE_NAME ) )
@@ -97,13 +98,13 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );
 
-   OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
+   OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_pMaterial->GetTextureResource() );
 
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
    m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
-   SetRadius( pMeshExtra->m_Radius );
+  // SetRadius( pMeshExtra->m_Radius );
 
    OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
    OpenGLRendererLoader::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
@@ -228,9 +229,9 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
 
    glUniform3fv( m_EyePosWorldSpaceUni, 1, ( const GLfloat* ) &pScene->GetCamera()->GetToWorldPosition() );
 
-   glUniform4fv( m_MaterialDiffuseUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetDiffuse() );
-   glUniform3fv( m_MaterialAmbientUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetAmbient() );
-   glUniform3fv( m_MaterialSpecularUni, 1, ( const GLfloat* ) m_Props.GetMaterialPtr()->GetSpecular() );
+   glUniform4fv( m_MaterialDiffuseUni, 1, ( const GLfloat* ) m_pMaterial->GetDiffuse() );
+   glUniform3fv( m_MaterialAmbientUni, 1, ( const GLfloat* ) m_pMaterial->GetAmbient() );
+   glUniform3fv( m_MaterialSpecularUni, 1, ( const GLfloat* ) m_pMaterial->GetSpecular() );
 
    const auto& globalBoneTransform = m_pAnimationState->m_GlobalBoneTransform;
    glUniformMatrix4fv( m_BoneTransformUni, globalBoneTransform.size(), GL_TRUE, &( globalBoneTransform[ 0 ][ 0 ][ 0 ] ) );

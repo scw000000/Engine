@@ -14,6 +14,8 @@
 #include "EngineStd.h"
 #include "Geometry.h"
 
+#include <assimp/cimport.h>
+#include <assimp/scene.h>
 const Vec2 Vec2::g_Zero( 0.0f, 0.0f );
 const Vec2 Vec2::g_Identity( 1.0f, 1.0f );
 
@@ -114,6 +116,13 @@ TiXmlElement* Vec3::GenerateOverridesXML( TiXmlElement* pResource ) const
       }
    return pRetNode;
    }
+
+// aiMat is row major order matrix
+Mat4x4::Mat4x4( const aiMatrix4x4t<float>& aiMat ) : glm::mat4( aiMat.a1, aiMat.a2, aiMat.a3, aiMat.a4, 
+                                                                aiMat.b1, aiMat.b2, aiMat.b3, aiMat.b4,
+                                                                aiMat.c1, aiMat.c2, aiMat.c3, aiMat.c4, 
+                                                                aiMat.d1, aiMat.d2, aiMat.d3, aiMat.d4 )
+   {}
 
 bool Vec4::Init( TiXmlElement* pData )
    {

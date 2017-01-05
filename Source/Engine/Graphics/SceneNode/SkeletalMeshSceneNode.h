@@ -97,4 +97,5 @@ class SkeletalMeshSceneNode : public SceneNode
       unsigned long     m_VerticesIndexCount;
 
       shared_ptr< AnimationState > m_pAnimationState;
+      MaterialPtr       m_pMaterial;
    };

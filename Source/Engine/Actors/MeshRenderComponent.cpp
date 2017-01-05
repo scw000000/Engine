@@ -36,7 +36,37 @@ MeshRenderComponent::MeshRenderComponent( void ) : m_pMeshResource( ENG_NEW Reso
 // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
 shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
    {
-   shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), this, m_pMeshResource, m_pMaterial, RenderGroup::RenderGroup_Actor, m_pTransform ) );
+   auto pScene = MeshResourceLoader::LoadAndReturnScene( *m_pMeshResource );
+   shared_ptr< SceneNode > pMeshRootNode( ENG_NEW SceneNode( m_pOwner->GetId(), this, RenderGroup_Actor, m_pTransform ) );
+
+   std::queue< std::pair< shared_ptr< SceneNode >, aiNode* > > nodeQueue;
+   nodeQueue.push( std::pair< shared_ptr< SceneNode >, aiNode* >( pMeshRootNode, pScene->mRootNode ) );
+
+   while( nodeQueue.size() )
+      {
+      auto nodePair = nodeQueue.front();
+      auto pSceneNode = nodePair.first;
+      auto pAiNode = nodePair.second;
+      nodeQueue.pop();
+      for( unsigned int i = 0; i < pAiNode->mNumChildren; ++i )
+         {
+         auto pAiChildNode = pAiNode->mChildren[ i ];
+         shared_ptr< SceneNode > pChildSceneNode( ENG_NEW SceneNode( m_pOwner->GetId(), this, RenderGroup_Actor, TransformPtr( ENG_NEW Transform( pAiChildNode->mTransformation ) ) ) );
+         pSceneNode->VAddChild( pChildSceneNode );
+         pChildSceneNode->VSetParentNode( pSceneNode.get() );
+         nodeQueue.push( std::pair< shared_ptr< SceneNode >, aiNode* >( pChildSceneNode, pAiChildNode ) );
+         }
+      for( unsigned int i = 0; i < pAiNode->mNumMeshes; ++i )
+         {
+         shared_ptr< Material > pChildMaterial( ENG_NEW Material( *m_pMaterial ) );
+         pChildMaterial->SetMeshIndex( pAiNode->mMeshes[ i ] );
+         shared_ptr< SceneNode > pChildSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), this, m_pMeshResource, pChildMaterial, RenderGroup_Actor, TransformPtr( ENG_NEW Transform() ) ) );
+         pChildSceneNode->VSetParentNode( pSceneNode.get() );
+         pSceneNode->VAddChild( pChildSceneNode );
+         }
+      }
+      
+ //  shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), this, m_pMeshResource, m_pMaterial, RenderGroup::RenderGroup_Actor, m_pTransform ) );
    //// get the transform component
    //shared_ptr<TransformComponent> pTransformComponent = MakeStrongPtr( m_pOwner->GetComponent<TransformComponent>( TransformComponent::s_ComponentId ) );
    //if ( !pTransformComponent )
@@ -48,7 +78,7 @@ shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
    //WeakBaseRenderComponentPtr wbrcp(this);
    //shared_ptr< SceneNode > pMeshSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), wbrcp, m_pMeshResource, m_pMaterial, RenderPass::RenderPass_Actor, pTransformComponent->GetTransform() ) );
    //
-   return pMeshSceneNode;
+   return pMeshRootNode;
    }
 
 bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )

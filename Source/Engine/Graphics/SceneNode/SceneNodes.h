@@ -73,8 +73,8 @@ class SceneNodeProperties
       RenderGroup GetRenderGroup( void ) const { return m_RenderGroup; }
       float GetRadius( void ) const { return m_Radius; }
       
-      MaterialPtr GetMaterialPtr( void ) const { return m_pMaterial; }
-      void SetMaterialPtr( MaterialPtr pMaterial ) { pMaterial = m_pMaterial; }
+    //  MaterialPtr GetMaterialPtr( void ) const { return m_pMaterial; }
+    //  void SetMaterialPtr( MaterialPtr pMaterial ) { pMaterial = m_pMaterial; }
 
       bool GetEnableShadow( void ) const { return m_EnableShadow; }
       void SetEnableShadow( bool isEnabled ) { m_EnableShadow = isEnabled; }
@@ -84,7 +84,6 @@ class SceneNodeProperties
       TransformPtr m_pTransform;
       TransformPtr m_pGlobalTransform;
       float m_Radius;
-      MaterialPtr m_pMaterial;
       std::string m_Name;
       RenderGroup m_RenderGroup;
       bool m_EnableShadow;
@@ -101,7 +100,7 @@ class SceneNode : public ISceneNode
    friend class LightManager;
 
    public:
-      SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderGroup renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ), MaterialPtr pMaterial = MaterialPtr() );
+      SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderGroup renderPass, TransformPtr pNewTransform = TransformPtr( ENG_NEW Transform ) );
 
 	   virtual ~SceneNode();
 

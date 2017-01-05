@@ -71,8 +71,8 @@ shared uint sGlobalIdxListLength;
 
 shared uint sMinDepthU;
 shared uint sMaxDepthU;
-shared float sMinDepth;
-shared float sMaxDepth;
+shared float sNearPlaneVS;
+shared float sFarPlaneVS;
 
 shared uint sGlobalStoreOffset;
 
@@ -152,16 +152,16 @@ void main()
     if( gl_LocalInvocationIndex == 0 )
         {
         // to NDC space
-        sMinDepth = uintBitsToFloat( sMinDepthU ) * 2.0 - 1.0;
-        sMaxDepth = uintBitsToFloat( sMaxDepthU ) * 2.0 - 1.0;
+        sNearPlaneVS = uintBitsToFloat( sMinDepthU ) * 2.0 - 1.0;
+        sFarPlaneVS = uintBitsToFloat( sMaxDepthU ) * 2.0 - 1.0;
         
-        sMinDepth = -uProj[3][2] / ( sMinDepth + uProj[2][2] );
-        sMaxDepth = -uProj[3][2] / ( sMaxDepth + uProj[2][2] );
+        sNearPlaneVS = -uProj[3][2] / ( sNearPlaneVS + uProj[2][2] );
+        sFarPlaneVS = -uProj[3][2] / ( sFarPlaneVS + uProj[2][2] );
         
-        // if sMinDepth = -N, sMaxDepth = -F
-        // ( 0, 0, -N, 1 ) dot vec4( 0.0, 0.0, -1.0, sMinDepth ) = N - N = 0
-        // ( 0, 0, -F, 1 ) dot vec4( 0.0, 0.0, 1.0, -sMinDepth ) = -F + F = 0
-        sNearFarPlanes = vec4[]( vec4( 0.0, 0.0, -1.0, sMinDepth ), vec4( 0.0, 0.0, 1.0, -sMaxDepth ) );
+        // if sNearPlaneVS = -N, sFarPlaneVS = -F
+        // ( 0, 0, -N, 1 ) dot vec4( 0.0, 0.0, -1.0, sNearPlaneVS ) = N - N = 0
+        // ( 0, 0, -F, 1 ) dot vec4( 0.0, 0.0, 1.0, -sNearPlaneVS ) = -F + F = 0
+        sNearFarPlanes = vec4[]( vec4( 0.0, 0.0, -1.0, sNearPlaneVS ), vec4( 0.0, 0.0, 1.0, -sFarPlaneVS ) );
         }
         
     barrier();
@@ -177,8 +177,8 @@ void main()
                     if( IsSphereInsideFrustum( LightPropsSSBO.data[ i ].m_PositionVS,
                                                LightPropsSSBO.data[ i ].m_Attenuation.w,
                                                TileFrustumSSBO.data[ sTileIndex ].m_Planes,
-                                               sMinDepth,
-                                               sMaxDepth
+                                               sNearPlaneVS,
+                                               sFarPlaneVS
                                                 ) )
                         {
                         AppendLocalIdxList( i );
@@ -234,10 +234,15 @@ void main()
                 imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 1.0, 1.0 ) );
                 
                 }
-            imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 1.0, 0.0, 1.0 ) );
+            imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 0.0, 0.0, 1.0 ) );
             }
-            
-       // if( ( gl_WorkGroupID.x % 2u ) == 1 && ( gl_WorkGroupID.y % 2u ) == 1 )
+        }
+        else
+        {
+        imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 1.0, 1.0, 1.0 ) );
+           
+        }
+               // if( ( gl_WorkGroupID.x % 2u ) == 1 && ( gl_WorkGroupID.y % 2u ) == 1 )
       //      {
       //      imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 0.0, 0.0, 1.0 ) );
           
@@ -246,5 +251,4 @@ void main()
 
       //  imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( vec3( gl_WorkGroupID.xyz ) / vec3( gl_NumWorkGroups.xyz ), 1.0 ) );
             
-        }
     }

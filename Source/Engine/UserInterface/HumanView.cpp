@@ -33,7 +33,7 @@ HumanView::HumanView( void )
       m_pWorld = g_pApp->m_pEngineLogic->m_pWrold;
 		PerspectiveFrustum frustum;
       Point screenSize = g_pApp->m_EngineOptions.GetScreenSize();
-      frustum.Init( ENG_PI / 4.0f, ( float ) screenSize.x / ( float ) screenSize.y, 0.1f, 500.0f );
+      frustum.Init( ENG_PI / 4.0f, ( float ) screenSize.x / ( float ) screenSize.y, 0.1f, 1500.0f );
       
       m_pCamera.reset( ENG_NEW CameraNode( Vec3(0.0f, 0.0f, 0.0f), // position in World Space
 								Vec3( 0.0f, 0.0f, 1.0f), // look target

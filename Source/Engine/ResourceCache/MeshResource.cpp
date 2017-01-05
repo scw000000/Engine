@@ -35,6 +35,14 @@ extern Mat4x4 aiMat4x4ToMat4( aiMatrix4x4 aiMat44 )
    return toWorld;
    }
 
+MeshResourceExtraData::MeshResourceExtraData( unsigned int meshNum ) 
+   : m_pScene( NULL )
+   {
+   m_NumVertices = 0; 
+   m_NumVertexIndex = 0;
+   m_NumBones = 0; 
+   }
+
 void MeshResourceExtraData::LoadBones( void )
    {
    BoneId currentBoneId = 0;
@@ -94,41 +102,42 @@ int MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, sh
    {
    const char* p_Msg = NULL;
    //aiProcessPreset_TargetRealtime_Quality // aiProcess_JoinIdenticalVertices
-   const struct aiScene *p_AiScene = aiImportFileFromMemory( rawBuffer, 
+   const struct aiScene *pAiScene = aiImportFileFromMemory( rawBuffer, 
                                                            rawSize, 
-                                                           aiProcess_Triangulate | aiProcess_LimitBoneWeights/*| aiProcessPreset_TargetRealtime_Fast | aiProcess_SortByPType*/,
+                                                           aiProcess_Triangulate | aiProcess_LimitBoneWeights| aiProcessPreset_TargetRealtime_Fast /*| aiProcess_SortByPType*/,
                                                            p_Msg );
-   if( !p_AiScene )
+   if( !pAiScene )
       {
       ENG_ERROR( p_Msg );
       return false;
       }
-   shared_ptr< MeshResourceExtraData > extra( ENG_NEW MeshResourceExtraData );
+   shared_ptr< MeshResourceExtraData > extra( ENG_NEW MeshResourceExtraData( pAiScene->mNumMeshes ) );
    handle->SetExtraData( extra );
-   extra->m_pScene = p_AiScene;
-   extra->m_Radius = 0;
-   for( unsigned int meshIdx = 0; meshIdx < p_AiScene->mNumMeshes; ++meshIdx )
-      {
-      auto pMesh = p_AiScene->mMeshes[ meshIdx ];
-      extra->m_NumVertices += pMesh->mNumVertices;
-      for( unsigned int vertexId = 0; vertexId < pMesh->mNumVertices; ++vertexId )
-         {    
-         auto curSquareLength = pMesh->mVertices[ vertexId ].SquareLength();
-         extra->m_Radius = std::max( extra->m_Radius, curSquareLength );
-         }
+   extra->m_pScene = pAiScene;
 
-      for( unsigned int faceId = 0; faceId < pMesh->mNumFaces; ++faceId )
-         {
-         extra->m_NumVertexIndex += pMesh->mFaces[ faceId ].mNumIndices;
-         }
-      }
+   //extra->m_Radius = 0;
+   //for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
+   //   {
+   //   auto pMesh = pAiScene->mMeshes[ meshIdx ];
+   //   extra->m_NumVertices += pMesh->mNumVertices;
+   //   for( unsigned int vertexId = 0; vertexId < pMesh->mNumVertices; ++vertexId )
+   //      {    
+   //      auto curSquareLength = pMesh->mVertices[ vertexId ].SquareLength();
+   //      extra->m_Radius[ meshIdx ] = std::max( extra->m_Radius[ meshIdx ], curSquareLength );
+   //      }
+   //   extra->m_Radius[ meshIdx ] = std::sqrt( extra->m_Radius[ meshIdx ] );
+   ////   for( unsigned int faceId = 0; faceId < pMesh->mNumFaces; ++faceId )
+   ////      {
+   ////      extra->m_NumVertexIndex += pMesh->mFaces[ faceId ].mNumIndices;
+   ////      }
+   //   }
    extra->LoadBones();
-   extra->m_GlobalInverseTransform = p_AiScene->mRootNode->mTransformation;
+   extra->m_GlobalInverseTransform = pAiScene->mRootNode->mTransformation;
    extra->m_GlobalInverseTransform.Inverse();
 
-   extra->m_Radius = std::sqrt( extra->m_Radius );
+  // extra->m_Radius = std::sqrt( extra->m_Radius );
    struct aiMemoryInfo memInfo;
-   aiGetMemoryRequirements( p_AiScene, &memInfo );
+   aiGetMemoryRequirements( pAiScene, &memInfo );
    handle->SetSize( memInfo.total );
    return S_OK;
    }

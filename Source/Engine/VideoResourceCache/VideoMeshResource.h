@@ -17,7 +17,7 @@
 class VideoMeshResourceExtraData : public IVideoResourceExtraData
    {
    public:
-   VideoMeshResourceExtraData( unsigned int size );
+   VideoMeshResourceExtraData( unsigned int meshCount );
       ~VideoMeshResourceExtraData( void );
 
    public:
@@ -37,6 +37,7 @@ class VideoMeshResourceExtraData : public IVideoResourceExtraData
          MeshCount_Num
          };
       std::vector< unsigned int[ MeshCount_Num ] > m_MeshCount;
+      std::vector< float > m_Radius;
    };
 
 class VideoMeshResourceLoader : public VideoResourceLoader

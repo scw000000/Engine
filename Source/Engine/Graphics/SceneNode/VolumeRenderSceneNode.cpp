@@ -55,7 +55,7 @@ VolumeRenderSceneNode::VolumeRenderSceneNode( const ActorId actorId,
                                               shared_ptr<Resource> pTransferFunctionResource,
                                               const Vec3& textureDiemension,
                                               const Vec3& cuboidDimension )
-                                              : SceneNode( actorId, pRenderComponent, renderGroup, pTransform, shared_ptr< Material >( ENG_NEW Material() ) ),
+                                              : SceneNode( actorId, pRenderComponent, renderGroup, pTransform ),
                                               m_FirstPassVertexShader( Resource ( FIRST_PASS_VERTEX_SHADER_FILE_NAME ) ),
                                               m_FirstPassFragmentShader( Resource( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ) ),
                                               m_SecondPassVertexShader( Resource( SECOND_PASS_VERTEX_SHADER_FILE_NAME ) ),

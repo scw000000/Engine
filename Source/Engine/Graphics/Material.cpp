@@ -22,6 +22,7 @@ Material::Material( void ) : m_TextureResource( "art\\default.jpg" )
    m_Emissive = g_Black;      
    m_Shininess = 0.f;          
    m_AlphaType = AlphaOpaque;
+   m_MeshIndex = 0;
    }
 
 bool Material::Init( TiXmlElement* pData )

@@ -18,9 +18,10 @@
 
 const std::vector< std::string > MESH_LOADER_PATTERNS( { "*.obj", "*.fbx" } );
 
-VideoMeshResourceExtraData::VideoMeshResourceExtraData( unsigned int size ) :
-   m_BufferObjects( size ),
-   m_MeshCount( size )
+VideoMeshResourceExtraData::VideoMeshResourceExtraData( unsigned int meshCount ) :
+   m_BufferObjects( meshCount ),
+   m_MeshCount( meshCount ),
+   m_Radius( meshCount, 0.f )
    {
    
    }
@@ -67,6 +68,13 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
       pData->m_MeshCount[ meshIdx ][ VideoMeshResourceExtraData::MeshCount_Vertex ] = vertexCount;
       pData->m_MeshCount[ meshIdx ][ VideoMeshResourceExtraData::MeshCount_Index ] = indicesCOunt;
 
+      for( unsigned int vertexIdx = 0; vertexIdx < pMesh->mNumVertices; ++vertexIdx )
+         {
+         auto curSquareLength = pMesh->mVertices[ vertexIdx ].SquareLength();
+         pData->m_Radius[ meshIdx ] = std::max( pData->m_Radius[ meshIdx ], curSquareLength );
+         }
+      pData->m_Radius[ meshIdx ] = std::sqrt( pData->m_Radius[ meshIdx ] );
+
       ENG_ASSERT( pData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Vertex ] );
       glBindBuffer( GL_ARRAY_BUFFER, pData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Vertex ] );
       glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof( aiVector3t<float> ), pMesh->mVertices, GL_STATIC_DRAW );
@@ -106,13 +114,12 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
       unsigned int indexsSize = sizeof( unsigned int );
       for( unsigned int faceIdx = 0; faceIdx < pMesh->mNumFaces; ++faceIdx )
          {
-         const aiFace& face = pMesh->mFaces[ faceIdx ];
-         
          glBufferSubData( GL_ELEMENT_ARRAY_BUFFER,
                           faceIdx * 3u * indexsSize,
                           3u * indexsSize,
-                          face.mIndices );
+                          pMesh->mFaces[ faceIdx ].mIndices );
          }
+      // load Material
       }
    videoHandle->SetExtraData( pExtraData );
    OpenGLRenderManager::CheckError();

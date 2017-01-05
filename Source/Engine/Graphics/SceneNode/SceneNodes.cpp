@@ -18,7 +18,7 @@
 #include "..\Actors\ActorComponent.h"
 #include "..\Actors\RenderComponent.h"
 
-SceneNodeProperties::SceneNodeProperties( void ) : m_pTransform(), m_pGlobalTransform( ENG_NEW Transform() ), m_pMaterial()
+SceneNodeProperties::SceneNodeProperties( void ) : m_pTransform(), m_pGlobalTransform( ENG_NEW Transform() )
    {
    m_ActorId = INVALID_ACTOR_ID;
    m_Radius = 0;
@@ -38,22 +38,22 @@ Transform SceneNodeProperties::GetLocalTransform( void ) const
 
 void SceneNodeProperties::SetAlpha( const float alpha )
    {
-   if( m_pMaterial )
+   /*if( m_pMaterial )
       {
       m_pMaterial->SetAlpha( alpha );
-      }
+      }*/
    }
 
 float SceneNodeProperties::GetAlpha( void ) const 
    { 
-   if( m_pMaterial )
+   /*if( m_pMaterial )
       { 
       return m_pMaterial->GetAlpha(); 
-      } 
+      } */
    return fOPAQUE; 
    }
 
-SceneNode::SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderGroup renderPass, TransformPtr pNewTransform, MaterialPtr pMaterial )
+SceneNode::SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, RenderGroup renderPass, TransformPtr pNewTransform )
    {
    m_pParent = NULL;
 	m_Props.m_ActorId = actorId;
@@ -61,7 +61,6 @@ SceneNode::SceneNode( ActorId actorId, IRenderComponent* pRenderComponent, Rende
 	m_Props.m_RenderGroup = renderPass;
 	//m_Props.m_AlphaType = AlphaOpaque;
    m_pRenderComponent = pRenderComponent;
-   m_Props.m_pMaterial = pMaterial;
    m_Props.m_pTransform = pNewTransform;
    *m_Props.m_pGlobalTransform = *pNewTransform; // copy value from local transform
    m_Props.m_Radius = 0.f;
@@ -197,9 +196,8 @@ int SceneNode::VRenderChildren( Scene *pScene )
 
                pScene->AddAlphaSceneNode( asn );
                }
-
-            it->VRenderChildren( pScene );
             }
+         it->VRenderChildren( pScene );
          }
       it->VPostRender( pScene );
       }

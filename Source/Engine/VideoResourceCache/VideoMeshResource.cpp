@@ -15,8 +15,9 @@
 #include "EngineStd.h"
 #include "VideoMeshResource.h"
 #include "..\Graphics\Renderer\RenderManager.h"
+#include "VideoTextureResource.h"
 
-const std::vector< std::string > MESH_LOADER_PATTERNS( { "*.obj", "*.fbx" } );
+const std::vector< std::string > MESH_LOADER_PATTERNS( { "*.obj", "*.fbx", "*.3ds", "*.fbx" } );
 
 VideoMeshResourceExtraData::VideoMeshResourceExtraData( unsigned int meshCount ) :
    m_BufferObjects( meshCount ),
@@ -55,6 +56,23 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
    VideoMeshResourceExtraData* pData = ENG_NEW VideoMeshResourceExtraData( pAiScene->mNumMeshes );
    ENG_ASSERT( pData );
    shared_ptr< VideoMeshResourceExtraData > pExtraData( pData );
+
+   // load Material
+   for( unsigned int i = 0; i < pAiScene->mNumMaterials; ++i )
+      {
+      auto pAiMaterial = pAiScene->mMaterials[ i ];
+      LoadTexture( pAiMaterial, aiTextureType_DIFFUSE );
+      LoadTexture( pAiMaterial, aiTextureType_AMBIENT );
+      LoadTexture( pAiMaterial, aiTextureType_SPECULAR );
+      LoadTexture( pAiMaterial, aiTextureType_EMISSIVE );
+      LoadTexture( pAiMaterial, aiTextureType_HEIGHT );
+      LoadTexture( pAiMaterial, aiTextureType_NORMALS );
+      LoadTexture( pAiMaterial, aiTextureType_SHININESS );
+      LoadTexture( pAiMaterial, aiTextureType_OPACITY );
+      LoadTexture( pAiMaterial, aiTextureType_DISPLACEMENT );
+      LoadTexture( pAiMaterial, aiTextureType_LIGHTMAP );
+      LoadTexture( pAiMaterial, aiTextureType_REFLECTION );
+      }
 
    unsigned int arrayOfBuffersLen = ENG_ARRAY_SIZE_IN_ELEMENTS( pData->m_BufferObjects[ 0 ] );
    for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
@@ -103,7 +121,7 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
          }
       else
          {
-         ENG_ASSERT( 0 && "not suportted UV component Num" );
+         ENG_ASSERT( "not suportted UV component Num" );
          }
 
 
@@ -119,7 +137,7 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
                           3u * indexsSize,
                           pMesh->mFaces[ faceIdx ].mIndices );
          }
-      // load Material
+
       }
    videoHandle->SetExtraData( pExtraData );
    OpenGLRenderManager::CheckError();
@@ -132,4 +150,15 @@ VideoMeshResourceExtraData* VideoMeshResourceLoader::LoadAndReturnMeshResourceEx
    auto pRet = static_pointer_cast< VideoMeshResourceExtraData >( pVideoHandle->GetExtraData() );
    return pRet.get();
  
+   }
+
+GLuint VideoMeshResourceLoader::LoadTexture( aiMaterial* pMaterial, aiTextureType type ) const
+   {
+   unsigned int typeCount = pMaterial->GetTextureCount( type );
+   for( unsigned int i = 0; i < typeCount; ++i )
+      {
+      aiString filePath;
+      pMaterial->GetTexture( type, i, &filePath );
+      }
+   return 0;
    }

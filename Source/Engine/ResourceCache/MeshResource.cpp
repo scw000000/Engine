@@ -14,10 +14,11 @@
 
 #include "EngineStd.h"
 #include "MeshResource.h"
+#include <assimp/Importer.hpp>
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
 
-const char* MESH_LOADER_PATTERNS[] = { "*.obj", "*.fbx" };
+const char* MESH_LOADER_PATTERNS[] = { "*.obj", "*.fbx", "*.3ds", "*.fbx" };
 
 BoneData::BoneData( const aiMatrix4x4& offset, BoneId id )
    {

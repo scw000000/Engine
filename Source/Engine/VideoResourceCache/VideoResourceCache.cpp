@@ -119,7 +119,7 @@ shared_ptr< VideoResourceHandle > VideoResourceCache::Load( const Resource& reso
 
    if( !loader )
       {
-      ENG_ASSERT( loader && _T( "Rresource loader not found!" ) );
+      ENG_ASSERT( loader && _T( "Resource loader not found!" ) );
       return handle;
       }
    

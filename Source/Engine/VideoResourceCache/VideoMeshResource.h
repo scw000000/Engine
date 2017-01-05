@@ -40,10 +40,14 @@ class VideoMeshResourceExtraData : public IVideoResourceExtraData
       std::vector< float > m_Radius;
    };
 
+//struct aiMaterial;
+
 class VideoMeshResourceLoader : public VideoResourceLoader
    {
-      public:
+   public:
       VideoMeshResourceLoader( void );
       virtual int VLoadResource( shared_ptr<ResHandle> handle, shared_ptr< VideoResourceHandle > videoHandle ) override;
       static VideoMeshResourceExtraData* LoadAndReturnMeshResourceExtraData( const Resource& resource );
+   private:
+      GLuint LoadTexture( aiMaterial* pMaterial, aiTextureType type ) const;
    };

@@ -458,6 +458,17 @@ int DeferredMainRenderer::OnRestoreGeometryPass( void )
    m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_AlbedoTexture ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uAlbedoTex" );
    ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_AlbedoTexture ] != -1 );
 
+   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMapTexture ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uNormalMapTex" );
+   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
+
+   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_UseNormalMap ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uUseNormalMap" );
+   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
+
+   glUseProgram( m_Programs[ RenderPass_Geometry ] );
+      glUniform1i( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_AlbedoTexture ], 0 );
+      glUniform1i( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMapTexture ], 1 );
+   glUseProgram( 0 );
+
    auto result = glCheckFramebufferStatus( GL_FRAMEBUFFER );
    ENG_ASSERT( glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE && "Frame buffer error" );
 

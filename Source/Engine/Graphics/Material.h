@@ -14,8 +14,8 @@
  */
 #include "SceneNodes.h"
 
-class aiScene;
-class aiMesh;
+struct aiScene;
+struct aiMesh;
 
 enum AlphaType;
 

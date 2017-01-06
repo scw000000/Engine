@@ -49,6 +49,7 @@ MeshSceneNode::MeshSceneNode( const ActorId actorId,
 
    m_MVPUni = 0;
    m_MeshTextureObj = 0;
+   m_NormalMapTextureObj = 0;
    m_MeshTextureUni = 0;
    m_VAO = 0;
 
@@ -65,7 +66,7 @@ MeshSceneNode::MeshSceneNode( const ActorId actorId,
    m_MaterialSpecularUni = 0;
 
    m_VerticesIndexCount = 0;
-
+   m_UseNormalMap = false;
    m_Props.SetEnableShadow( true );
 
    m_pDeferredMainRenderer = dynamic_cast< DeferredMainRenderer* >( &g_pApp->m_pRenderManager->VGetMainRenderer() );
@@ -90,6 +91,16 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_FragmentShader.VReleaseShader( m_Program );*/
 
    m_MeshTextureObj = VideoTextureResourceLoader::LoadAndReturnTextureObject( m_pMaterial->m_DiffuseTextureRes );
+
+   if( m_pMaterial->m_NormalTextureRes.m_Name.size() )
+      {
+      m_NormalMapTextureObj = VideoTextureResourceLoader::LoadAndReturnTextureObject( m_pMaterial->m_NormalTextureRes );
+      m_UseNormalMap = true;
+      }
+   else
+      {
+      m_UseNormalMap = false;
+      }
  //  OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
 
   // shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
@@ -106,7 +117,8 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_Buffers[ UV_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_UV ];
    m_Buffers[ Index_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Index ];
    m_Buffers[ Normal_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Normal ];
-   
+   m_Buffers[ Tangent_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Tangent ];
+   m_Buffers[ Bitangent_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Bitangent ];
    //if(  )
    //   {
    //   }
@@ -210,7 +222,18 @@ int MeshSceneNode::VRender( Scene *pScene )
    
    glActiveTexture( GL_TEXTURE0 );
    glBindTexture( GL_TEXTURE_2D, m_MeshTextureObj );
-   glUniform1i( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_AlbedoTexture ], 0 );
+  // glUniform1i( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_AlbedoTexture ], 0 );
+
+   if( m_UseNormalMap )
+      {
+      glActiveTexture( GL_TEXTURE1 );
+      glBindTexture( GL_TEXTURE_2D, m_NormalMapTextureObj );
+      glUniform1ui( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_UseNormalMap ], 1u );
+      }
+   else
+      {
+      glUniform1ui( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_UseNormalMap ], 0u );
+      }
 
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
    glEnableVertexAttribArray( 0 );
@@ -245,6 +268,28 @@ int MeshSceneNode::VRender( Scene *pScene )
          ( void* ) 0
          );
    
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Tangent_Buffer ] );
+   glEnableVertexAttribArray( 3 );
+   glVertexAttribPointer(
+      3,
+      3,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      ( void* ) 0
+      );
+
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Bitangent_Buffer ] );
+   glEnableVertexAttribArray( 4 );
+   glVertexAttribPointer(
+      4,
+      3,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      ( void* ) 0
+      );
+
    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ Index_Buffer ] );
 
    glDrawElements(

@@ -110,11 +110,27 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
       glBindBuffer( GL_ARRAY_BUFFER, pData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Normal ] );
       glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof( aiVector3t<float> ), pMesh->mNormals, GL_STATIC_DRAW );
 
+      glBindBuffer( GL_ARRAY_BUFFER, pData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Tangent ] );
+      glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof( aiVector3t<float> ), pMesh->mTangents, GL_STATIC_DRAW );
+
+      glBindBuffer( GL_ARRAY_BUFFER, pData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Bitangent ] );
+      glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof( aiVector3t<float> ), pMesh->mBitangents, GL_STATIC_DRAW );
+
       ENG_ASSERT( pData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_UV ] );
       glBindBuffer( GL_ARRAY_BUFFER, pData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_UV ] );
       if( pMesh->mNumUVComponents[ 0 ] == 3u )
          {
-         glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof( aiVector3t<float> ), pMesh->mTextureCoords[ 0 ], GL_STATIC_DRAW );
+         glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof( aiVector2t<float> ), NULL, GL_STATIC_DRAW );
+         unsigned int vec2DSize = sizeof( aiVector2D );
+         for( unsigned int uvIdx = 0; uvIdx < vertexCount; ++uvIdx )
+            {
+            glBufferSubData( GL_ARRAY_BUFFER,
+                             uvIdx * vec2DSize,
+                             vec2DSize,
+                             &pMesh->mTextureCoords[ 0 ][ uvIdx ] );
+            }
+         ENG_ASSERT( 0 );
+        // glBufferData( GL_ARRAY_BUFFER, vertexCount * sizeof( aiVector3t<float> ), pMesh->mTextureCoords[ 0 ], GL_STATIC_DRAW );
          }
       else if( pMesh->mNumUVComponents[ 0 ] == 2u )
          {
@@ -126,6 +142,8 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
                              uvIdx * vec2DSize,
                              vec2DSize,
                              &pMesh->mTextureCoords[ 0 ][ uvIdx ] );
+       //     ENG_ASSERT( pMesh->mTextureCoords[ 0 ][ uvIdx ].x >= 0.f && pMesh->mTextureCoords[ 0 ][ uvIdx ].x <= 1.f );
+        //    ENG_ASSERT( pMesh->mTextureCoords[ 0 ][ uvIdx ].y >= 0.f && pMesh->mTextureCoords[ 0 ][ uvIdx ].y <= 1.f );
             }
          }
       else

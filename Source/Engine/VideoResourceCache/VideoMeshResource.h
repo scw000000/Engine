@@ -26,6 +26,8 @@ class VideoMeshResourceExtraData : public IVideoResourceExtraData
          MeshBufferData_Vertex,
          MeshBufferData_Normal,
          MeshBufferData_UV,
+         MeshBufferData_Tangent,
+         MeshBufferData_Bitangent,
          MeshBufferData_Index,
          MeshBufferData_Num
          };

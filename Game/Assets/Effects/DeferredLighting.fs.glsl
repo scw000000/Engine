@@ -1,6 +1,6 @@
 #version 430
 
-#define MAXIMUM_LIGHTS_SUPPORTED 8u
+#define MAXIMUM_LIGHTS_SUPPORTED 4096u
 
 #define TILE_SIZE 16u
 
@@ -164,9 +164,9 @@ vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 diffuse, vec3 s
     
     vec3 halfway = normalize( lightDir + viewDir );
     specular = specularNormalFac 
-                * GetDistribution( halfway, normal, shininess )
+               // * GetDistribution( halfway, normal, shininess );
 				* GetFresnel( lightDir, halfway, specular );
-    
+    //* luminosity+ specular
     return max( ( diffuse + specular ) * ( nDotL * luminosity ), vec3( 0.0 ) ) * light.m_Color.rgb;
     }
     

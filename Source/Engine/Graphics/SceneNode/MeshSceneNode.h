@@ -60,6 +60,8 @@ class MeshSceneNode : public SceneNode
          Vertex_Buffer,
          UV_Buffer, 
          Normal_Buffer,
+         Tangent_Buffer,
+         Bitangent_Buffer,
          Index_Buffer, 
          Num_Buffers
          };
@@ -90,4 +92,7 @@ class MeshSceneNode : public SceneNode
       unsigned long     m_VerticesIndexCount;
 
       DeferredMainRenderer *m_pDeferredMainRenderer;
+
+      bool              m_UseNormalMap;
+      GLuint            m_NormalMapTextureObj;
    };

@@ -58,7 +58,10 @@ int VideoTextureResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, sha
      //    textureFormat = GL_RGBA;
          glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, pSurface->w, pSurface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pSurface->pixels );
          break;
-      default:
+      case SDL_PIXELFORMAT_ARGB8888:
+         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, pSurface->w, pSurface->h, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, pSurface->pixels ); 
+            break;
+      default:        
          ENG_ASSERT( 0 && "Image format not supported" );
          break;
       };

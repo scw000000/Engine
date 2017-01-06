@@ -85,6 +85,8 @@ class DeferredMainRenderer : public MainRenderer
          GeometryPassUni_MVP,
          GeometryPassUni_NormalMat,
          GeometryPassUni_AlbedoTexture,
+         GeometryPassUni_NormalMapTexture,
+         GeometryPassUni_UseNormalMap,
          GeometryPassUni_Num
          };
 

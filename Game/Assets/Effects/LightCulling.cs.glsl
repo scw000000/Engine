@@ -216,26 +216,40 @@ void main()
     
     if( gl_GlobalInvocationID.x < uScreenSize.x && gl_GlobalInvocationID.y < uScreenSize.y ) // valid depth test position
         {
-         imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
+        float ratio = float ( sLocalIdxCount ) / float ( uValidLightNum );
+        vec3 outColor = vec3( 0.0 );
+        if( ratio <= 0.5 ) // lerp between green and yellow
+            {
+            ratio *= 2.0;
+            outColor = mix( vec3( 0.0, 1.0, 0.0 ), vec3( 1.0, 1.0, 0.0 ), ratio );
+            }
+        else // lerp between yellow and red
+            {
+            ratio = ( ratio - 0.5 ) * 2.0;
+            outColor = mix( vec3( 1.0, 1.0, 0.0 ), vec3( 1.0, 0.0, 0.0 ), ratio );
+            }
+        imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( outColor, 1.0 ) );
             
-        if( sLocalIdxCount == 1 )
-            {
-            imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 1.0, 0.0, 1.0 ) );
-            }
-        else if( sLocalIdxCount == 0 )
-            {
-            imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
-            }
-        if( sLocalIdxCount == 2 )
-            {
+       //  imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
+            
+     //   if( sLocalIdxCount == 1 )
+      //      {
+      //      imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 1.0, 0.0, 1.0 ) );
+      //      }
+      //  else if( sLocalIdxCount == 0 )
+     //       {
+      //      imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 0.0, 1.0 ) );
+      //      }
+      //  if( sLocalIdxCount == 2 )
+      //      {
             // sGlobalIdxListLength = 510600
-            if( sGlobalStoreOffset + 1 >= sGlobalIdxListLength )
-                {
-                imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 1.0, 1.0 ) );
-                
-                }
-            imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 0.0, 0.0, 1.0 ) );
-            }
+      //      if( sGlobalStoreOffset + 1 >= sGlobalIdxListLength )
+      //          {
+      //          imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 0.0, 0.0, 1.0, 1.0 ) );
+      //          
+      //          }
+      //      imageStore( debugTex, ivec2( gl_GlobalInvocationID.xy ), vec4( 1.0, 0.0, 0.0, 1.0 ) );
+      //      }
         }
         else
         {

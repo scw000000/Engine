@@ -42,7 +42,17 @@ int TextureResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize,
       ENG_ERROR( SDL_GetError() );
       return false;
       }
-   SDL_Surface* p_Surface = IMG_Load_RW( p_RWops, 0 );
+   SDL_Surface* p_Surface = NULL;
+   auto exten = handle->GetResource().GetExtension();
+   if( handle->GetResource().GetExtension().compare( "tga" ) ) // SDL cannot detect TGA file format
+      {
+      p_Surface = IMG_Load_RW( p_RWops, 0 );
+      }
+   else 
+      {
+      p_Surface = IMG_LoadTGA_RW( p_RWops );
+      }
+
    if( SDL_RWclose( p_RWops ) )
       {
       ENG_WARNING( SDL_GetError() );

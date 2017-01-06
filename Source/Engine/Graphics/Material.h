@@ -23,7 +23,7 @@ class Material
       Material( void );
       bool Init( TiXmlElement* pData );
       void SetTextureResource( const Resource& newTextureRes );
-      Resource GetTextureResource( void ) const { return m_TextureResource; };
+      Resource GetDiffuseTextureResource( void ) const { return m_DiffuseTextureRes; };
 
       void SetAmbient( const Color& color );
 	   Color GetAmbient( void ) const { return m_Ambient; }
@@ -48,7 +48,11 @@ class Material
 
       void SetMeshIndex( unsigned int idx ) { m_MeshIndex = idx; }
       unsigned int GetMeshIndex( void ) const { return m_MeshIndex; }
-   private:
+
+      void SetMaterialIndex( unsigned int idx ) { m_MaterialIndex = idx; }
+      unsigned int GetMaterialIndex( void ) const { return m_MaterialIndex; }
+      
+   public:
       Color    m_Diffuse;       
       Color    m_Ambient;      
       Color    m_Specular;      
@@ -56,5 +60,7 @@ class Material
       float    m_Shininess;     
       AlphaType m_AlphaType;
       unsigned int m_MeshIndex;
-      Resource m_TextureResource;
+      unsigned int m_MaterialIndex;
+      Resource m_DiffuseTextureRes;
+      Resource m_NormalTextureRes;
    };

@@ -82,14 +82,14 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    {
    ReleaseResource();
 
-   m_VertexShader.VOnRestore();
+   /*m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
    m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.GetShaderObject(), m_FragmentShader.GetShaderObject() } );
    ENG_ASSERT( m_Program );
    m_VertexShader.VReleaseShader( m_Program );
-   m_FragmentShader.VReleaseShader( m_Program );
+   m_FragmentShader.VReleaseShader( m_Program );*/
 
-   m_MeshTextureObj = VideoTextureResourceLoader::LoadAndReturnTextureObject( m_pMaterial->GetTextureResource() );
+   m_MeshTextureObj = VideoTextureResourceLoader::LoadAndReturnTextureObject( m_pMaterial->m_DiffuseTextureRes );
  //  OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
 
   // shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
@@ -106,71 +106,80 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_Buffers[ UV_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_UV ];
    m_Buffers[ Index_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Index ];
    m_Buffers[ Normal_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Normal ];
-
-   glGenVertexArrays( 1, &m_VAO );
-   glBindVertexArray( m_VAO );
-
-   // 1st attribute buffer : vertices
-   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
-   glEnableVertexAttribArray( VERTEX_LOCATION );
-   glVertexAttribPointer(
-      VERTEX_LOCATION,                  // attribute
-      3,                  // size
-      GL_FLOAT,           // type
-      GL_FALSE,           // normalized?
-      0,                  // stride
-      ( void* ) 0            // array buffer offset
-      );
-
-   // 2nd attribute buffer : UVs
-   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
-   glEnableVertexAttribArray( UV_LOCATION );
-   glVertexAttribPointer(
-      UV_LOCATION,                                // attribute
-      2,                                // size
-      GL_FLOAT,                         // type
-      GL_FALSE,                         // normalized?
-      0,                                // stride
-      ( void* ) 0                          // array buffer offset
-      );
-
-   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Normal_Buffer ] );
-   glEnableVertexAttribArray( NORMAL_LOCATION );
-   glVertexAttribPointer(
-      NORMAL_LOCATION,                  // attribute
-      3,                  // size
-      GL_FLOAT,           // type
-      GL_FALSE,           // normalized?
-      0,                  // stride
-      ( void* ) 0            // array buffer offset
-      );
-
-   glUseProgram( m_Program );
-   m_MVPUni          = glGetUniformLocation( m_Program, "uMVP" );
-   m_MUni      = glGetUniformLocation( m_Program, "uM" );
-   m_LightPosWorldSpaceUni = glGetUniformLocation( m_Program, "uLightPosition_WorldSpace" );
-   m_LigthDirectionUni     = glGetUniformLocation( m_Program, "uLighDirection_WorldSpace" );
-   m_LightColorUni         = glGetUniformLocation( m_Program, "uLightColor" );
-  // m_LightPowerUni         = glGetUniformLocation( m_Program, "uLightPower" );
-   m_LightNumberUni        = glGetUniformLocation( m_Program, "uLightNumber" );
-   /*m_ShadowMapMatrixUni    = glGetUniformLocation( m_Program, "uShadowMapMatrix" );
-  
-   for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
-      {
-      std::string str( "uShadowMapTexture[" );
-      str.push_back( '0' + i );
-      str.push_back( ']' );
-      m_ShadowMapTextureUni[ i ] = glGetUniformLocation( m_Program, str.c_str() );
-      }*/
-
-   m_EyePosWorldSpaceUni   = glGetUniformLocation( m_Program, "uEyePosition_WorldSpace" );
    
-   m_MeshTextureUni     = glGetUniformLocation( m_Program, "uMeshTexture" );
-   glUniform1i( m_MeshTextureUni, 0 );
+   //if(  )
+   //   {
+   //   }
+   //m_MeshTextureObj = pMeshResData->m_MaterialTexHandles[  ]
 
-   m_MaterialDiffuseUni    = glGetUniformLocation( m_Program, "uMaterialDiffuse" );
-   m_MaterialAmbientUni    = glGetUniformLocation( m_Program, "uMaterialAmbient" );
-   m_MaterialSpecularUni   = glGetUniformLocation( m_Program, "uMaterialSpecular" );
+   auto renderPass = DeferredMainRenderer::RenderPass_Geometry;
+   glUseProgram( m_pDeferredMainRenderer->m_Programs[ renderPass ] );
+   glUniform1i( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_AlbedoTexture ], 0 );
+   glUseProgram( 0 );
+  // glGenVertexArrays( 1, &m_VAO );
+  // glBindVertexArray( m_VAO );
+
+  // // 1st attribute buffer : vertices
+  // glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
+  // glEnableVertexAttribArray( VERTEX_LOCATION );
+  // glVertexAttribPointer(
+  //    VERTEX_LOCATION,                  // attribute
+  //    3,                  // size
+  //    GL_FLOAT,           // type
+  //    GL_FALSE,           // normalized?
+  //    0,                  // stride
+  //    ( void* ) 0            // array buffer offset
+  //    );
+
+  // // 2nd attribute buffer : UVs
+  // glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
+  // glEnableVertexAttribArray( UV_LOCATION );
+  // glVertexAttribPointer(
+  //    UV_LOCATION,                                // attribute
+  //    2,                                // size
+  //    GL_FLOAT,                         // type
+  //    GL_FALSE,                         // normalized?
+  //    0,                                // stride
+  //    ( void* ) 0                          // array buffer offset
+  //    );
+
+  // glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Normal_Buffer ] );
+  // glEnableVertexAttribArray( NORMAL_LOCATION );
+  // glVertexAttribPointer(
+  //    NORMAL_LOCATION,                  // attribute
+  //    3,                  // size
+  //    GL_FLOAT,           // type
+  //    GL_FALSE,           // normalized?
+  //    0,                  // stride
+  //    ( void* ) 0            // array buffer offset
+  //    );
+
+  // glUseProgram( m_Program );
+  // m_MVPUni          = glGetUniformLocation( m_Program, "uMVP" );
+  // m_MUni      = glGetUniformLocation( m_Program, "uM" );
+  // m_LightPosWorldSpaceUni = glGetUniformLocation( m_Program, "uLightPosition_WorldSpace" );
+  // m_LigthDirectionUni     = glGetUniformLocation( m_Program, "uLighDirection_WorldSpace" );
+  // m_LightColorUni         = glGetUniformLocation( m_Program, "uLightColor" );
+  //// m_LightPowerUni         = glGetUniformLocation( m_Program, "uLightPower" );
+  // m_LightNumberUni        = glGetUniformLocation( m_Program, "uLightNumber" );
+  // /*m_ShadowMapMatrixUni    = glGetUniformLocation( m_Program, "uShadowMapMatrix" );
+  //
+  // for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
+  //    {
+  //    std::string str( "uShadowMapTexture[" );
+  //    str.push_back( '0' + i );
+  //    str.push_back( ']' );
+  //    m_ShadowMapTextureUni[ i ] = glGetUniformLocation( m_Program, str.c_str() );
+  //    }*/
+
+  // m_EyePosWorldSpaceUni   = glGetUniformLocation( m_Program, "uEyePosition_WorldSpace" );
+  // 
+  // m_MeshTextureUni     = glGetUniformLocation( m_Program, "uMeshTexture" );
+  // glUniform1i( m_MeshTextureUni, 0 );
+
+  // m_MaterialDiffuseUni    = glGetUniformLocation( m_Program, "uMaterialDiffuse" );
+  // m_MaterialAmbientUni    = glGetUniformLocation( m_Program, "uMaterialAmbient" );
+  // m_MaterialSpecularUni   = glGetUniformLocation( m_Program, "uMaterialSpecular" );
 
    glUseProgram( 0 );
    // restore all of its children
@@ -201,7 +210,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    
    glActiveTexture( GL_TEXTURE0 );
    glBindTexture( GL_TEXTURE_2D, m_MeshTextureObj );
-   glUniform1i( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_AlbedoTexture ], 0 );
+   
 
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
    glEnableVertexAttribArray( 0 );

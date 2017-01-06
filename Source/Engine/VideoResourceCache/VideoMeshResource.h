@@ -38,6 +38,13 @@ class VideoMeshResourceExtraData : public IVideoResourceExtraData
          };
       std::vector< unsigned int[ MeshCount_Num ] > m_MeshCount;
       std::vector< float > m_Radius;
+      enum MaterialTexture
+         {
+         MateralTexture_Diffuse,
+         MateralTexture_Normal,
+         MateralTexture_Num
+         };
+      std::vector< std::vector<shared_ptr< VideoResourceHandle > > > m_MaterialTexHandles;
    };
 
 //struct aiMaterial;
@@ -49,5 +56,5 @@ class VideoMeshResourceLoader : public VideoResourceLoader
       virtual int VLoadResource( shared_ptr<ResHandle> handle, shared_ptr< VideoResourceHandle > videoHandle ) override;
       static VideoMeshResourceExtraData* LoadAndReturnMeshResourceExtraData( const Resource& resource );
    private:
-      GLuint LoadTexture( aiMaterial* pMaterial, aiTextureType type ) const;
+      shared_ptr< VideoResourceHandle > LoadTexture( aiMaterial* pMaterial, aiTextureType type, const std::string& filePath = "" ) const;
    };

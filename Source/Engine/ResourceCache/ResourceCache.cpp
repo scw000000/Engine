@@ -34,14 +34,14 @@ Resource::Resource( const std::string &name, bool caseSensitive )
       }
    }
 
-std::string Resource::GetExtension( void )
+std::string Resource::GetExtension( void ) const
    {
    size_t extensionStart = m_Name.find_last_of( '.' );
    ENG_ASSERT( extensionStart != std::string::npos );
    return m_Name.substr( extensionStart + 1 );
    }
 
-std::string Resource::GetFileName( void )
+std::string Resource::GetFileName( void ) const
    {
    size_t fileNameStart = m_Name.find_last_of( "\\" );
    if( fileNameStart == std::string::npos )
@@ -49,6 +49,16 @@ std::string Resource::GetFileName( void )
       fileNameStart = 0;
       }
    return m_Name.substr( fileNameStart + 1 );
+   }
+
+std::string Resource::GetPath( void ) const
+   {
+   size_t fileNameStart = m_Name.find_last_of( "\\" );
+   if( fileNameStart == std::string::npos )
+      {
+      fileNameStart = 0;
+      }
+   return m_Name.substr( 0, fileNameStart + 1 );
    }
 
 bool Resource::Init( TiXmlElement* pData, bool caseSensitive )

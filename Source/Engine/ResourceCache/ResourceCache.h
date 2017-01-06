@@ -22,8 +22,9 @@ class Resource
    {
    public:
       Resource( const std::string &name, bool caseSensitive = false );
-      std::string GetExtension( void );
-      std::string GetFileName( void );
+      std::string GetExtension( void ) const;
+      std::string GetFileName( void ) const;
+      std::string GetPath( void ) const;
       bool Init( TiXmlElement* pData, bool caseSensitive = false );
       TiXmlElement* GenerateXML( void );
       TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
@@ -49,6 +50,7 @@ class ResHandle
      // char *WritableBuffer() { return m_pBuffer; }
       shared_ptr<IResourceExtraData> GetExtraData() const { return m_Extra; }
       void SetExtraData( shared_ptr<IResourceExtraData> extra ) { m_Extra = extra; }
+      const Resource& GetResource( void ) const { return m_Resource; }
 
    protected:
       Resource m_Resource;

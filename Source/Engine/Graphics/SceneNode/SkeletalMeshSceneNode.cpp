@@ -98,7 +98,7 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );
 
-   OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_pMaterial->GetTextureResource() );
+   OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_pMaterial->m_DiffuseTextureRes );
 
    shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );

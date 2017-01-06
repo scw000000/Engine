@@ -60,6 +60,7 @@ shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
          {
          shared_ptr< Material > pChildMaterial( ENG_NEW Material( *m_pMaterial ) );
          pChildMaterial->SetMeshIndex( pAiNode->mMeshes[ i ] );
+         pChildMaterial->SetMaterialIndex( pScene->mMeshes[ pAiNode->mMeshes[ i ] ]->mMaterialIndex );
          shared_ptr< SceneNode > pChildSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), this, m_pMeshResource, pChildMaterial, RenderGroup_Actor, TransformPtr( ENG_NEW Transform() ) ) );
          pChildSceneNode->VSetParentNode( pSceneNode.get() );
          pSceneNode->VAddChild( pChildSceneNode );

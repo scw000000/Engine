@@ -16,8 +16,10 @@
 #include "VideoMeshResource.h"
 #include "..\Graphics\Renderer\RenderManager.h"
 #include "VideoTextureResource.h"
+#include <assimp/cimport.h>
+#include <assimp/postprocess.h>
 
-const std::vector< std::string > MESH_LOADER_PATTERNS( { "*.obj", "*.fbx", "*.3ds", "*.fbx" } );
+const std::vector< std::string > MESH_LOADER_PATTERNS( { "*.obj", "*.fbx", "*.3ds", "*.fbx", "*.blend" } );
 
 VideoMeshResourceExtraData::VideoMeshResourceExtraData( unsigned int meshCount ) :
    m_BufferObjects( meshCount ),
@@ -48,6 +50,9 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
    {
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( handle->GetExtraData() );
    auto pAiScene = pMeshExtra->m_pScene;
+  // auto pAiScene = aiImportFile( "F:\\Workspace\\Engine\\Game\\Assets\\Art\\sponza\\sponza.obj",
+  //                                         aiProcess_Triangulate | aiProcess_LimitBoneWeights | aiProcessPreset_TargetRealtime_Fast /*| aiProcess_SortByPType*/ );
+  // ENG_ASSERT( pAiScene );
    if( pAiScene->mNumMeshes == 0u )
       {
       ENG_ASSERT( 0 && "No mesh inside this file" );
@@ -58,20 +63,24 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
    shared_ptr< VideoMeshResourceExtraData > pExtraData( pData );
 
    // load Material
+   pData->m_MaterialTexHandles.resize( pAiScene->mNumMaterials, std::vector<shared_ptr< VideoResourceHandle > >( VideoMeshResourceExtraData::MateralTexture_Num ) );
+   std::string filePath = handle->GetResource().GetPath();
    for( unsigned int i = 0; i < pAiScene->mNumMaterials; ++i )
       {
       auto pAiMaterial = pAiScene->mMaterials[ i ];
-      LoadTexture( pAiMaterial, aiTextureType_DIFFUSE );
-      LoadTexture( pAiMaterial, aiTextureType_AMBIENT );
-      LoadTexture( pAiMaterial, aiTextureType_SPECULAR );
-      LoadTexture( pAiMaterial, aiTextureType_EMISSIVE );
-      LoadTexture( pAiMaterial, aiTextureType_HEIGHT );
-      LoadTexture( pAiMaterial, aiTextureType_NORMALS );
-      LoadTexture( pAiMaterial, aiTextureType_SHININESS );
-      LoadTexture( pAiMaterial, aiTextureType_OPACITY );
-      LoadTexture( pAiMaterial, aiTextureType_DISPLACEMENT );
-      LoadTexture( pAiMaterial, aiTextureType_LIGHTMAP );
-      LoadTexture( pAiMaterial, aiTextureType_REFLECTION );
+      pData->m_MaterialTexHandles[ i ][ VideoMeshResourceExtraData::MateralTexture_Diffuse ] = 
+         LoadTexture( pAiMaterial, aiTextureType_DIFFUSE, filePath );  // used in sponza
+  //    LoadTexture( pAiMaterial, aiTextureType_SPECULAR );
+ //     LoadTexture( pAiMaterial, aiTextureType_AMBIENT );
+ //     LoadTexture( pAiMaterial, aiTextureType_EMISSIVE );
+  //    LoadTexture( pAiMaterial, aiTextureType_HEIGHT );
+      pData->m_MaterialTexHandles[ i ][ VideoMeshResourceExtraData::MateralTexture_Normal ] =
+         LoadTexture( pAiMaterial, aiTextureType_NORMALS, filePath ); // used in sponza
+  //    LoadTexture( pAiMaterial, aiTextureType_SHININESS );
+ //     LoadTexture( pAiMaterial, aiTextureType_OPACITY );
+ //     LoadTexture( pAiMaterial, aiTextureType_DISPLACEMENT );
+  //    LoadTexture( pAiMaterial, aiTextureType_LIGHTMAP );
+  //    LoadTexture( pAiMaterial, aiTextureType_REFLECTION );
       }
 
    unsigned int arrayOfBuffersLen = ENG_ARRAY_SIZE_IN_ELEMENTS( pData->m_BufferObjects[ 0 ] );
@@ -152,13 +161,17 @@ VideoMeshResourceExtraData* VideoMeshResourceLoader::LoadAndReturnMeshResourceEx
  
    }
 
-GLuint VideoMeshResourceLoader::LoadTexture( aiMaterial* pMaterial, aiTextureType type ) const
+shared_ptr< VideoResourceHandle > VideoMeshResourceLoader::LoadTexture( aiMaterial* pMaterial, aiTextureType type, const std::string& filePath ) const
    {
    unsigned int typeCount = pMaterial->GetTextureCount( type );
+   ENG_ASSERT( typeCount <= 1 );
    for( unsigned int i = 0; i < typeCount; ++i )
       {
-      aiString filePath;
-      pMaterial->GetTexture( type, i, &filePath );
+      aiString relFilePath;
+      pMaterial->GetTexture( type, i, &relFilePath );
+      std::string fullPath( filePath );
+      fullPath.append( relFilePath.C_Str() );
+      return g_pApp->m_pVideoResCache->GetHandle( Resource( fullPath ) );
       }
-   return 0;
+   return shared_ptr< VideoResourceHandle >();
    }

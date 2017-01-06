@@ -51,12 +51,15 @@ int VideoTextureResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, sha
         // textureFormat = GL_RGB;
          glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB8, pSurface->w, pSurface->h, 0, GL_RGB, GL_UNSIGNED_BYTE, pSurface->pixels );
          break;
+      case SDL_PIXELFORMAT_BGR24:
+         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB8, pSurface->w, pSurface->h, 0, GL_BGR, GL_UNSIGNED_BYTE, pSurface->pixels );
+         break;
       case SDL_PIXELFORMAT_RGBA8888:
      //    textureFormat = GL_RGBA;
          glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, pSurface->w, pSurface->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, pSurface->pixels );
          break;
       default:
-         ENG_ASSERT( 0 && "Not supported image format" );
+         ENG_ASSERT( 0 && "Image format not supported" );
          break;
       };
 

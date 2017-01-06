@@ -14,7 +14,7 @@
 #include "EngineStd.h"
 #include "Material.h"
 
-Material::Material( void ) : m_TextureResource( "art\\default.jpg" )
+Material::Material( void ) : m_DiffuseTextureRes( "art\\default.jpg" )
    {
    m_Diffuse = g_White;        
    m_Ambient = Color( 0.20f, 0.20f, 0.20f, 1.0f );       
@@ -23,6 +23,7 @@ Material::Material( void ) : m_TextureResource( "art\\default.jpg" )
    m_Shininess = 0.f;          
    m_AlphaType = AlphaOpaque;
    m_MeshIndex = 0;
+   m_MaterialIndex = 0;
    }
 
 bool Material::Init( TiXmlElement* pData )
@@ -31,7 +32,7 @@ bool Material::Init( TiXmlElement* pData )
       {
       return false;
       }
-   m_TextureResource.Init( pData->FirstChildElement( "Texture" ) );
+   m_DiffuseTextureRes.Init( pData->FirstChildElement( "Texture" ) );
 
    m_Diffuse.Init( pData->FirstChildElement( "Diffuse" ) );
 
@@ -42,7 +43,7 @@ bool Material::Init( TiXmlElement* pData )
 
 void Material::SetTextureResource( const Resource& newTexture )
    {
-   m_TextureResource = newTexture;
+   m_DiffuseTextureRes = newTexture;
    }
 
 void Material::SetAmbient( const Color &color )
@@ -86,7 +87,7 @@ TiXmlElement* Material::GenerateXML( void )
    {
    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Material" );
 
-   TiXmlElement* pTexture = m_TextureResource.GenerateXML();
+   TiXmlElement* pTexture = m_DiffuseTextureRes.GenerateXML();
    pTexture->SetValue( "Texture" );
    pRetNode->LinkEndChild( pTexture );
 
@@ -105,7 +106,7 @@ TiXmlElement* Material::GenerateOverridesXML( TiXmlElement* pResource )
    {
    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Material" );
    
-   TiXmlElement* pTexture = m_TextureResource.GenerateOverridesXML( pResource->FirstChildElement( "Texture" ) );
+   TiXmlElement* pTexture = m_DiffuseTextureRes.GenerateOverridesXML( pResource->FirstChildElement( "Texture" ) );
    pTexture->SetValue( "Texture" );
    pRetNode->LinkEndChild( pTexture );
 

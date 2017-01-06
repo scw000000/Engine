@@ -112,10 +112,10 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    //   }
    //m_MeshTextureObj = pMeshResData->m_MaterialTexHandles[  ]
 
-   auto renderPass = DeferredMainRenderer::RenderPass_Geometry;
-   glUseProgram( m_pDeferredMainRenderer->m_Programs[ renderPass ] );
-   glUniform1i( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_AlbedoTexture ], 0 );
-   glUseProgram( 0 );
+   //auto renderPass = DeferredMainRenderer::RenderPass_Geometry;
+   //glUseProgram( m_pDeferredMainRenderer->m_Programs[ renderPass ] );
+   //glUniform1i( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_AlbedoTexture ], 0 );
+   //glUseProgram( 0 );
   // glGenVertexArrays( 1, &m_VAO );
   // glBindVertexArray( m_VAO );
 
@@ -210,7 +210,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    
    glActiveTexture( GL_TEXTURE0 );
    glBindTexture( GL_TEXTURE_2D, m_MeshTextureObj );
-   
+   glUniform1i( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_AlbedoTexture ], 0 );
 
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
    glEnableVertexAttribArray( 0 );

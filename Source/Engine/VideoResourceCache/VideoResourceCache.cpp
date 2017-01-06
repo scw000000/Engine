@@ -70,6 +70,7 @@ shared_ptr< VideoResourceHandle > VideoResourceCache::GetHandle( const Resource&
       {
       Update( handle );
       }
+   ENG_ASSERT( handle );
    return handle;
    }
 

@@ -11,7 +11,7 @@
             </Transform>
             <Mesh path="art\sponza\sponza.fbx" />
             <Material>
-                <Texture path="art\cube.jpg" />
+                <Texture />
                 <Diffuse r="1.000000" g="1.000000" b="1.000000" a="1.000000" />
                 <Ambient r="0.100000" g="0.100000" b="0.100000" a="1.000000" />
             </Material>

@@ -13,6 +13,8 @@
  */
 #include "EngineStd.h"
 #include "Material.h"
+#include "assimp/cimport.h"
+#include "assimp/postprocess.h"
 
 Material::Material( void ) : m_DiffuseTextureRes( "art\\default.jpg" )
    {
@@ -23,7 +25,36 @@ Material::Material( void ) : m_DiffuseTextureRes( "art\\default.jpg" )
    m_Shininess = 0.f;          
    m_AlphaType = AlphaOpaque;
    m_MeshIndex = 0;
-   m_MaterialIndex = 0;
+   }
+
+Material::Material( const aiScene* pAiScene, unsigned int meshIndex, const std::string& filePath ) :
+   m_MeshIndex( meshIndex )
+   {
+   ENG_ASSERT( meshIndex < pAiScene->mNumMeshes );
+   auto pAiMesh = pAiScene->mMeshes[ meshIndex ];
+   auto pAiMateral = pAiScene->mMaterials[ pAiMesh->mMaterialIndex ];
+
+   unsigned int typeCount = pAiMateral->GetTextureCount( aiTextureType_DIFFUSE );
+   ENG_ASSERT( typeCount <= 1 );
+   if( typeCount > 0 )
+      {
+      aiString relFilePath;
+      pAiMateral->GetTexture( aiTextureType_DIFFUSE, 0, &relFilePath );
+      std::string fullPath( filePath );
+      fullPath.append( relFilePath.C_Str() );
+      m_DiffuseTextureRes = Resource( fullPath );
+      }
+
+   typeCount = pAiMateral->GetTextureCount( aiTextureType_NORMALS );
+   ENG_ASSERT( typeCount <= 1 );
+   if( typeCount > 0 )
+      {
+      aiString relFilePath;
+      pAiMateral->GetTexture( aiTextureType_NORMALS, 0, &relFilePath );
+      std::string fullPath( filePath );
+      fullPath.append( relFilePath.C_Str() );
+      m_NormalTextureRes = Resource( fullPath );
+      }
    }
 
 bool Material::Init( TiXmlElement* pData )

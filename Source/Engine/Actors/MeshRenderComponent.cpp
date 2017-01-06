@@ -42,6 +42,17 @@ shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
    std::queue< std::pair< shared_ptr< SceneNode >, aiNode* > > nodeQueue;
    nodeQueue.push( std::pair< shared_ptr< SceneNode >, aiNode* >( pMeshRootNode, pScene->mRootNode ) );
 
+   std::vector< MaterialPtr > pMaterials;
+   pMaterials.reserve( pScene->mNumMeshes );
+   std::string filePath = m_pMeshResource->GetPath();
+   for( unsigned int i = 0; i < pScene->mNumMeshes; ++i )
+      {
+      pMaterials.push_back( MaterialPtr( ENG_NEW Material( pScene, i, filePath ) ) );
+      if( pMaterials[ i ]->m_DiffuseTextureRes.m_Name.size() == 0 )
+         {
+         pMaterials[ i ]->m_DiffuseTextureRes = m_pMaterial->m_DiffuseTextureRes;
+         }
+      }
    while( nodeQueue.size() )
       {
       auto nodePair = nodeQueue.front();
@@ -58,10 +69,10 @@ shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
          }
       for( unsigned int i = 0; i < pAiNode->mNumMeshes; ++i )
          {
-         shared_ptr< Material > pChildMaterial( ENG_NEW Material( *m_pMaterial ) );
-         pChildMaterial->SetMeshIndex( pAiNode->mMeshes[ i ] );
-         pChildMaterial->SetMaterialIndex( pScene->mMeshes[ pAiNode->mMeshes[ i ] ]->mMaterialIndex );
-         shared_ptr< SceneNode > pChildSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), this, m_pMeshResource, pChildMaterial, RenderGroup_Actor, TransformPtr( ENG_NEW Transform() ) ) );
+     //    shared_ptr< Material > pChildMaterial( ENG_NEW Material( *m_pMaterial ) );
+       //  pChildMaterial->SetMeshIndex( pAiNode->mMeshes[ i ] );
+        // pChildMaterial->SetMaterialIndex( pScene->mMeshes[ pAiNode->mMeshes[ i ] ]->mMaterialIndex );
+         shared_ptr< SceneNode > pChildSceneNode( ENG_NEW MeshSceneNode( m_pOwner->GetId(), this, m_pMeshResource, pMaterials[ pAiNode->mMeshes[ i ] ], RenderGroup_Actor, TransformPtr( ENG_NEW Transform() ) ) );
          pChildSceneNode->VSetParentNode( pSceneNode.get() );
          pSceneNode->VAddChild( pChildSceneNode );
          }

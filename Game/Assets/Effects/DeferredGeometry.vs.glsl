@@ -3,6 +3,8 @@
 layout(location = 0) in vec3 iVertexPosMS;
 layout(location = 1) in vec3 iVertexNormalMS;
 layout(location = 2) in vec2 iUV;
+// layout(location = 2) in vec2 iVertexTangentMS;
+// layout(location = 2) in vec2 iVertexBitangentMS;
 
 uniform mat4 uMVP;
 uniform mat4 uNormal;

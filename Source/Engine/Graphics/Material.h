@@ -14,6 +14,8 @@
  */
 #include "SceneNodes.h"
 
+class aiScene;
+class aiMesh;
 
 enum AlphaType;
 
@@ -21,6 +23,7 @@ class Material
    {
    public:
       Material( void );
+      Material( const aiScene* pAiScene, unsigned int meshIndex, const std::string& filePath );
       bool Init( TiXmlElement* pData );
       void SetTextureResource( const Resource& newTextureRes );
       Resource GetDiffuseTextureResource( void ) const { return m_DiffuseTextureRes; };
@@ -48,9 +51,6 @@ class Material
 
       void SetMeshIndex( unsigned int idx ) { m_MeshIndex = idx; }
       unsigned int GetMeshIndex( void ) const { return m_MeshIndex; }
-
-      void SetMaterialIndex( unsigned int idx ) { m_MaterialIndex = idx; }
-      unsigned int GetMaterialIndex( void ) const { return m_MaterialIndex; }
       
    public:
       Color    m_Diffuse;       
@@ -60,7 +60,6 @@ class Material
       float    m_Shininess;     
       AlphaType m_AlphaType;
       unsigned int m_MeshIndex;
-      unsigned int m_MaterialIndex;
       Resource m_DiffuseTextureRes;
       Resource m_NormalTextureRes;
    };

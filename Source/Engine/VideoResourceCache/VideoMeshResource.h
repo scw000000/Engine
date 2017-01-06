@@ -38,13 +38,6 @@ class VideoMeshResourceExtraData : public IVideoResourceExtraData
          };
       std::vector< unsigned int[ MeshCount_Num ] > m_MeshCount;
       std::vector< float > m_Radius;
-      enum MaterialTexture
-         {
-         MateralTexture_Diffuse,
-         MateralTexture_Normal,
-         MateralTexture_Num
-         };
-      std::vector< std::vector<shared_ptr< VideoResourceHandle > > > m_MaterialTexHandles;
    };
 
 //struct aiMaterial;

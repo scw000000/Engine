@@ -63,25 +63,25 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
    shared_ptr< VideoMeshResourceExtraData > pExtraData( pData );
 
    // load Material
-   pData->m_MaterialTexHandles.resize( pAiScene->mNumMaterials, std::vector<shared_ptr< VideoResourceHandle > >( VideoMeshResourceExtraData::MateralTexture_Num ) );
-   std::string filePath = handle->GetResource().GetPath();
-   for( unsigned int i = 0; i < pAiScene->mNumMaterials; ++i )
-      {
-      auto pAiMaterial = pAiScene->mMaterials[ i ];
-      pData->m_MaterialTexHandles[ i ][ VideoMeshResourceExtraData::MateralTexture_Diffuse ] = 
-         LoadTexture( pAiMaterial, aiTextureType_DIFFUSE, filePath );  // used in sponza
-  //    LoadTexture( pAiMaterial, aiTextureType_SPECULAR );
- //     LoadTexture( pAiMaterial, aiTextureType_AMBIENT );
- //     LoadTexture( pAiMaterial, aiTextureType_EMISSIVE );
-  //    LoadTexture( pAiMaterial, aiTextureType_HEIGHT );
-      pData->m_MaterialTexHandles[ i ][ VideoMeshResourceExtraData::MateralTexture_Normal ] =
-         LoadTexture( pAiMaterial, aiTextureType_NORMALS, filePath ); // used in sponza
-  //    LoadTexture( pAiMaterial, aiTextureType_SHININESS );
- //     LoadTexture( pAiMaterial, aiTextureType_OPACITY );
- //     LoadTexture( pAiMaterial, aiTextureType_DISPLACEMENT );
-  //    LoadTexture( pAiMaterial, aiTextureType_LIGHTMAP );
-  //    LoadTexture( pAiMaterial, aiTextureType_REFLECTION );
-      }
+ //  pData->m_MaterialTexHandles.resize( pAiScene->mNumMaterials, std::vector<shared_ptr< VideoResourceHandle > >( VideoMeshResourceExtraData::MateralTexture_Num ) );
+ //  std::string filePath = handle->GetResource().GetPath();
+ //  for( unsigned int i = 0; i < pAiScene->mNumMaterials; ++i )
+ //     {
+ //     auto pAiMaterial = pAiScene->mMaterials[ i ];
+ //     pData->m_MaterialTexHandles[ i ][ VideoMeshResourceExtraData::MateralTexture_Diffuse ] = 
+ //        LoadTexture( pAiMaterial, aiTextureType_DIFFUSE, filePath );  // used in sponza
+ // //    LoadTexture( pAiMaterial, aiTextureType_SPECULAR );
+ ////     LoadTexture( pAiMaterial, aiTextureType_AMBIENT );
+ ////     LoadTexture( pAiMaterial, aiTextureType_EMISSIVE );
+ // //    LoadTexture( pAiMaterial, aiTextureType_HEIGHT );
+ //     pData->m_MaterialTexHandles[ i ][ VideoMeshResourceExtraData::MateralTexture_Normal ] =
+ //        LoadTexture( pAiMaterial, aiTextureType_NORMALS, filePath ); // used in sponza
+ // //    LoadTexture( pAiMaterial, aiTextureType_SHININESS );
+ ////     LoadTexture( pAiMaterial, aiTextureType_OPACITY );
+ ////     LoadTexture( pAiMaterial, aiTextureType_DISPLACEMENT );
+ // //    LoadTexture( pAiMaterial, aiTextureType_LIGHTMAP );
+ // //    LoadTexture( pAiMaterial, aiTextureType_REFLECTION );
+ //     }
 
    unsigned int arrayOfBuffersLen = ENG_ARRAY_SIZE_IN_ELEMENTS( pData->m_BufferObjects[ 0 ] );
    for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )

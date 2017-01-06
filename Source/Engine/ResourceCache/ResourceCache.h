@@ -21,7 +21,7 @@
 class Resource
    {
    public:
-      Resource( const std::string &name, bool caseSensitive = false );
+      Resource( const std::string &name = "", bool caseSensitive = false );
       std::string GetExtension( void ) const;
       std::string GetFileName( void ) const;
       std::string GetPath( void ) const;

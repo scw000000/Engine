@@ -8,7 +8,7 @@
 #define LIGHT_TYPE_POINT       1u
 #define LIGHT_TYPE_DIRECTIONAL 2u
 
-#define MAX_SHININESS 8192.0f
+#define MAX_SHININESS 25.0f
 
 struct Light
 {
@@ -112,12 +112,17 @@ float GetSpecularNormalizeFactor( float shininess )
 vec3 GetFresnel( vec3 lightDir, vec3 halfway, vec3 specular )
     {
     float eDotN = clamp( dot( lightDir, halfway ), 0.0, 1.0 );
-	return dot( specular, vec3( 1.0 ) ) > 0 ? specular + ( 1 - specular ) * exp2( -( 5.55473f * eDotN + 6.98316f) * eDotN ) : vec3( 0 );
+	//return dot( specular, vec3( 1.0 ) ) > 0.0 ? specular + ( vec3( 1.0f ) - specular ) * exp2( -( 5.55473f * eDotN + 6.98316f) * eDotN ) : vec3( 0.0 );
+  // return specular;
+    return min( specular.b, min( specular.r, specular.g ) ) > 0.0 ? specular + ( vec3( 1.0f ) - specular ) * exp2( -( 5.55473f * eDotN + 6.98316f) * eDotN ) : vec3( 0.0 );
+
     }
 
 vec3 GetDistribution( vec3 halfway, vec3 normal, float shininess)
     {
-	return vec3( exp( ( shininess + 0.775f ) * ( max( dot( halfway, normal ), 0.0f ) - 1) ) );
+    return vec3( exp( ( shininess + 0.775f ) * ( max( dot( halfway, normal ), 0.0f ) - 1) ) );
+    // shininess error!
+	//return vec3( exp( ( shininess + 0.775f ) * ( max( dot( halfway, normal ), 0.0f ) - 1) ) );
     }
     
 vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 diffuse, vec3 specular, float specularNormalFac, float shininess )
@@ -141,7 +146,7 @@ vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 diffuse, vec3 s
             break;
         case LIGHT_TYPE_DIRECTIONAL:
             return vec3( 0.0, 1.0, 0.0 );  
-            lightDir = light.m_DirectionVS;
+            lightDir = -light.m_DirectionVS;
             dist = -1.0;
             luminosity = 1.0;
             break;
@@ -164,8 +169,10 @@ vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 diffuse, vec3 s
     
     vec3 halfway = normalize( lightDir + viewDir );
     specular = specularNormalFac 
-               // * GetDistribution( halfway, normal, shininess );
+                * GetDistribution( halfway, normal, shininess )
 				* GetFresnel( lightDir, halfway, specular );
+  //   return ( diffuse + specular ) * light.m_Color.rgb * nDotL * luminosity;    
+   
     //* luminosity+ specular
     return max( ( diffuse + specular ) * ( nDotL * luminosity ), vec3( 0.0 ) ) * light.m_Color.rgb;
     }

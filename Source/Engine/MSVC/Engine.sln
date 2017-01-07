@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "Engine.vcxproj", "{07BF4ACF-00EF-4486-8AF0-E821FE0FA858}"
 EndProject
@@ -14,6 +14,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EditorDLL", "..\..\LevelEdi
 	ProjectSection(ProjectDependencies) = postProject
 		{07BF4ACF-00EF-4486-8AF0-E821FE0FA858} = {07BF4ACF-00EF-4486-8AF0-E821FE0FA858}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "..\..\Game\MSVC\Game.vcxproj", "{6D28666C-54E2-4832-9A97-08AA64153331}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -56,6 +58,16 @@ Global
 		{21538942-8FE9-45FC-9B57-8F36169181F2}.Release|Mixed Platforms.Build.0 = Release|Win32
 		{21538942-8FE9-45FC-9B57-8F36169181F2}.Release|Win32.ActiveCfg = Release|Win32
 		{21538942-8FE9-45FC-9B57-8F36169181F2}.Release|Win32.Build.0 = Release|Win32
+		{6D28666C-54E2-4832-9A97-08AA64153331}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{6D28666C-54E2-4832-9A97-08AA64153331}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{6D28666C-54E2-4832-9A97-08AA64153331}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{6D28666C-54E2-4832-9A97-08AA64153331}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6D28666C-54E2-4832-9A97-08AA64153331}.Debug|Win32.Build.0 = Debug|Win32
+		{6D28666C-54E2-4832-9A97-08AA64153331}.Release|Any CPU.ActiveCfg = Release|Win32
+		{6D28666C-54E2-4832-9A97-08AA64153331}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{6D28666C-54E2-4832-9A97-08AA64153331}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{6D28666C-54E2-4832-9A97-08AA64153331}.Release|Win32.ActiveCfg = Release|Win32
+		{6D28666C-54E2-4832-9A97-08AA64153331}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

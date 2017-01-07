@@ -49,7 +49,7 @@ int EditorMain( int *pWindow, int screenWidth, int screenHeight )
 
    g_pApp->InitInstance( ( SDL_Window* ) pWindow, g_pApp->m_EngineOptions.GetScreenSize().x, g_pApp->m_EngineOptions.GetScreenSize().y );
 
-   return true;
+   return 0;
    }
 
 void SingleLoop( void )

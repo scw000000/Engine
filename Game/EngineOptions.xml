@@ -1,7 +1,8 @@
-<PlayerOptions>
-  <Graphics Renderer="OpenGL" Width="1280" Height="720" RunFullSpeed="no" />
+<EditorOptions>
+  <Graphics Renderer="OpenGL" RunFullSpeed="no" />
   <Sound SfxVolume="100" MusicVolume="100"/>
-  <ResCache UseDevelopmentDirectories="no" GUIDirectory="GUI/" LevelDirectory="world\"/> 
-  <User Level="test.xml" Layout="MainMenu.layout"/>
-  <PhysicsDebug DrawWireFrame="yes" DrawContactPoints="yes" />
-</PlayerOptions>
+  <ResCache UseDevelopmentDirectories="yes" AssetsDirectory=".\Assets\" GUIDirectory="Assets/GUI/" LevelDirectory="world\" ActorInstanceDirectory="ActorInstances\"/> 
+  <User Environment="editor" Layout="Empty.layout" ShowMouseCursor="yes" LevelInstanceDirectory="test\"/>
+  <PhysicsDebug DrawWireFrame="no" DrawContactPoints="yes" />
+  <Script PreInitFile="Scripts\PreInit.lua"/>
+</EditorOptions>

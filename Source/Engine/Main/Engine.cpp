@@ -466,7 +466,7 @@ int EngineApp::Modal( shared_ptr<PromptBox> pModalScreen, int defaultAnswer )
       Sint32 code = 0;
       m_pEngineLogic->VSetActorUpdate( false );
       m_pEngineLogic->VSetWorldUpdate( false );
-      int result = PumpUntilMessage( eventEndType, code );
+    //  int result = PumpUntilMessage( eventEndType, code );
       m_pEngineLogic->VSetActorUpdate( true );
       m_pEngineLogic->VSetWorldUpdate( true );
       if( code == g_QuitNoPrompt )
@@ -567,11 +567,8 @@ void EngineApp::ResetMousePosition( void )
    SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
    }
 
-//
-// class GameCodeApp::PumpUntilMessage			- Chapter 10, page 295
-//
 int EngineApp::PumpUntilMessage( Uint32& eventEnd, Sint32& code )
-{
+   {
    SDL_Event event;
 	int currentTime = timeGetTime();
 	for ( ;; )
@@ -607,11 +604,11 @@ int EngineApp::PumpUntilMessage( Uint32& eventEnd, Sint32& code )
             OnFrameRender( appTime, fElapasedTime );
 			   }
 		   }
-	}
+	   }
 	
 
 	return 0;
-}
+   }
 
 void EngineApp::MainLoop( void )
    {

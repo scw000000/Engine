@@ -35,7 +35,7 @@ Actor::~Actor( void )
 
 bool Actor::Init( TiXmlElement* pData )
    {
-   ENG_LOG( "Actor", std::string( "Initializing Actor " ) + ToStr( m_Id ) );
+//   ENG_LOG( "Actor", std::string( "Initializing Actor " ) + ToStr( m_Id ) );
 
 	m_Type = pData->Attribute( "type" );
    m_pActorClassResource->Init( pData->FirstChildElement( "ActorClassResource" ) );

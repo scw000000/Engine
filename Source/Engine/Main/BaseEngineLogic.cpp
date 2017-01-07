@@ -335,7 +335,15 @@ bool BaseEngineLogic::VLoadLevel()
       Resource resource( postLoadScript );
       shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );  // this actually loads the XML file from the zip file
       }
-   
+   ENGRandom random;
+   Resource res( "actors\\light.xml" );
+   for( int i = 0; i < 100; ++i )
+      {
+      float x = random.Random() * ( 1421.f + 1290.f ) - 1290.f;
+      float z = random.Random() * ( 634 + 565 ) - 565.f;
+      TransformPtr pTransform( ENG_NEW Transform( Vec3( x, 20.f, z ) ) );
+   //   VCreateActor( res, pTransform );
+      }
    return true;
    }
 

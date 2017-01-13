@@ -15,7 +15,7 @@
 
 #pragma comment( lib, "Engine.lib" )
 
-//EngineApp engineApp;
+EngineApp engineApp;
 
 //int main( int argc, char *argv[] )
 INT WINAPI wWinMain( HINSTANCE hInstance,

@@ -285,4 +285,6 @@ $RECYCLE.BIN/
 
 [Tt]emp/
 
-Win32Debug/
+#Win32Debug/
+
+Lib/

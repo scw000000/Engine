@@ -40,7 +40,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(ProjectDir)..\..\Lib\$(PlatformName)$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)..\..\\Lib\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
     <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.7\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus\lua51\src;$(SolutionDir)..\3rdParty\SDL2_image-2.0.1;$(SolutionDir)..\3rdParty\assimp-3.2\include;$(SolutionDir)..\3rdParty\bullet3-2.83.7\src;$(IncludePath)</IncludePath>
@@ -49,7 +49,7 @@
     <ExecutablePath>$(SystemRoot)\System32;$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(ProjectDir)..\..\Lib\$(PlatformName)$(Configuration)\</OutDir>
+    <OutDir>$(ProjectDir)..\..\\Lib\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)..\..\Temp\$(ProjectName)$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
     <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.7\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus\lua51\src;$(SolutionDir)..\3rdParty\SDL2_image-2.0.1;$(SolutionDir)..\3rdParty\assimp-3.2\include;$(SolutionDir)..\3rdParty\bullet3-2.83.7\src;$(IncludePath)</IncludePath>

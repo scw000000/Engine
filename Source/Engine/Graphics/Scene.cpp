@@ -72,9 +72,6 @@ int Scene::OnRender( void )
    {
    if ( m_pRoot && m_pCamera )
 	   {
-		// The scene root could be anything, but it
-		// is usually a SceneNode with the identity
-		// matrix
 		m_pCamera->SetViewTransform( this );
 		m_pLightManager->CalcLighting( this );
       m_pRenderManager->VGetMainRenderer().VLoadLight( m_pLightManager->m_ActiveLights );
@@ -113,7 +110,7 @@ int Scene::PreUpdate( void )
    {
    if( !m_pRoot )
       return S_OK;
-
+   // Set up global transform
    return m_pRoot->VPreUpdate( this );
    }
 

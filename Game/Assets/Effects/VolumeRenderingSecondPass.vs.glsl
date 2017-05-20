@@ -12,5 +12,4 @@ void main()
 {
     oEntryPoint_ModelSpace = iVerClr;
     gl_Position = uMVP * vec4( iVerPos, 1.0 );
-    // ExitPointCoord 输入到fragment shader 的过程中经过rasterization， interpolation, assembly primitive
 }

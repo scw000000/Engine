@@ -85,11 +85,6 @@ HWND EngineApp::GetHwnd( void )
 
 bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHeight )
    {
-   /*auto test = std::vector< Vec2 >( { Vec2( 1.0f, 1.0f ), Vec2( 5.0f, 5.0f ), Vec2( 4.0f, 4.0f ), Vec2( 1.0f, -3.0f ) } );*/
-   //auto test = std::vector< Vec2 >( { Vec2( 0.0f, 2.0f ), Vec2( 1.0f, 4.0f ), Vec2( 2.0f, 0.0f ), Vec2( 3.0f, 1.0f ), Vec2( 4.0f, 3.0f ) } );
-   //Triangulation( test );
-
-
    // Check for existing instance of the same window
 	// Not sure if this feature is working normally.... 
    #ifndef _DEBUG
@@ -218,7 +213,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       CHAR charTitle[ 100 ];
       if( GenericToAnsiCch( charTitle, VGetGameTitle(), strlen( charTitle ) ) != S_OK )
          {
-         ENG_ERROR( "Game title translation failed" );
+       //  ENG_ERROR( "Game title translation failed" );
          }
 
       m_pWindow = SDL_CreateWindow( charTitle, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth,screenHeight, SDL_WINDOW_OPENGL );
@@ -393,7 +388,7 @@ void EngineApp::MsgProc( void )
 
             m_bQuitRequested = true;
             pHumanView = GetHumanView();
-            // remenber to process additional messagebox
+            // remember to process additional messagebox
             if ( pHumanView )
 				   {
                if( pHumanView->Ask( QUESTION_QUIT_GAME ) == IDNO )
@@ -412,7 +407,7 @@ void EngineApp::MsgProc( void )
          case SDL_DROPFILE:
             SetWindowFocus();
             m_pEngineLogic->VOnFileDrop( event.drop.file, GetMousePosition() );
-            SDL_free( event.drop.file );    // Free dropped_filedir memory
+            SDL_free( event.drop.file );    // Free dropped_file memory
             break;
          case SDL_MOUSEBUTTONDOWN:
          case SDL_KEYDOWN:
@@ -453,7 +448,7 @@ BaseEngineLogic *EngineApp::VCreateLogic( void )
 int EngineApp::Modal( shared_ptr<PromptBox> pModalScreen, int defaultAnswer )
    {
    ENG_ASSERT( GetWindow() != NULL && _T("Main Window is NULL!") );
-   // if the dialog poped out while the window is minimized, flash it to notify
+   // if the dialog popped out while the window is minimized, flash it to notify
 	if ( IsIconic(GetHwnd()) )
 	   {
 		FlashWhileMinimized();
@@ -746,16 +741,6 @@ void EngineApp::OnClose()
 
    LuaStateManager::GetSingleton().ClearLuaState();
    InternalScriptExports::Destroy();
-   /*
-	VDestroyNetworkEventForwarder();
 
-	SAFE_DELETE(m_pBaseSocketManager);
-
-	SAFE_DELETE(m_pEventManager);
-
-    BaseScriptComponent::UnregisterScriptFunctions();
-
-	SAFE_DELETE(m_ResCache);
-   */
 	return;
 }

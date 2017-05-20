@@ -13,7 +13,7 @@
 #pragma comment( lib, "tinyxml.lib" )
 #pragma comment( lib, "lua51_debug.lib" )
 
-#pragma comment( lib, "assimp-vc120-mtd.lib" )
+#pragma comment( lib, "assimp-vc140-mt.lib" )
 
 
 #if defined(_M_IX86)

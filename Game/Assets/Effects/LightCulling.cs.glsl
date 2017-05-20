@@ -127,7 +127,7 @@ void main()
     // gl_GlobalInvocationID​
     if( gl_LocalInvocationIndex == 0 )
         {
-        sMinDepthU = 0xFFFFFFFFu;
+        sMinDepthU = 0xFF7FFFFFu; // mininum negative real number can be presented as floating point
         sMaxDepthU = 0u;
         sLocalIdxCount = 0u;
         sGlobalStoreOffset = 0u;
@@ -135,6 +135,9 @@ void main()
         sGlobalIdxListLength = gl_NumWorkGroups.x * gl_NumWorkGroups.y * gl_NumWorkGroups.z * AVERAGE_OVERLAP_LIGHTS_PER_TILE;
         }
     
+    // http://malideveloper.arm.com/sample-code/introduction-compute-shaders-2/
+    // use memoryBarrierShared before barrier is highly recommended
+    memoryBarrierShared();
     barrier();
     // test min max depth
     
@@ -145,7 +148,8 @@ void main()
         atomicMin( sMinDepthU, depth );
         atomicMax( sMaxDepthU, depth );
         }
-               
+    
+    memoryBarrierShared();    
     barrier();
     // set min max depth and far near plane
 
@@ -163,7 +167,8 @@ void main()
         // ( 0, 0, -F, 1 ) dot vec4( 0.0, 0.0, 1.0, -sNearPlaneVS ) = -F + F = 0
         sNearFarPlanes = vec4[]( vec4( 0.0, 0.0, -1.0, sNearPlaneVS ), vec4( 0.0, 0.0, 1.0, -sFarPlaneVS ) );
         }
-        
+    
+    memoryBarrierShared();    
     barrier();
 
     // testing light culling
@@ -190,7 +195,8 @@ void main()
                 };
             }
         }
-        
+    
+    memoryBarrierShared();    
     barrier();
     
     if( gl_LocalInvocationIndex == 0 )
@@ -199,6 +205,7 @@ void main()
         sGlobalStoreOffset = atomicAdd( LightIdxCountSSBO.data, sLocalIdxCount );
         }
     
+    memoryBarrierShared();
     barrier();
         
     for( uint i= gl_LocalInvocationIndex; i < sLocalIdxCount && sGlobalStoreOffset + i < sGlobalIdxListLength; i += uInvokePerGroup )

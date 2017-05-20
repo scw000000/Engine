@@ -204,7 +204,6 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
 
 int SkeletalMeshSceneNode::VRender( Scene *pScene )
    {
-   // Use our shader
    glUseProgram( m_Program );
    glBindVertexArray( m_VertexArrayObj );
 
@@ -212,9 +211,7 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
 
    // Get the projection & view matrix from the camera class
    Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * globalToWorld;
-   // Send our transformation to the currently bound shader, 
-   // in the "MVP" uniform
-   // 1-> how many matrix, GL_FALSE->should transpose or not
+
    glUniformMatrix4fv( m_MVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
 
    glUniformMatrix4fv( m_MUni, 1, GL_FALSE, &( globalToWorld[ 0 ][ 0 ] ) );

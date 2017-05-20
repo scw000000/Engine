@@ -51,7 +51,8 @@ uniform sampler2D   uDepthTex;
 uniform sampler2D   uMRT0;
 uniform sampler2D   uMRT1;
 uniform uvec2       uTileNum;
-uniform vec2       uHalfSizeNearPlane;
+// ratio between ( x, y ) and z value, y = tan( pCamera->GetFrustum().m_FovY / 2.0f );
+uniform vec2       uHalfSizeNearPlane; 
 uniform mat4        uProj;
 
 in vec2 vUV;
@@ -64,8 +65,8 @@ vec3 ToViewSpace( vec3 p )
     p = p * 2.0 - vec3( 1.0, 1.0, 1.0 ); // to NDC space
     p.xy = uHalfSizeNearPlane * p.xy;
     vec3 eyeDir = vec3( p.xy, -1 );
-    float positiveDepthVS = uProj[3][2] / ( p.z + uProj[2][2] ); 
-    return eyeDir * positiveDepthVS;
+    float eyeDirScale = uProj[3][2] / ( p.z + uProj[2][2] ); 
+    return eyeDir * eyeDirScale;
     }
 
 vec3 GetNormal( vec4 mrt0 )

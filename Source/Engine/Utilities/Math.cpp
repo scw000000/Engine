@@ -34,9 +34,6 @@ Vec3 Interpolate( float normalizedValue, Vec3 begin, Vec3 end )
    }
 
 
-//
-// void MapYDeadZone								- Chapter 9, page 258
-//
 void MapYDeadZone( Vec3 &input, float deadZone )
    {
 	if (deadZone>=1.0f)

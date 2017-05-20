@@ -296,9 +296,6 @@ void BulletPhysics::VSyncRigidBodyToRenderComponent( StrongRenderComponentPtr pR
    renderCompMotionState->setWorldTransform( newTransform );
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::AddShape						- Chapter 17, page 600
-//
 void BulletPhysics::AddShape( StrongRenderComponentPtr pRenderComp, 
                               btCollisionShape* shape, 
                               float mass )
@@ -343,11 +340,6 @@ void BulletPhysics::AddShape( StrongRenderComponentPtr pRenderComp,
    VLinkRenderCompAttribute( pRenderComp );
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::RemoveCollisionObject			- not described in the book
-//
-//    Removes a collision object from the game world
-//
 void BulletPhysics::RemoveCollisionObject( btCollisionObject * const removeMe )
    {
    // first remove the object from the physics sim
@@ -388,10 +380,6 @@ void BulletPhysics::RemoveCollisionObject( btCollisionObject * const removeMe )
    delete removeMe;
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::FindBulletRigidBody			- not described in the book
-//    Finds a Bullet rigid body given an actor ID
-//
 btRigidBody* BulletPhysics::FindBulletRigidBody( StrongRenderComponentPtr pRenderComp ) const
    {
    RenderCompToRigidBodyMap::const_iterator found = m_RenderCompToRigidBody.find( pRenderComp );
@@ -401,10 +389,6 @@ btRigidBody* BulletPhysics::FindBulletRigidBody( StrongRenderComponentPtr pRende
    return NULL;
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::FindActorID				- not described in the book
-//    Finds an Actor ID given a Bullet rigid body 
-//
 StrongRenderComponentPtr BulletPhysics::FindRenderComponent( btRigidBody const * pbody ) const
    {
    RigidBodyToRenderCompMap::const_iterator found = m_RigidBodyToRenderComp.find( pbody );
@@ -414,9 +398,6 @@ StrongRenderComponentPtr BulletPhysics::FindRenderComponent( btRigidBody const *
    return StrongRenderComponentPtr( );
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VAddSphere					- Chapter 17, page 599
-//
 void BulletPhysics::VAddSphere( float radius, 
                                 StrongRenderComponentPtr pRenderComp )
    {
@@ -434,9 +415,6 @@ void BulletPhysics::VAddSphere( float radius,
    AddShape( pRenderComp, /*initialTransform,*/ collisionShape, mass);
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VAddBox
-//
 void BulletPhysics::VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pRenderComp )
    {
    if( !pRenderComp )
@@ -480,11 +458,6 @@ void BulletPhysics::VAddPointCloud( Vec3 *verts,
    AddShape( pRenderComp, shape, mass);
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VRemoveActor					- not described in the book
-//
-//    Implements the method to remove actors from the physics simulation
-//
 void BulletPhysics::VRemoveRenderComponent( StrongRenderComponentPtr pRenderComp )
    {
    ENG_ASSERT( pRenderComp );
@@ -497,9 +470,6 @@ void BulletPhysics::VRemoveRenderComponent( StrongRenderComponentPtr pRenderComp
       }
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VRenderDiagnostics			- Chapter 17, page 604
-//
 void BulletPhysics::VRenderDiagnostics( void )
    {
    m_DynamicsWorld->debugDrawWorld( );
@@ -535,9 +505,6 @@ void BulletPhysics::VCreateTrigger( WeakActorPtr pActor, const Vec3 &pos, const 
    m_RigidBodyToRenderComp[ body ] = pStrongRenderComp;
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VApplyForce					- Chapter 17, page 603
-//
 void BulletPhysics::VApplyForce( const Vec3 &dir, float newtons, ActorId actorId )
    {
    StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
@@ -555,9 +522,6 @@ void BulletPhysics::VApplyForce( const Vec3 &dir, float newtons, ActorId actorId
       }
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VApplyTorque					- Chapter 17, page 603
-//
 void BulletPhysics::VApplyTorque( const Vec3 &dir, float newtons, ActorId actorId )
    {
    StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
@@ -575,11 +539,6 @@ void BulletPhysics::VApplyTorque( const Vec3 &dir, float newtons, ActorId actorI
       }
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VKinematicMove				- not described in the book
-//
-//    Forces a phyics object to a new location/orientation
-//
 bool BulletPhysics::VKinematicMove( const Transform &trans, ActorId actorId )
    {
    StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
@@ -597,11 +556,6 @@ bool BulletPhysics::VKinematicMove( const Transform &trans, ActorId actorId )
    return false;
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VGetTransform					- not described in the book
-//
-//   Returns the current transform of the physics object
-//
 Transform BulletPhysics::VGetTransform( ActorId actorId )
    {
    StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
@@ -631,21 +585,11 @@ void BulletPhysics::VDestroyRenderCompDelegate( IEventPtr pEvent )
    VRemoveRenderComponent( pDerivedEvent->GetStrongRenderComp() );
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VSetTransform					- not described in the book
-//
-//   Sets the current transform of the physics object
-//
 void BulletPhysics::VSetTransform( ActorId actorId, const Transform& trans )
    {
    VKinematicMove( trans, actorId );
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VRotateY						- not described in the book
-//
-//   A helper function used to turn objects to a new heading
-//
 void BulletPhysics::VRotateY( ActorId const actorId, float const deltaAngleRadians, float const time )
    {
    StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
@@ -663,13 +607,6 @@ void BulletPhysics::VRotateY( ActorId const actorId, float const deltaAngleRadia
    pRigidBody->setCenterOfMassTransform( pRigidBody->getCenterOfMassTransform( ) * angleTransform );
    }
 
-
-
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VGetOrientationY				- not described in the book
-//
-//   A helper functions use to access the current heading of a physics object
-//
 float BulletPhysics::VGetOrientationY( ActorId actorId )
    {
    StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
@@ -703,17 +640,11 @@ float BulletPhysics::VGetOrientationY( ActorId actorId )
    return FLT_MAX;  // fail...
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VStopActor					- Chapter 17, page 604
-//
 void BulletPhysics::VStopActor( ActorId actorId )
    {
    VSetVelocity( actorId, Vec3( 0.f, 0.f, 0.f ) );
    }
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::VGetVelocity					- Chapter 17, page 604
-//
 Vec3 BulletPhysics::VGetVelocity( ActorId actorId )
    {
    StrongActorPtr pStrongActor = g_pApp->m_pEngineLogic->VGetActor( actorId ).lock();
@@ -781,13 +712,6 @@ void BulletPhysics::VTranslate( ActorId actorId, const Vec3& vec )
    pRigidBody->translate( btVec );
    }
 
-
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::BulletInternalTickCallback		- Chapter 17, page 606
-//
-// This function is called after bullet performs its internal update.  We
-//   use it to detect collisions between objects for Game code.
-//
 void BulletPhysics::BulletInternalTickCallback( btDynamicsWorld * const world, btScalar const timeStep )
    {
    ENG_ASSERT( world );

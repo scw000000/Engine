@@ -42,14 +42,15 @@
     <OutDir>$(ProjectDir)..\..\..\Game\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)..\..\Temp\$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.7\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus\lua51\src;$(SolutionDir)..\3rdParty\SDL2_image-2.0.1;$(SolutionDir)..\3rdParty\assimp-3.2\include;$(SolutionDir)..\3rdParty\bullet3-2.83.7\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.7\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus\lua51\src;$(SolutionDir)..\3rdParty\SDL2_image-2.0.1;$(SolutionDir)..\3rdParty\assimp-3.3.1\include;$(SolutionDir)..\3rdParty\bullet3-2.83.7\src;$(IncludePath)</IncludePath>
     <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)..\..\..\Game\Bin\$(PlatformName)$(Configuration)\</OutDir>
     <IntDir>$(ProjectDir)..\..\Temp\$(PlatformName)$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)$(PlatformName)$(Configuration)</TargetName>
-    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.7\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus\lua51\src;$(SolutionDir)..\3rdParty\SDL2_image-2.0.1;$(SolutionDir)..\3rdParty\assimp-3.2\include;$(SolutionDir)..\3rdParty\bullet3-2.83.7\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir);$(SolutionDir)..\3rdParty\SDL\include\;$(SolutionDir)..\3rdParty\GLEW\include\;$(SolutionDir)..\3rdParty\GLM;$(SolutionDir)..\3rdParty\zlib-1.2.8;$(SolutionDir)..\3rdParty\cegui-0.8.7\cegui\include;$(SolutionDir)..\3rdParty\tinyxml;$(SolutionDir)..\3rdParty\FastDelegate;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus;$(SolutionDir)..\3rdParty\luaplus51\Src\LuaPlus\lua51\src;$(SolutionDir)..\3rdParty\SDL2_image-2.0.1;$(SolutionDir)..\3rdParty\assimp-3.3.1\include;$(SolutionDir)..\3rdParty\bullet3-2.83.7\src;$(IncludePath)</IncludePath>
+    <LibraryPath>$(VC_LibraryPath_x86);$(WindowsSDK_LibraryPath_x86);$(SolutionDir)..\..\Lib\$(platform)$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -78,12 +79,14 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>GameStd.h</PrecompiledHeaderFile>
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers />
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

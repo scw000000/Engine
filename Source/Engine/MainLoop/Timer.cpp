@@ -1,10 +1,16 @@
-////////////////////////////////////////////////////////////////////////////////
-// Filename: Timer.cpp
-////////////////////////////////////////////////////////////////////////////////
-
-///////////////////////
-// MY CLASS INCLUDES //
-///////////////////////
+/*!
+ * \file Timer.cpp
+ * \date 2017/03/20 9:26
+ *
+ * \author scw00
+ * Contact: user@company.com
+ *
+ * \brief 
+ *
+ * TODO: long description
+ *
+ * \note
+*/
 #include "EngineStd.h"
 #include "Timer.h"
 
@@ -19,14 +25,12 @@ Timer* GetGlobalTimer()
 Timer::Timer()
    {
    m_bTimerStopped = true;
-   m_u64TicksPerSec = 0;
+   // Get how many ticks euqal one second
+   m_u64TicksPerSec = SDL_GetPerformanceFrequency();
 
    m_llStopTime = 0;
    m_llLastElapsedTime = 0;
    m_llBaseTime = 0;
-
-   // Get how many ticks euqal one second
-   m_u64TicksPerSec = SDL_GetPerformanceFrequency();
    }
 
 void Timer::Reset()
@@ -118,7 +122,7 @@ void Timer::GetTimeValues( double* pfTime, double* pfAbsoluteTime, float* pfElap
    *pfElapsedTime = fElapsedTime;
    }
 
-// This function returns how many seconds has elpased
+// This function returns how many seconds has elapsed
 float Timer::GetElapsedTime()
    {
    Uint64 qwTime = GetAdjustedCurrentTime();

@@ -31,9 +31,6 @@ void InitIntersection( Intersection &intersection, DWORD faceIndex, FLOAT dist, 
    T *v1 = &pVertices[ pIndices[ 3 * faceIndex + 1 ] ];
    T *v2 = &pVertices[ pIndices[ 3 * faceIndex + 2 ] ];
 
-   // If all you want is the vertices hit, then you are done.  In this sample, we
-   // want to show how to infer texture coordinates as well, using the BaryCentric
-   // coordinates supplied by D3DXIntersect
    FLOAT dtu1 = v1->tu - v0->tu;
    FLOAT dtu2 = v2->tu - v0->tu;
    FLOAT dtv1 = v1->tv - v0->tv;

@@ -23,13 +23,13 @@
 
 #pragma comment( lib, "zlibstat.lib" )
 #pragma comment( lib, "tinyxml.lib" )
-#pragma comment( lib, "lua51_debug.lib" )
 
-#pragma comment( lib, "assimp-vc120-mtd.lib" )
+#pragma comment( lib, "assimp-vc140-mt.lib" )
 
 #if defined(_M_IX86)
 	#if defined(_DEBUG)
       //#pragma comment(lib, "glew32sd.lib")
+      #pragma comment( lib, "lua51_debug.lib" )
       #pragma comment( lib, "glew32d.lib" )
       #pragma comment( lib, "CEGUIBase-0_d.lib" )
       #pragma comment( lib, "CEGUIOpenGLRenderer-0_d.lib" )
@@ -37,6 +37,13 @@
       #pragma comment( lib, "BulletDynamics_Debug.lib" )
       #pragma comment( lib, "LinearMath_Debug.lib" )
 	#else
+      #pragma comment( lib, "lua51.lib" )
+      #pragma comment( lib, "glew32.lib" )
+      #pragma comment( lib, "CEGUIBase-0.lib" )
+      #pragma comment( lib, "CEGUIOpenGLRenderer-0.lib" )
+      #pragma comment( lib, "BulletCollision.lib" )
+      #pragma comment( lib, "BulletDynamics.lib" )
+      #pragma comment( lib, "LinearMath.lib" )
 
 	#endif
 #elif defined(_M_X64)

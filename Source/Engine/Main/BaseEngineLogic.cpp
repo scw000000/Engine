@@ -77,7 +77,7 @@ bool BaseEngineLogic::Init()
    IGamePhysics::GetSingleton().VInitialize();
    m_pLevelManager->Init();
    m_pWrold->OnRestore();
-   // m_pGUIManager->Init( g_pApp->m_EngineOptions.GetGUIDirectory() );
+   m_pGUIManager->Init( g_pApp->m_EngineOptions.GetGUIDirectory() );
    shared_ptr<IView> pView( ENG_NEW HumanView() );
    VAddView( pView );
    if( !VLoadLevel() )
@@ -183,10 +183,10 @@ int BaseEngineLogic::VOnRestore( void )
 
 void BaseEngineLogic::VOnMsgProc( SDL_Event event )
    {
-   /*if( m_pGUIManager->OnMsgProc( event ) )
+   if( m_pGUIManager->OnMsgProc( event ) )
       {
       return;
-      }*/
+      }
    // send event to all of game views
    for( auto i = m_ViewList.rbegin( ); i != m_ViewList.rend( ); ++i )
       {
@@ -212,7 +212,7 @@ void BaseEngineLogic::VOnUpdate( float time, float elapsedTime )
    unsigned long deltaMs = unsigned long( elapsedTime * 1000.0f );
 	m_Lifetime += elapsedTime;
 
-   // m_pGUIManager->OnUpdate( deltaMs );
+   m_pGUIManager->OnUpdate( deltaMs );
    // update all game views
    for ( ViewList::iterator it = m_ViewList.begin(); it != m_ViewList.end(); ++it )
 	   {

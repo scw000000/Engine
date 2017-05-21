@@ -26,7 +26,7 @@ HumanView::HumanView( void )
    {
 	m_pProcessManager = ENG_NEW ProcessManager;
 	m_ViewId = gc_InvalidGameViewId;
-   // AttachLayout( shared_ptr<UserInterface>( ENG_NEW UserInterface( Resource( g_pApp->m_EngineOptions.GetGUILayoutFieName(), true ) ) ) );
+   AttachLayout( shared_ptr<UserInterface>( ENG_NEW UserInterface( Resource( g_pApp->m_EngineOptions.GetGUILayoutFieName(), true ) ) ) );
 
    if ( g_pApp->m_pEngineLogic->m_pWrold )
 	   {

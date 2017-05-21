@@ -96,7 +96,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       return false;
       }
    #endif
-   
+
    //--------------------------------- 
    // Check system requirements
    //--------------------------------- 
@@ -143,9 +143,6 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       ENG_ERROR("Failed to initialize resource cache!  Are your paths set up correctly?");
 		return false;
 	   }
-
- //  extern shared_ptr<IResourceLoader> CreateWAVResourceLoader();
-   
 
    if( !LoadStrings("English") )
 	   {

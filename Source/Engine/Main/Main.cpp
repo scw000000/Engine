@@ -63,8 +63,6 @@
 int main( int argc, char *argv[] )
    {
    // Set up checks for memory leaks.
-	// Game Coding Complete reference - Chapter 21, page 834
-	//
 	int tmpDbgFlag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
    
 	// set this flag to keep memory blocks around
@@ -83,7 +81,7 @@ int main( int argc, char *argv[] )
 
    _CrtSetDbgFlag( tmpDbgFlag );
 
-   Logger::Init( "logging.xml" );
+   EngLogger::Init( "logging.xml" );
 
    g_pApp->m_EngineOptions.Init( "EngineOptions.xml" );
    Point screenSize = g_pApp->m_EngineOptions.GetScreenSize();
@@ -91,7 +89,7 @@ int main( int argc, char *argv[] )
 
    g_pApp->MainLoop();
 
-   Logger::Destroy();
+   EngLogger::Destroy();
 
    return 0;
    }

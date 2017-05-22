@@ -76,9 +76,6 @@
     <ClCompile Include="..\Utilities\Random.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\Debugging\Logger.cpp">
-      <Filter>Debugging</Filter>
-    </ClCompile>
     <ClCompile Include="..\Utilities\String.cpp">
       <Filter>Utilities</Filter>
     </ClCompile>
@@ -301,6 +298,9 @@
     <ClCompile Include="..\VideoResourceCache\VideoMeshResource.cpp">
       <Filter>VideoResource</Filter>
     </ClCompile>
+    <ClCompile Include="..\Debugging\EngLogger.cpp">
+      <Filter>Debugging</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -318,9 +318,6 @@
     </ClInclude>
     <ClInclude Include="..\Memory\MemoryPool.h">
       <Filter>Memory</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Debugging\Logger.h">
-      <Filter>Debugging</Filter>
     </ClInclude>
     <ClInclude Include="..\Utilities\String.h">
       <Filter>Utilities</Filter>
@@ -556,6 +553,12 @@
     </ClInclude>
     <ClInclude Include="..\VideoResourceCache\VideoMeshResource.h">
       <Filter>VideoResource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Debugging\EngLogger.h">
+      <Filter>Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Main\Libs.h">
+      <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

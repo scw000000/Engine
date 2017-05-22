@@ -171,7 +171,7 @@ bool EventManager::VUpdate( unsigned long maxMs )
       ToStr( queueToProcess ) + "; " +
       ToStr( ( unsigned long ) m_EventQueues[ queueToProcess ].size() )
       + " events to process" ) ); 
-      Logger::Log( "EventLoop", s, NULL, NULL, 0 ); 
+      EngLogger::Log( "EventLoop", s, NULL, NULL, 0 ); 
    /*ENG_LOG("EventLoop", "Processing Event Queue " + 
             ToStr(queueToProcess) + "; " + 
             ToStr((unsigned long)m_EventQueues[queueToProcess].size()) 

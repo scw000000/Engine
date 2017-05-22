@@ -36,7 +36,7 @@
 //
 //========================================================================
 #include "EngineStd.h"
-#include "Logger.h"
+#include "EngLogger.h"
 
 #include "../Multicore/CriticalSection.h"
 #include "../Utilities/String.h"
@@ -91,7 +91,7 @@ public:
 	};
    //first: tag name, second: tag setting(flags)
 	typedef std::map<string, unsigned char> Tags;
-	typedef std::list<Logger::ErrorMessenger*> ErrorMessengerList;
+	typedef std::list<EngLogger::ErrorMessenger*> ErrorMessengerList;
 	
 	Tags m_tags;
 	ErrorMessengerList m_errorMessengers;
@@ -111,7 +111,7 @@ public:
 	void SetDisplayFlags(const std::string& tag, unsigned char flags);
 
 	// error messengers
-	void AddErrorMessenger(Logger::ErrorMessenger* pMessenger);
+	void AddErrorMessenger(EngLogger::ErrorMessenger* pMessenger);
 	LogMgr::ErrorDialogResult Error(const std::string& errorMessage, bool isFatal, const char* funcName, const char* sourceFile, unsigned int lineNum);
 
 private:
@@ -146,7 +146,7 @@ LogMgr::~LogMgr(void)
 	m_messengerCriticalSection.Lock();
     for (auto it = m_errorMessengers.begin(); it != m_errorMessengers.end(); ++it)
 	{
-		Logger::ErrorMessenger* pMessenger = (*it);
+		EngLogger::ErrorMessenger* pMessenger = (*it);
 		delete pMessenger;
 	}
 	m_errorMessengers.clear();
@@ -246,7 +246,7 @@ void LogMgr::SetDisplayFlags(const std::string& tag, unsigned char flags)
 //------------------------------------------------------------------------------------------------------------------------------------
 // Adds an error messenger to the list
 //------------------------------------------------------------------------------------------------------------------------------------
-void LogMgr::AddErrorMessenger(Logger::ErrorMessenger* pMessenger)
+void LogMgr::AddErrorMessenger(EngLogger::ErrorMessenger* pMessenger)
 {
 	m_messengerCriticalSection.Lock();
 	m_errorMessengers.push_back(pMessenger);
@@ -366,7 +366,7 @@ void LogMgr::GetOutputBuffer(std::string& outOutputBuffer, const string& tag, co
 // ErrorMessenger
 // This constructor let the errorMessenger add itself to logMgr automatically when it is newed
 //-----------------------------------------------------------------------------------------------------------------------
-Logger::ErrorMessenger::ErrorMessenger(void)
+EngLogger::ErrorMessenger::ErrorMessenger(void)
 {
 	s_pLogMgr->AddErrorMessenger(this);
 	m_enabled = true;
@@ -376,7 +376,7 @@ Logger::ErrorMessenger::ErrorMessenger(void)
 // Assert and error are not fatal
 // If the message bos is choosed ignore the error, then turn off the error handling
 //-----------------------------------------------------------------------------------------------------------------------
-void Logger::ErrorMessenger::Show(const std::string& errorMessage, bool isFatal, const char* funcName, const char* sourceFile, unsigned int lineNum)
+void EngLogger::ErrorMessenger::Show(const std::string& errorMessage, bool isFatal, const char* funcName, const char* sourceFile, unsigned int lineNum)
 {
 	if (m_enabled)
 	{
@@ -391,7 +391,7 @@ void Logger::ErrorMessenger::Show(const std::string& errorMessage, bool isFatal,
 // C Interface
 //-----------------------------------------------------------------------------------------------------------------------
 
-namespace Logger {
+namespace EngLogger {
 
 void Init(const char* loggingConfigFilename)
 {

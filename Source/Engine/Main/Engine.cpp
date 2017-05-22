@@ -167,12 +167,14 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    ScriptExports::Register();
    
    Resource resource( m_EngineOptions.GetPreInitScriptFile() );
-   shared_ptr<ResHandle> pResourceHandle = m_pResCache->GetHandle( resource );  
+   // shared_ptr< ResHandle > pReshandle( ENG_NEW ResHandle( resource, 0, 0, m_pResCache ) );
+   
+   shared_ptr<ResHandle> pResourceHandle = m_pResCache->GetHandle( resource );
    ENG_ASSERT( pResourceHandle );
 
-   RegisterScriptClass< AnimationClipNode, IAnimationNode >();
-   RegisterScriptClass< AnimationLerpNode, IAnimationNode >();
-   RegisterScriptClass< AnimationState >();
+   // RegisterScriptClass< AnimationClipNode, IAnimationNode >();
+   // RegisterScriptClass< AnimationLerpNode, IAnimationNode >();
+   // RegisterScriptClass< AnimationState >();
 
    //--------------------------------- 
    //  Initialize Lua scripting
@@ -239,7 +241,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       {
       SDL_ShowCursor( SDL_DISABLE );
       }
-   
+
    SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
    // setup opengl rendering context
    SDL_GLContext glContext = SDL_GL_CreateContext( m_pWindow );
@@ -249,14 +251,12 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       }
    
    // Needed for core profile
-   glewExperimental = true; 
+   glewExperimental = GL_TRUE; 
 
    GLenum error = glewInit();
 
-   if( error != GLEW_OK )
-      {
-      ENG_ERROR( reinterpret_cast<const char *>( gluErrorString( error ) ) );
-      }
+   ENG_ASSERT( error == GLEW_OK );
+
    // set two buffer for rendering
    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 
@@ -282,7 +282,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
    // Set Renderer
    //--------------------------------- 
-    if( GetRendererImpl() == Renderer_OpenGL )
+   if( GetRendererImpl() == Renderer_OpenGL )
       {
      // m_pRenderer = shared_ptr< IMainRenderer >( ENG_NEW MainRenderer() );
       m_pRenderManager = shared_ptr< IRenderManager >( ENG_NEW OpenGLRenderManager() );

@@ -120,7 +120,7 @@
     <ClCompile Include="..\Controller\Controller.cpp" />
     <ClCompile Include="..\Controller\EditorController.cpp" />
     <ClCompile Include="..\Controller\MovementController.cpp" />
-    <ClCompile Include="..\Debugging\Logger.cpp" />
+    <ClCompile Include="..\Debugging\EngLogger.cpp" />
     <ClCompile Include="..\Debugging\vsGLInfoLib.cpp" />
     <ClCompile Include="..\Event\EventManager.cpp" />
     <ClCompile Include="..\Event\Events.cpp" />
@@ -216,7 +216,7 @@
     <ClInclude Include="..\Controller\Controller.h" />
     <ClInclude Include="..\Controller\EditorController.h" />
     <ClInclude Include="..\Controller\MovementController.h" />
-    <ClInclude Include="..\Debugging\Logger.h" />
+    <ClInclude Include="..\Debugging\EngLogger.h" />
     <ClInclude Include="..\Debugging\vsGLInfoLib.h" />
     <ClInclude Include="..\Event\EventManager.h" />
     <ClInclude Include="..\Event\Events.h" />
@@ -250,6 +250,7 @@
     <ClInclude Include="..\Main\BaseEngineLogic.h" />
     <ClInclude Include="..\Main\Engine.h" />
     <ClInclude Include="..\Main\Interfaces.h" />
+    <ClInclude Include="..\Main\Libs.h" />
     <ClInclude Include="..\Math\Frustum.h" />
     <ClInclude Include="..\Math\Geometry.h" />
     <ClInclude Include="..\Memory\MemoryPool.h" />

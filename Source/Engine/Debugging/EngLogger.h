@@ -1,30 +1,4 @@
 #pragma once
-//---------------------------------------------------------------------------------------------------------------------
-// TYPICAL USAGE:
-// 
-// 1) Call the ENG_ASSERT() macro just like you would for _ASSERTE()
-//		Example -> ENG_ASSERT(ptr != NULL);
-// 2) Call the GCC_ERROR() macro to send out an error message
-//		Example -> GCC_ERROR("Something Blew Up!");
-//---------------------------------------------------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------------------------------------------------
-// LOGGING:
-// 
-// Calling  ENG_LOG("tag", "Log message") will print:
-//  [tag] Log Message
-// To enable these logs, you need to either manually call Logger::SetDisplayFlags() or set up a logging.xml file.
-// logging.xml should follow this form:
-// 
-//  <Logger>
-//      <Log tag="Actor" debugger="1" file="0"/>
-//  </Logger>
-// 
-// The above chunk will cause all logs sent with the "Actor" tag to be displayed in the debugger.  If you set file 
-// to 1 as well, it would log out to a file as well.  Don't check in logging.xml to SVN, it should be a local-only 
-// file.
-//---------------------------------------------------------------------------------------------------------------------
-
 /*
 there are two different ways to inform an error 
 1.new the errirMessenger nested class and inform it to show disered message
@@ -40,14 +14,7 @@ The difference is that any error catched by errorMgr will make an additional win
 const unsigned char LOGFLAG_WRITE_TO_LOG_FILE =		1 << 0;
 const unsigned char LOGFLAG_WRITE_TO_DEBUGGER =		1 << 1;
 
-
-//---------------------------------------------------------------------------------------------------------------------
-// This is the public Logger interface.  You must call Init() before any logging can take place and Destroy() when
-// you're done to clean it up.  Call SetDisplayFlags() to set the display flags for a particular logging tag.  By 
-// default, they are all off.  Although you can, you probably shouldn't call Log() directly.  Use the ENG_LOG() macro 
-// instead since it can be stripped out by the compiler for Release builds.
-//---------------------------------------------------------------------------------------------------------------------
-namespace Logger
+namespace EngLogger
 {
 	// This class is used by the debug macros and shouldn't be accessed externally.
 	class ErrorMessenger
@@ -77,7 +44,7 @@ namespace Logger
 #define ENG_FATAL(str) \
 	do \
 	{ \
-		static Logger::ErrorMessenger* pErrorMessenger = ENG_NEW Logger::ErrorMessenger; \
+		static EngLogger::ErrorMessenger* pErrorMessenger = ENG_NEW EngLogger::ErrorMessenger; \
 		std::string s((str)); \
 		pErrorMessenger->Show(s, true, __FUNCTION__, __FILE__, __LINE__); \
 	} \
@@ -91,7 +58,7 @@ namespace Logger
 #define ENG_ERROR(str) \
 	do \
 	{ \
-		static Logger::ErrorMessenger* pErrorMessenger = ENG_NEW Logger::ErrorMessenger; \
+		static EngLogger::ErrorMessenger* pErrorMessenger = ENG_NEW EngLogger::ErrorMessenger; \
 		std::string s((str)); \
 		pErrorMessenger->Show(s, false, __FUNCTION__, __FILE__, __LINE__); \
 	} \
@@ -103,7 +70,7 @@ namespace Logger
 	do \
 	{ \
 		std::string s((str)); \
-		Logger::Log("WARNING", s, __FUNCTION__, __FILE__, __LINE__); \
+		EngLogger::Log("WARNING", s, __FUNCTION__, __FILE__, __LINE__); \
 	}\
 	while (0)\
 
@@ -114,7 +81,7 @@ namespace Logger
 	do \
 	{ \
 		std::string s((str)); \
-		Logger::Log("INFO", s, NULL, NULL, 0); \
+		EngLogger::Log("INFO", s, NULL, NULL, 0); \
 	} \
 	while (0) \
 
@@ -124,7 +91,7 @@ namespace Logger
 	do \
 	{ \
 		std::string s((str)); \
-		Logger::Log(tag, s, NULL, NULL, 0); \
+		EngLogger::Log(tag, s, NULL, NULL, 0); \
 	} \
 	while (0) \
 
@@ -134,7 +101,7 @@ namespace Logger
 	{ \
 		if (!(expr)) \
 		{ \
-			static Logger::ErrorMessenger* pErrorMessenger = ENG_NEW Logger::ErrorMessenger; \
+			static EngLogger::ErrorMessenger* pErrorMessenger = ENG_NEW EngLogger::ErrorMessenger; \
 			pErrorMessenger->Show(#expr, false, __FUNCTION__, __FILE__, __LINE__); \
 		} \
 	} \

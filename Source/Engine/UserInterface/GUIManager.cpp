@@ -318,7 +318,7 @@ CEGUI::Key::Scan GUIManager::SDLKeyToCEGUIKey( SDL_Keycode key )
       case SDLK_POWER:        return Key::Power;
       default:                return Key::Unknown;
       }
-      std::cout << "unkown key" << std::endl;
+      ENG_WARNING( "Unkown key input" );
       return Key::Unknown;
    }
 

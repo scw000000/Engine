@@ -59,6 +59,7 @@ class EngineApp
        bool IsMouseInsideWindow( void );
        void SetWindowFocus( void );
        void ResetMousePosition( void );
+       static int EventFilter( void* userdata, SDL_Event* event );
 
    public:
       EngineOptions m_EngineOptions;
@@ -88,6 +89,8 @@ class EngineApp
       */
       virtual TCHAR* VGetGameTitle() { return _T("Engine"); };
       
+      
+
 
    protected:
       bool m_bIsRunning;

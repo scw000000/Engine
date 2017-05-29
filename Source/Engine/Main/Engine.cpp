@@ -341,6 +341,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    int result= SInputManager::GetSingleton().Init( m_pEngineLogic->m_pGUIManager.get() );
    ENG_ASSERT( result == S_OK );
 
+   SDL_SetEventFilter( EventFilter, nullptr );
    //--------------------------------- 
    // Input Manager
    //--------------------------------- 
@@ -573,6 +574,51 @@ void EngineApp::ResetMousePosition( void )
    SDL_WarpMouseInWindow( g_pApp->GetWindow(), g_pApp->GetScreenSize().GetX() / 2, g_pApp->GetScreenSize().GetY() / 2 );
    }
 
+int EngineApp::EventFilter( void* userdata, SDL_Event* event )
+   {
+   switch( event->type )
+      {
+      case SDL_WINDOWEVENT:
+      case SDL_QUIT:
+      case SDL_DROPFILE:
+      case SDL_MOUSEBUTTONDOWN:
+         if( SInputManager::GetSingleton().m_MouseButtonState[ event->button.button ].m_bIsDown )
+            {
+            return 0;
+            }
+         break;
+      case SDL_KEYDOWN:
+         if( SInputManager::GetSingleton().m_KeyState[ event->key.keysym.scancode ].m_bIsDown )
+            {
+            return 0;
+            }
+         break;
+      case SDL_KEYUP:
+      case SDL_TEXTEDITING:
+      case SDL_TEXTINPUT:
+      case SDL_KEYMAPCHANGED:
+      case SDL_MOUSEMOTION:
+      case SDL_MOUSEBUTTONUP:
+      case SDL_MOUSEWHEEL:
+      case SDL_JOYAXISMOTION:
+      case SDL_JOYBALLMOTION:
+      case SDL_JOYHATMOTION:
+      case SDL_JOYBUTTONDOWN:
+      case SDL_JOYBUTTONUP:
+      case SDL_JOYDEVICEADDED:
+      case SDL_JOYDEVICEREMOVED:
+      case SDL_CONTROLLERAXISMOTION:
+      case SDL_CONTROLLERBUTTONDOWN:
+      case SDL_CONTROLLERBUTTONUP:
+      case SDL_CONTROLLERDEVICEADDED:
+      case SDL_CONTROLLERDEVICEREMOVED:
+      case SDL_CONTROLLERDEVICEREMAPPED:
+      default:
+         break;
+      };
+   return 1;
+   }
+
 int EngineApp::PumpUntilMessage( Uint32& eventEnd, Sint32& code )
    {
    SDL_Event event;
@@ -606,6 +652,7 @@ int EngineApp::PumpUntilMessage( Uint32& eventEnd, Sint32& code )
             double absoluteTime = 0.0;
             float  fElapasedTime = 0.0f;
             GetGlobalTimer()->GetTimeValues( &appTime, &absoluteTime, &fElapasedTime );
+            SInputManager::GetSingleton().VOnTick( fElapasedTime );
             m_pEngineLogic->VOnUpdate( ( float ) appTime, fElapasedTime );
             OnFrameRender( appTime, fElapasedTime );
 			   }
@@ -629,6 +676,7 @@ void EngineApp::MainLoop( void )
          break;
          }
       GetGlobalTimer()->GetTimeValues( &fAppTime, &fAbsoluteTime, &fElapasedTime );
+      SInputManager::GetSingleton().VOnTick( fElapasedTime );
 
       OnUpdateGame( fAppTime, fElapasedTime );
       

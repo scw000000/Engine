@@ -208,6 +208,7 @@ void InputManager::VOnTick( float deltaSeconds )
       }*/
    m_CurMousePos = g_pApp->GetMousePosition();
    m_MouseShift = m_CurMousePos - m_LastMousePos;
+
    /*for( auto pController : m_Controllers )
       {
       pController->VOnTick( deltaSeconds );

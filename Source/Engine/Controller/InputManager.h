@@ -32,6 +32,7 @@ REGISTER_SINGLETON( InputManager );
 
 class InputManager : public IInputManager
    {
+   friend class EngineApp;
    EXPOSE_CONSTRUCTOR( InputManager );
    public:
       int Init( GUIManager* pManager );

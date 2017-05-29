@@ -43,8 +43,8 @@ void EditorController::VOnTick( float deltaSeconds )
    auto& mouseShift = m_InputManager.VGetMouseShift();
    if( !m_isRotateWhenLButtonDown || ( m_isRotateWhenLButtonDown && ( m_InputManager.VIsMouseButtonDown( SDL_BUTTON_LEFT ) ) ) )
       {
-      m_TargetRotShift.x += 1.f * ( ( float ) mouseShift.y );
-      m_TargetRotShift.y += -1.f * ( ( float ) mouseShift.x );
+      m_TargetRotShift.x += 0.001f * ( ( float ) mouseShift.y );
+      m_TargetRotShift.y += -0.001f * ( ( float ) mouseShift.x );
       }
    if( m_isRotateWhenLButtonDown )
       {

@@ -84,10 +84,12 @@ int UserInterface::VAsk( MessageBox_Questions question )
          return defaultAnswer;
          }
       bool prevMouseDisplay = m_IsMouseCursorEnable;
-      bool prevMouseLock = g_pApp->GetHumanView()->m_pController->VIsPointerLocked();
+      bool prevMouseLock = SInputManager::GetSingleton().VGetIsCursorLocked();
+      // bool prevMouseLock = g_pApp->GetHumanView()->m_pController->VIsPointerLocked();
       m_pGUIManager->SetDisplayMouseCursor( true );
       VSetIsMouseCursorEnable( true );
-      g_pApp->GetHumanView()->m_pController->VSetPointerLocked( false );
+      SInputManager::GetSingleton().VSetCursorLocked( false );
+      // g_pApp->GetHumanView()->m_pController->VSetPointerLocked( false );
 
       shared_ptr<PromptBox> pPromptBox( ENG_NEW PromptBox( m_pPromptRoot, m_ModalEventType, msg, title, buttonFlags ) );
       pPromptBox->GetWindow()->setModalState( true );
@@ -96,7 +98,8 @@ int UserInterface::VAsk( MessageBox_Questions question )
       if( !m_pPromptRoot->getChildCount() )
          {
          VSetIsMouseCursorEnable( prevMouseDisplay );
-         g_pApp->GetHumanView()->m_pController->VSetPointerLocked( prevMouseLock );
+         SInputManager::GetSingleton().VSetCursorLocked( prevMouseLock );
+         // g_pApp->GetHumanView()->m_pController->VSetPointerLocked( prevMouseLock );
          }
       return result;
       }

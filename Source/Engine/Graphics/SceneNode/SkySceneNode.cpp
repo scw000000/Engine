@@ -157,7 +157,7 @@ void SkySceneNode::ReleaseResource( void )
       m_VertexArrayObj = 0;
       }
 
-   glDeleteBuffers( ENG_ARRAY_SIZE_IN_ELEMENTS( m_Buffers ), &m_Buffers[ 0 ] );
+   glDeleteBuffers( ENG_ARRAY_LENGTH( m_Buffers ), &m_Buffers[ 0 ] );
    ENG_ZERO_MEM( m_Buffers );
 
    if( m_TextureUni )

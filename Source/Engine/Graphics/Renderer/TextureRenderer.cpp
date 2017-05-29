@@ -131,7 +131,7 @@ void TextureRenderer::DrawTexture( GLuint textureObj, const Point& offset, const
    
    glDrawElements(
       GL_TRIANGLES,      // mode
-      ENG_ARRAY_SIZE_IN_ELEMENTS( QUAD_VERTEX_INDEX ),    // count
+      ENG_ARRAY_LENGTH( QUAD_VERTEX_INDEX ),    // count
       GL_UNSIGNED_SHORT,   // type
       ( void* ) 0           // element array buffer offset
       );
@@ -146,7 +146,7 @@ void TextureRenderer::ReleaseResource( void )
    glDeleteVertexArrays( 1, &m_VAO );
    m_VAO = 0;
 
-   glDeleteBuffers( ENG_ARRAY_SIZE_IN_ELEMENTS( m_Buffers ), &m_Buffers[ 0 ] );
+   glDeleteBuffers( ENG_ARRAY_LENGTH( m_Buffers ), &m_Buffers[ 0 ] );
    ENG_ZERO_MEM( m_Buffers );
 
    glDeleteProgram( m_Program );

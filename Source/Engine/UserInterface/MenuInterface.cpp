@@ -15,6 +15,7 @@
 #include "EngineStd.h"
 #include "MenuInterface.h"
 #include "HumanView.h"
+#include "..\Controller\InputManager.h"
 
 MenuInterface::MenuInterface( const Resource& layoutRes ) : UserInterface( layoutRes )
    {
@@ -80,6 +81,7 @@ bool MenuInterface::StartLevel( const CEGUI::EventArgs& arg )
    auto selectedLevel = m_pLevelList->getFirstSelectedItem();
    g_pApp->m_pEngineLogic->VLoadLevel();
    g_pApp->GetHumanView()->AttachLayout( shared_ptr<UserInterface> ( ENG_NEW UserInterface( Resource( "Empty.layout", true ) ) ) );
-   g_pApp->GetHumanView()->m_pController->VSetPointerLocked( true );
+   // SInputManager::GetSingleton().
+   // g_pApp->GetHumanView()->m_pController->VSetPointerLocked( true );
    return true;
    }

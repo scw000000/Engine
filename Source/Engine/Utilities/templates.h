@@ -4,7 +4,7 @@
  * \date 2017/03/20 9:04
  *
  * \author scw00
- * Contact: user@company.com
+ * Contact: scw000000@gmail.com
  *
  * \brief 
  *
@@ -13,28 +13,79 @@
  * \note
 */
 
-template <class T>
-class singleton
-{
-	T m_OldValue;
-	T* m_pGlobalValue;
+/*!
+* \class ENG_Noncopyable
+*
+* \brief Modified version of non copyable class
+*  reference https://msdn.microsoft.com/zh-tw/library/dn457344.aspx
+* \author SCW
+* \date 05 2016
+*/
+class ENG_Noncopyable
+   {
+      public:
+      ENG_Noncopyable( void ) {}; // Default constructor 
 
-public:
-   // class menber pointer point to new location
-   // copy pointer data to oldValue 
-   // copy newValue data to globalValue
-   // -> move m_pGlobalValue to new location, and assign its value to new value
-   // -> before that, copy its original value to m_OldValue
-	singleton(T newValue, T* globalValue)
-	{ 
-		m_pGlobalValue = globalValue;
-		m_OldValue = *globalValue; 
-		*m_pGlobalValue = newValue;
-	}
+      ENG_Noncopyable( const ENG_Noncopyable& x ) = delete;
+      ENG_Noncopyable& operator=( const ENG_Noncopyable& x ) = delete;
+   };
 
-	virtual ~singleton() { *m_pGlobalValue = m_OldValue; }
-};
+//template <class T>
+//class singleton
+//{
+//	T m_OldValue;
+//	T* m_pGlobalValue;
+//
+//public:
+//   // class menber pointer point to new location
+//   // copy pointer data to oldValue 
+//   // copy newValue data to globalValue
+//   // -> move m_pGlobalValue to new location, and assign its value to new value
+//   // -> before that, copy its original value to m_OldValue
+//	singleton(T newValue, T* globalValue)
+//	{ 
+//		m_pGlobalValue = globalValue;
+//		m_OldValue = *globalValue; 
+//		*m_pGlobalValue = newValue;
+//	}
+//
+//	virtual ~singleton() { *m_pGlobalValue = m_OldValue; }
+//};
 
+template < typename T > class Singleton : public ENG_Noncopyable
+   {
+   public:
+      static T& GetSingleton( void )
+         {
+         ENG_ASSERT( m_bHasBeenCreated == false && "The singleton class cannot be create-release more then once" );
+         if( !m_pInstance && !m_bHasBeenCreated )
+            {
+            m_pInstance = ENG_NEW T;
+            ENG_ASSERT( m_pInstance );
+            }
+         return *m_pInstance;
+         }
+
+      static void DeleteSingleton( void )
+         {
+         if( m_pInstance )
+            {
+            SAFE_DELETE( m_pInstance );
+            }
+         }
+   
+   private:
+      Singleton( void ) { m_bHasBeenCreated = true }
+      virtual ~Singleton( void ) { }
+
+   private:
+      static T* m_pInstance;
+      static bool m_bHasBeenCreated;
+   };
+
+#define REGISTER_SINGLETON( x ) class x; typedef Singleton< x > S##x; bool Singleton< x >::m_bHasBeenCreated = false; x* Singleton< x >::m_pInstance = nullptr
+
+#define EXPOSE_CONSTRUCTOR( x ) friend class Singleton< x >
 
 template <class Type>
 shared_ptr<Type> MakeStrongPtr(weak_ptr<Type> pWeakPtr)
@@ -240,4 +291,3 @@ class GenericObjectFactory
       return ( m_creationFunctions.find(id) != m_creationFunctions.end() );
       }
    };
-

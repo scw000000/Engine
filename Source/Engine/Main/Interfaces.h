@@ -131,33 +131,46 @@ class IEngineLogic
 
 typedef std::list<shared_ptr<IView> > ViewList;
 
-class IKeyboardHandler
+class IController
    {
-   public:
-	   virtual bool VOnKeyDown( const SDL_Scancode& keyCode ) = 0;
-	   virtual bool VOnKeyUp( const SDL_Scancode& keyCode ) = 0;
+      public:
+      virtual ~IController( void ) {};
+      virtual void VOnTick( float deltaSeconds ) = 0;
    };
 
-class IPointerHandler
+class IKeyboardManager
    {
    public:
-	   virtual bool VOnPointerMove( Point motion ) = 0;
-	   virtual bool VOnPointerButtonDown( Uint8 button ) = 0;
-	   virtual bool VOnPointerButtonUp( Uint8 button ) = 0;
-      virtual void VSetPointerLocked( bool isLocked ) = 0;
-      virtual bool VIsPointerLocked( void ) = 0;
+      virtual void VOnKeyDown( const SDL_Scancode& keyCode ) = 0;
+      virtual void VOnKeyUp( const SDL_Scancode& keyCode ) = 0;
    };
 
-class IController : public IKeyboardHandler, public IPointerHandler
+class IMouseManager
    {
    public:
-      virtual ~IController( void ){}
+      virtual void VOnMouseMove( Point motion ) = 0;
+	   virtual void VOnMouseButtonDown( Uint8 button ) = 0;
+      virtual void VOnMouseButtonUp( Uint8 button ) = 0;
+      virtual void VSetCursorLocked( bool isLocked ) = 0;
+      virtual bool VGetIsCursorLocked( void ) const = 0;
+   };
+
+class IInputManager : public IKeyboardManager, public IMouseManager
+   {
+   public:
+      virtual ~IInputManager( void ) {}
       virtual bool VOnMsgProc( const SDL_Event& event ) = 0;
-      virtual void VOnTickUpdate( unsigned long deltaMilliseconds ) = 0;
-      virtual void VOnUpdate( unsigned long deltaMilliseconds ) = 0;
+      virtual void VOnTick( float deltaSeconds ) = 0;
+      virtual int VRegisterController( shared_ptr< IController > pController ) = 0;
+      virtual int VDeregisterController( shared_ptr< IController > pController ) = 0;
+      virtual bool VIsControllerRegistered( shared_ptr< IController > pController ) const = 0;
+      virtual bool VIsKeyDown( const SDL_Scancode& keyCode ) const = 0;
+      virtual bool VIsMouseButtonDown( Uint8 button ) const = 0;
+      virtual const Point& VGetMouseShift( void ) const = 0;
+      virtual const Point& VGetMousePosition( void ) const = 0;
    };
 
-class IJoystickHandler
+class IJoystickManager
    {
    public:
 	   virtual bool VOnButtonDown(const std::string &buttonName, int const pressure)=0;
@@ -165,7 +178,7 @@ class IJoystickHandler
 	   virtual bool VOnJoystick(float const x, float const y)=0;
    };
 
-class IGamepadHandler
+class IGamepadManager
    {
    public:
 	   virtual bool VOnTrigger(const std::string &triggerName, float const pressure)=0;

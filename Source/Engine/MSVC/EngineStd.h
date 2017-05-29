@@ -35,32 +35,13 @@
 #include <vector>
 #include <queue>
 #include <map>
+#include <unordered_set>
 
 using std::tr1::shared_ptr;
 using std::tr1::weak_ptr;
 using std::tr1::static_pointer_cast;
 using std::tr1::dynamic_pointer_cast;
 
-/*!
- * \class ENG_Noncopyable
- *
- * \brief Modified version of non copyable class
- *  reference https://msdn.microsoft.com/zh-tw/library/dn457344.aspx
- * \author SCW
- * \date 05 2016
- */
-class ENG_Noncopyable
-   {  
-   public:
-      ENG_Noncopyable( void ) { }; // Default constructor 
-
-      ENG_Noncopyable( const ENG_Noncopyable& x ) = delete;  
-      ENG_Noncopyable& operator=( const ENG_Noncopyable& x ) = delete;  
-   };  
-
-//
-//This macro must placed before all of the self-defined headers
-//
 #if defined(_DEBUG)
 #	define ENG_NEW new(_NORMAL_BLOCK,__FILE__, __LINE__)
 #else
@@ -118,7 +99,8 @@ extern const int SCREEN_HEIGHT;
 
 #define ENG_ZERO_MEM( x ) memset(x, 0, sizeof( x ))
 #define ENG_ARRAY_SIZE( x ) ( sizeof( x ) )
-#define ENG_ARRAY_SIZE_IN_ELEMENTS( x ) ( sizeof( x ) / sizeof( x[ 0 ] ) )
+#define ENG_ARRAY_LENGTH( x ) ( sizeof( x ) / sizeof( x[ 0 ] ) )
+#define ENG_ARRAY_SIZE_PER_ELEMENT( x ) ( sizeof( x[ 0 ] ) )
 
 ///////////////////////
 //3rd party INCLUDES //

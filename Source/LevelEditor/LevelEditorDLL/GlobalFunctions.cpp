@@ -41,8 +41,8 @@ int EditorMain( int *pWindow, int screenWidth, int screenHeight )
    tmpDbgFlag |= _CRTDBG_LEAK_CHECK_DF;
 
    _CrtSetDbgFlag( tmpDbgFlag );
-
-   Logger::Init( "logging.xml" );
+   
+   EngLogger::Init( "logging.xml" );
 
    g_pApp->m_EngineOptions.Init( "EditorOptions.xml" );
    g_pApp->m_EngineOptions.SetScreenSize( Point( screenWidth, screenHeight ) );
@@ -60,7 +60,7 @@ void SingleLoop( void )
 void Shutdown( void )
    {
    g_pApp->OnClose();
-   Logger::Destroy();
+   EngLogger::Destroy();
    }
 
 void LoadLevel( BSTR levelPath )

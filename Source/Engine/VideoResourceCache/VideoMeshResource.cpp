@@ -33,7 +33,7 @@ VideoMeshResourceExtraData::~VideoMeshResourceExtraData( void )
    {
    if( m_BufferObjects.size() )
       {
-      unsigned int arrLen = ENG_ARRAY_SIZE_IN_ELEMENTS( m_BufferObjects[ 0 ] );
+      unsigned int arrLen = ENG_ARRAY_LENGTH( m_BufferObjects[ 0 ] );
          for( auto arry : m_BufferObjects )
             {
             glDeleteBuffers( arrLen, arry );
@@ -83,7 +83,7 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
  // //    LoadTexture( pAiMaterial, aiTextureType_REFLECTION );
  //     }
 
-   unsigned int arrayOfBuffersLen = ENG_ARRAY_SIZE_IN_ELEMENTS( pData->m_BufferObjects[ 0 ] );
+   unsigned int arrayOfBuffersLen = ENG_ARRAY_LENGTH( pData->m_BufferObjects[ 0 ] );
    for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
       {
       glGenBuffers( arrayOfBuffersLen, pData->m_BufferObjects[ meshIdx ] );

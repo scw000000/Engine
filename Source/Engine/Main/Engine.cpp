@@ -25,6 +25,7 @@
 #include "..\Animation\AnimationClipNode.h"
 #include "..\Animation\AnimationLerpNode.h"
 #include "..\Animation\AnimationState.h"
+#include "..\Controller\InputManager.h"
 #include "SDL_image.h"
 
 
@@ -322,7 +323,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 
    // initialize the directory location you can store save game files
 	_tcscpy_s( m_saveGameDirectory, GetSaveGameDirectory( GetHwnd(), VGetGameAppDirectory() ) );
-
+   
    //--------------------------------- 
    // Create game & view
    //--------------------------------- 
@@ -334,6 +335,19 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
    // Create game & view
    //--------------------------------- 
+   //--------------------------------- 
+   // Input Manager
+   //--------------------------------- 
+   int result= SInputManager::GetSingleton().Init( m_pEngineLogic->m_pGUIManager.get() );
+   ENG_ASSERT( result == S_OK );
+   if( !SInputManager::GetSingleton().m_pGUIManager )
+      {
+      int i = 0;
+      }
+   //--------------------------------- 
+   // Input Manager
+   //--------------------------------- 
+
    m_bIsRunning = true;
 
    return true;
@@ -428,7 +442,10 @@ void EngineApp::MsgProc( void )
          case SDL_CONTROLLERDEVICEADDED:
          case SDL_CONTROLLERDEVICEREMOVED:
          case SDL_CONTROLLERDEVICEREMAPPED:
-         m_pEngineLogic->VOnMsgProc( event );
+            if( !SInputManager::GetSingleton().VOnMsgProc( event ) )
+               {
+               m_pEngineLogic->VOnMsgProc( event );
+               }
          }
       
       }// If poll event exist
@@ -728,6 +745,7 @@ void EngineApp::OnClose()
    m_bIsRunning = false;
 	// release all the game systems in reverse order from which they were created
    ENG_LOG( "Test", "On close" );
+   SInputManager::DeleteSingleton();
 	SAFE_DELETE( m_pEngineLogic );
    SAFE_DELETE( m_pVideoResCache );
    IMG_Quit();

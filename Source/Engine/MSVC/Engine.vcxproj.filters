@@ -301,6 +301,9 @@
     <ClCompile Include="..\Debugging\EngLogger.cpp">
       <Filter>Debugging</Filter>
     </ClCompile>
+    <ClCompile Include="..\Controller\InputManager.cpp">
+      <Filter>Controller</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -559,6 +562,9 @@
     </ClInclude>
     <ClInclude Include="..\Main\Libs.h">
       <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Controller\InputManager.h">
+      <Filter>Controller</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

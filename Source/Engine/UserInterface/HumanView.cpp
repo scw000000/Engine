@@ -17,6 +17,7 @@
 #include "MenuInterface.h"
 #include "..\Graphics\Scene.h"
 #include "..\Controller\EditorController.h"
+#include "..\Controller\InputManager.h"
 
 const unsigned int SCREEN_MAX_FRAME_RATE = 60;
 const Uint64 SCREEN_MIN_RENDER_INTERVAL = ( SDL_GetPerformanceFrequency() / SCREEN_MAX_FRAME_RATE );
@@ -43,7 +44,7 @@ HumanView::HumanView( void )
 		m_pWorld->AddChild( INVALID_ACTOR_ID, m_pCamera );
       m_pWorld->SetCamera( m_pCamera );
       }
-   m_pController.reset( ENG_NEW EditorController( m_pCamera, 0.f, 0.f, true ) );
+   m_pController.reset( ENG_NEW EditorController( Singleton< InputManager >::GetSingleton(), m_pCamera, 0.f, 0.f, true ) );
    }
 
 HumanView::~HumanView()
@@ -84,45 +85,47 @@ int HumanView::VOnLostDevice()
 // let the controller handle the input event
 int HumanView::VOnMsgProc( SDL_Event event )
    {
-   // Iterate through the screen layers first
-	// In reverse order since we'll send input messages to the 
-	// screen on top
+   return 0;
 
-   if( m_pController && m_pController->VOnMsgProc( event ) )
-      {
-      return true;
-      }
+ //  // Iterate through the screen layers first
+	//// In reverse order since we'll send input messages to the 
+	//// screen on top
+ //  
+ //  if( m_pController && m_pController->VOnMsgProc( event ) )
+ //     {
+ //     return true;
+ //     }
 
-	// Inject userInput into controller here
-   switch ( event.type ) 
-	   {
-      case WM_KEYDOWN:
-			break;
-	
-        case WM_KEYUP:
-			break;
+	//// Inject userInput into controller here
+ //  switch ( event.type ) 
+	//   {
+ //     case WM_KEYDOWN:
+	//		break;
+	//
+ //       case WM_KEYUP:
+	//		break;
 
-		case WM_MOUSEMOVE:
-			break;
+	//	case WM_MOUSEMOVE:
+	//		break;
 
-		case WM_LBUTTONDOWN:
-			break;
+	//	case WM_LBUTTONDOWN:
+	//		break;
 
-		case WM_LBUTTONUP:
-			break;
+	//	case WM_LBUTTONUP:
+	//		break;
 
-		case WM_RBUTTONDOWN:
-			break;
+	//	case WM_RBUTTONDOWN:
+	//		break;
 
-		case WM_RBUTTONUP:
-			break;
-		case WM_CHAR:
-			break;
-		default:
-			return 0;
-	   }
+	//	case WM_RBUTTONUP:
+	//		break;
+	//	case WM_CHAR:
+	//		break;
+	//	default:
+	//		return 0;
+	//   }
 
-	return 0;
+	//return 0;
    }
 
 void HumanView::VOnUpdate( const unsigned long deltaMs )
@@ -130,7 +133,7 @@ void HumanView::VOnUpdate( const unsigned long deltaMs )
    static bool test = true;
    if( m_pController )
       {
-      m_pController->VOnTickUpdate( deltaMs );
+      m_pController->VOnTick( (float)deltaMs / 1000.f );
       }
    m_pProcessManager->UpdateProcesses( deltaMs );
    }

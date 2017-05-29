@@ -383,7 +383,7 @@ void MeshSceneNode::ReleaseResource( void )
    glDeleteVertexArrays( 1, &m_VAO );
    m_VAO = 0;
 
-   glDeleteBuffers( ENG_ARRAY_SIZE_IN_ELEMENTS( m_Buffers ), &m_Buffers[ 0 ] );
+   glDeleteBuffers( ENG_ARRAY_LENGTH( m_Buffers ), &m_Buffers[ 0 ] );
    ENG_ZERO_MEM( m_Buffers );
 
    glDeleteTextures( 1, &m_MeshTextureObj );

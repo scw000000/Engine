@@ -16,6 +16,7 @@
 #include "../Mainloop/ProcessManager.h"
 #include "../UserInterface/GUIManager.h"
 #include "../Actors/Actor.h"
+#include "../Controller/InputManager.h"
 
 class ActorFactory;
 

@@ -279,7 +279,7 @@ void VolumeRenderSceneNode::ReleaseResource( void )
    m_VAO = 0;
 
 
-   glDeleteBuffers( ENG_ARRAY_SIZE_IN_ELEMENTS( m_VBOs ), &m_VBOs[ 0 ] );
+   glDeleteBuffers( ENG_ARRAY_LENGTH( m_VBOs ), &m_VBOs[ 0 ] );
    ENG_ZERO_MEM( m_VBOs );
 
    glDeleteProgram( m_FirstPassProgram );

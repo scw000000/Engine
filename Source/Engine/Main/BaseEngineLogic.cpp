@@ -342,7 +342,7 @@ bool BaseEngineLogic::VLoadLevel()
       float x = random.Random() * ( 1421.f + 1290.f ) - 1290.f;
       float z = random.Random() * ( 634 + 565 ) - 565.f;
       TransformPtr pTransform( ENG_NEW Transform( Vec3( x, 20.f, z ) ) );
-      //VCreateActor( res, pTransform );
+      VCreateActor( res, pTransform );
       }
    return true;
    }

@@ -631,7 +631,7 @@ void DeferredMainRenderer::CalculateLighting( void )
 
    glDrawElements(
       GL_TRIANGLES,      // mode
-      ENG_ARRAY_SIZE_IN_ELEMENTS( QUAD_VERTEX_INDEX ),    // count
+      ENG_ARRAY_LENGTH( QUAD_VERTEX_INDEX ),    // count
       GL_UNSIGNED_SHORT,   // type
       ( void* ) 0           // element array buffer offset
       );

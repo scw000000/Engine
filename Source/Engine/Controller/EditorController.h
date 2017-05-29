@@ -29,12 +29,12 @@ class EditorController : public Controller
       * @param  smoothness float smoothness
       * @return
       */
-   EditorController( shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown, bool isMouseLocked = false, float smoothness = 0.7f );
+   EditorController( InputManager& manager, shared_ptr<SceneNode> object, float initialYaw, float initialPitch, bool rotateWhenLButtonDown, bool isMouseLocked = false, float smoothness = 0.7f );
 
       void SetObject( shared_ptr<SceneNode> newObject );
 
    protected:
-      virtual void VOnUpdate( unsigned long elapsedMs ) override;
+      virtual void VOnTick( float deltaSeconds ) override;
 
    protected:
       shared_ptr<SceneNode> m_pControllingObject;
@@ -46,7 +46,7 @@ class EditorController : public Controller
       float		m_CurrentSpeed;
       float    m_MsToMaxSpeed;
       float    m_Smoothness;
-      // Added for Ch19/20 refactor
+
       bool		m_isRotateWhenLButtonDown;
 
    };

@@ -38,7 +38,14 @@ class GUIManager
       void AttachLayout( shared_ptr<UserInterface> pUI );
       void DetachLayout( shared_ptr<UserInterface> pUI );
 
-      int  OnMsgProc( SDL_Event event ); // process the OS event
+      bool OnKeyDown( const SDL_Scancode& code );
+      bool OnKeyUp( const SDL_Scancode& code );
+
+      bool OnMouseMove( Point motion );
+      bool OnMouseButtonDown( Uint8 button );
+      bool OnMouseButtonUp( Uint8 button );
+
+      int  OnMsgProc( SDL_Event event );
 
       CEGUI::GUIContext* GetContext( void ) { return m_pContext; }
       
@@ -46,9 +53,10 @@ class GUIManager
       void SetDisplayMouseCursor( bool isDisplay );
 
    protected:
-      static CEGUI::Key::Scan SDLKeyToCEGUIKey( SDL_Keycode key );
+      static CEGUI::Key::Scan SDLScanToCEGUIScanCode( SDL_Scancode code );
       static CEGUI::MouseButton SDLButtonTOCEGUIButton( Uint8 button );
       bool OnMouseEntersArea( const CEGUI::EventArgs& arg );
+      bool HasModelWindow( void ) const { return m_pContext->getModalWindow() != NULL; }
 
    protected:
       static  CEGUI::OpenGL3Renderer* s_pRenderer;

@@ -67,6 +67,7 @@
       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);WIN32;_WINDOWS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <ProgramDataBaseFileName>$(OutDir)$(TargetName).pdb</ProgramDataBaseFileName>
+      <AdditionalOptions>-Zm111 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -119,6 +120,7 @@
     <ClCompile Include="..\Animation\BoneTransform.cpp" />
     <ClCompile Include="..\Controller\Controller.cpp" />
     <ClCompile Include="..\Controller\EditorController.cpp" />
+    <ClCompile Include="..\Controller\InputManager.cpp" />
     <ClCompile Include="..\Controller\MovementController.cpp" />
     <ClCompile Include="..\Debugging\EngLogger.cpp" />
     <ClCompile Include="..\Debugging\vsGLInfoLib.cpp" />
@@ -214,6 +216,7 @@
     <ClInclude Include="..\Animation\AnimationState.h" />
     <ClInclude Include="..\Animation\BoneTransform.h" />
     <ClInclude Include="..\Controller\Controller.h" />
+    <ClInclude Include="..\Controller\InputManager.h" />
     <ClInclude Include="..\Controller\EditorController.h" />
     <ClInclude Include="..\Controller\MovementController.h" />
     <ClInclude Include="..\Debugging\EngLogger.h" />

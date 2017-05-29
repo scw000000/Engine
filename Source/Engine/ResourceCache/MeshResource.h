@@ -13,8 +13,8 @@
  * \note
  */
 
-#include <assimp/cimport.h>
-#include <assimp/scene.h>
+#include "assimp/cimport.h"
+#include "assimp/scene.h"
 
 #define MAXIMUM_BONES_PER_ACTOR 100
 #define MAXIMUM_BONES_PER_VEREX 4

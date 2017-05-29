@@ -14,7 +14,7 @@ ProcessManager::~ProcessManager(void)
    ClearAllProcesses();
    }
 
-unsigned int ProcessManager::UpdateProcesses( unsigned long deltaMs )
+unsigned int ProcessManager::UpdateProcesses( float deltaSeconds )
    {
    unsigned short int successCount = 0;
    unsigned short int failCount = 0;
@@ -36,7 +36,7 @@ unsigned int ProcessManager::UpdateProcesses( unsigned long deltaMs )
 
       if( pCurrProcess->GetState() == Process::RUNNING )
          {
-         pCurrProcess->VOnUpdate( deltaMs );
+         pCurrProcess->VOnUpdate( deltaSeconds );
          }
       // This process is SUCCEED or FAILED or ABORTED
       // After necessary processing, remove it from the list

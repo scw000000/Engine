@@ -127,9 +127,9 @@ int SceneNode::VPreUpdate( Scene *pScene )
    return ret;
    }
 
-int SceneNode::VOnUpdate( Scene* pScene, unsigned long deltaMs )
+int SceneNode::VOnUpdate( Scene* pScene, float deltaSeconds )
    {
-   int ret = VDelegateUpdate( pScene, deltaMs );
+   int ret = VDelegateUpdate( pScene, deltaSeconds );
  
    if( ret != S_OK )
       {
@@ -138,7 +138,7 @@ int SceneNode::VOnUpdate( Scene* pScene, unsigned long deltaMs )
 
    for( auto it : m_Children )
       {
-      ret = it->VOnUpdate( pScene, deltaMs );
+      ret = it->VOnUpdate( pScene, deltaSeconds );
       if( ret != S_OK )
          {
          return ret;

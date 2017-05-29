@@ -44,7 +44,7 @@ bool AnimationLerpNode::VDelegateVInit( void )
    return true;
    }
 
-void AnimationLerpNode::VDelegateUpdate( unsigned long elapsedMs ) 
+void AnimationLerpNode::VDelegateUpdate( float deltaSeconds )
    {
    
    }

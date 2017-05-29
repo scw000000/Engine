@@ -24,7 +24,7 @@ class AnimationClipNode : public BaseAnimationNode< AnimationClipNode >
       virtual bool VDelegateBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) override;
       //AnimationClipNode( shared_ptr< MeshResourceExtraData > pMeshExtra, const std::string& clipName );
       virtual bool VDelegateVInit( void ) override;
-      virtual void VDelegateUpdate( unsigned long elapsedMs ) override;
+      virtual void VDelegateUpdate( float deltaSeconds ) override;
       virtual bool VGetLocalBoneTransform( BoneTransform& boneTransform, BoneId boneId ) const override;
       virtual void VSetTimePosition( float timePos ) override;
 

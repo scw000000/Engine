@@ -65,7 +65,7 @@ bool AnimationClipNode::VDelegateVInit( void )
       return false;
       }
    m_AiTicksPerMs = ( float ) ( m_pAnimation->mTicksPerSecond != 0 ? m_pAnimation->mTicksPerSecond : 25.f ) / 1000.f;
-   m_DurationInMs = ( float ) 1000.0 * m_pAnimation->mDuration / m_pAnimation->mTicksPerSecond;
+   m_DurationInMs = 1000.0f * ( float ) ( m_pAnimation->mDuration / m_pAnimation->mTicksPerSecond );
 
    for( unsigned int nodeIdx = 0; nodeIdx < m_pAnimation->mNumChannels; ++nodeIdx )
       {
@@ -95,9 +95,9 @@ bool AnimationClipNode::VDelegateVInit( void )
 //   m_CurrentAiTicks = 0.f;
 //   }
 
-void AnimationClipNode::VDelegateUpdate( unsigned long elapsedMs )
+void AnimationClipNode::VDelegateUpdate( float deltaSeconds )
    {
-   VAddTimeOffset( m_PlaybackRate * elapsedMs / m_DurationInMs );
+   VAddTimeOffset( m_PlaybackRate * deltaSeconds / m_DurationInMs );
    
    }
 

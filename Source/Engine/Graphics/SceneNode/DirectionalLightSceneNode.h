@@ -25,7 +25,7 @@ class DirectionalLightNode : public ILightNode
       virtual void VRenderShadowMap( shared_ptr< ISceneNode > pNode ) override;
       virtual void VPreRenderShadowMap( void ) override;
       // Update Frustum size here       
-      virtual int VDelegateUpdate( Scene *pScene, unsigned long elapsedMs ) override;
+      virtual int VDelegateUpdate( Scene *pScene, float deltaSeconds ) override;
       virtual bool VIsInside( const Vec3& worldPos, float radius = 0.f ) const override;
       virtual Mat4x4 VGetVPMatrix( void ) const override;
       virtual Mat4x4 VGetShadowMapMatrix( void ) const override;

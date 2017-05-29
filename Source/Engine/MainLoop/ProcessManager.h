@@ -14,7 +14,7 @@ class ProcessManager
    public:
       ~ProcessManager( void );
 
-      unsigned int UpdateProcesses( unsigned long deltaMs );
+      unsigned int UpdateProcesses( float deltaSeconds );
       WeakProcessPtr AttachProcess( StrongProcessPtr pProcess );
       void AbortAllProcesses( bool immediate );
       // acccessors

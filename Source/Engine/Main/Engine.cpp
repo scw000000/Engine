@@ -599,6 +599,7 @@ int EngineApp::EventFilter( void* userdata, SDL_Event* event )
       case SDL_TEXTINPUT:
       case SDL_KEYMAPCHANGED:
          break;
+      // to prevent SDL from spaming events
       case SDL_MOUSEMOTION:
          SInputManager::GetSingleton().VOnMouseMove( Point( event->motion.x, event->motion.y ) );
          return 0;

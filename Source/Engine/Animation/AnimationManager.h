@@ -21,7 +21,7 @@ class IAnimationManager : public ENG_Noncopyable
       virtual ~IAnimationManager( void ) { };
       virtual void VSetIsRunning( bool isRunning ) = 0;
       virtual bool VGetIsRunning( void ) const = 0;
-      virtual void VUpdate( unsigned long elapsedMs ) = 0;
+      virtual void VUpdate( float deltaSeconds ) = 0;
       virtual void VAddAnimationState( shared_ptr< AnimationState > pNewState ) = 0;
       virtual void VRemoveAnimationState( ActorId actorId ) = 0;
       virtual shared_ptr< AnimationState > VGetAnimationState( ActorId actorId ) const = 0;
@@ -36,7 +36,7 @@ class AnimationManager : public IAnimationManager
       static AnimationManager& GetSingleton( void );
       virtual void VSetIsRunning( bool isRunning ) override;
       virtual bool VGetIsRunning( void ) const override { return m_IsRunning; };
-      virtual void VUpdate( unsigned long elapsedMs ) override;
+      virtual void VUpdate( float deltaSeconds ) override;
       virtual void VAddAnimationState( shared_ptr< AnimationState > pNewState ) override;
       virtual void VRemoveAnimationState( ActorId actorId ) override;
       virtual shared_ptr< AnimationState > VGetAnimationState( ActorId actorId ) const override;

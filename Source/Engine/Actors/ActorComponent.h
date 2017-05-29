@@ -30,7 +30,7 @@ class IActorComponent
 
       virtual bool VInit( TiXmlElement* pData ) = 0;
       virtual void VPostInit( void ) = 0;
-      virtual void VUpdate( const unsigned long deltaMs ) = 0;
+      virtual void VUpdate( float deltaSeconds ) = 0;
       virtual void SetOwner( StrongActorPtr pOwner ) = 0;
       virtual void Destory( void ) = 0;
       virtual TiXmlElement* VGenerateXML( void ) = 0;
@@ -55,7 +55,7 @@ template <typename T>class BaseActorComponent : virtual public IActorComponent
       virtual ComponentRegisterId VGetRegisterId( void ) const override { return s_ComponentId; };
       virtual const std::string& VGetName( void ) const override { return s_Name; }
       virtual void VPostInit( void ) override {};
-      virtual void VUpdate( const unsigned long deltaMs ) override {};
+      virtual void VUpdate( float deltaSeconds ) override {};
       virtual const ChildComponents& VGetChildComponents( void ) const override { return m_ChildComponents; }
       virtual WeakActorComponentPtr VGetParentComponent( void ) override { return m_pParentComponent; }
       virtual ActorComponentId VGetActorComponentId( void ) const override { return m_ActorComponentId; }

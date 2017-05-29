@@ -32,7 +32,7 @@ class Scene
       int OnLostDevice( void );
       // For setting up global transform
       int PreUpdate( void );
-      int OnUpdate( unsigned long deltaMs );
+      int OnUpdate( float deltaSeconds );
       shared_ptr< ISceneNode > FindSceneNode( ActorId id );
       bool AddChild( ActorId id, shared_ptr< ISceneNode > pNode );
       bool RemoveChild( ActorId id );

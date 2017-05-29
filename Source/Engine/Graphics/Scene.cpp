@@ -114,7 +114,7 @@ int Scene::PreUpdate( void )
    return m_pRoot->VPreUpdate( this );
    }
 
-int Scene::OnUpdate( unsigned long deltaMs )
+int Scene::OnUpdate( float deltaSeconds )
    {
    PreUpdate();
 
@@ -123,10 +123,9 @@ int Scene::OnUpdate( unsigned long deltaMs )
 
    static double lastTime = GetGlobalTimer()->GetTime();
    double now = GetGlobalTimer()->GetTime();
-	unsigned long elapsedTime = (unsigned long) ( ( now - lastTime )* 1000.0 );
 	lastTime = now;
 
-	return m_pRoot->VOnUpdate( this, elapsedTime );
+   return m_pRoot->VOnUpdate( this, deltaSeconds );
    }
 
 shared_ptr< ISceneNode > Scene::FindSceneNode( ActorId id )

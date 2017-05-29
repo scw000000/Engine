@@ -128,14 +128,14 @@ int HumanView::VOnMsgProc( SDL_Event event )
 	//return 0;
    }
 
-void HumanView::VOnUpdate( const unsigned long deltaMs )
+void HumanView::VOnUpdate( float deltaSeconds )
    {
    static bool test = true;
    if( m_pController )
       {
-      m_pController->VOnTick( (float)deltaMs / 1000.f );
+      m_pController->VOnTick( deltaSeconds );
       }
-   m_pProcessManager->UpdateProcesses( deltaMs );
+   m_pProcessManager->UpdateProcesses( deltaSeconds );
    }
 
 void HumanView::AttachLayout( shared_ptr<UserInterface> pUI )

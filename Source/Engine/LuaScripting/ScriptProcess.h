@@ -27,7 +27,7 @@ class ScriptProcess : public Process
 
    protected:
       virtual void VOnInit( void ) override;
-      virtual void VOnUpdate( unsigned long deltaMs ) override;
+      virtual void VOnUpdate( float deltaSeconds ) override;
       virtual void VOnSuccess( void ) override;
       virtual void VOnFail( void ) override;
       virtual void VOnAbort( void ) override;

@@ -91,7 +91,7 @@ class IView
       virtual int VOnMsgProc( SDL_Event event ) = 0;
       virtual ViewType VGetType( void ) = 0;
       virtual ViewId VGetId( ) const = 0;
-      virtual void VOnUpdate( const unsigned long deltaMs ) = 0;
+      virtual void VOnUpdate( float deltaSeconds ) = 0;
       virtual void VOnAttach( ViewId vid ) = 0;
    };
 
@@ -109,7 +109,7 @@ class IEngineLogic
 	   //virtual void VSetProxy()=0;				
       virtual int VOnRestore( void ) = 0;
 	   virtual void VOnMsgProc( SDL_Event event ) = 0;
-      virtual void VOnUpdate( float time, float elapsedTime ) = 0;
+      virtual void VOnUpdate( float time, float deltaSeconds ) = 0;
       virtual void VOnRender( double fTime, float fElapsedTime ) = 0;
 	   virtual void VMoveActor( ActorId id, Mat4x4 const &mat ) = 0;
       virtual void VAddView( shared_ptr<IView> pView ) = 0;
@@ -323,8 +323,8 @@ class ISceneNode
 
       virtual int VPreUpdate( Scene *pScene ) = 0;
 
-	   virtual int VOnUpdate( Scene *pScene, unsigned long deltaMs ) = 0;
-      virtual int VDelegateUpdate( Scene *pScene, unsigned long elapsedMs ) = 0;
+      virtual int VOnUpdate( Scene *pScene, float deltaSeconds ) = 0;
+      virtual int VDelegateUpdate( Scene *pScene, float deltaSeconds ) = 0;
 
 	   virtual int VOnRestore( Scene *pScene ) = 0;
 

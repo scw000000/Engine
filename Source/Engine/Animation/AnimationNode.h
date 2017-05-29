@@ -24,8 +24,8 @@ class IAnimationNode
       virtual ~IAnimationNode( void ) {}
       virtual bool VInit( void ) = 0;
       virtual bool VDelegateVInit( void ) = 0;
-      virtual void VUpdate( unsigned long elapsedMs ) = 0;
-      virtual void VDelegateUpdate( unsigned long elapsedMs ) = 0;
+      virtual void VUpdate( float deltaSeconds ) = 0;
+      virtual void VDelegateUpdate( float deltaSeconds ) = 0;
       virtual void VSetTimePosition( float timePos ) = 0;
       virtual float VGetTimePosition( void ) const = 0;
       virtual void VAddTimeOffset( float offset ) = 0;
@@ -49,8 +49,8 @@ template <typename T>class BaseAnimationNode : public IAnimationNode, public Bas
       BaseAnimationNode( void );
       virtual bool VInit( void ) override;
       virtual bool VDelegateVInit( void ) override { return true; };
-      virtual void VUpdate( unsigned long elapsedMs ) final override;
-      virtual void VDelegateUpdate( unsigned long elapsedMs ) override {  };
+      virtual void VUpdate( float deltaSeconds ) final override;
+      virtual void VDelegateUpdate( float deltaSeconds ) override {  };
       virtual void VSetTimePosition( float timePos ) override;
       virtual float VGetTimePosition( void ) const override;
       /**
@@ -108,14 +108,14 @@ template <typename T> bool BaseAnimationNode<T>::VInit( void )
    return true;
    }
 
-template <typename T> void BaseAnimationNode<T>::VUpdate( unsigned long elapsedMs )
+template <typename T> void BaseAnimationNode<T>::VUpdate( float deltaSeconds )
    {
    if( m_IsRunning )
       {
-      VDelegateUpdate( elapsedMs );
+      VDelegateUpdate( deltaSeconds );
       for( auto pChildNode : m_ChildAnimNodes )
          {
-         pChildNode->VUpdate( elapsedMs );
+         pChildNode->VUpdate( deltaSeconds );
          }
       }
    }

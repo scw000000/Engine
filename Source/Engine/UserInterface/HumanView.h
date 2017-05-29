@@ -35,7 +35,7 @@ class HumanView : public IView
       virtual int VOnRestore( void ) override;
       virtual int VOnLostDevice( void );
       virtual int VOnMsgProc( SDL_Event event ) override; // process the OS event
-	   virtual void VOnUpdate( const unsigned long deltaMs ) override;
+	   virtual void VOnUpdate( float deltaSeconds ) override;
       
       void AttachLayout( shared_ptr<UserInterface> pUI );
       void DetachLayout( void );

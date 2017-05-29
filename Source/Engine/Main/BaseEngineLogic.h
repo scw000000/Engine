@@ -87,7 +87,7 @@ class BaseEngineLogic : public IEngineLogic
        * @param  elapsedTime float elapsedTime
        * @return void
        */
-      virtual void VOnUpdate( float time, float elapsedTime ) override;
+      virtual void VOnUpdate( float time, float deltaSeconds ) override;
       virtual void VOnRender( double fTime, float fElapsedTime ) override;
       virtual void VRenderDiagnostics( void ) const override;
 

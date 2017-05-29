@@ -124,8 +124,8 @@ class SceneNode : public ISceneNode
 
       virtual int VPreUpdate( Scene *pScene ) override;
 
-      virtual int VOnUpdate( Scene *pScene, unsigned long elapsedMs ) override;
-      virtual int VDelegateUpdate( Scene *pScene, unsigned long elapsedMs ) override { return S_OK; };
+      virtual int VOnUpdate( Scene *pScene, float deltaSeconds ) override;
+      virtual int VDelegateUpdate( Scene *pScene, float deltaSeconds ) override { return S_OK; };
 
 	   virtual int VPreRender( Scene *pScene ) override;
 	   virtual bool VIsVisible( Scene *pScene ) override;

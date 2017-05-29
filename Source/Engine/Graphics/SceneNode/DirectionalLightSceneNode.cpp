@@ -148,7 +148,7 @@ void DirectionalLightNode::VPreRenderShadowMap( void )
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    }
 
-int DirectionalLightNode::VDelegateUpdate( Scene *pScene, unsigned long elapsedMs )
+int DirectionalLightNode::VDelegateUpdate( Scene *pScene, float deltaSeconds )
    {
    auto pCamera = pScene->GetCamera();
    auto cameraFrustum = pCamera->GetFrustum();

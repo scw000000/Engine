@@ -33,7 +33,7 @@ class Actor
       void PostInit( void );
       // To break out the circular reference strongPtr chain of Actor & actorComponent
       void Destroy( void );
-      void Update( unsigned long deltaMs );
+      void Update( float deltaSeconds );
       TiXmlElement* BuildComponentXML( StrongActorComponentPtr pComponent );
       TiXmlElement* GenerateXML( void );
       TiXmlElement* BuildOverridesXML( StrongActorComponentPtr pComponent, TiXmlElement* pResouce );

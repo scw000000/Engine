@@ -78,13 +78,13 @@ void AnimationState::AddTimeOffset( float timeOffset )
    m_pRootAnimNode->VAddTimeOffset( timeOffset );
    }
 
-void AnimationState::Update( unsigned long elapsedMs )
+void AnimationState::Update( float deltaSeconds )
    {
    if( !m_pRootAnimNode )
       {
       return;
       }
-   m_pRootAnimNode->VUpdate( elapsedMs );
+   m_pRootAnimNode->VUpdate( deltaSeconds );
    UpdatetGlobalBoneTransform( m_pMeshExtraData->m_pScene->mRootNode, m_pMeshExtraData->m_GlobalInverseTransform );
    }
 

@@ -41,9 +41,9 @@ void ScriptProcess::VOnInit( void )
       }
    }
 
-void ScriptProcess::VOnUpdate( unsigned long deltaMs )
+void ScriptProcess::VOnUpdate( float deltaSeconds )
    {
-   m_Time += deltaMs;
+   m_Time += deltaSeconds;
    if( m_Time >= m_Frequency )
       {
       LuaPlus::LuaFunction< void* > func( m_ScriptUpdateFunction );

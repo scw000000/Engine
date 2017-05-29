@@ -62,11 +62,11 @@ void Actor::Destroy( void )
    m_Components.clear();
    }
 
-void Actor::Update( unsigned long deltaMs)
+void Actor::Update( float deltaSeconds )
    {
    for (ActorComponents::iterator it = m_Components.begin(); it != m_Components.end(); ++it)
       {
-      it->second->VUpdate(deltaMs);
+      it->second->VUpdate(deltaSeconds);
       }
    }
 

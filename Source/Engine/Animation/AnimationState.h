@@ -34,7 +34,7 @@ class AnimationState : public BaseScriptClass< AnimationState >
       float GetTimePosition( void ) const;
       void SetTimePosition( float newTimePos ); 
       void AddTimeOffset( float timeOffset );
-      void Update( unsigned long elapsedMs );
+      void Update( float deltaSeconds );
       void UpdatetGlobalBoneTransform( aiNode* pAiNode, const aiMatrix4x4& parentTransfrom );
       void SetIsRunning( bool isRunning );
       bool GetIsRunning( void ) const;

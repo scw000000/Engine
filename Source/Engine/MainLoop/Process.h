@@ -52,7 +52,7 @@ class Process
 
    protected:
       virtual void VOnInit( void ) { m_state = RUNNING; }
-      virtual void VOnUpdate( unsigned long deltaMs ) = 0;
+      virtual void VOnUpdate( float deltaSeconds ) = 0;
       virtual void VOnSuccess( void ) { }
       virtual void VOnFail( void ) { }
       virtual void VOnAbort( void ) { }

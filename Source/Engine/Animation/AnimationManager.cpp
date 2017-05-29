@@ -39,13 +39,13 @@ void AnimationManager::VSetIsRunning( bool isRunning )
       }
    }
 
-void AnimationManager::VUpdate( unsigned long elapsedMs ) 
+void AnimationManager::VUpdate( float deltaSeconds ) 
    {
    if( m_IsRunning )
       {
       for( auto pAnimStateIt : m_AnimationStates )
          {
-         pAnimStateIt.second->Update( elapsedMs );
+         pAnimStateIt.second->Update( deltaSeconds );
          }
       }
    }

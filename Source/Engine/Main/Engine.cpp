@@ -576,6 +576,7 @@ void EngineApp::ResetMousePosition( void )
 
 int EngineApp::EventFilter( void* userdata, SDL_Event* event )
    {
+   // ENG_LOG( "Test", ToStr( event->type ) );
    switch( event->type )
       {
       case SDL_WINDOWEVENT:
@@ -597,7 +598,11 @@ int EngineApp::EventFilter( void* userdata, SDL_Event* event )
       case SDL_TEXTEDITING:
       case SDL_TEXTINPUT:
       case SDL_KEYMAPCHANGED:
+         break;
       case SDL_MOUSEMOTION:
+         SInputManager::GetSingleton().VOnMouseMove( Point( event->motion.x, event->motion.y ) );
+         return 0;
+         break;
       case SDL_MOUSEBUTTONUP:
       case SDL_MOUSEWHEEL:
       case SDL_JOYAXISMOTION:

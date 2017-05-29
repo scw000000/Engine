@@ -140,6 +140,7 @@ int InputManager::Init( GUIManager* pManager )
 void InputManager::VOnMouseMove( Point motion )
    {
    m_CurMousePos = motion;
+   m_pGUIManager->OnMouseMove( motion );
    }
 
 bool InputManager::VOnMsgProc( const SDL_Event& event )
@@ -161,7 +162,6 @@ bool InputManager::VOnMsgProc( const SDL_Event& event )
       case SDL_MOUSEMOTION:
             {
             VOnMouseMove( Point( event.motion.x, event.motion.y ) );
-            m_pGUIManager->OnMouseMove( Point( event.motion.x, event.motion.y ) );
             return true;
             }
       case SDL_MOUSEBUTTONDOWN:

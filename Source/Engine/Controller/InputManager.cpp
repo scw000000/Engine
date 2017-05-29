@@ -28,8 +28,8 @@ int InputManager::Init( GUIManager* pManager )
       }
    m_CurMousePos = m_LastMousePos = g_pApp->GetMousePosition();
    m_MouseShift = Point( 0, 0 );
-   memset( &m_KeyState[ 0 ], 0x00, sizeof( ENG_ARRAY_SIZE_PER_ELEMENT( m_KeyState ) * SDL_NUM_SCANCODES ) );
-   memset( &m_MouseButtonState[ 0 ], 0x00, sizeof( ENG_ARRAY_SIZE_PER_ELEMENT( m_KeyState ) ) * 256 );
+   ENG_ZERO_MEM( m_KeyState );
+   ENG_ZERO_MEM( m_MouseButtonState );
    return S_OK;
    /*s_ValidScanCodes[ 0 ] = SDL_SCANCODE_BACKSPACE;
    s_ValidScanCodes[ 1 ] = SDL_SCANCODE_TAB;
@@ -150,26 +150,31 @@ bool InputManager::VOnMsgProc( const SDL_Event& event )
             {
             VOnKeyDown( event.key.keysym.scancode );
             m_KeyState[ event.key.keysym.scancode ].m_bIsMasked = m_pGUIManager->OnKeyDown( event.key.keysym.scancode );
+            return true;
             }
       case SDL_KEYUP:
             {
             VOnKeyUp( event.key.keysym.scancode );
             m_KeyState[ event.key.keysym.scancode ].m_bIsMasked = m_pGUIManager->OnKeyUp( event.key.keysym.scancode );
+            return true;
             }
       case SDL_MOUSEMOTION:
             {
             VOnMouseMove( Point( event.motion.x, event.motion.y ) );
             m_pGUIManager->OnMouseMove( Point( event.motion.x, event.motion.y ) );
+            return true;
             }
       case SDL_MOUSEBUTTONDOWN:
             {
             VOnMouseButtonDown( event.button.button );
             m_KeyState[ event.button.button ].m_bIsMasked = m_pGUIManager->OnMouseButtonDown( event.button.button );
+            return true;
             }
       case SDL_MOUSEBUTTONUP:
             {
             VOnMouseButtonUp( event.button.button );
             m_KeyState[ event.button.button ].m_bIsMasked = m_pGUIManager->OnMouseButtonUp( event.button.button );
+            return true;
             }
       case SDL_MOUSEWHEEL:
             return true;

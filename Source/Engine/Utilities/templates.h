@@ -57,11 +57,12 @@ template < typename T > class Singleton : public ENG_Noncopyable
    public:
       static T& GetSingleton( void )
          {
-         ENG_ASSERT( m_bHasBeenCreated == false && "The singleton class cannot be create-release more then once" );
-         if( !m_pInstance && !m_bHasBeenCreated )
+         if( !m_pInstance )
             {
+            ENG_ASSERT( m_bHasBeenCreated == false && "The singleton class cannot be create-release more then once" );
             m_pInstance = ENG_NEW T;
             ENG_ASSERT( m_pInstance );
+            m_bHasBeenCreated = true;
             }
          return *m_pInstance;
          }

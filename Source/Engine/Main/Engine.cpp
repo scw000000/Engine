@@ -340,10 +340,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    //--------------------------------- 
    int result= SInputManager::GetSingleton().Init( m_pEngineLogic->m_pGUIManager.get() );
    ENG_ASSERT( result == S_OK );
-   if( !SInputManager::GetSingleton().m_pGUIManager )
-      {
-      int i = 0;
-      }
+
    //--------------------------------- 
    // Input Manager
    //--------------------------------- 

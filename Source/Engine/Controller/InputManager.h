@@ -37,8 +37,8 @@ class InputManager : public IInputManager
       int Init( GUIManager* pManager );
 
       // Keyboard 
-      virtual void VOnKeyDown( const SDL_Scancode& keyCode )  override { m_KeyState[ keyCode ].m_bIsDown = false; }
-      virtual void VOnKeyUp( const SDL_Scancode& keyCode ) override { m_KeyState[ keyCode ].m_bIsDown = true; }
+      virtual void VOnKeyDown( const SDL_Scancode& keyCode )  override { m_KeyState[ keyCode ].m_bIsDown = true; }
+      virtual void VOnKeyUp( const SDL_Scancode& keyCode ) override { m_KeyState[ keyCode ].m_bIsDown = false; }
 
       // Mouse
       virtual void VOnMouseMove( Point motion ) override;
@@ -71,9 +71,7 @@ class InputManager : public IInputManager
       Point             m_MouseShift;
       
       std::unordered_set< shared_ptr< IController > > m_Controllers;
-      public:
       GUIManager*       m_pGUIManager;
-
       static std::vector< SDL_Scancode > s_ValidScanCodes;
    private:
    };

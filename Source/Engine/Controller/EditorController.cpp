@@ -28,7 +28,7 @@ EditorController::EditorController( InputManager& manager,
                                     m_pControllingObject( object ),
                                     m_pTransform( ENG_NEW Transform( object->VGetProperties().GetLocalTransform() ) )
    {
-   m_MaxSpeed = 40.0f / 1000.f;			// 40 meters per Ms
+   m_MaxSpeed = 40.f;	
    m_CurrentSpeed = 0.0f;
    m_MsToMaxSpeed = 1.5f;
    m_Smoothness = std::max( 0.0f, std::min( 0.99f, smoothness ) );
@@ -43,8 +43,8 @@ void EditorController::VOnTick( float deltaSeconds )
    auto& mouseShift = m_InputManager.VGetMouseShift();
    if( !m_isRotateWhenLButtonDown || ( m_isRotateWhenLButtonDown && ( m_InputManager.VIsMouseButtonDown( SDL_BUTTON_LEFT ) ) ) )
       {
-      m_TargetRotShift.x += 0.001f * ( ( float ) mouseShift.y );
-      m_TargetRotShift.y += -0.001f * ( ( float ) mouseShift.x );
+      m_TargetRotShift.x += 1.f * ( ( float ) mouseShift.y );
+      m_TargetRotShift.y += -1.f * ( ( float ) mouseShift.x );
       }
    if( m_isRotateWhenLButtonDown )
       {
@@ -127,7 +127,7 @@ void EditorController::VOnTick( float deltaSeconds )
       // Ramp the acceleration by the elapsed time.
       float numberOfSeconds = 2.f;
       // a = maxV * numOfSeconds -> after numOfSecconds the scene node will reach max speed
-      m_CurrentSpeed += m_MaxSpeed * ( deltaSeconds / m_MsToMaxSpeed );
+      m_CurrentSpeed += m_MaxSpeed * ( deltaSeconds / ( m_MsToMaxSpeed / 1000.f ) );
       //	m_CurrentSpeed += m_MaxSpeed * ( (deltaSeconds * deltaSeconds) / numberOfSeconds);
       if( m_CurrentSpeed > m_MaxSpeed )
          {

@@ -44,7 +44,7 @@ HumanView::HumanView( void )
 		m_pWorld->AddChild( INVALID_ACTOR_ID, m_pCamera );
       m_pWorld->SetCamera( m_pCamera );
       }
-   m_pController.reset( ENG_NEW EditorController( Singleton< InputManager >::GetSingleton(), m_pCamera, 0.f, 0.f, true ) );
+   m_pController.reset( ENG_NEW EditorController( SInputManager::GetSingleton(), m_pCamera, 0.f, 0.f, true ) );
    }
 
 HumanView::~HumanView()

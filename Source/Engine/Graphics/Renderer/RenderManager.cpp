@@ -41,7 +41,7 @@ int OpenGLRenderManager::VPreRender( void )
    return S_OK;
    }
 
-int OpenGLRenderManager::VPostRenderNodes( Scene* pScene )
+int OpenGLRenderManager::VLightingPass( Scene* pScene )
    {
    auto screensize = g_pApp->GetScreenSize();
    float xSize = 300.f;
@@ -52,6 +52,26 @@ int OpenGLRenderManager::VPostRenderNodes( Scene* pScene )
 
    m_MainRenderer.LightCulling( pScene );
    m_MainRenderer.CalculateLighting();
+   return S_OK;
+   }
+
+int OpenGLRenderManager::VSSAOPass( void )
+   {
+   return S_OK;
+   }
+
+int OpenGLRenderManager::VMotionBlurPass( void )
+   {
+   return S_OK;
+   }
+
+int OpenGLRenderManager::VBloomPass( void )
+   {
+   return S_OK;
+   }
+
+int OpenGLRenderManager::VToneMappingPass( void )
+   {
    return S_OK;
    }
 

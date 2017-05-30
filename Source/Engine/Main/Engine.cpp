@@ -589,7 +589,8 @@ int EngineApp::EventFilter( void* userdata, SDL_Event* event )
             }
          break;
       case SDL_KEYDOWN:
-         if( SInputManager::GetSingleton().m_KeyState[ event->key.keysym.scancode ].m_bIsDown )
+         // filter out repeat key down
+         if( event->key.repeat )
             {
             return 0;
             }

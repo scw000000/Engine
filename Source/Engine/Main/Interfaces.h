@@ -297,7 +297,11 @@ class IRenderManager
       virtual int VInit( void ) = 0;
       virtual int VOnRestore( Scene* pScene ) = 0;
       virtual int VPreRender( void ) = 0;
-      virtual int VPostRenderNodes( Scene* pScene ) = 0;
+      virtual int VLightingPass( Scene* pScene ) = 0;
+      virtual int VSSAOPass( void ) = 0;
+      virtual int VMotionBlurPass( void ) = 0;
+      virtual int VBloomPass( void ) = 0;
+      virtual int VToneMappingPass( void ) = 0;
       virtual int VPostRender( void ) = 0;
       virtual void VShutDown( void ) = 0;
       virtual IMainRenderer& VGetMainRenderer( void ) = 0;

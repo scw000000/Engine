@@ -75,6 +75,7 @@ int Scene::OnRender( void )
 		m_pCamera->SetViewTransform( this );
 		m_pLightManager->CalcLighting( this );
       m_pRenderManager->VGetMainRenderer().VLoadLight( m_pLightManager->m_ActiveLights );
+      // Base pass rendering
 		if ( m_pRoot->VPreRender( this ) == S_OK )
 		   {
 			m_pRoot->VRender( this );
@@ -82,7 +83,6 @@ int Scene::OnRender( void )
 			m_pRoot->VPostRender( this );
 		   }
 		RenderAlphaPass();
-      m_pRenderManager->VPostRenderNodes( this );
 	   }
 	return S_OK;
    }

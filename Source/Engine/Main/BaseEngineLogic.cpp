@@ -246,9 +246,14 @@ void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )
       {
       pView->VOnRender( fTime, fElapsedTime );
       }
-   //Render GUI last
-   // m_pGUIManager->OnRender( fTime, fElapsedTime );
+   m_pRenderManager->VLightingPass( m_pWrold.get() );
+   m_pRenderManager->VSSAOPass();
+   m_pRenderManager->VMotionBlurPass();
+   m_pRenderManager->VBloomPass();
+   m_pRenderManager->VToneMappingPass();
    VRenderDiagnostics();
+   //Render GUI last
+   m_pGUIManager->OnRender( fTime, fElapsedTime );
    m_pRenderManager->VPostRender();
    }
 

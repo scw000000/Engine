@@ -40,8 +40,8 @@ MeshSceneNode::MeshSceneNode( const ActorId actorId,
                               : SceneNode( actorId, pRenderComponent, renderGroup, pTransform ),
                               m_pMaterial( pMaterial ), 
                               m_pMeshResource( pMeshResouce ),
-                              m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
-                              m_FragmentShader( Resource( FRAGMENT_SHADER_FILE_NAME ) )
+                              m_VertexShader( shared_ptr< Resource >( ENG_NEW Resource( VERTEX_SHADER_FILE_NAME ) ) ),
+                              m_FragmentShader( shared_ptr< Resource >( ENG_NEW Resource( FRAGMENT_SHADER_FILE_NAME ) ) )
    {
    m_Program = 0;
 
@@ -90,11 +90,19 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );*/
 
-   m_MeshTextureObj = VideoTextureResourceLoader::LoadAndReturnTextureObject( m_pMaterial->m_DiffuseTextureRes );
+   m_MeshTextureObj = VideoTextureResourceLoader::LoadAndReturnTextureObject( m_pMaterial->m_pDiffuseTextureRes );
 
-   if( m_pMaterial->m_NormalTextureRes.m_Name.size() )
+   if( m_pMaterial->m_pNormalTextureRes && m_pMaterial->m_pNormalTextureRes->m_Name.size() )
       {
-      m_NormalMapTextureObj = VideoTextureResourceLoader::LoadAndReturnTextureObject( m_pMaterial->m_NormalTextureRes );
+      // This is a dirty fix, some of the normal texture file name in sponza scene are wrong
+      // They are set to diffuse texture, so here I only replace them to the correct ones
+      int startIdx = m_pMaterial->m_pNormalTextureRes->m_Name.find( "diff.tga" );
+      if( startIdx != std::string::npos )
+         {
+         m_pMaterial->m_pNormalTextureRes->m_Name.replace( startIdx, 7, "ddn.tga" );
+         m_pMaterial->m_pNormalTextureRes->m_Name.pop_back();
+         }
+      m_NormalMapTextureObj = VideoTextureResourceLoader::LoadAndReturnTextureObject( m_pMaterial->m_pNormalTextureRes );
       m_UseNormalMap = true;
       }
    else
@@ -110,7 +118,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    
    //OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
 
-   auto pMeshResData = VideoMeshResourceLoader::LoadAndReturnMeshResourceExtraData( *m_pMeshResource );
+   auto pMeshResData = VideoMeshResourceLoader::LoadAndReturnMeshResourceExtraData( m_pMeshResource );
    SetRadius( pMeshResData->m_Radius[ meshIdx ] );
    m_VerticesIndexCount = pMeshResData->m_MeshCount[ meshIdx ][ VideoMeshResourceExtraData::MeshCount_Index ];
    m_Buffers[ Vertex_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Vertex ];

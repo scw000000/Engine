@@ -43,8 +43,8 @@ int TextureResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize,
       return false;
       }
    SDL_Surface* p_Surface = NULL;
-   auto exten = handle->GetResource().GetExtension();
-   if( handle->GetResource().GetExtension().compare( "tga" ) ) // SDL cannot detect TGA file format
+   auto exten = handle->GetResource()->GetExtension();
+   if( handle->GetResource()->GetExtension().compare( "tga" ) ) // SDL cannot detect TGA file format
       {
       p_Surface = IMG_Load_RW( p_RWops, 0 );
       }
@@ -70,9 +70,9 @@ int TextureResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize,
 	return S_OK;
    }
 
-SDL_Surface* TextureResourceLoader::LoadAndReturnSurface( const Resource& resource )
+SDL_Surface* TextureResourceLoader::LoadAndReturnSurface( shared_ptr< Resource > pResource )
    {
-   shared_ptr<ResHandle> pTextureResHandle = g_pApp->m_pResCache->GetHandle( resource );
+   shared_ptr<ResHandle> pTextureResHandle = g_pApp->m_pResCache->GetHandle( pResource );
    shared_ptr< SDLTextureResourceExtraData > pTextureExtra = static_pointer_cast< SDLTextureResourceExtraData >( pTextureResHandle->GetExtraData() );
    return pTextureExtra->m_pSurface;
    }

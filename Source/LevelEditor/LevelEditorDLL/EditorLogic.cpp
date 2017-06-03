@@ -25,11 +25,11 @@ EditorLogic::EditorLogic( shared_ptr< IRenderManager > pRenderManager ) : BaseEn
 
 void EditorLogic::VOnFileDrop( const char* filePath, const Point& dropLocation )
    {
-   Resource fileRes( filePath );
+   shared_ptr< Resource > pFileRes( ENG_NEW Resource( filePath ) );
    // std::string extension = fileRes.GetExtension();
-   if( WildcardMatch( "*.xml", fileRes.m_Name.c_str() ) )
+   if( WildcardMatch( "*.xml", pFileRes->m_Name.c_str() ) )
       {
-      TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( fileRes );
+      TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( pFileRes );
       std::string rootName = pRoot->Value();
       TransformPtr pTransform( m_pWrold->GetCamera()->VGetProperties().GetTransformPtr() );
       Vec3 projStart;
@@ -38,12 +38,12 @@ void EditorLogic::VOnFileDrop( const char* filePath, const Point& dropLocation )
       pTransform->SetPosition( projEnd );
       if( !std::strcmp( rootName.c_str(), "ActorClass" ) )
          {
-         VCreateActor( fileRes, pTransform );
+         VCreateActor( pFileRes, pTransform );
          }
       else if( !std::strcmp( rootName.c_str(), "World" ) )
          {
          VClearWorld();
-         std::string newLevelInstanceDir = fileRes.GetFileName();
+         std::string newLevelInstanceDir = pFileRes->GetFileName();
          VLoadLevel();
          }
       }
@@ -64,7 +64,7 @@ void EditorLogic::VSaveActor( ActorId id )
       {
       return;
       }
-   TiXmlElement* pResource = XmlResourceLoader::LoadAndReturnRootXmlElement( *actorIt->second->m_pActorClassResource );
+   TiXmlElement* pResource = XmlResourceLoader::LoadAndReturnRootXmlElement( actorIt->second->m_pActorClassResource );
    TiXmlElement* pOverrides = actorIt->second->GenerateOverridesXML( pResource );
 
    if( actorIt->second->m_pActorInstanceResource ) // this actor is not drag-drop generated

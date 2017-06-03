@@ -34,7 +34,7 @@ bool VolumeRenderComponent::VDelegateInit( TiXmlElement* pData )
    auto pVolumeTextureRes = pData->FirstChildElement( "VolumeTexture" );
    if( pVolumeTextureRes )
       {
-      m_pVolumeTextureResource->Init( pVolumeTextureRes );
+      m_pVolumeTextureResource->VInit( pVolumeTextureRes );
       auto pDimensionElement = pVolumeTextureRes->FirstChildElement( "TextureDimension" );
       if( pDimensionElement )
          {
@@ -51,7 +51,7 @@ bool VolumeRenderComponent::VDelegateInit( TiXmlElement* pData )
    auto pTransferFuncionTextureRes = pData->FirstChildElement( "TransferFunction" );
    if( pTransferFuncionTextureRes )
       {
-      m_pTransferFuncionResource->Init( pTransferFuncionTextureRes );
+      m_pTransferFuncionResource->VInit( pTransferFuncionTextureRes );
       }
    
    return true;
@@ -66,20 +66,20 @@ void VolumeRenderComponent::VDelegatePostInit( void )
 
 void VolumeRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement ) 
    {
-   auto pVolumeTexture = m_pVolumeTextureResource->GenerateXML();
+   auto pVolumeTexture = m_pVolumeTextureResource->VGenerateXML();
    pVolumeTexture->SetValue( "VolumeTexture" );
 
-   auto pTextureDimension = m_TextureDimension.GernerateXML();
+   auto pTextureDimension = m_TextureDimension.GenerateXML();
    pTextureDimension->SetValue( "TextureDimension" );
    pVolumeTexture->LinkEndChild( pTextureDimension );
 
-   auto pCuboidDimension = m_CuboidDimension.GernerateXML();
+   auto pCuboidDimension = m_CuboidDimension.GenerateXML();
    pCuboidDimension->SetValue( "CuboidDimension" );
    pVolumeTexture->LinkEndChild( pCuboidDimension );
 
    pBaseElement->LinkEndChild( pVolumeTexture );
 
-   auto pTransferFunction = m_pTransferFuncionResource->GenerateXML();
+   auto pTransferFunction = m_pTransferFuncionResource->VGenerateXML();
    pTransferFunction->SetValue( "TransferFunction" );
    pBaseElement->LinkEndChild( pVolumeTexture );
    }

@@ -36,7 +36,7 @@ MeshRenderComponent::MeshRenderComponent( void ) : m_pMeshResource( ENG_NEW Reso
 // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
 shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
    {
-   auto pScene = MeshResourceLoader::LoadAndReturnScene( *m_pMeshResource );
+   auto pScene = MeshResourceLoader::LoadAndReturnScene( m_pMeshResource );
    shared_ptr< SceneNode > pMeshRootNode( ENG_NEW SceneNode( m_pOwner->GetId(), this, RenderGroup_Actor, m_pTransform ) );
 
    std::queue< std::pair< shared_ptr< SceneNode >, aiNode* > > nodeQueue;
@@ -48,9 +48,9 @@ shared_ptr<SceneNode> MeshRenderComponent::VCreateSceneNode( void )
    for( unsigned int i = 0; i < pScene->mNumMeshes; ++i )
       {
       pMaterials.push_back( MaterialPtr( ENG_NEW Material( pScene, i, filePath ) ) );
-      if( pMaterials[ i ]->m_DiffuseTextureRes.m_Name.size() == 0 )
+      if( !pMaterials[ i ]->m_pDiffuseTextureRes )
          {
-         pMaterials[ i ]->m_DiffuseTextureRes = m_pMaterial->m_DiffuseTextureRes;
+         pMaterials[ i ]->m_pDiffuseTextureRes = m_pMaterial->m_pDiffuseTextureRes;
          }
       }
    while( nodeQueue.size() )
@@ -101,7 +101,7 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
       }
 
    // Set mesh file path
-   m_pMeshResource->Init( pData->FirstChildElement( "Mesh" ) );
+   m_pMeshResource->VInit( pData->FirstChildElement( "Mesh" ) );
 
    m_pMaterial->Init( pData->FirstChildElement( "Material" ) );
 
@@ -118,7 +118,7 @@ bool MeshRenderComponent::VDelegateInit( TiXmlElement* pData )
 
 void MeshRenderComponent::VDelegatePostInit( void )
    {
-   auto pAiScene = MeshResourceLoader::LoadAndReturnScene( *m_pMeshResource );
+   auto pAiScene = MeshResourceLoader::LoadAndReturnScene( m_pMeshResource );
    auto pMesh = pAiScene->mMeshes[ 0 ];
 
    auto pShpereAttr = static_pointer_cast< BulletSpherePhysicsAttributes >( m_pPhysicsAttributes );
@@ -128,7 +128,7 @@ void MeshRenderComponent::VDelegatePostInit( void )
 
 void MeshRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )
    {
-   TiXmlElement* pMesh = m_pMeshResource->GenerateXML();
+   TiXmlElement* pMesh = m_pMeshResource->VGenerateXML();
    pMesh->SetValue( "Mesh" );
    pBaseElement->LinkEndChild( pMesh );
 
@@ -138,7 +138,7 @@ void MeshRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )
 
 void MeshRenderComponent::VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode )
    {
-   TiXmlElement* pMesh = m_pMeshResource->GenerateOverridesXML( pResourceNode->FirstChildElement( "Mesh" ) );
+   TiXmlElement* pMesh = m_pMeshResource->VGenerateOverridesXML( pResourceNode->FirstChildElement( "Mesh" ) );
    pMesh->SetValue( "Mesh" );
    pBaseElement->LinkEndChild( pMesh );
 

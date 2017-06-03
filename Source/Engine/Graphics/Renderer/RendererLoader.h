@@ -31,10 +31,10 @@ struct VertexToBoneMapping
 class OpenGLRendererLoader
    {
    public:
-      static void LoadTexture2D( GLuint* textureId, const Resource& pTextureResource );
+      static void LoadTexture2D( GLuint* textureId, shared_ptr< Resource > pTextureResource );
       static void LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, GLuint* pIndexBuffer, GLuint* pNormalBuffer, shared_ptr<ResHandle> pMeshResHandle );
       static void LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMeshResHandle );
-      static void CompileAndLoadShader( GLuint& shaderObj, const Resource& shaderRes, GLuint shaderType );
+      static void CompileAndLoadShader( GLuint& shaderObj, shared_ptr< Resource > pResource, GLuint shaderType );
       static GLuint GenerateProgram( const std::vector< GLuint >& shderObjs );
       static GLuint GenerateProgram( const std::vector< shared_ptr< OpenGLShader > >& shderObjs );
    };

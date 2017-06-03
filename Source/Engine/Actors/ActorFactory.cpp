@@ -25,27 +25,27 @@ ActorFactory::ActorFactory( void )
 
 // This version of function is different than the source code
 // Including function arguments LATER: modify it and let it consistant
-StrongActorPtr ActorFactory::CreateActor( const Resource& classRes, const Resource* pOverridesRes, TransformPtr pInitialTransform /*= NULL*/, ActorId serversActorId /*= INVALID_ACTOR_ID */ )
+StrongActorPtr ActorFactory::CreateActor( shared_ptr< Resource > pClassResource, shared_ptr< Resource > pOverridesRes, TransformPtr pInitialTransform /*= NULL*/, ActorId serversActorId /*= INVALID_ACTOR_ID */ )
    {  
-   TiXmlElement* pActorClassNode = XmlResourceLoader::LoadAndReturnRootXmlElement( classRes );
+   TiXmlElement* pActorClassNode = XmlResourceLoader::LoadAndReturnRootXmlElement( pClassResource );
    
    if( !pActorClassNode )
       {
-      ENG_ERROR( "Failed to read actor class resource: " + classRes.m_Name );
+      ENG_ERROR( "Failed to read actor class resource: " + pClassResource->m_Name );
       return StrongActorPtr();
       }
 
    ActorId nextActorId = GetNextActorId();
    if( nextActorId == INVALID_ACTOR_ID )
       {
-      ENG_ERROR( "Actor ID generation failed: " + classRes.m_Name );
+      ENG_ERROR( "Actor ID generation failed: " + pClassResource->m_Name );
       }
 
    TiXmlElement* pActorClassDataNode = pActorClassNode->FirstChildElement( "Data" );
    StrongActorPtr pActor( ENG_NEW Actor( nextActorId ) );
    if( !pActor->Init( pActorClassDataNode ) )
       {
-      ENG_ERROR( "Failed to initialize actor " + classRes.m_Name );
+      ENG_ERROR( "Failed to initialize actor " + pClassResource->m_Name );
       }
    
    TiXmlElement* pFirstResComponentNode = pActorClassDataNode->NextSiblingElement();
@@ -66,7 +66,7 @@ StrongActorPtr ActorFactory::CreateActor( const Resource& classRes, const Resour
 
    if( pOverridesRes )
       {
-      TiXmlElement* pOverridesNode = XmlResourceLoader::LoadAndReturnRootXmlElement( *pOverridesRes );
+      TiXmlElement* pOverridesNode = XmlResourceLoader::LoadAndReturnRootXmlElement( pOverridesRes );
       pActor->m_pActorInstanceResource.reset( ENG_NEW Resource( pOverridesRes->m_Name ) );
       // Resource loading failed, return empty pointer
       if( !pOverridesNode )

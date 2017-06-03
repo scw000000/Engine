@@ -49,9 +49,9 @@ bool SkeletalMeshRenderComponent::VDelegateInit( TiXmlElement* pData )
       }
 
    // Set mesh file path
-   m_pSkeletalMeshResource->Init( pData->FirstChildElement( "SkeletalMesh" ) );
+   m_pSkeletalMeshResource->VInit( pData->FirstChildElement( "SkeletalMesh" ) );
 
-   m_pAnimScriptResource->Init( pData->FirstChildElement( "AnimationScript" ) );
+   m_pAnimScriptResource->VInit( pData->FirstChildElement( "AnimationScript" ) );
 
    m_pMaterial->Init( pData->FirstChildElement( "Material" ) );
 
@@ -68,7 +68,7 @@ bool SkeletalMeshRenderComponent::VDelegateInit( TiXmlElement* pData )
 
 void SkeletalMeshRenderComponent::VDelegatePostInit( void )
    {
-   auto pAiScene = MeshResourceLoader::LoadAndReturnScene( *m_pSkeletalMeshResource );
+   auto pAiScene = MeshResourceLoader::LoadAndReturnScene( m_pSkeletalMeshResource );
    auto pMesh = pAiScene->mMeshes[ 0 ];
 
    auto pShpereAttr = static_pointer_cast< BulletSpherePhysicsAttributes >( m_pPhysicsAttributes );
@@ -78,11 +78,11 @@ void SkeletalMeshRenderComponent::VDelegatePostInit( void )
 
 void SkeletalMeshRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )
    {
-   TiXmlElement* pMesh = m_pSkeletalMeshResource->GenerateXML();
+   TiXmlElement* pMesh = m_pSkeletalMeshResource->VGenerateXML();
    pMesh->SetValue( "SkeletalMesh" );
    pBaseElement->LinkEndChild( pMesh );
 
-   TiXmlElement* pAnim = m_pAnimScriptResource->GenerateXML();
+   TiXmlElement* pAnim = m_pAnimScriptResource->VGenerateXML();
    pAnim->SetValue( "AnimationScript" );
    pBaseElement->LinkEndChild( pAnim );
 
@@ -92,7 +92,7 @@ void SkeletalMeshRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseEleme
 
 void SkeletalMeshRenderComponent::VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode )
    {
-   TiXmlElement* pMesh = m_pSkeletalMeshResource->GenerateOverridesXML( pResourceNode->FirstChildElement( "SkeletalMesh" ) );
+   TiXmlElement* pMesh = m_pSkeletalMeshResource->VGenerateOverridesXML( pResourceNode->FirstChildElement( "SkeletalMesh" ) );
    pMesh->SetValue( "SkeletalMesh" );
    pBaseElement->LinkEndChild( pMesh );
 

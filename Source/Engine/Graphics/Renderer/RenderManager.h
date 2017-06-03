@@ -33,6 +33,23 @@ class OpenGLRenderManager : public IRenderManager
     //  virtual void VCheckError( void ) const override;
       static void CheckError( void );
    protected:
+      int OnRestoreTextures( void );
+
+   protected:
+
+      enum ScreenSpaceTextures
+         {
+         SST_Depth,
+         SST_MRT0,
+         SST_MRT1,
+#ifdef _DEBUG
+         SST_TileDebugging,
+#endif // _DEBUG   
+         SST_Num
+         };
+
+      GLuint m_SST[ SST_Num ];
+
       DeferredMainRenderer m_MainRenderer;
       TextureRenderer m_TextureDrawer;
    };

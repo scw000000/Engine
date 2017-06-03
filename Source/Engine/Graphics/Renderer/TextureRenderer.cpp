@@ -39,8 +39,8 @@ const GLfloat QUAD_UV_POSITION[] = {
 const unsigned short QUAD_VERTEX_INDEX[] = { 0, 1, 2, 0, 2, 3 };
 
 TextureRenderer::TextureRenderer( void ) : 
-   m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
-   m_FragmentShader( Resource( FRAGMENT_SHADER_FILE_NAME ) )
+   m_VertexShader( shared_ptr< Resource >( ENG_NEW Resource( VERTEX_SHADER_FILE_NAME ) ) ),
+   m_FragmentShader( shared_ptr< Resource >( ENG_NEW Resource( FRAGMENT_SHADER_FILE_NAME ) ) ) 
    {
    m_Program = 0;
 

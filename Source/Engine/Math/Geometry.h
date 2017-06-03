@@ -137,7 +137,7 @@ class Vec3 : public glm::vec3
          return ( glm::cross<float, glm::highp>( (*this), b ) );
          }
       bool Init( TiXmlElement* pData );
-      TiXmlElement* GernerateXML( void ) const;
+      TiXmlElement* GenerateXML( void ) const;
       TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource ) const;
 
    public:

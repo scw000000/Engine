@@ -41,9 +41,9 @@ bool SkyRenderComponent::VDelegateInit( TiXmlElement* pData )
       {
       return false;
       }
-   m_pMeshResource->Init( pData->FirstChildElement( "Mesh" ) );
+   m_pMeshResource->VInit( pData->FirstChildElement( "Mesh" ) );
 
-   m_pTextureResource->Init( pData->FirstChildElement( "Texture" ) );
+   m_pTextureResource->VInit( pData->FirstChildElement( "Texture" ) );
    return true;
    }
 
@@ -75,22 +75,22 @@ shared_ptr<SceneNode> SkyRenderComponent::VCreateSceneNode( void )
 
 void SkyRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )
    {
-   TiXmlElement* pMesh = m_pMeshResource->GenerateXML();
+   TiXmlElement* pMesh = m_pMeshResource->VGenerateXML();
    pMesh->SetValue( "Mesh" );
    pBaseElement->LinkEndChild( pMesh );
 
-   TiXmlElement* pTexture = m_pTextureResource->GenerateXML();
+   TiXmlElement* pTexture = m_pTextureResource->VGenerateXML();
    pTexture->SetValue( "Texture" );
    pBaseElement->LinkEndChild( pTexture );
    }
 
 void SkyRenderComponent::VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode )
    {
-   TiXmlElement* pMesh = m_pMeshResource->GenerateOverridesXML( pResourceNode->FirstChildElement( "Mesh" ) );
+   TiXmlElement* pMesh = m_pMeshResource->VGenerateOverridesXML( pResourceNode->FirstChildElement( "Mesh" ) );
    pMesh->SetValue( "Mesh" );
    pBaseElement->LinkEndChild( pMesh );
 
-   TiXmlElement* pTextrue = m_pTextureResource->GenerateOverridesXML( pResourceNode->FirstChildElement( "Texture" ) );
+   TiXmlElement* pTextrue = m_pTextureResource->VGenerateOverridesXML( pResourceNode->FirstChildElement( "Texture" ) );
    pTextrue->SetValue( "Texture" );
    pBaseElement->LinkEndChild( pTextrue );
    }

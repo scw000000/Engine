@@ -81,13 +81,13 @@ ActorId CreateActor( BSTR classFilePath )
    {
    std::string classFile = ws2s( std::wstring( classFilePath, SysStringLen( classFilePath ) ) );
    g_pApp->SetWindowFocus();
-   Resource classRes( classFile );
+   shared_ptr< Resource > pClassRes( ENG_NEW Resource( classFile ) );
    TransformPtr pTransform( g_pApp->m_pEngineLogic->m_pWrold->GetCamera()->VGetProperties().GetTransformPtr() );
    Vec3 projStart;
    Vec3 projEnd;
    g_pApp->m_pEngineLogic->m_pWrold->GetCamera()->GetScreenProjectPoint( projStart, projEnd, g_pApp->GetMousePosition(), 17.f );
    pTransform->SetPosition( projEnd );
-   auto actorPtr = g_pApp->m_pEngineLogic->VCreateActor( classFile, pTransform );
+   auto actorPtr = g_pApp->m_pEngineLogic->VCreateActor( pClassRes, pTransform );
    return actorPtr ? actorPtr->GetId(): INVALID_ACTOR_ID;
    }
 

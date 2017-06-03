@@ -16,7 +16,7 @@
 #include "assimp/cimport.h"
 #include "assimp/postprocess.h"
 
-Material::Material( void ) : m_DiffuseTextureRes( "art\\default.jpg" )
+Material::Material( void ) : m_pDiffuseTextureRes( ENG_NEW VideoTextureResource( "art\\default.jpg", false, true ) )
    {
    m_Diffuse = g_White;        
    m_Ambient = Color( 0.20f, 0.20f, 0.20f, 1.0f );       
@@ -42,7 +42,7 @@ Material::Material( const aiScene* pAiScene, unsigned int meshIndex, const std::
       pAiMateral->GetTexture( aiTextureType_DIFFUSE, 0, &relFilePath );
       std::string fullPath( filePath );
       fullPath.append( relFilePath.C_Str() );
-      m_DiffuseTextureRes = Resource( fullPath );
+      m_pDiffuseTextureRes = shared_ptr< VideoTextureResource >( ENG_NEW VideoTextureResource( fullPath, false, true ) );
       }
 
    typeCount = pAiMateral->GetTextureCount( aiTextureType_NORMALS );
@@ -53,7 +53,7 @@ Material::Material( const aiScene* pAiScene, unsigned int meshIndex, const std::
       pAiMateral->GetTexture( aiTextureType_NORMALS, 0, &relFilePath );
       std::string fullPath( filePath );
       fullPath.append( relFilePath.C_Str() );
-      m_NormalTextureRes = Resource( fullPath );
+      m_pNormalTextureRes = shared_ptr< VideoTextureResource >( ENG_NEW VideoTextureResource( fullPath, false, false ) );
       }
    }
 
@@ -63,7 +63,7 @@ bool Material::Init( TiXmlElement* pData )
       {
       return false;
       }
-   m_DiffuseTextureRes.Init( pData->FirstChildElement( "Texture" ) );
+   m_pDiffuseTextureRes->VInit( pData->FirstChildElement( "Texture" ) );
 
    m_Diffuse.Init( pData->FirstChildElement( "Diffuse" ) );
 
@@ -72,9 +72,9 @@ bool Material::Init( TiXmlElement* pData )
    return true;
    }
 
-void Material::SetTextureResource( const Resource& newTexture )
+void Material::SetTextureResource( shared_ptr< VideoTextureResource > pResource )
    {
-   m_DiffuseTextureRes = newTexture;
+   m_pDiffuseTextureRes = pResource;
    }
 
 void Material::SetAmbient( const Color &color )
@@ -118,7 +118,7 @@ TiXmlElement* Material::GenerateXML( void )
    {
    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Material" );
 
-   TiXmlElement* pTexture = m_DiffuseTextureRes.GenerateXML();
+   TiXmlElement* pTexture = m_pDiffuseTextureRes->VGenerateXML();
    pTexture->SetValue( "Texture" );
    pRetNode->LinkEndChild( pTexture );
 
@@ -137,7 +137,7 @@ TiXmlElement* Material::GenerateOverridesXML( TiXmlElement* pResource )
    {
    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Material" );
    
-   TiXmlElement* pTexture = m_DiffuseTextureRes.GenerateOverridesXML( pResource->FirstChildElement( "Texture" ) );
+   TiXmlElement* pTexture = m_pDiffuseTextureRes->VGenerateOverridesXML( pResource->FirstChildElement( "Texture" ) );
    pTexture->SetValue( "Texture" );
    pRetNode->LinkEndChild( pTexture );
 

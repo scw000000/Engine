@@ -12,20 +12,36 @@
  *
  * \note
 */
+#include "..\ResourceCache\ResourceCache.h"
 class VideoResourceCache;
+
+class VideoTextureResource : public Resource
+   {
+   public:
+      VideoTextureResource( const std::string &name = "", bool caseSensitive = false, bool bIsSRGB = false );
+      virtual bool VInit( TiXmlElement* pData, bool caseSensitive = false ) override;
+      virtual TiXmlElement* VGenerateXML( void ) override;
+      virtual TiXmlElement* VGenerateOverridesXML( TiXmlElement* pResource ) override;
+
+
+   public:
+      bool m_bIsSRGB;
+   };
+
+   
 
 class VideoResourceHandle
    {
    friend class VideoResourceCache;
    public:
-      VideoResourceHandle( const Resource &resource, unsigned int size, VideoResourceCache *pResCache );
+      VideoResourceHandle( shared_ptr< Resource > pResource, unsigned int size, VideoResourceCache *pResCache );
       unsigned int GetSize( void ) const { return m_Size; }
 
       shared_ptr< IVideoResourceExtraData > GetExtraData() const { return m_Extra; }
       void SetExtraData( shared_ptr< IVideoResourceExtraData > extra ) { m_Extra = extra; }
 
    protected:
-      Resource m_Resource;
+      shared_ptr< Resource > m_pResource;
       unsigned int m_Size;
       shared_ptr< IVideoResourceExtraData > m_Extra;
       VideoResourceCache *m_pResCache;
@@ -56,16 +72,16 @@ class VideoResourceCache
       // Note that the DefaultResourceLoader is last one in the list, so any loader will match before it if the file format is supported
       template< typename T > void RegisterLoader( void );
 
-      shared_ptr< VideoResourceHandle > GetHandle( const Resource& resource );
+      shared_ptr< VideoResourceHandle > GetHandle( shared_ptr< Resource > pResource );
       //int Preload( const std::string pattern, void( *progressCallback )( int, bool & ) );
       void Flush( void );
       // std::vector<std::string> Match( const std::string pattern );
       //bool IsFileExist( const Resource& resource );
 
    protected:
-      shared_ptr< VideoResourceHandle > Find( const Resource& resource );
+      shared_ptr< VideoResourceHandle > Find( shared_ptr< Resource > pResource );
       void Update( shared_ptr< VideoResourceHandle > handle );
-      shared_ptr< VideoResourceHandle > Load( const Resource& resource );
+      shared_ptr< VideoResourceHandle > Load( shared_ptr< Resource > pResource );
       void Free( shared_ptr< VideoResourceHandle > gonner );
 
      // bool MakeRoom( unsigned int size );

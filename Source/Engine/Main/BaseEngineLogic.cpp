@@ -101,21 +101,21 @@ void BaseEngineLogic::VAddView( shared_ptr<IView> pView )
 	pView->VOnRestore(); 
    }
 
-StrongActorPtr BaseEngineLogic::VCreateActor( const Resource& actorRes, TransformPtr pTransform, ActorId serversActorId )
+StrongActorPtr BaseEngineLogic::VCreateActor( shared_ptr< Resource > pActorRes, TransformPtr pTransform, ActorId serversActorId )
    {
    ENG_ASSERT( m_pActorFactory );
-   Resource actorClassRes = actorRes;
-   const Resource* pActorOverridesRes = NULL;
-   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( actorRes );
+   shared_ptr< Resource > actorClassRes = pActorRes;
+   shared_ptr< Resource > pActorOverridesRes;
+   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( pActorRes );
    std::string rootName = pRoot->Value();
 
    if( !std::strcmp( rootName.c_str(), "ActorInstance" ) ) // If this file is overrides file, find the actor class res
       {
-      TiXmlHandle actorClassResHandle = XmlResourceLoader::LoadAndReturnRootXmlElement( actorRes );
+      TiXmlHandle actorClassResHandle = XmlResourceLoader::LoadAndReturnRootXmlElement( pActorRes );
       TiXmlElement* pActorClassReshNode = actorClassResHandle.FirstChild( "Data" ).FirstChild( "ActorClassResource" ).ToElement();
       ENG_ASSERT( pActorClassReshNode );
-      actorClassRes = Resource( pActorClassReshNode->Attribute( "path" ) );
-      pActorOverridesRes = &actorRes;
+      actorClassRes = shared_ptr< Resource >( ENG_NEW Resource( pActorClassReshNode->Attribute( "path" ) ) );
+      pActorOverridesRes = pActorRes;
       }
 
    StrongActorPtr pActor = m_pActorFactory->CreateActor( actorClassRes, pActorOverridesRes, pTransform );
@@ -270,13 +270,12 @@ void BaseEngineLogic::VRenderDiagnostics( void ) const
 bool BaseEngineLogic::VLoadLevel()
    {
    m_pLevelManager->Init();
-
-   Resource levelRes( m_pLevelManager->GetCurrentLevel() );
+   shared_ptr< Resource > pLevelRes( ENG_NEW Resource( m_pLevelManager->GetCurrentLevel() ) );
     // Grab the root XML node
-   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( levelRes );
+   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( pLevelRes );
    if (!pRoot)
       { 
-      ENG_ERROR( "Failed to find level resource file: " + levelRes.m_Name );
+      ENG_ERROR( "Failed to find level resource file: " + pLevelRes->m_Name );
       return false;
       }
 
@@ -295,8 +294,7 @@ bool BaseEngineLogic::VLoadLevel()
     // load the pre-load script if there is one
    if (preLoadScript)
       {
-      Resource resource( preLoadScript );
-      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );  // this actually loads the XML file from the zip file
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( shared_ptr< Resource >( ENG_NEW Resource( preLoadScript ) ) );  // this actually loads the XML file from the zip file
       }
 
     // load all initial actors
@@ -306,8 +304,7 @@ bool BaseEngineLogic::VLoadLevel()
       for ( TiXmlElement* pNode = pActorsNode->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
          {
          std::string actorFileName = pNode->Attribute( "actorinstance" );
-         Resource overridesResource( g_pApp->m_EngineOptions.GetFullActorInstanceDirectory() + actorFileName );
-         StrongActorPtr pActor = VCreateActor( overridesResource );
+         StrongActorPtr pActor = VCreateActor( shared_ptr< Resource >( ENG_NEW Resource( g_pApp->m_EngineOptions.GetFullActorInstanceDirectory() + actorFileName ) ) );
        //  StrongActorPtr pActor = VCreateActorFromOverrides( overridesResource );
 			if ( pActor )
 			   {
@@ -337,17 +334,15 @@ bool BaseEngineLogic::VLoadLevel()
     // load the post-load script if there is one
    if ( postLoadScript )
       {
-      Resource resource( postLoadScript );
-      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );  // this actually loads the XML file from the zip file
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( shared_ptr< Resource >( ENG_NEW Resource( postLoadScript ) ) );  // this actually loads the XML file from the zip file
       }
    ENGRandom random;
-   Resource res( "actors\\light.xml" );
    for( int i = 0; i < 100; ++i )
       {
       float x = random.Random() * ( 1421.f + 1290.f ) - 1290.f;
       float z = random.Random() * ( 634 + 565 ) - 565.f;
       TransformPtr pTransform( ENG_NEW Transform( Vec3( x, 20.f, z ) ) );
-      VCreateActor( res, pTransform );
+      VCreateActor( shared_ptr< Resource >( ENG_NEW Resource( "actors\\light.xml" ) ), pTransform );
       }
    return true;
    }
@@ -419,12 +414,12 @@ void BaseEngineLogic::VGameStart( void )
 
 void BaseEngineLogic::ReInitWorld( void )
    {
-   Resource levelRes( ( m_pLevelManager->GetCurrentLevel() ).c_str() );
+   shared_ptr< Resource > levelRes( ENG_NEW Resource( ( m_pLevelManager->GetCurrentLevel() ).c_str() ) );
    // Grab the root XML node
    TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( levelRes );
    if( !pRoot )
       {
-      ENG_ERROR( "Failed to find level resource file: " + levelRes.m_Name );
+      ENG_ERROR( "Failed to find level resource file: " + levelRes->m_Name );
       //return false;
       }
 
@@ -443,17 +438,18 @@ void BaseEngineLogic::ReInitWorld( void )
    // load the pre-load script if there is one
    if( preLoadScript )
       {
-      Resource resource( preLoadScript );
-      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );  // this actually loads the XML file from the zip file
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( shared_ptr< Resource >( ENG_NEW Resource( preLoadScript ) ) );  // this actually loads the XML file from the zip file
       }
 
    for( auto actorIt : m_Actors )
       {
-      TiXmlElement* pActorData = XmlResourceLoader::LoadAndReturnRootXmlElement( actorIt.second->m_pActorClassResource->m_Name );
+      TiXmlElement* pActorData = XmlResourceLoader::LoadAndReturnRootXmlElement( 
+         shared_ptr< Resource >( ENG_NEW Resource( actorIt.second->m_pActorClassResource->m_Name ) ) );
       m_pActorFactory->ModifyActor( actorIt.second, pActorData );
       if( actorIt.second->m_pActorInstanceResource )
          {
-         pActorData = XmlResourceLoader::LoadAndReturnRootXmlElement( actorIt.second->m_pActorInstanceResource->m_Name );
+         pActorData = XmlResourceLoader::LoadAndReturnRootXmlElement( 
+            shared_ptr< Resource >( ENG_NEW Resource( actorIt.second->m_pActorInstanceResource->m_Name ) ) );
          m_pActorFactory->ModifyActor( actorIt.second, pActorData );
          }
       }
@@ -478,8 +474,7 @@ void BaseEngineLogic::ReInitWorld( void )
    // load the post-load script if there is one
    if( postLoadScript )
       {
-      Resource resource( postLoadScript );
-      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource ); 
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( shared_ptr< Resource >( ENG_NEW Resource( postLoadScript ) ) );
       }
 
    //return true;

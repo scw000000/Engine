@@ -71,5 +71,5 @@ class MeshResourceLoader : public ResourceLoader
 	   virtual unsigned int VGetLoadedResourceSize( char *rawBuffer, unsigned int rawSize ) override ;
 	   virtual int VLoadResource( char *rawBuffer, unsigned int rawSize, shared_ptr<ResHandle> handle ) override ;
       virtual bool VUsePreAllocate( void ) const override { return false; }
-      static const aiScene* LoadAndReturnScene( const Resource& resource );
+      static const aiScene* LoadAndReturnScene( shared_ptr< Resource > pResource );
    };

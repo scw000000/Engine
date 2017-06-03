@@ -25,10 +25,10 @@ class Resource
       std::string GetExtension( void ) const;
       std::string GetFileName( void ) const;
       std::string GetPath( void ) const;
-      bool Init( TiXmlElement* pData, bool caseSensitive = false );
-      TiXmlElement* GenerateXML( void );
-      TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource );
-
+      virtual bool VInit( TiXmlElement* pData, bool caseSensitive = false );
+      virtual TiXmlElement* VGenerateXML( void );
+      virtual TiXmlElement* VGenerateOverridesXML( TiXmlElement* pResource );
+      ~Resource( void ) {};
    public:
       std::string m_Name;
    };
@@ -41,7 +41,7 @@ class ResHandle
    friend class ResourceCache;
 
    public:
-      ResHandle( const Resource &resource, char *buffer, unsigned int size, ResourceCache *pResCache );
+      ResHandle( shared_ptr< Resource > pResource, char *buffer, unsigned int size, ResourceCache *pResCache );
       virtual ~ResHandle();
 
       unsigned int GetSize( void ) const { return m_Size; }
@@ -50,10 +50,10 @@ class ResHandle
      // char *WritableBuffer() { return m_pBuffer; }
       shared_ptr<IResourceExtraData> GetExtraData() const { return m_Extra; }
       void SetExtraData( shared_ptr<IResourceExtraData> extra ) { m_Extra = extra; }
-      const Resource& GetResource( void ) const { return m_Resource; }
+      shared_ptr< Resource > GetResource( void ) const { return m_pResource; }
 
    protected:
-      Resource m_Resource;
+      shared_ptr< Resource > m_pResource;
       char *m_pBuffer;
       unsigned int m_Size;
       shared_ptr<IResourceExtraData> m_Extra;
@@ -105,17 +105,17 @@ class ResourceCache
       // Note that the DefaultResourceLoader is last one in the list, so any loader will match before it if the file format is supported
       template< typename T > void RegisterLoader( void );
 
-      shared_ptr< ResHandle > GetHandle( const Resource& resource );
+      shared_ptr< ResHandle > GetHandle( shared_ptr< Resource > pResource );
       int Preload( const std::string pattern, void (*progressCallback)( int, bool & ) );
       void Flush( void );
       bool IsUsingDevelopmentDirectories( void ) const { ENG_ASSERT( m_pResourceFile ); return m_pResourceFile->VIsUsingDevelopmentDirectories(); }
       std::vector<std::string> Match( const std::string pattern );
-      bool IsFileExist( const Resource& resource );
+      bool IsFileExist( shared_ptr< Resource > pResource );
 
    protected:
-      shared_ptr< ResHandle > Find( const Resource& resource );
+      shared_ptr< ResHandle > Find( shared_ptr< Resource > pResource );
       void Update( shared_ptr< ResHandle > handle  );
-      shared_ptr< ResHandle > Load( const Resource& resource );
+      shared_ptr< ResHandle > Load( shared_ptr<Resource > pResource );
       void Free( shared_ptr< ResHandle > gonner );
 
       bool MakeRoom( unsigned int size );
@@ -153,8 +153,8 @@ class ResourceZipFile : public IResourceFile
 	   ~ResourceZipFile();
 
 	   virtual bool VOpen() override;
-      virtual int VGetRawResourceSize( const Resource &r ) override;
-      virtual int VGetRawResource( const Resource &r, char *buffer ) override;
+      virtual int VGetRawResourceSize( shared_ptr< Resource > pResource ) override;
+      virtual int VGetRawResource( shared_ptr< Resource > pResource, char *buffer ) override;
       virtual int VGetNumResources() const override;
       virtual std::string VGetResourceName( int num ) const override;
       virtual bool VIsUsingDevelopmentDirectories( void ) const { return false; }

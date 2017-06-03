@@ -28,6 +28,6 @@ class VideoTextureResourceLoader : public VideoResourceLoader
    public:
       VideoTextureResourceLoader( void );
       virtual int VLoadResource( shared_ptr<ResHandle> handle, shared_ptr< VideoResourceHandle > videoHandle ) override;
-      static GLuint LoadAndReturnTextureObject( const Resource& resource );
+      static GLuint LoadAndReturnTextureObject( shared_ptr< VideoTextureResource > pResource );
    };
 

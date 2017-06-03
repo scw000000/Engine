@@ -20,17 +20,17 @@ class IShader
       virtual void VOnRestore( void ) = 0;
       virtual void VReleaseShader( GLuint program ) = 0;
     //  virtual GLuint VGetShaderObject( void ) const = 0;
-      virtual void VSetResource( const Resource& resource ) = 0;
+      virtual void VSetResource( shared_ptr< Resource > pResource ) = 0;
    };
 
 class OpenGLShader : public IShader
    {
    public:
-      OpenGLShader( const Resource& shaderResource );
+      OpenGLShader( shared_ptr< Resource > pShaderResource );
       
       virtual void VReleaseShader( GLuint program ) override;
       virtual GLuint GetShaderObject( void ) const { return m_ShaderObj; };
-      virtual void VSetResource( const Resource& resource ) override { m_ShaderResource = resource; }
+      virtual void VSetResource( shared_ptr< Resource > pResource ) override { m_pShaderResource = pResource; }
 
    protected:
       void CompileAndSetShader( GLuint shaderType );
@@ -38,13 +38,13 @@ class OpenGLShader : public IShader
 
    protected:
       GLuint m_ShaderObj;
-      Resource m_ShaderResource;
+      shared_ptr< Resource > m_pShaderResource;
    };
 
 class VertexShader : public OpenGLShader
    {
    public:
-      VertexShader( const Resource& shaderResource = Resource( "" ) );
+      VertexShader( shared_ptr< Resource > pResource );
 	   ~VertexShader( void );
       // This function is called in SceneNode::Onrestore
       // reload and compile vertex shader
@@ -55,7 +55,7 @@ class VertexShader : public OpenGLShader
 class FragmentShader : public OpenGLShader
    {
    public:
-      FragmentShader( const Resource& shaderResource = Resource( "" ) );
+      FragmentShader( shared_ptr< Resource > pResource );
 	   ~FragmentShader( void );
       // This function is called in SceneNode::Onrestore
       // reload and compile fragment shader
@@ -65,7 +65,7 @@ class FragmentShader : public OpenGLShader
 class ComputeShader : public OpenGLShader
    {
       public:
-      ComputeShader( const Resource& shaderResource = Resource( "" ) ) : OpenGLShader( shaderResource ) {};
+      ComputeShader( shared_ptr< Resource > pResource ) : OpenGLShader( pResource ) {};
       ~ComputeShader( void ) {};
       // This function is called in SceneNode::Onrestore
       // reload and compile fragment shader

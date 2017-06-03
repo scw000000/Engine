@@ -10,6 +10,9 @@
 
 #define MAX_SHININESS 25.0f
 
+#define GAMMA 22.0f
+#define INVERSE_GAMMA 1.0f / 22.0f
+
 struct Light
 {
     //--------------------------------------------------------------
@@ -211,18 +214,18 @@ void main()
     uint listOffset = LightIdxGridSSBO.data[ tileIdx * 2u ];
     uint listLength = LightIdxGridSSBO.data[ tileIdx * 2u + 1u ];
 
-    oColor = vec4( 0.0, 0.0, 0.0, 1.0 );
+    vec3 outputColor = vec3( 0.0, 0.0, 0.0 );
 
     // calculate each light in light list
     for( uint i = 0; i < listLength; ++i )
         {
        // if( LightIdxListSSBO.data[ listOffset + i ] > 0 )
         //    {
-          //  oColor.xyz = vec3( 0.0, 1.0, 0.0 );
+          //  outputColor = vec3( 0.0, 1.0, 0.0 );
         //    break;
         //    }
         //Light light = LightPropsSSBO.data[ LightIdxListSSBO.data[ listOffset + i ] ];
-        oColor.xyz += CalcLight(    LightIdxListSSBO.data[ listOffset + i ], 
+        outputColor += CalcLight(    LightIdxListSSBO.data[ listOffset + i ], 
                                 meshPosVS, 
                                 normal, 
                                 diffuse, 
@@ -231,15 +234,21 @@ void main()
                                 shininess );
     
         }
-    oColor.xyz += albedo * 0.2;
+    outputColor += albedo * 0.2;
+    
+    // doing the tone mapping
+    outputColor = outputColor / ( outputColor + vec3( 0.187 ) ) * 1.035;
+    
+    // outputColor = pow( outputColor, GAMMA_VALUE );
    // if( listLength == 2 )
   //      {
-    //    oColor.xyz = vec3( 0.0, 1.0, 0.0 );
+    //    outputColor = vec3( 0.0, 1.0, 0.0 );
    //     }
-  //  oColor.xyz += vec3( 0.2 );
-  // oColor.xyz = diffuse;
-   // oColor = vec4( vUV * 2.0 - vec2( 1.0, 1.0), 0.0, 1.0 );
-  // oColor = vec4( meshPosVS.xyz, 1.0 );
-    oColor.a = 1.0;
+  //  outputColor += vec3( 0.2 );
+  // outputColor = diffuse;
+   // outputColor = vec4( vUV * 2.0 - vec2( 1.0, 1.0), 0.0, 1.0 );
+  // outputColor = vec4( meshPosVS.xyz, 1.0 );
+  
+    oColor = vec4( outputColor, 1.0f );
     }
 

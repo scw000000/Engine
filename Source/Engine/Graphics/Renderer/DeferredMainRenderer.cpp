@@ -54,15 +54,16 @@ const GLfloat QUAD_UV_POSITION[] = {
 
 const unsigned short QUAD_VERTEX_INDEX[] = { 0, 1, 2, 0, 2, 3 };
 
-DeferredMainRenderer::DeferredMainRenderer( void )
+DeferredMainRenderer::DeferredMainRenderer( void ) : 
+   m_TileFrustumShader( shared_ptr< Resource >( ENG_NEW Resource( TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME ) ) )
    {
-   m_Shaders[ RenderPass_Geometry ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( Resource( GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME ) ) ) );
-   m_Shaders[ RenderPass_Geometry ].push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( Resource( GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ) );
+   m_Shaders[ RenderPass_Geometry ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( shared_ptr< Resource >( ENG_NEW Resource( GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME ) ) ) ) );
+   m_Shaders[ RenderPass_Geometry ].push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( shared_ptr< Resource >( ENG_NEW Resource( GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ) ) );
 
-   m_Shaders[ RenderPass_LightCulling ].push_back( shared_ptr< OpenGLShader >( ENG_NEW ComputeShader( Resource( LIGHT_CULL_COMPUTE_SHADER_FILE_NAME ) ) ) );
+   m_Shaders[ RenderPass_LightCulling ].push_back( shared_ptr< OpenGLShader >( ENG_NEW ComputeShader( shared_ptr< Resource >( ENG_NEW Resource( LIGHT_CULL_COMPUTE_SHADER_FILE_NAME ) ) ) ) );
    
-   m_Shaders[ RenderPass_Lighting ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( Resource( LIGHT_PASS_VERTEX_SHADER_FILE_NAME ) ) ) );
-   m_Shaders[ RenderPass_Lighting ].push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( Resource( LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ) );
+   m_Shaders[ RenderPass_Lighting ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( shared_ptr< Resource >( ENG_NEW Resource( LIGHT_PASS_VERTEX_SHADER_FILE_NAME ) ) ) ) );
+   m_Shaders[ RenderPass_Lighting ].push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( shared_ptr< Resource >( ENG_NEW Resource( LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ) ) );
 
    //m_VertexShaders[ RenderPass_LightCalc ].VSetResource( Resource( LIGHT_PASS_VERTEX_SHADER_FILE_NAME ) );
    //m_FragmentShaders[ RenderPass_LightCalc ].VSetResource( Resource( LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME ) );
@@ -70,8 +71,6 @@ DeferredMainRenderer::DeferredMainRenderer( void )
    m_Uniforms[ RenderPass_Geometry ] = std::vector< GLuint >( GeometryPassUni_Num, -1 );
    m_Uniforms[ RenderPass_LightCulling ] = std::vector< GLuint >( LightCullPassUni_Num, -1 );
    m_Uniforms[ RenderPass_Lighting ] = std::vector< GLuint >( LightingPassUni_Num, -1 );
-
-   m_TileFrustumShader.VSetResource( Resource( TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME ) );
 
    ENG_ZERO_MEM( m_SSBOs );
 
@@ -103,8 +102,6 @@ int DeferredMainRenderer::VOnRestore( Scene* pScene )
    ReleaseResource();
 
    OnRestoreSSBO();
-
-   OnRestoreTextures();
 
    OnRestoreTileFrustum( pScene );
 
@@ -173,94 +170,9 @@ void DeferredMainRenderer::VLoadLight( Lights& lights )
    OpenGLRenderManager::CheckError();
    }
 
-//int OpenGLDeferredRenderer::VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode )
-//   {
-//   glUseProgram( m_Programs[ RenderPass_Geometry ] );
-//   glBindVertexArray( m_VAOs[ RenderPass_Geometry ] );
-//   glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
-//
-//  /* glEnable( GL_CULL_FACE );
-//   glCullFace( GL_BACK );
-//   glEnable( GL_DEPTH_TEST );*/
-//  // auto viewTest = Mat4x4::LookAt( Vec3( 5, 5, 0 ), Vec3( 5, 5, 1 ), g_Up );
-//   auto view = pScene->GetCamera()->GetView();
-//   auto proj = pScene->GetCamera()->GetProjection();
-//   auto model = pNode->VGetGlobalTransformPtr()->GetToWorld();
-//   //auto mvp = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * pNode->VGetGlobalTransformPtr()->GetToWorld();
-//  // auto mvp = pScene->GetCamera()->GetProjection() * viewTest * pNode->VGetGlobalTransformPtr()->GetToWorld();
-//   auto mvp = proj * view * model;
-//   glUniformMatrix4fv( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ], 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
-//
-//   Mat4x4 normalMat = ( proj * view );
-//   normalMat = normalMat.Inverse().Transpose();
-//
-//  /* glUniformMatrix4fv( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ], 1, GL_FALSE, &normalMat[ 0 ][ 0 ] );*/
-//
-//   auto bufferObj = pNode->VGetShadowVertexInfo();
-//   if( !bufferObj.m_Vertexbuffer || !bufferObj.m_NormalBuffer || !bufferObj.m_IndexBuffer )
-//      {
-//      return S_OK;
-//      }
-//
-//   glBindBuffer( GL_ARRAY_BUFFER, bufferObj.m_Vertexbuffer );
-//   glEnableVertexAttribArray( GEOMETRY_PASS_VERTEX_LOCATION );
-//   glVertexAttribPointer(
-//      GEOMETRY_PASS_VERTEX_LOCATION, 
-//      3,                
-//      GL_FLOAT,           
-//      GL_FALSE,           
-//      0,               
-//      ( void* ) 0         
-//      );
-//
-//   /*glBindBuffer( GL_ARRAY_BUFFER, bufferObj.m_UVBuffer );
-//   glEnableVertexAttribArray( GEOMETRY_PASS_UV_LOCATION );
-//   glVertexAttribPointer(
-//      GEOMETRY_PASS_UV_LOCATION,
-//      2,
-//      GL_FLOAT,
-//      GL_FALSE,
-//      0,
-//      ( void* ) 0
-//      );*/
-//
-//   /*glBindBuffer( GL_VERTEX_ARRAY, bufferObj.m_NormalBuffer );
-//   glEnableVertexAttribArray( GEOMETRY_PASS_NORMAL_LOCATION );
-//   glVertexAttribPointer(
-//      GEOMETRY_PASS_NORMAL_LOCATION,
-//      3,
-//      GL_FLOAT,
-//      GL_FALSE,
-//      0,
-//      ( void* ) 0
-//      );*/
-//
-//   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, bufferObj.m_IndexBuffer );
-//
-//   /*glActiveTexture( GL_TEXTURE0 );
-//   glBindTexture( GL_TEXTURE_2D, bufferObj.m_TextureObj );
-//   glUniform1i( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MeshTexture ], 0 );*/
-//
-//   glDrawElements(
-//      GL_TRIANGLES,    
-//      bufferObj.m_VertexCount,   
-//      GL_UNSIGNED_INT, 
-//      ( void* ) 0        
-//      );
-//
-//   ENG_ASSERT( !glGetError() );
-//
-//   glDisableVertexAttribArray( GEOMETRY_PASS_VERTEX_LOCATION );
-//   glUseProgram( 0 );
-//   glBindVertexArray( 0 );
-//   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-//
-//   return S_OK;
-//   }
-
 void DeferredMainRenderer::ReleaseResource( void ) 
    {
-   
+   // TODO: release SSBO & programs
 
 //   return S_OK;
    }
@@ -302,56 +214,21 @@ int DeferredMainRenderer::OnRestoreSSBO( void )
    }
 
 
-int DeferredMainRenderer::OnRestoreTextures( void )
+int DeferredMainRenderer::OnRestoreTextures( GLuint depTex
+                                             , GLuint mrt0Tex
+                                             , GLuint mrt1Tex
+#ifdef _DEBUG
+                                             , GLuint tileDebugTex
+#endif // _DEBUG
+                                             )
    {
-   auto screenSize = g_pApp->GetScreenSize();
+   m_UsedTextures[ UsdTex_Depth ] = depTex;
+   m_UsedTextures[ UsdTex_Mrt0 ] = mrt0Tex;
+   m_UsedTextures[ UsdTex_Mrt1 ] = mrt1Tex;
+#ifdef _DEBUG
+   m_UsedTextures[ UsdTex_TileDebugging ] = tileDebugTex;
+#endif // _DEBUG
 
-   // Create all textures at once
-   glGenTextures( SST_Num, m_SST );
-   for( int i = 0; i < SST_Num; ++i )
-      {
-      ENG_ASSERT( m_SST[ i ] );
-      }
-   // MRT 0
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalGlossiness ] );
-   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-
-   // MRT 1
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_AlbedoMetalness ] );
-   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-
-   // Depth texture
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
-   glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenSize.x, screenSize.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL );
-
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-   // For depth test
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE );
-
-   // Tile debugging
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_TileDebugging ] );
-   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB16, screenSize.x, screenSize.y, 0, GL_RGB, GL_FLOAT, NULL );
-
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-
-   glBindTexture( GL_TEXTURE_2D, 0 );
-   // glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_ShadowMapTextureObj, 0 );
-   OpenGLRenderManager::CheckError();
    return S_OK;
    }
 
@@ -418,29 +295,27 @@ int DeferredMainRenderer::OnRestoreTileFrustum( Scene* pScene )
    return S_OK;
    }
 
-int DeferredMainRenderer::OnRestoreGeometryPass( void )
+int DeferredMainRenderer::OnRestoreGeometryPass()
    {
+
    GenerateProgram( RenderPass_Geometry );
-
- //  glGenVertexArrays( 1, &m_VAOs[ RenderPass_Geometry ] );
- //  glBindVertexArray( m_VAOs[ RenderPass_Geometry ] );
-
+   
    glGenFramebuffers( 1, &m_FBO[ RenderPass_Geometry ] );
    ENG_ASSERT( m_FBO[ RenderPass_Geometry ] );
    glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
 
   // glDrawBuffer( GL_NONE );
    // Depth buffer
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
-   glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_SST[ SST_Depth ], 0 );
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Depth ] );
+   glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Depth ], 0 );
 
    // MRT 0 
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalGlossiness ] );
-   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_SST[ SST_NormalGlossiness ], 0 );
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt0 ] );
+   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_UsedTextures[ UsdTex_Mrt0 ], 0 );
 
    // MRT 1
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_AlbedoMetalness ] );
-   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_SST[ SST_AlbedoMetalness ], 0 );
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt1 ] );
+   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_UsedTextures[ UsdTex_Mrt1 ], 0 );
 
    GLuint outputAttatchments[ ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, /*GL_COLOR_ATTACHMENT2*/ };
    glDrawBuffers( 2, outputAttatchments );
@@ -591,11 +466,13 @@ void DeferredMainRenderer::LightCulling( Scene* pScene )
    glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 4, m_SSBOs[ SSBO_TileFrustum ] );
 
    glActiveTexture( GL_TEXTURE0 );
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Depth ] );
 
+#ifdef _DEBUG
    glActiveTexture( GL_TEXTURE1 );
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_TileDebugging ] );
-   glBindImageTexture( 1, m_SST[ SST_TileDebugging ], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16 );
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_TileDebugging ] );
+   glBindImageTexture( 1, m_UsedTextures[ UsdTex_TileDebugging ], 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA16 );
+#endif // _DEBUG
 
    glDispatchCompute( m_TileNum[ 0 ], m_TileNum[ 1 ], 1u );
 
@@ -619,13 +496,13 @@ void DeferredMainRenderer::CalculateLighting( void )
    glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 2, m_SSBOs[ SSBO_LightProperties ] );
 
    glActiveTexture( GL_TEXTURE0 );
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Depth ] );
 
    glActiveTexture( GL_TEXTURE1 );
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_NormalGlossiness ] );
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt0 ] );
 
    glActiveTexture( GL_TEXTURE2 );
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_AlbedoMetalness ] );
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt1 ] );
 
    glBindVertexArray( m_LightingVAO );
 

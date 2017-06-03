@@ -93,7 +93,7 @@ bool Vec3::Init( TiXmlElement* pData )
    return success;
    }
 
-TiXmlElement* Vec3::GernerateXML( void ) const
+TiXmlElement* Vec3::GenerateXML( void ) const
    {
    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "Vector3" );
    pRetNode->SetAttribute( "x", ToStr( x ).c_str() );
@@ -105,7 +105,7 @@ TiXmlElement* Vec3::GernerateXML( void ) const
 
 TiXmlElement* Vec3::GenerateOverridesXML( TiXmlElement* pResource ) const
    {
-   TiXmlElement* pRetNode = GernerateXML();
+   TiXmlElement* pRetNode = GenerateXML();
    if( !std::strcmp( pRetNode->Attribute( "x" ), pResource->Attribute( "x" ) ) &&
        !std::strcmp( pRetNode->Attribute( "y" ), pResource->Attribute( "y" ) ) &&
        !std::strcmp( pRetNode->Attribute( "z" ), pResource->Attribute( "z" ) ) )
@@ -395,15 +395,15 @@ TiXmlElement* Transform::GenerateXML( void ) const
    {
    TiXmlElement* pRetXMLNode = ENG_NEW TiXmlElement( "Transform" );
 
-   TiXmlElement* pPosition = GetToWorldPosition().GernerateXML();
+   TiXmlElement* pPosition = GetToWorldPosition().GenerateXML();
    pPosition->SetValue( "Position" );
    pRetXMLNode->LinkEndChild( pPosition );
 
-   TiXmlElement* pRotation = GetPitchYawRollDeg().GernerateXML();
+   TiXmlElement* pRotation = GetPitchYawRollDeg().GenerateXML();
    pRotation->SetValue( "PitchYawRoll" );
    pRetXMLNode->LinkEndChild( pRotation );
 
-   TiXmlElement* pScale = GetScale().GernerateXML();
+   TiXmlElement* pScale = GetScale().GenerateXML();
    pScale->SetValue( "Scale" );
    pRetXMLNode->LinkEndChild( pScale );
 

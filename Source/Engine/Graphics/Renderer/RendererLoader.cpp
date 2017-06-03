@@ -34,7 +34,7 @@ void VertexToBoneMapping::AddBoneData( BoneId boneID, float boneWeight )
    ENG_ASSERT( 0 );
    }
 
-void OpenGLRendererLoader::LoadTexture2D( GLuint* textureId, const Resource& textureResource )
+void OpenGLRendererLoader::LoadTexture2D( GLuint* textureId, shared_ptr< Resource > pTextureResource )
    {
    glGenTextures( 1, textureId );
 
@@ -43,7 +43,7 @@ void OpenGLRendererLoader::LoadTexture2D( GLuint* textureId, const Resource& tex
    // No worry for row size that is not evenly divided by 4
    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
-   auto pSurface = TextureResourceLoader::LoadAndReturnSurface( textureResource );
+   auto pSurface = TextureResourceLoader::LoadAndReturnSurface( pTextureResource );
 
    GLenum textureFormat = GL_RGB;
    switch( pSurface->format->format )
@@ -220,18 +220,18 @@ void OpenGLRendererLoader::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle>
                  GL_STATIC_DRAW );
    }
 
-void OpenGLRendererLoader::CompileAndLoadShader( GLuint& shaderObj, const Resource& shaderRes, GLuint shaderType )
+void OpenGLRendererLoader::CompileAndLoadShader( GLuint& shaderObj, shared_ptr< Resource > pResource, GLuint shaderType )
    {
    shaderObj = glCreateShader( shaderType );
 
-   shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( shaderRes );  // this actually loads the shader file from the zip file
+   shared_ptr< ResHandle > pResourceHandle = g_pApp->m_pResCache->GetHandle( pResource );  // this actually loads the shader file from the zip file
 
    if( !pResourceHandle )
       {
       ENG_ERROR( "Invalid shader file path" );
       }
    // Compile Vertex Shader
-   ENG_LOG( "Renderer", "Compiling shader: " + shaderRes.m_Name );
+   ENG_LOG( "Renderer", "Compiling shader: " + pResource->m_Name );
 
    GLchar* p_shaderText = ( GLchar* ) pResourceHandle->GetBuffer();
 

@@ -46,9 +46,9 @@ int XmlResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, sha
    }
 
 // The resource handle will be pushed into m_lruResHandleList until engine exist or swapped out
-TiXmlElement* XmlResourceLoader::LoadAndReturnRootXmlElement( const Resource& resource )
+TiXmlElement* XmlResourceLoader::LoadAndReturnRootXmlElement( shared_ptr< Resource > pResource )
    {
-   shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );  // this actually loads the XML file from the zip file
+   shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( pResource );  // this actually loads the XML file from the zip file
    ENG_ASSERT( pResourceHandle );
    shared_ptr<XmlResourceExtraData> pExtraData = static_pointer_cast< XmlResourceExtraData >( pResourceHandle->GetExtraData() );
    return pExtraData->GetRoot();

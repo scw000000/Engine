@@ -56,7 +56,7 @@ class BaseEngineLogic : public IEngineLogic
 
       ActorId GetNewActorID( void ) { return ++m_LastActorId; }
       std::string BaseEngineLogic::GetActorXml( ActorId id );
-      virtual StrongActorPtr VCreateActor( const Resource& actorRes,
+      virtual StrongActorPtr VCreateActor( shared_ptr< Resource > pActorRes,
                                            TransformPtr pTransform = NULL,
                                            ActorId serversActorId = INVALID_ACTOR_ID ) override;
 

@@ -28,11 +28,17 @@ class DeferredMainRenderer : public MainRenderer
       virtual int VOnRestore( Scene* pScene ) override;
     //  virtual int VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode ) override;
       virtual void VLoadLight( Lights& lights ) override;
+      int OnRestoreTextures( GLuint depTex 
+                             , GLuint mrt0Tex 
+                             , GLuint mrt1Tex
+#ifdef _DEBUG
+                             , GLuint tileDebugTex
+#endif // _DEBUG
+                             );
 
    protected:
       void ReleaseResource( void );
       int OnRestoreSSBO( void );
-      int OnRestoreTextures( void );
       int OnRestoreTileFrustum( Scene* pScene );
       int OnRestoreGeometryPass( void );
       int OnRestourLightCullPass( Scene* pScene );
@@ -42,6 +48,18 @@ class DeferredMainRenderer : public MainRenderer
       void GenerateProgram( unsigned int renderPass );
 
    private:
+      enum UsedTextures
+         {
+         UsdTex_Depth,
+         UsdTex_Mrt0,
+         UsdTex_Mrt1,
+#ifdef _DEBUG
+         UsdTex_TileDebugging,
+#endif // _DEBUG
+         UsdTex_Num
+         };
+      GLuint m_UsedTextures[ UsdTex_Num ];
+
       enum RenderPass
          {
          RenderPass_Geometry,
@@ -66,17 +84,6 @@ class DeferredMainRenderer : public MainRenderer
          };
 
       GLuint m_SSBOs[ SSBO_Num ];
-
-      enum ScreenSpaceTextures
-         {
-         SST_Depth,
-         SST_NormalGlossiness,
-         SST_AlbedoMetalness,
-         SST_TileDebugging,
-         SST_Num
-         };
-
-      GLuint m_SST[ SST_Num ];
 
       GLuint m_FBO[ RenderPass_Num ];
 
@@ -114,6 +121,7 @@ class DeferredMainRenderer : public MainRenderer
       std::vector< GLuint > m_Uniforms[ RenderPass_Num ];
 
       unsigned int m_TileNum[ 2 ];
+      GLuint m_OutPutTex[ 3 ];
       ComputeShader m_TileFrustumShader;
 
       enum VBOs

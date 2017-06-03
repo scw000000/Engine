@@ -49,7 +49,7 @@ bool AnimationClipNode::VDelegateVInit( void )
       {
       return false;
       }
-   m_pAnimResHandle = g_pApp->m_pResCache->GetHandle( *m_pAnimRes );
+   m_pAnimResHandle = g_pApp->m_pResCache->GetHandle( m_pAnimRes );
    if( m_pAnimResHandle )
       {
       shared_ptr<MeshResourceExtraData> pMeshAnimExtra = static_pointer_cast< MeshResourceExtraData >( m_pAnimResHandle->GetExtraData() );

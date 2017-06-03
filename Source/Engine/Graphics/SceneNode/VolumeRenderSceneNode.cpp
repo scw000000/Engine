@@ -56,12 +56,12 @@ VolumeRenderSceneNode::VolumeRenderSceneNode( const ActorId actorId,
                                               const Vec3& textureDiemension,
                                               const Vec3& cuboidDimension )
                                               : SceneNode( actorId, pRenderComponent, renderGroup, pTransform ),
-                                              m_FirstPassVertexShader( Resource ( FIRST_PASS_VERTEX_SHADER_FILE_NAME ) ),
-                                              m_FirstPassFragmentShader( Resource( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ) ),
-                                              m_SecondPassVertexShader( Resource( SECOND_PASS_VERTEX_SHADER_FILE_NAME ) ),
-                                              m_SecondPassFragmentShader( Resource( SECOND_PASS_FRAGMENT_SHADER_FILE_NAME ))
+                                              m_FirstPassVertexShader( shared_ptr< Resource >( ENG_NEW Resource( FIRST_PASS_VERTEX_SHADER_FILE_NAME ) ) ),
+                                              m_FirstPassFragmentShader( shared_ptr< Resource >( ENG_NEW Resource( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ),
+                                              m_SecondPassVertexShader( shared_ptr< Resource >( ENG_NEW Resource( SECOND_PASS_VERTEX_SHADER_FILE_NAME ) ) ),
+                                              m_SecondPassFragmentShader( shared_ptr< Resource >( ENG_NEW Resource( SECOND_PASS_FRAGMENT_SHADER_FILE_NAME ) ) )
    {
-   SetAlpha( 0.1f );
+   SetAlpha( 0.1f ); 
 
    m_pVolumeTextureResource = pVolumeTextureResource;
    m_pTransferFuncionResource = pTransferFunctionResource;
@@ -181,7 +181,7 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_REPEAT );
    glTexParameteri( GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_REPEAT );
    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
-   auto volumeTextureResHandle = g_pApp->m_pResCache->GetHandle( *m_pVolumeTextureResource );
+   auto volumeTextureResHandle = g_pApp->m_pResCache->GetHandle( m_pVolumeTextureResource );
    auto pRawBuffer = volumeTextureResHandle->GetBuffer();
    glTexImage3D( GL_TEXTURE_3D, 0, GL_INTENSITY, m_TextureDimension.x, m_TextureDimension.y, m_TextureDimension.z, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, pRawBuffer );
 
@@ -195,7 +195,7 @@ int VolumeRenderSceneNode::VOnRestore( Scene *pScene )
    // Set texture storage methods
    glPixelStorei( GL_UNPACK_ALIGNMENT, 1 );
 
-   auto transferFunctionTextureResHandle = g_pApp->m_pResCache->GetHandle( *m_pTransferFuncionResource );
+   auto transferFunctionTextureResHandle = g_pApp->m_pResCache->GetHandle( m_pTransferFuncionResource );
    pRawBuffer = transferFunctionTextureResHandle->GetBuffer();
    glTexImage1D( GL_TEXTURE_1D, 0, GL_RGBA8, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, pRawBuffer );
 

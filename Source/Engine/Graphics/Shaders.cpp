@@ -18,14 +18,14 @@
 #include "Scene.h"
 
 
-OpenGLShader::OpenGLShader( const Resource& shaderResource ) : m_ShaderResource( shaderResource )
+OpenGLShader::OpenGLShader( shared_ptr< Resource > pShaderResource ) : m_pShaderResource( pShaderResource )
    {
    m_ShaderObj = 0;
    }
 
 void OpenGLShader::CompileAndSetShader( GLuint shaderType )
    {
-   OpenGLRendererLoader::CompileAndLoadShader( m_ShaderObj, m_ShaderResource, shaderType );
+   OpenGLRendererLoader::CompileAndLoadShader( m_ShaderObj, m_pShaderResource, shaderType );
    }
 
 void OpenGLShader::VReleaseShader( GLuint program )
@@ -38,7 +38,7 @@ void OpenGLShader::VReleaseShader( GLuint program )
    m_ShaderObj = 0;
    }
 
-VertexShader::VertexShader( const Resource& shaderResource ) : OpenGLShader( shaderResource )
+VertexShader::VertexShader( shared_ptr< Resource > pResource ) : OpenGLShader( pResource )
    {
    }
 
@@ -51,7 +51,7 @@ void VertexShader::VOnRestore( void )
    CompileAndSetShader( GL_VERTEX_SHADER );
    }
 
-FragmentShader::FragmentShader( const Resource& shaderResource ) : OpenGLShader( shaderResource )
+FragmentShader::FragmentShader( shared_ptr< Resource > pResource ) : OpenGLShader( pResource )
    {
    }
 

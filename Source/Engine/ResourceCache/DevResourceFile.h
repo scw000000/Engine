@@ -25,8 +25,8 @@ class DevResourceFile : public IResourceFile
       DevResourceFile( Mode mode );
 
       virtual bool VOpen( void ) override;
-      virtual int VGetRawResourceSize( const Resource &r ) override;
-      virtual int VGetRawResource( const Resource &r, char *buffer ) override;
+      virtual int VGetRawResourceSize( shared_ptr< Resource > pResource ) override;
+      virtual int VGetRawResource( shared_ptr< Resource > pResource, char *buffer ) override;
       virtual int VGetNumResources( void ) const override;
       virtual std::string VGetResourceName( int num ) const override;
       virtual bool VIsUsingDevelopmentDirectories( void ) const override { return true; }

@@ -49,8 +49,8 @@ SkeletalMeshSceneNode::SkeletalMeshSceneNode(
    m_pAnimScriptResource( pAnimScriptResource ),
    m_pMaterial( pMaterial ),
    // m_pMaterial(  ),
-   m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
-   m_FragmentShader( Resource( FRAGMENT_SHADER_FILE_NAME ) )
+   m_VertexShader( shared_ptr< Resource >( ENG_NEW Resource( VERTEX_SHADER_FILE_NAME ) ) ),
+   m_FragmentShader( shared_ptr< Resource >( ENG_NEW Resource( FRAGMENT_SHADER_FILE_NAME ) ) )
    {
    m_Program = 0;
 
@@ -98,9 +98,10 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    m_VertexShader.VReleaseShader( m_Program );
    m_FragmentShader.VReleaseShader( m_Program );
 
-   OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_pMaterial->m_DiffuseTextureRes );
+   // Not function now
+   // OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_pMaterial->m_pDiffuseTextureRes );
 
-   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
+   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
    m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
@@ -109,7 +110,7 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
    OpenGLRendererLoader::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
 
-   shared_ptr<ResHandle> pScriptResHandle = g_pApp->m_pResCache->GetHandle( *m_pAnimScriptResource );
+   shared_ptr<ResHandle> pScriptResHandle = g_pApp->m_pResCache->GetHandle( m_pAnimScriptResource );
    if( pScriptResHandle )
       {
       auto luaAnimState = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( "scriptRet" );

@@ -142,9 +142,9 @@ int MeshResourceLoader::VLoadResource( char *rawBuffer, unsigned int rawSize, sh
    return S_OK;
    }
 
-const aiScene* MeshResourceLoader::LoadAndReturnScene( const Resource& resource )
+const aiScene* MeshResourceLoader::LoadAndReturnScene( shared_ptr< Resource > pResource )
    {
-   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( resource );  	
+   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( pResource );  	
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast<MeshResourceExtraData>( pMeshResHandle->GetExtraData() );
    return pMeshExtra->m_pScene;
    }

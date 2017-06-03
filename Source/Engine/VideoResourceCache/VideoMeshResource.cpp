@@ -50,9 +50,7 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
    {
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( handle->GetExtraData() );
    auto pAiScene = pMeshExtra->m_pScene;
-  // auto pAiScene = aiImportFile( "F:\\Workspace\\Engine\\Game\\Assets\\Art\\sponza\\sponza.obj",
-  //                                         aiProcess_Triangulate | aiProcess_LimitBoneWeights | aiProcessPreset_TargetRealtime_Fast /*| aiProcess_SortByPType*/ );
-  // ENG_ASSERT( pAiScene );
+
    if( pAiScene->mNumMeshes == 0u )
       {
       ENG_ASSERT( 0 && "No mesh inside this file" );
@@ -171,9 +169,9 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
    return S_OK;
    }
 
-VideoMeshResourceExtraData* VideoMeshResourceLoader::LoadAndReturnMeshResourceExtraData( const Resource& resource )
+VideoMeshResourceExtraData* VideoMeshResourceLoader::LoadAndReturnMeshResourceExtraData( shared_ptr< Resource > pResource )
    {
-   auto pVideoHandle = g_pApp->m_pVideoResCache->GetHandle( resource );
+   auto pVideoHandle = g_pApp->m_pVideoResCache->GetHandle( pResource );
    auto pRet = static_pointer_cast< VideoMeshResourceExtraData >( pVideoHandle->GetExtraData() );
    return pRet.get();
  
@@ -189,7 +187,9 @@ shared_ptr< VideoResourceHandle > VideoMeshResourceLoader::LoadTexture( aiMateri
       pMaterial->GetTexture( type, i, &relFilePath );
       std::string fullPath( filePath );
       fullPath.append( relFilePath.C_Str() );
-      return g_pApp->m_pVideoResCache->GetHandle( Resource( fullPath ) );
+      bool bIsSRGB = ( type == aiTextureType_DIFFUSE ) ? true : false;
+      shared_ptr< Resource > pResource( ENG_NEW VideoTextureResource( fullPath, false, bIsSRGB ) );
+      return g_pApp->m_pVideoResCache->GetHandle( shared_ptr< Resource >( pResource ) );
       }
    return shared_ptr< VideoResourceHandle >();
    }

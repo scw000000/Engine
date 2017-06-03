@@ -186,11 +186,11 @@ TiXmlElement* BulletPhysicsAttributes::VGenerateXML( void ) const
    pRootNode->LinkEndChild( pMovementNode );
    XMLHelper::SetAttribute( pMovementNode, "active", m_IsActive );
 
-   TiXmlElement* pTranslate = m_TransLateFactor.GernerateXML();
+   TiXmlElement* pTranslate = m_TransLateFactor.GenerateXML();
    pMovementNode->LinkEndChild( pTranslate );
    pTranslate->SetValue( "Translate" );
 
-   TiXmlElement* pRotate = m_RotateFactor.GernerateXML();
+   TiXmlElement* pRotate = m_RotateFactor.GenerateXML();
    pMovementNode->LinkEndChild( pRotate );
    pRotate->SetValue( "Rotate" );
 

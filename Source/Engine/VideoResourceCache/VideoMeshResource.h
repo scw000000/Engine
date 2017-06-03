@@ -49,7 +49,7 @@ class VideoMeshResourceLoader : public VideoResourceLoader
    public:
       VideoMeshResourceLoader( void );
       virtual int VLoadResource( shared_ptr<ResHandle> handle, shared_ptr< VideoResourceHandle > videoHandle ) override;
-      static VideoMeshResourceExtraData* LoadAndReturnMeshResourceExtraData( const Resource& resource );
+      static VideoMeshResourceExtraData* LoadAndReturnMeshResourceExtraData( shared_ptr< Resource > pResource );
    private:
       shared_ptr< VideoResourceHandle > LoadTexture( aiMaterial* pMaterial, aiTextureType type, const std::string& filePath = "" ) const;
    };

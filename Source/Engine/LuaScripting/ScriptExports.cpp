@@ -59,8 +59,7 @@ bool InternalScriptExports::LoadAndExecuteScriptResource( const char *scriptRes 
    {
    if( !g_pApp->m_EngineOptions.GetIsUsingDevDirectory() )
       {
-      Resource resource( scriptRes );
-      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( resource );  // this actually loads the Lua file from the zip file
+      shared_ptr<ResHandle> pResourceHandle = g_pApp->m_pResCache->GetHandle( shared_ptr< Resource >( ENG_NEW Resource( scriptRes ) ) );  // this actually loads the Lua file from the zip file
       if( pResourceHandle )
          {
          return true;

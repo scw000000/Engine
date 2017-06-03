@@ -25,8 +25,7 @@ class Material
       Material( void );
       Material( const aiScene* pAiScene, unsigned int meshIndex, const std::string& filePath );
       bool Init( TiXmlElement* pData );
-      void SetTextureResource( const Resource& newTextureRes );
-      Resource GetDiffuseTextureResource( void ) const { return m_DiffuseTextureRes; };
+      void SetTextureResource( shared_ptr< VideoTextureResource > pResource );
 
       void SetAmbient( const Color& color );
 	   Color GetAmbient( void ) const { return m_Ambient; }
@@ -60,6 +59,6 @@ class Material
       float    m_Shininess;     
       AlphaType m_AlphaType;
       unsigned int m_MeshIndex;
-      Resource m_DiffuseTextureRes;
-      Resource m_NormalTextureRes;
+      shared_ptr< VideoTextureResource > m_pDiffuseTextureRes;
+      shared_ptr< VideoTextureResource > m_pNormalTextureRes;
    };

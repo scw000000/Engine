@@ -167,10 +167,10 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
 
    ScriptExports::Register();
    
-   Resource resource( m_EngineOptions.GetPreInitScriptFile() );
+   // Resource resource( m_EngineOptions.GetPreInitScriptFile() );
    // shared_ptr< ResHandle > pReshandle( ENG_NEW ResHandle( resource, 0, 0, m_pResCache ) );
    
-   shared_ptr<ResHandle> pResourceHandle = m_pResCache->GetHandle( resource );
+   shared_ptr<ResHandle> pResourceHandle = m_pResCache->GetHandle( shared_ptr< Resource >( ENG_NEW Resource( m_EngineOptions.GetPreInitScriptFile() ) ) );
    ENG_ASSERT( pResourceHandle );
 
    // RegisterScriptClass< AnimationClipNode, IAnimationNode >();
@@ -504,8 +504,7 @@ bool EngineApp::LoadStrings( std::string language )
 	std::string languageFile = "Strings\\";
 	languageFile += language;
 	languageFile += ".xml";
-   Resource languageRes( languageFile, g_pApp->m_EngineOptions.GetIsUsingDevDirectory() );
-   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( languageRes );
+   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( shared_ptr< Resource >( ENG_NEW Resource( languageFile, g_pApp->m_EngineOptions.GetIsUsingDevDirectory() ) ) );
 	// load failed
    if ( !pRoot )
 	   {

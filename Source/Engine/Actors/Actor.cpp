@@ -38,7 +38,7 @@ bool Actor::Init( TiXmlElement* pData )
 //   ENG_LOG( "Actor", std::string( "Initializing Actor " ) + ToStr( m_Id ) );
 
 	m_Type = pData->Attribute( "type" );
-   m_pActorClassResource->Init( pData->FirstChildElement( "ActorClassResource" ) );
+   m_pActorClassResource->VInit( pData->FirstChildElement( "ActorClassResource" ) );
    unsigned int rootComponentId = 0;
    return true;
    }
@@ -95,7 +95,7 @@ TiXmlElement* Actor::GenerateXML( void )
    TiXmlElement* pRetNode = ENG_NEW TiXmlElement( "ActorClass" );
    TiXmlElement* pDataNode = ENG_NEW TiXmlElement( "Data" );
    pDataNode->SetAttribute( "type", m_Type.c_str() );
-   TiXmlElement* pActorResNode = m_pActorClassResource->GenerateXML();
+   TiXmlElement* pActorResNode = m_pActorClassResource->VGenerateXML();
    pActorResNode->SetValue( "ActorClassResource" );
    pDataNode->LinkEndChild( pActorResNode );
    pRetNode->LinkEndChild( pDataNode );

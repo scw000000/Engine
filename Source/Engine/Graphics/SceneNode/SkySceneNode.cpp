@@ -29,8 +29,8 @@ SkySceneNode::SkySceneNode(
    : SceneNode( actorId, pRenderComponent, renderGroup, pTransform ),
    m_pMeshResource( pMeshResource ),
    m_pTextureResource( ptextureResource ),
-   m_VertexShader( Resource( VERTEX_SHADER_FILE_NAME ) ),
-   m_FragmentShader( Resource( FRAGMENT_SHADER_FILE_NAME ) ),
+   m_VertexShader( shared_ptr< Resource >( ENG_NEW Resource( VERTEX_SHADER_FILE_NAME ) ) ),
+   m_FragmentShader( shared_ptr< Resource >( ENG_NEW Resource( FRAGMENT_SHADER_FILE_NAME ) ) ),
    m_IsActive( true )
    {
    m_Program = 0;
@@ -66,9 +66,9 @@ int SkySceneNode::VOnRestore( Scene *pScene )
    m_FragmentShader.VReleaseShader( m_Program );
 
 
-   OpenGLRendererLoader::LoadTexture2D( &m_Texture, *m_pTextureResource );
+   OpenGLRendererLoader::LoadTexture2D( &m_Texture, m_pTextureResource );
    
-   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
+   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( m_pMeshResource );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
    m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;

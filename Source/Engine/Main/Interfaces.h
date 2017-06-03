@@ -101,7 +101,7 @@ class IEngineLogic
    {
    public:
    	virtual WeakActorPtr VGetActor( ActorId id ) = 0;
-      virtual StrongActorPtr VCreateActor( const Resource& actorRes,
+      virtual StrongActorPtr VCreateActor( shared_ptr< Resource > pActorRes,
                                            TransformPtr pTransform,
                                            ActorId serversActorId ) = 0;
       virtual void VDestroyActor( ActorId actorId ) = 0;
@@ -194,16 +194,22 @@ class ResHandle;
 
 class IResourceExtraData
    {
-      public:
+   public:
       virtual ~IResourceExtraData() {}
       //virtual std::string VToString()=0;
    };
 
 class IVideoResourceExtraData
    {
-      public:
+   public:
       virtual ~IVideoResourceExtraData() {}
       //virtual std::string VToString()=0;
+   };
+
+class IVideoResourceLoadingOptions 
+   {
+   public:
+      virtual ~IVideoResourceLoadingOptions(){}
    };
 
 // The resource loader is responsible for manipulate handle and setting its extra data
@@ -235,10 +241,10 @@ class IVideoResourceLoader
 class IResourceFile
    {
    public:
-	   virtual bool VOpen() = 0;
-	   virtual int VGetRawResourceSize(const Resource &r) = 0;
-	   virtual int VGetRawResource(const Resource &r, char *buffer) = 0;
-	   virtual int VGetNumResources() const = 0;
+	   virtual bool VOpen( void ) = 0;
+	   virtual int VGetRawResourceSize( shared_ptr< Resource > pResource ) = 0;
+      virtual int VGetRawResource( shared_ptr< Resource > pResource, char *buffer ) = 0;
+	   virtual int VGetNumResources( void ) const = 0;
 	   virtual std::string VGetResourceName(int num) const = 0;
       virtual bool VIsUsingDevelopmentDirectories(void) const = 0;
 	   virtual ~IResourceFile() { }

@@ -24,8 +24,8 @@ const char* const FIRST_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DepthRTT.fs.g
 
 DirectionalLightNode::DirectionalLightNode( const ActorId actorId, IRenderComponent* pRenderComponent, const LightPropertiesPtr& pLightProps, TransformPtr pTransform )
    : ILightNode( actorId, pRenderComponent, pLightProps, pTransform ),
-   m_FirstPassVertexShader( Resource( FIRST_PASS_VERTEX_SHADER_FILE_NAME ) ),
-   m_FirstPassFragmentShader( Resource( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ) )
+   m_FirstPassVertexShader( shared_ptr< Resource >( ENG_NEW Resource( FIRST_PASS_VERTEX_SHADER_FILE_NAME ) ) ),
+   m_FirstPassFragmentShader( shared_ptr< Resource >( ENG_NEW Resource( FIRST_PASS_FRAGMENT_SHADER_FILE_NAME ) ) )
    {
    m_ShadowMapDimension = g_pApp->GetScreenSize();
    m_MVPUni = -1;

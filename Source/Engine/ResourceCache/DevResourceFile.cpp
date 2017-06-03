@@ -68,9 +68,9 @@ bool DevResourceFile::VOpen()
    }
 
 
-int DevResourceFile::VGetRawResourceSize( const Resource &r )
+int DevResourceFile::VGetRawResourceSize( shared_ptr< Resource > pResource )
    {
-   int num = Find( r.m_Name.c_str() );
+   int num = Find( pResource->m_Name.c_str() );
    if( num == -1 )
       {
       return -1;
@@ -88,14 +88,14 @@ int DevResourceFile::VGetRawResourceSize( const Resource &r )
       return ResourceZipFile::VGetRawResourceSize( r );*/
    }
 
-int DevResourceFile::VGetRawResource( const Resource &r, char *buffer )
+int DevResourceFile::VGetRawResource( shared_ptr< Resource > pResource, char *buffer )
    {
-   int num = Find( r.m_Name.c_str() );
+   int num = Find( pResource->m_Name.c_str() );
    if( num == -1 )
       {
       return -1;
       }
-   std::string fullFileSpec = ws2s( m_AssetsDir ) + r.m_Name.c_str();
+   std::string fullFileSpec = ws2s( m_AssetsDir ) + pResource->m_Name.c_str();
    FILE *f = fopen( fullFileSpec.c_str(), "rb" );
    size_t bytes = fread( buffer, 1, m_AssetFileInfo[ num ].nFileSizeLow, f );
    fclose( f );

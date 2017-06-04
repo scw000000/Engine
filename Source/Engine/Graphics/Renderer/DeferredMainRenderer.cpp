@@ -25,9 +25,6 @@
 #define GEOMETRY_PASS_UV_LOCATION 2
 #define GEOMETRY_PASS_NORMAL_LOCATION 1
 
-#define LIGHT_PASS_VERTEX_LOCATION    0
-#define LIGHT_PASS_UV_LOCATION        1
-
 const char* const TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME = "Effects\\TileFrustumGeneration.cs.glsl";
 
 const char* const LIGHT_CULL_COMPUTE_SHADER_FILE_NAME = "Effects\\LightCulling.cs.glsl";

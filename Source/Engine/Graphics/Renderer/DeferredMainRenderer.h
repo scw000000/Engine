@@ -124,16 +124,6 @@ class DeferredMainRenderer : public MainRenderer
       GLuint m_OutPutTex[ 3 ];
       ComputeShader m_TileFrustumShader;
 
-      enum VBOs
-         {
-         VBOs_Vertex,
-         VBOs_UV,
-         VBOs_Index,
-         VBOs_Num
-         };
-      GLuint            m_Buffers[ VBOs_Num ];
-
-      GLuint m_LightingVAO;
    };
 
 typedef struct tileFrustum

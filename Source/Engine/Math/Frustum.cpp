@@ -26,6 +26,32 @@ bool BaseFrustum::VInside( const Vec3 &point ) const
    return true;
    }
 
+bool BaseFrustum::VInside( const Vec3 &pointFrom, const Vec3 &pointTo )
+   {
+   int intersecCount = 0;
+   bool fromInside = true;
+   bool toInside = true;
+   for( int i = 0; i < NumPlanes; ++i )
+      {
+      bool fromTest = m_Planes[ i ].Inside( pointFrom );
+      bool toTest = m_Planes[ i ].Inside( pointTo );
+      if( !fromTest )
+         {
+         fromInside = false;
+         }
+      if( !toTest )
+         {
+         toInside = false;
+         }
+      // They are in different side of the plane
+      if( fromTest ^ toTest )
+         {
+         ++intersecCount;
+         }
+      }
+   return fromInside || toInside || ( intersecCount == 2 );
+   }
+
 bool BaseFrustum::VInside( const Vec3 &point, float radius ) const
    {
    for( int i = 0; i < NumPlanes; ++i )

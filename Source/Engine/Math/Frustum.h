@@ -33,6 +33,8 @@ class IFrustum
       * @return bool
       */
       virtual bool VInside( const Vec3 &point, float radius ) const = 0;
+
+      virtual bool VInside( const Vec3 &pointFrom, const Vec3 &pointTo ) const = 0;
    };
 
 class BaseFrustum : public IFrustum
@@ -40,7 +42,7 @@ class BaseFrustum : public IFrustum
    public:
       virtual bool VInside( const Vec3 &point ) const override;
       virtual bool VInside( const Vec3 &point, float radius ) const override;
-
+      virtual bool VInside( const Vec3 &pointFrom, const Vec3 &pointTo ) const override;
    public:
       enum Side { Near, Far, Top, Right, Bottom, Left, NumPlanes };
 

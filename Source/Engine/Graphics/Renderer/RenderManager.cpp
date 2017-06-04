@@ -14,7 +14,7 @@
 
 #include "EngineStd.h"
 #include "RenderManager.h"
-
+#include "RenderHelper.h"
 
 
 OpenGLRenderManager::OpenGLRenderManager( void )
@@ -26,11 +26,14 @@ OpenGLRenderManager::OpenGLRenderManager( void )
 int OpenGLRenderManager::VInit( void ) 
    {
    OnRestoreTextures();
+   OpenglRenderHelper::OnRestore();
+
    return S_OK;
    }
 
 int OpenGLRenderManager::VOnRestore( Scene* pScene )
    {
+   
    m_MainRenderer.OnRestoreTextures( m_SST[ SST_Depth ]
                                      , m_SST[ SST_MRT0 ]
                                      , m_SST[ SST_MRT1 ] 

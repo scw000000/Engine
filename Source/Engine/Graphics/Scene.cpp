@@ -16,6 +16,7 @@
 #include "Scene.h"
 #include "..\Event\EventManager.h"
 #include "FastDelegate.h"
+#include "..\Graphics\Renderer\RenderHelper.h"
 
 Scene::Scene( shared_ptr< IRenderManager > pRenderManager ) : m_pRoot( ENG_NEW RootNode ), m_pLightManager( ENG_NEW LightManager )
    {
@@ -171,7 +172,7 @@ bool Scene::RemoveChild( ActorId id )
 
 void Scene::RenderAlphaPass()
    {
-   m_pRenderManager->VGetMainRenderer().VSetRenderingAlpha( true );
+   OpenglRenderHelper::SetRenderingAlpha( true );
    //MainRenderer::VSetRenderAlpha( true );
    // This it not implemented yet!
 	m_AlphaSceneNodes.sort();
@@ -185,7 +186,7 @@ void Scene::RenderAlphaPass()
 	//	PopTransform();
 		m_AlphaSceneNodes.pop_back();
 	   }
-   m_pRenderManager->VGetMainRenderer().VSetRenderingAlpha( false );
+   OpenglRenderHelper::SetRenderingAlpha( false );
    }
 
 void Scene::NewRenderComponentDelegate( IEventPtr pEvent )

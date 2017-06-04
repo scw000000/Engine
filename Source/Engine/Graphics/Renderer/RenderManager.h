@@ -11,7 +11,7 @@
  *
  * \note
 */
-#include "DeferredMainRenderer.h"
+#include "TBDRMainRenderer.h"
 #include "TextureRenderer.h"
 
 class OpenGLRenderManager : public IRenderManager
@@ -50,6 +50,6 @@ class OpenGLRenderManager : public IRenderManager
 
       GLuint m_SST[ SST_Num ];
 
-      DeferredMainRenderer m_MainRenderer;
+      TBDRMainRenderer m_MainRenderer;
       TextureRenderer m_TextureDrawer;
    };

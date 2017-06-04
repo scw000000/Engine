@@ -13,6 +13,7 @@
  * \note
 */
 #include "VideoResourceCache.h"
+#include "assimp/material.h"
 
 class VideoMeshResourceExtraData : public IVideoResourceExtraData
    {
@@ -41,8 +42,6 @@ class VideoMeshResourceExtraData : public IVideoResourceExtraData
       std::vector< unsigned int[ MeshCount_Num ] > m_MeshCount;
       std::vector< float > m_Radius;
    };
-
-//struct aiMaterial;
 
 class VideoMeshResourceLoader : public VideoResourceLoader
    {

@@ -12,11 +12,12 @@
  * \note
 */
 #include "EngineStd.h"
-#include "DeferredMainRenderer.h"
+#include "TBDRMainRenderer.h"
 #include "RendererLoader.h"
 #include "RenderManager.h"
 #include "..\Light.h"
 #include "..\..\Debugging\vsGLInfoLib.h"
+#include "RenderHelper.h"
 
 #define TILE_WIDTH 16u
 #define TILE_HEIGHT 16u
@@ -35,23 +36,7 @@ const char* const GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredGe
 const char* const LIGHT_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DeferredLighting.vs.glsl";
 const char* const LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredLighting.fs.glsl";
 
-const GLfloat QUAD_VERTEX_POSITION[] = {
-   -1.0f, -1.0f, // bottom left
-   1.0f, -1.0f, // bottom right
-   1.0f, 1.0f, // top right
-   -1.0f, 1.0f // top left
-   };
-
-const GLfloat QUAD_UV_POSITION[] = {
-   0.0f, 0.0f, // bottom left
-   1.0f, 0.0f, // bottom right
-   1.0f, 1.0f, // top right
-   0.0f, 1.0f // top left
-   };
-
-const unsigned short QUAD_VERTEX_INDEX[] = { 0, 1, 2, 0, 2, 3 };
-
-DeferredMainRenderer::DeferredMainRenderer( void ) : 
+TBDRMainRenderer::TBDRMainRenderer( void ) : 
    m_TileFrustumShader( shared_ptr< Resource >( ENG_NEW Resource( TILE_FRUSTUM_COMPUTE_SHADER_FILE_NAME ) ) )
    {
    m_Shaders[ RenderPass_Geometry ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( shared_ptr< Resource >( ENG_NEW Resource( GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME ) ) ) ) );
@@ -80,21 +65,12 @@ DeferredMainRenderer::DeferredMainRenderer( void ) :
    
    }
 
-void DeferredMainRenderer::VShutdown( void )
+void TBDRMainRenderer::VShutdown( void )
    {
  
    }
 
-int DeferredMainRenderer::VPreRender( void )
-   {
-   MainRenderer::VPreRender();
-   glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
-   glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-   return S_OK;
-   }
-
-int DeferredMainRenderer::VOnRestore( Scene* pScene )
+int TBDRMainRenderer::VOnRestore( Scene* pScene )
    {
    ReleaseResource();
 
@@ -123,7 +99,22 @@ int DeferredMainRenderer::VOnRestore( Scene* pScene )
    return S_OK;
    }
 
-void DeferredMainRenderer::VLoadLight( Lights& lights )
+int TBDRMainRenderer::VPreRender( void )
+   {
+   glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
+   glClear( GL_DEPTH_BUFFER_BIT );
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+   glClear( GL_DEPTH_BUFFER_BIT );
+   return S_OK;
+   }
+
+int TBDRMainRenderer::VPostRender( void )
+   {
+   SDL_GL_SwapWindow( g_pApp->GetWindow() );
+   return S_OK;
+   }
+
+void TBDRMainRenderer::VLoadLight( Lights& lights )
    {
    glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_LightProperties ] );
 
@@ -167,14 +158,14 @@ void DeferredMainRenderer::VLoadLight( Lights& lights )
    OpenGLRenderManager::CheckError();
    }
 
-void DeferredMainRenderer::ReleaseResource( void ) 
+void TBDRMainRenderer::ReleaseResource( void ) 
    {
    // TODO: release SSBO & programs
 
 //   return S_OK;
    }
 
-int DeferredMainRenderer::OnRestoreSSBO( void )
+int TBDRMainRenderer::OnRestoreSSBO( void )
    {
    glGenBuffers( SSBO_Num, m_SSBOs );
    for( int i = 0; i < SSBO_Num; ++i )
@@ -211,7 +202,7 @@ int DeferredMainRenderer::OnRestoreSSBO( void )
    }
 
 
-int DeferredMainRenderer::OnRestoreTextures( GLuint depTex
+int TBDRMainRenderer::OnRestoreTextures( GLuint depTex
                                              , GLuint mrt0Tex
                                              , GLuint mrt1Tex
 #ifdef _DEBUG
@@ -229,7 +220,7 @@ int DeferredMainRenderer::OnRestoreTextures( GLuint depTex
    return S_OK;
    }
 
-int DeferredMainRenderer::OnRestoreTileFrustum( Scene* pScene )
+int TBDRMainRenderer::OnRestoreTileFrustum( Scene* pScene )
    {
    m_TileFrustumShader.VOnRestore();
    auto program = OpenGLRendererLoader::GenerateProgram( { m_TileFrustumShader.GetShaderObject() } );
@@ -292,7 +283,7 @@ int DeferredMainRenderer::OnRestoreTileFrustum( Scene* pScene )
    return S_OK;
    }
 
-int DeferredMainRenderer::OnRestoreGeometryPass()
+int TBDRMainRenderer::OnRestoreGeometryPass()
    {
 
    GenerateProgram( RenderPass_Geometry );
@@ -349,7 +340,7 @@ int DeferredMainRenderer::OnRestoreGeometryPass()
    return S_OK;
    }
 
-int DeferredMainRenderer::OnRestourLightCullPass( Scene* pScene )
+int TBDRMainRenderer::OnRestourLightCullPass( Scene* pScene )
    {
    GenerateProgram( RenderPass_LightCulling );
 
@@ -376,7 +367,7 @@ int DeferredMainRenderer::OnRestourLightCullPass( Scene* pScene )
    return S_OK;
    }
 
-int DeferredMainRenderer::OnRestoreLightingPass( Scene* pScene )
+int TBDRMainRenderer::OnRestoreLightingPass( Scene* pScene )
    {
    GenerateProgram( RenderPass_Lighting );
 
@@ -405,48 +396,12 @@ int DeferredMainRenderer::OnRestoreLightingPass( Scene* pScene )
    glUniformMatrix4fv( m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_Proj ], 1, GL_FALSE, &proj[ 0 ][ 0 ] );
 
    glUseProgram( 0 );
-
-   glGenVertexArrays( 1, &m_LightingVAO );
-   glBindVertexArray( m_LightingVAO );
-   // 1st attribute buffer : vertices
-   glGenBuffers( 1, &m_Buffers[ VBOs_Vertex ] );
-   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ VBOs_Vertex ] );
-   glBufferData( GL_ARRAY_BUFFER, ENG_ARRAY_SIZE( QUAD_VERTEX_POSITION ), QUAD_VERTEX_POSITION, GL_STATIC_DRAW );
-   glEnableVertexAttribArray( LIGHT_PASS_VERTEX_LOCATION );
-   glVertexAttribPointer(
-      LIGHT_PASS_VERTEX_LOCATION,                  // attribute
-      2,                  // size
-      GL_FLOAT,           // type
-      GL_FALSE,           // normalized?
-      0,                  // stride
-      ( void* ) 0            // array buffer offset
-      );
-
-   // 2nd attribute buffer : UVs
-   glGenBuffers( 1, &m_Buffers[ VBOs_UV ] );
-   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ VBOs_UV ] );
-   glBufferData( GL_ARRAY_BUFFER, ENG_ARRAY_SIZE( QUAD_UV_POSITION ), QUAD_UV_POSITION, GL_STATIC_DRAW );
-   glEnableVertexAttribArray( LIGHT_PASS_UV_LOCATION );
-   glVertexAttribPointer(
-      LIGHT_PASS_UV_LOCATION,                                // attribute
-      2,                                // size
-      GL_FLOAT,                         // type
-      GL_FALSE,                         // normalized?
-      0,                                // stride
-      ( void* ) 0                          // array buffer offset
-      );
-
-   glGenBuffers( 1, &m_Buffers[ VBOs_Index ] );
-   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ VBOs_Index ] );
-   glBufferData( GL_ELEMENT_ARRAY_BUFFER, ENG_ARRAY_SIZE( QUAD_VERTEX_INDEX ), QUAD_VERTEX_INDEX, GL_STATIC_DRAW );
-
-   glBindVertexArray( 0 );
-
+   
    OpenGLRenderManager::CheckError();
    return S_OK;
    }
 
-void DeferredMainRenderer::LightCulling( Scene* pScene )
+void TBDRMainRenderer::LightCulling( Scene* pScene )
    {
    glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
 
@@ -480,7 +435,7 @@ void DeferredMainRenderer::LightCulling( Scene* pScene )
    OpenGLRenderManager::CheckError();
    }
 
-void DeferredMainRenderer::CalculateLighting( void )
+void TBDRMainRenderer::CalculateLighting( void )
    {
    glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
 
@@ -501,16 +456,7 @@ void DeferredMainRenderer::CalculateLighting( void )
    glActiveTexture( GL_TEXTURE2 );
    glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt1 ] );
 
-   glBindVertexArray( m_LightingVAO );
-
-   glDrawElements(
-      GL_TRIANGLES,      // mode
-      ENG_ARRAY_LENGTH( QUAD_VERTEX_INDEX ),    // count
-      GL_UNSIGNED_SHORT,   // type
-      ( void* ) 0           // element array buffer offset
-      );
-
-   glBindVertexArray( 0 );
+   OpenglRenderHelper::RenderQuad();
 
    glUseProgram( 0 );
 
@@ -535,7 +481,7 @@ void DeferredMainRenderer::CalculateLighting( void )
    OpenGLRenderManager::CheckError();
    }
 
-void DeferredMainRenderer::GenerateProgram( unsigned int renderPass )
+void TBDRMainRenderer::GenerateProgram( unsigned int renderPass )
    {
    for( auto shader : m_Shaders[ renderPass ] )
       {

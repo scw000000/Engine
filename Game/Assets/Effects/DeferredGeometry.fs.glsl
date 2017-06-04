@@ -18,7 +18,6 @@ void main(){
         {
         mat3 tbn = mat3( normalize( vTangentVS ), normalize( vBitangentVS ), normalize( vNormalVS ) );
         oMRT0.xyz = tbn * texture( uNormalMapTex, vUV ).rgb; 
-        oMRT0.xyz = texture( uNormalMapTex, vUV ).rgb;
         }
     else
         {

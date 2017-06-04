@@ -13,12 +13,13 @@
  * \note
  */
 #include "..\Shaders.h"
-
+#include "..\ResourceCache\MeshResource.h"
 
 class MeshResourceExtraData;
 
 struct aiAnimation;
 struct aiNodeAnim;
+struct aiNode;
 
 class AnimationState;
 

@@ -13,19 +13,20 @@
  * \note
 */
 #include "..\Shaders.h"
-#include "MainRenderer.h"
 
 #define AVERAGE_OVERLAP_LIGHTS_PER_TILE 200u
 
-class DeferredMainRenderer : public MainRenderer
+class TBDRMainRenderer : public IMainRenderer
    {
    friend class MeshSceneNode;
    friend class OpenGLRenderManager;
    public:
-      DeferredMainRenderer( void );
+      TBDRMainRenderer( void );
       virtual void VShutdown( void ) override;
       virtual int VPreRender( void ) override;
       virtual int VOnRestore( Scene* pScene ) override;
+      // This functino is called at the end of HumanView::Render after calling Scene to Render
+      virtual int VPostRender( void ) override;
     //  virtual int VOnRender( Scene *pScene, shared_ptr< ISceneNode > pNode ) override;
       virtual void VLoadLight( Lights& lights ) override;
       int OnRestoreTextures( GLuint depTex 

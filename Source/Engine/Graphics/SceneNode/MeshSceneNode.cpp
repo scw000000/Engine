@@ -20,7 +20,7 @@
 #include "..\VideoResourceCache\VideoMeshResource.h"
 #include "..\Renderer\RenderManager.h"
 #include "..\Renderer\RendererLoader.h"
-#include "..\Renderer\DeferredMainRenderer.h"
+#include "..\Renderer\TBDRMainRenderer.h"
 
 
 #define VERTEX_LOCATION    0
@@ -69,7 +69,7 @@ MeshSceneNode::MeshSceneNode( const ActorId actorId,
    m_UseNormalMap = false;
    m_Props.SetEnableShadow( true );
 
-   m_pDeferredMainRenderer = dynamic_cast< DeferredMainRenderer* >( &g_pApp->m_pRenderManager->VGetMainRenderer() );
+   m_pDeferredMainRenderer = dynamic_cast< TBDRMainRenderer* >( &g_pApp->m_pRenderManager->VGetMainRenderer() );
    ENG_ASSERT( m_pDeferredMainRenderer );
    }
 
@@ -210,7 +210,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
 
 int MeshSceneNode::VRender( Scene *pScene )
    {
-   auto renderPass = DeferredMainRenderer::RenderPass_Geometry;
+   auto renderPass = TBDRMainRenderer::RenderPass_Geometry;
    glUseProgram( m_pDeferredMainRenderer->m_Programs[ renderPass ] );
 
    glBindVertexArray( 0 );
@@ -222,11 +222,11 @@ int MeshSceneNode::VRender( Scene *pScene )
       //auto mvp = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * pNode->VGetGlobalTransformPtr()->GetToWorld();
      // auto mvp = pScene->GetCamera()->GetProjection() * viewTest * pNode->VGetGlobalTransformPtr()->GetToWorld();
    auto mvp = proj * view * model;
-   glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_MVP ], 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
+   glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_MVP ], 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
    
    Mat4x4 normalMat = ( view * model );
    normalMat = normalMat.Inverse().Transpose();
-   glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_NormalMat ], 1, GL_FALSE, &normalMat[ 0 ][ 0 ] );
+   glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_NormalMat ], 1, GL_FALSE, &normalMat[ 0 ][ 0 ] );
    
    glActiveTexture( GL_TEXTURE0 );
    glBindTexture( GL_TEXTURE_2D, m_MeshTextureObj );
@@ -236,11 +236,11 @@ int MeshSceneNode::VRender( Scene *pScene )
       {
       glActiveTexture( GL_TEXTURE1 );
       glBindTexture( GL_TEXTURE_2D, m_NormalMapTextureObj );
-      glUniform1ui( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_UseNormalMap ], 1u );
+      glUniform1ui( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_UseNormalMap ], 1u );
       }
    else
       {
-      glUniform1ui( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ DeferredMainRenderer::GeometryPassUni_UseNormalMap ], 0u );
+      glUniform1ui( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_UseNormalMap ], 0u );
       }
 
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );

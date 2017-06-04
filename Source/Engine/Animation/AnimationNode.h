@@ -13,6 +13,7 @@
  * \note
  */
 #include "..\LuaScripting\ScriptClass.h"
+#include "..\ResourceCache\MeshResource.h"
 
 struct BoneTransform;
 typedef unsigned int BoneId;

@@ -15,6 +15,7 @@
 #include "EngineStd.h"
 #include "PhysicsDebugDrawer.h"
 #include "../UserInterface/HumanView.h"
+#include "..\Graphics\Renderer\RenderHelper.h"
 
 BulletDebugDrawer::BulletDebugDrawer( void )
    {
@@ -171,7 +172,7 @@ void BulletDebugDrawer::drawLine( const btVector3& from, const btVector3& to, co
    Color color( lineColor.x( ), lineColor.y( ), lineColor.z( ) );
 
    shared_ptr<Scene> pScene = g_pApp->m_pEngineLogic->m_pWrold;
-   g_pApp->m_pRenderManager->VGetMainRenderer().VDrawLine( vec3From, vec3To, color );
+   OpenglRenderHelper::DrawLine( vec3From, vec3To, color );
    }
 
 

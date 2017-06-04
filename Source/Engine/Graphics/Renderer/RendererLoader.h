@@ -12,6 +12,7 @@
  * \note
 */
 #include "..\Shaders.h"
+#include "..\ResourceCache\MeshResource.h"
 
 struct VertexToBoneMapping
    {

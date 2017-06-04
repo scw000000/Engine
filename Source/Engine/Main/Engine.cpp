@@ -18,8 +18,8 @@
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Event\EventManager.h"
 #include "..\Event\Events.h"
-#include "..\Graphics\Renderer\MainRenderer.h"
 #include "..\Graphics\Renderer\RenderManager.h"
+#include "..\Graphics\Renderer\RenderHelper.h"
 #include "..\LuaScripting\LuaStateManager.h"
 #include "..\LuaScripting\ScriptExports.h"
 #include "..\Animation\AnimationClipNode.h"
@@ -299,7 +299,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    // Cull triangles which normal is not towards the camera
    glEnable( GL_CULL_FACE );
    m_pRenderManager->VInit();
-   m_pRenderManager->VGetMainRenderer().VSetBackgroundColor( g_Black );
+   OpenglRenderHelper::SetBackgroundColor( g_Black );
   // m_pRenderer->VOnRestore();
    //--------------------------------- 
    // Set Renderer

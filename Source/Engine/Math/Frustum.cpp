@@ -26,7 +26,7 @@ bool BaseFrustum::VInside( const Vec3 &point ) const
    return true;
    }
 
-bool BaseFrustum::VInside( const Vec3 &pointFrom, const Vec3 &pointTo )
+bool BaseFrustum::VInside( const Vec3 &pointFrom, const Vec3 &pointTo ) const
    {
    int intersecCount = 0;
    bool fromInside = true;

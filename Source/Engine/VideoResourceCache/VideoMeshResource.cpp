@@ -16,6 +16,7 @@
 #include "VideoMeshResource.h"
 #include "..\Graphics\Renderer\RenderManager.h"
 #include "VideoTextureResource.h"
+#include "..\ResourceCache\MeshResource.h"
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
 

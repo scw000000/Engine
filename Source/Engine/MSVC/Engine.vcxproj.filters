@@ -277,12 +277,6 @@
     <ClCompile Include="..\Graphics\Renderer\RendererLoader.cpp">
       <Filter>Graphics\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="..\Graphics\Renderer\MainRenderer.cpp">
-      <Filter>Graphics\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Graphics\Renderer\DeferredMainRenderer.cpp">
-      <Filter>Graphics\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="..\Debugging\vsGLInfoLib.cpp">
       <Filter>Debugging</Filter>
     </ClCompile>
@@ -303,6 +297,12 @@
     </ClCompile>
     <ClCompile Include="..\Controller\InputManager.cpp">
       <Filter>Controller</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\RenderHelper.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\TBDRMainRenderer.cpp">
+      <Filter>Graphics\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -536,12 +536,6 @@
     <ClInclude Include="..\Graphics\Renderer\RendererLoader.h">
       <Filter>Graphics\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="..\Graphics\Renderer\MainRenderer.h">
-      <Filter>Graphics\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Graphics\Renderer\DeferredMainRenderer.h">
-      <Filter>Graphics\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="..\Debugging\vsGLInfoLib.h">
       <Filter>Debugging</Filter>
     </ClInclude>
@@ -565,6 +559,12 @@
     </ClInclude>
     <ClInclude Include="..\Controller\InputManager.h">
       <Filter>Controller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\RenderHelper.h">
+      <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\TBDRMainRenderer.h">
+      <Filter>Graphics\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

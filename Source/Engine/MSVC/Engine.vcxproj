@@ -131,9 +131,9 @@
     <ClCompile Include="..\Event\EventFactory.cpp" />
     <ClCompile Include="..\Graphics\Light.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
-    <ClCompile Include="..\Graphics\Renderer\DeferredMainRenderer.cpp" />
-    <ClCompile Include="..\Graphics\Renderer\MainRenderer.cpp" />
+    <ClCompile Include="..\Graphics\Renderer\TBDRMainRenderer.cpp" />
     <ClCompile Include="..\Graphics\Renderer\RendererLoader.cpp" />
+    <ClCompile Include="..\Graphics\Renderer\RenderHelper.cpp" />
     <ClCompile Include="..\Graphics\Renderer\RenderManager.cpp" />
     <ClCompile Include="..\Graphics\Renderer\TextureRenderer.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\DirectionalLightSceneNode.cpp" />
@@ -228,9 +228,9 @@
     <ClInclude Include="..\Event\EventFactory.h" />
     <ClInclude Include="..\Graphics\Light.h" />
     <ClInclude Include="..\Graphics\Material.h" />
-    <ClInclude Include="..\Graphics\Renderer\DeferredMainRenderer.h" />
-    <ClInclude Include="..\Graphics\Renderer\MainRenderer.h" />
+    <ClInclude Include="..\Graphics\Renderer\TBDRMainRenderer.h" />
     <ClInclude Include="..\Graphics\Renderer\RendererLoader.h" />
+    <ClInclude Include="..\Graphics\Renderer\RenderHelper.h" />
     <ClInclude Include="..\Graphics\Renderer\RenderManager.h" />
     <ClInclude Include="..\Graphics\Renderer\TextureRenderer.h" />
     <ClInclude Include="..\Graphics\SceneNode\DirectionalLightSceneNode.h" />

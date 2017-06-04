@@ -33,14 +33,5 @@ class TextureRenderer : public IRenderer
       VertexShader		m_VertexShader;
       FragmentShader		m_FragmentShader;
 
-      GLuint            m_VAO;
-      enum VBOs
-         {
-         VBOs_Vertex,
-         VBOs_UV,
-         VBOs_Index,
-         VBOs_Num
-         };
-      GLuint            m_Buffers[ VBOs_Num ];
       GLuint            m_TextureUni;
    };

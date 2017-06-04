@@ -15,7 +15,7 @@
 #include "SceneNodes.h"
 #include "..\Shaders.h"
 
-class DeferredMainRenderer;
+class TBDRMainRenderer;
 
 class MeshSceneNode : public SceneNode
    {
@@ -91,7 +91,7 @@ class MeshSceneNode : public SceneNode
 
       unsigned long     m_VerticesIndexCount;
 
-      DeferredMainRenderer *m_pDeferredMainRenderer;
+      TBDRMainRenderer *m_pDeferredMainRenderer;
 
       bool              m_UseNormalMap;
       GLuint            m_NormalMapTextureObj;

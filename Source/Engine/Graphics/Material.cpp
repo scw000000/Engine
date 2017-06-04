@@ -15,6 +15,7 @@
 #include "Material.h"
 #include "assimp/cimport.h"
 #include "assimp/postprocess.h"
+#include "assimp/scene.h"
 
 Material::Material( void ) : m_pDiffuseTextureRes( ENG_NEW VideoTextureResource( "art\\default.jpg", false, true ) )
    {

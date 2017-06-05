@@ -23,14 +23,18 @@
 const char* const SAMPLE_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\SSAOSample.vs.glsl";
 const char* const SAMPLE_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\SSAOSample.fs.glsl";
 
+const char* const BLUR_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\SSAOBlur.vs.glsl";
+const char* const BLUR_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\SSAOBlur.fs.glsl";
+
 SSAORenderer::SSAORenderer( void )
    {
-   m_Uniforms[ RenderPass_Sample ] = std::vector< GLuint >( SamplePassUni_Num, 0 );
    m_Shaders[ RenderPass_Sample ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( shared_ptr< Resource >( ENG_NEW Resource( SAMPLE_PASS_VERTEX_SHADER_FILE_NAME ) ) ) ) );
    m_Shaders[ RenderPass_Sample ].push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( shared_ptr< Resource >( ENG_NEW Resource( SAMPLE_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ) ) );
+   m_Uniforms[ RenderPass_Sample ] = std::vector< GLuint >( SamplePassUni_Num, 0 );
 
-   m_Shaders[ RenderPass_Blur ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( shared_ptr< Resource >( ENG_NEW Resource( SAMPLE_PASS_VERTEX_SHADER_FILE_NAME ) ) ) ) );
-   m_Shaders[ RenderPass_Blur ].push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( shared_ptr< Resource >( ENG_NEW Resource( SAMPLE_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ) ) );
+   m_Shaders[ RenderPass_Blur ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( shared_ptr< Resource >( ENG_NEW Resource( BLUR_PASS_VERTEX_SHADER_FILE_NAME ) ) ) ) );
+   m_Shaders[ RenderPass_Blur ].push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( shared_ptr< Resource >( ENG_NEW Resource( BLUR_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ) ) );
+   m_Uniforms[ RenderPass_Blur ] = std::vector< GLuint >( BlurPassUni_Num, 0 );
    }
 
 void SSAORenderer::VShutdown( void )
@@ -140,6 +144,34 @@ int SSAORenderer::VOnRestore( Scene* pScene )
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
    OpenglRenderHelper::CheckError();
+   ///////////////// BLUR ///////////////
+   glUseProgram( m_Programs[ RenderPass_Blur ] );
+   m_Uniforms[ RenderPass_Blur ][ BlurPassUni_SSAOTex ] = glGetUniformLocation( m_Programs[ RenderPass_Blur ], "uSSAOTex" );
+   glUniform1i( m_Uniforms[ RenderPass_Blur ][ BlurPassUni_SSAOTex ], 0 );
+
+   m_Uniforms[ RenderPass_Blur ][ BlurPassUni_ScreenSize ] = glGetUniformLocation( m_Programs[ RenderPass_Blur ], "uScreenSize" );
+   glUniform2f( m_Uniforms[ RenderPass_Blur ][ BlurPassUni_ScreenSize ], ( float ) screenSize.x, ( float ) screenSize.y );
+
+   glUseProgram( 0 );
+   
+   glGenFramebuffers( 1, &m_FBOs[ RenderPass_Blur ] );
+   ENG_ASSERT( m_FBOs[ RenderPass_Blur ] );
+   glBindFramebuffer( GL_FRAMEBUFFER, m_FBOs[ RenderPass_Blur ] );
+      
+   // Color output
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_SSAOBlur ] );
+   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_UsedTextures[ UsdTex_SSAOBlur ], 0 );
+
+   glBindTexture( GL_TEXTURE_2D, 0 );
+   glFramebufferTexture( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, 0, 0 );
+
+   glDrawBuffers( 1, outputAttatchments );
+
+   glBindTexture( GL_TEXTURE_2D, 0 );
+
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+   OpenglRenderHelper::CheckError();
    return S_OK; 
    };
 
@@ -178,5 +210,17 @@ void SSAORenderer::OnRender( void )
    OpenglRenderHelper::RenderQuad();
 
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+   ////////// BLUR //////////
+   glUseProgram( m_Programs[ RenderPass_Blur ] );
+   glBindFramebuffer( GL_FRAMEBUFFER, m_FBOs[ RenderPass_Blur ] );
+
+   glActiveTexture( GL_TEXTURE0 );
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_SSAO ] );
+
+   OpenglRenderHelper::RenderQuad();
+
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
    glUseProgram( 0 );
    }

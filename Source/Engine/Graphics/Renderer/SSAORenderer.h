@@ -47,6 +47,12 @@ class SSAORenderer : public IRenderer
          SamplePassUni_NoiseTextureSampleScale,
          SamplePassUni_Num
          };
+      enum BlurPassUniforms
+         {
+         BlurPassUni_SSAOTex,
+         BlurPassUni_ScreenSize,
+         BlurPassUni_Num
+         };
       enum UsedTextures
          {
          UsdTex_Depth,

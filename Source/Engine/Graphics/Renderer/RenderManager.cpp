@@ -64,8 +64,8 @@ int OpenGLRenderManager::VLightingPass( Scene* pScene )
 #ifdef _DEBUG
    // m_TextureDrawer.DrawTexture( m_SST[ SST_TileDebugging ], Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
 #endif // DEBUG
-   m_TextureDrawer.DrawTexture( m_SST[ SST_SSAO ], Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ), false );
-   m_TextureDrawer.DrawTexture( m_SST[ SST_MRT0 ], Point( 300, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
+   m_TextureDrawer.DrawTexture( m_SST[ SST_SSAO ], Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ), true );
+   m_TextureDrawer.DrawTexture( m_SST[ SST_SSAOBlur ], Point( 300, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ), true );
    m_TextureDrawer.DrawTexture( m_SST[ SST_MRT1 ], Point( 600, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
 
    m_MainRenderer.LightCulling( pScene );
@@ -170,7 +170,7 @@ int OpenGLRenderManager::OnRestoreTextures( void )
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_SSAO ] );
-   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB8, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );

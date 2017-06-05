@@ -17,7 +17,7 @@ uniform vec3 uSampleVectors[ MAX_SAMPLE_COUNT ];
 in vec2 vUV;
 in vec2 vViewRay;
 
-out vec4 oColor;
+out vec3 oColor;
 
 float DepthToViewSpaceDepth( float depth )
     {
@@ -69,7 +69,7 @@ void main()
         }
     occlusion = pow( 1.0 - occlusion / ( float( iterNum ) ), 2.0f );
     
-    oColor = vec4( occlusion );
+    oColor = vec3( occlusion );
     //if( iterNum == 100 )
     //    {
     //    oColor = vec4( 1, 0, 0, 1 );

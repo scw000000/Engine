@@ -1,6 +1,7 @@
 #version 430
 
 #define MAX_SAMPLE_COUNT 300
+#define SAMPLE_RADIUS 20.0f
 
 uniform sampler2D   uDepthTex;
 uniform sampler2D   uMRT0;
@@ -60,12 +61,12 @@ void main()
     float occlusion = 0.0f;
     for( int i = 0; i < iterNum; ++i )
         {
-        vec3 samplePointVS = ( tbn * uSampleVectors[ i ] * 10.0f ) + cuurrentPointVS;
+        vec3 samplePointVS = ( tbn * uSampleVectors[ i ] * SAMPLE_RADIUS ) + cuurrentPointVS;
         vec4 p = uProjectMat * vec4( samplePointVS, 1.0 );
         p.xy /= p.w;
         p = ( p + vec4( 1.0 ) ) * 0.5;
         float projectDepth = DepthToViewSpaceDepth( texture( uDepthTex, p.xy ).r );
-        occlusion += ( projectDepth > samplePointVS.z )? 1.0f : 0.0f;
+        occlusion += ( projectDepth > samplePointVS.z && abs( projectDepth - samplePointVS.z ) <= SAMPLE_RADIUS )? 1.0f : 0.0f;
         }
     occlusion = pow( 1.0 - occlusion / ( float( iterNum ) ), 2.0f );
     

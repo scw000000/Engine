@@ -382,6 +382,12 @@ int TBDRMainRenderer::OnRestoreLightingPass( Scene* pScene )
    m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_MRT1 ] = glGetUniformLocation( m_Programs[ RenderPass_Lighting ], "uMRT1" );
    glUniform1i( m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_MRT1 ], 2 );
 
+   m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_SSAOBlurTex ] = glGetUniformLocation( m_Programs[ RenderPass_Lighting ], "uSSAOBlurTex" );
+   glUniform1i( m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_SSAOBlurTex ], 3 );
+
+   m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_UseSSAO ] = glGetUniformLocation( m_Programs[ RenderPass_Lighting ], "uUseSSAO" );
+   glUniform1ui( m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_UseSSAO ], 1u );
+
    m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_TileNum ] = glGetUniformLocation( m_Programs[ RenderPass_Lighting ], "uTileNum" );
    glUniform2ui( m_Uniforms[ RenderPass_Lighting ][ LightingPassUni_TileNum ], m_TileNum[ 0 ], m_TileNum[ 1 ] );
 
@@ -455,6 +461,9 @@ void TBDRMainRenderer::CalculateLighting( void )
 
    glActiveTexture( GL_TEXTURE2 );
    glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt1 ] );
+
+   glActiveTexture( GL_TEXTURE3 );
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_SSAOBlur ] );
 
    OpenglRenderHelper::RenderQuad();
 

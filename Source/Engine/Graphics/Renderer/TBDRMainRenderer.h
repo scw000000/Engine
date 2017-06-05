@@ -57,6 +57,7 @@ class TBDRMainRenderer : public IMainRenderer
 #ifdef _DEBUG
          UsdTex_TileDebugging,
 #endif // _DEBUG
+         UsdTex_SSAOBlur,
          UsdTex_Num
          };
       GLuint m_UsedTextures[ UsdTex_Num ];
@@ -113,6 +114,8 @@ class TBDRMainRenderer : public IMainRenderer
          LightingPassUni_DepthTex,
          LightingPassUni_MRT0,
          LightingPassUni_MRT1,
+         LightingPassUni_SSAOBlurTex,
+         LightingPassUni_UseSSAO,
          LightingPassUni_TileNum,
          LightingPassUni_HalfSizeNearPlane,
          LightingPassUni_Proj,

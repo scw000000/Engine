@@ -53,6 +53,8 @@ layout ( std430, binding = 2 ) readonly buffer lightPropsSSBO
 uniform sampler2D   uDepthTex;
 uniform sampler2D   uMRT0;
 uniform sampler2D   uMRT1;
+uniform sampler2D   uSSAOBlurTex;
+uniform uint        uUseSSAO;
 uniform uvec2       uTileNum;
 // ratio between ( x, y ) and z value, y = tan( pCamera->GetFrustum().m_FovY / 2.0f );
 uniform vec2       uHalfSizeNearPlane; 
@@ -234,7 +236,13 @@ void main()
                                 shininess );
     
         }
-    outputColor += albedo * 0.2;
+       
+    float occlusion = 1.0f;
+    if( uUseSSAO == 1u )
+        {
+        occlusion = texture( uSSAOBlurTex, vUV ).r;
+        }
+    outputColor += albedo * 0.2 * occlusion;
     
     // doing the tone mapping
     outputColor = outputColor / ( outputColor + vec3( 0.187 ) ) * 1.035;

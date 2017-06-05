@@ -97,6 +97,10 @@ int SSAORenderer::VOnRestore( Scene* pScene )
       sampleVectors[ i ].x = ( random.Random() - 0.5f ) * 2.f;
       sampleVectors[ i ].y = ( random.Random() - 0.5f ) * 2.f;
       sampleVectors[ i ].z = random.Random();
+      sampleVectors[ i ].Normalize();
+      float scale = random.Random();
+      scale = Interpolate( scale * scale, 0.1f, 1.f );
+      sampleVectors[ i ] *= scale;
       }
    glUniform3fv( m_Uniforms[ RenderPass_Sample ][ SamplePassUni_SampleVectors ], MAX_SSAO_SAMPLE_POINTS, (GLfloat *) &sampleVectors[ 0 ] );
    

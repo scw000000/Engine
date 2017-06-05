@@ -14,9 +14,6 @@
 #include "EngineStd.h"
 #include "Math.h"
 
-//
-// void Interpolate									- Chapter 9, page 258
-//
 float Interpolate( float normalizedValue, float begin, float end )
    {
 	// first check input values

@@ -66,10 +66,10 @@ out vec4 oColor;
 vec3 ToViewSpace( vec3 p )
     {
     p = p * 2.0 - vec3( 1.0, 1.0, 1.0 ); // to NDC space
-    p.xy = uHalfSizeNearPlane * p.xy;
-    vec3 eyeDir = vec3( p.xy, -1 );
     float eyeDirScale = uProj[3][2] / ( p.z + uProj[2][2] ); 
-    return eyeDir * eyeDirScale;
+    p.xy *= uHalfSizeNearPlane;
+    p.z = -1.0;
+    return p * eyeDirScale;
     }
 
 vec3 GetNormal( vec4 mrt0 )
@@ -247,7 +247,7 @@ void main()
   //  outputColor += vec3( 0.2 );
   // outputColor = diffuse;
    // outputColor = vec4( vUV * 2.0 - vec2( 1.0, 1.0), 0.0, 1.0 );
-  // outputColor = vec4( meshPosVS.xyz, 1.0 );
+   // outputColor = ToViewSpace( vec3( vUV, depth ) );
   
     oColor = vec4( outputColor, 1.0f );
     }

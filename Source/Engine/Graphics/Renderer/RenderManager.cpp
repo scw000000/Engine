@@ -42,6 +42,8 @@ int OpenGLRenderManager::VOnRestore( Scene* pScene )
 #endif // _DEBUG                        
                                      );
    m_MainRenderer.VOnRestore( pScene );
+   m_SSAORenderer.OnRestoreTextures( m_SST[ SST_Depth ], m_SST[ SST_MRT0 ], m_SST[ SST_SSAO ], m_SST[ SST_SSAOBlur ] );
+   m_SSAORenderer.VOnRestore( pScene );
    m_TextureDrawer.VOnRestore( pScene );
    return S_OK;
    }
@@ -49,6 +51,7 @@ int OpenGLRenderManager::VOnRestore( Scene* pScene )
 int OpenGLRenderManager::VPreRender( void ) 
    {
    m_MainRenderer.VPreRender();
+   m_SSAORenderer.VPreRender();
    m_TextureDrawer.VPreRender();
    return S_OK;
    }
@@ -59,8 +62,9 @@ int OpenGLRenderManager::VLightingPass( Scene* pScene )
    float xSize = 300.f;
    float ySize = xSize * ( float ) screensize.y / ( float ) screensize.x;
 #ifdef _DEBUG
-   m_TextureDrawer.DrawTexture( m_SST[ SST_TileDebugging ], Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
+   // m_TextureDrawer.DrawTexture( m_SST[ SST_TileDebugging ], Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
 #endif // DEBUG
+   m_TextureDrawer.DrawTexture( m_SST[ SST_SSAO ], Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ), false );
    m_TextureDrawer.DrawTexture( m_SST[ SST_MRT0 ], Point( 300, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
    m_TextureDrawer.DrawTexture( m_SST[ SST_MRT1 ], Point( 600, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
 
@@ -71,6 +75,7 @@ int OpenGLRenderManager::VLightingPass( Scene* pScene )
 
 int OpenGLRenderManager::VSSAOPass( void )
    {
+   m_SSAORenderer.OnRender();
    return S_OK;
    }
 
@@ -94,6 +99,7 @@ int OpenGLRenderManager::VPostRender( void )
    m_TextureDrawer.VPostRender();
 
    m_MainRenderer.VPostRender();
+   m_SSAORenderer.VPostRender();
    return S_OK;
    }
 
@@ -101,6 +107,7 @@ void OpenGLRenderManager::VShutDown( void )
    {
    m_TextureDrawer.VShutdown();
    m_MainRenderer.VShutdown();
+   m_SSAORenderer.VShutdown();
    }
 
 void OpenGLRenderManager::CheckError( void ) 
@@ -134,6 +141,18 @@ int OpenGLRenderManager::OnRestoreTextures( void )
       {
       ENG_ASSERT( m_SST[ i ] );
       }
+   // Depth texture
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenSize.x, screenSize.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL );
+
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+   // For depth test
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE );
+
    // MRT 0
    glBindTexture( GL_TEXTURE_2D, m_SST[ SST_MRT0 ] );
    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA8, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
@@ -150,17 +169,20 @@ int OpenGLRenderManager::OnRestoreTextures( void )
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
-   // Depth texture
-   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Depth ] );
-   glTexImage2D( GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, screenSize.x, screenSize.y, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL );
-
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_SSAO ] );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB8, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-   // For depth test
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL );
-   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE );
+
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_SSAOBlur ] );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_R8, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
+
 
 #ifdef _DEBUG
    // Tile debugging

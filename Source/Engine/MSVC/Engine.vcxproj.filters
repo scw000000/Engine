@@ -304,6 +304,9 @@
     <ClCompile Include="..\Graphics\Renderer\TBDRMainRenderer.cpp">
       <Filter>Graphics\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\SSAORenderer.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -564,6 +567,9 @@
       <Filter>Graphics\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\Graphics\Renderer\TBDRMainRenderer.h">
+      <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\SSAORenderer.h">
       <Filter>Graphics\Renderer</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,13 +2,21 @@
 
 in vec2 oUV;
 
-out vec4 oColor;
+out vec3 oColor;
 
 uniform sampler2D uTexture;
+uniform uint uUseSingleColor;
 
 void main()
     {
-	oColor = vec4( texture( uTexture, oUV ).rgb, 1.0 );
-    //oColor.a = vec3( 0.0, 0.0, 1.0 );
-    //oColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+	vec3 sampleColor = texture( uTexture, oUV ).rgb;
+	// Output color = color of the texture at the specified UV
+    if( uUseSingleColor == 1u )
+        {
+        oColor = vec3( sampleColor.r );
+        }
+    else
+        {
+        oColor = sampleColor;
+        }
     }

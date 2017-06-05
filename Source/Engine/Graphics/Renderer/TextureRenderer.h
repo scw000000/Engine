@@ -22,7 +22,7 @@ class TextureRenderer : public IRenderer
       virtual void VShutdown( void ) override;
       virtual int VPreRender( void ) override;
       virtual int VPostRender( void ) override;
-      void DrawTexture( GLuint textureObj, const Point& offset, const Point& dimension );
+      void DrawTexture( GLuint textureObj, const Point& offset, const Point& dimension, bool useSingleColor = false );
 
    protected:
       void ReleaseResource( void );
@@ -34,4 +34,5 @@ class TextureRenderer : public IRenderer
       FragmentShader		m_FragmentShader;
 
       GLuint            m_TextureUni;
+      GLuint            m_UseSingleColorUni;
    };

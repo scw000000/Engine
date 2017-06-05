@@ -13,6 +13,7 @@
 */
 #include "TBDRMainRenderer.h"
 #include "TextureRenderer.h"
+#include "SSAORenderer.h"
 
 class OpenGLRenderManager : public IRenderManager
    {
@@ -42,6 +43,8 @@ class OpenGLRenderManager : public IRenderManager
          SST_Depth,
          SST_MRT0,
          SST_MRT1,
+         SST_SSAO,
+         SST_SSAOBlur,
 #ifdef _DEBUG
          SST_TileDebugging,
 #endif // _DEBUG   
@@ -51,5 +54,6 @@ class OpenGLRenderManager : public IRenderManager
       GLuint m_SST[ SST_Num ];
 
       TBDRMainRenderer m_MainRenderer;
+      SSAORenderer m_SSAORenderer;
       TextureRenderer m_TextureDrawer;
    };

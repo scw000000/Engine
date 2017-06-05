@@ -26,6 +26,7 @@ TextureRenderer::TextureRenderer( void ) :
    {
    m_Program = 0;
    m_TextureUni = 0;
+   m_UseSingleColorUni = 0;
    }
 
 
@@ -49,6 +50,9 @@ int TextureRenderer::VOnRestore( Scene* pScene )
    glUseProgram( m_Program );
    m_TextureUni = glGetUniformLocation( m_Program, "uTexture" );
    glUniform1i( m_TextureUni, 0 );
+
+   m_UseSingleColorUni = glGetUniformLocation( m_Program, "uUseSingleColor" );
+   glUniform1ui( m_UseSingleColorUni, 0u );
    glUseProgram( 0 );
 
    return S_OK;
@@ -63,7 +67,7 @@ int TextureRenderer::VPostRender( void )
    return S_OK;
    }
 
-void TextureRenderer::DrawTexture( GLuint textureObj, const Point& offset, const Point& dimension )
+void TextureRenderer::DrawTexture( GLuint textureObj, const Point& offset, const Point& dimension, bool useSingleColor /*= false */ )
    {
    glViewport( offset.x, offset.y, dimension.x, dimension.y );
 
@@ -71,11 +75,15 @@ void TextureRenderer::DrawTexture( GLuint textureObj, const Point& offset, const
    
    glActiveTexture( GL_TEXTURE0 );
    glBindTexture( GL_TEXTURE_2D, textureObj );
+
+   glUniform1ui( m_UseSingleColorUni, useSingleColor? 1u : 0u );
    
    OpenglRenderHelper::RenderQuad();
 
    auto screenSize = g_pApp->GetScreenSize();
    glViewport( 0, 0, screenSize.x, screenSize.y );
+
+   glUseProgram( 0 );
    }
 
 void TextureRenderer::ReleaseResource( void )

@@ -58,6 +58,7 @@ void main()
     vec3 cuurrentPointVS = DepthToViewSpaceVec( depth );
     
     uint iterNum = clamp( uSampleCount, 0u, MAX_SAMPLE_COUNT );
+    uint rejected = 0u;
     float occlusion = 0.0f;
     for( int i = 0; i < iterNum; ++i )
         {
@@ -66,9 +67,20 @@ void main()
         p.xy /= p.w;
         p = ( p + vec4( 1.0 ) ) * 0.5;
         float projectDepth = DepthToViewSpaceDepth( texture( uDepthTex, p.xy ).r );
-        occlusion += ( projectDepth > samplePointVS.z && abs( projectDepth - samplePointVS.z ) <= SAMPLE_RADIUS )? 1.0f : 0.0f;
+        
+        if( abs( projectDepth - samplePointVS.z ) <= SAMPLE_RADIUS )
+            {
+            if( projectDepth > samplePointVS.z )
+                {
+                occlusion += 1.0f;
+                }
+            }
+        else
+            {
+            ++rejected;
+            }
         }
-    occlusion = pow( 1.0 - occlusion / ( float( iterNum ) ), 2.0f );
+    occlusion = pow( 1.0 - occlusion / ( float( iterNum - rejected ) ), 2.0f );
     
     oColor = vec3( occlusion );
     //if( iterNum == 100 )

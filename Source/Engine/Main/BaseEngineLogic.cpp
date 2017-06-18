@@ -246,8 +246,8 @@ void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )
       {
       pView->VOnRender( fTime, fElapsedTime );
       }
-   m_pRenderManager->VLightingPass( m_pWrold.get() );
    m_pRenderManager->VSSAOPass();
+   m_pRenderManager->VLightingPass( m_pWrold.get() );
    m_pRenderManager->VMotionBlurPass();
    m_pRenderManager->VBloomPass();
    m_pRenderManager->VToneMappingPass();

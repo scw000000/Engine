@@ -137,6 +137,7 @@
     <ClCompile Include="..\Graphics\Renderer\RenderHelper.cpp" />
     <ClCompile Include="..\Graphics\Renderer\RenderManager.cpp" />
     <ClCompile Include="..\Graphics\Renderer\TextureRenderer.cpp" />
+    <ClCompile Include="..\Graphics\Renderer\ToneMappingRenderer.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\DirectionalLightSceneNode.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\MeshSceneNode.cpp" />
     <ClCompile Include="..\Graphics\SceneNode\SceneNodes.cpp" />
@@ -235,6 +236,7 @@
     <ClInclude Include="..\Graphics\Renderer\RenderHelper.h" />
     <ClInclude Include="..\Graphics\Renderer\RenderManager.h" />
     <ClInclude Include="..\Graphics\Renderer\TextureRenderer.h" />
+    <ClInclude Include="..\Graphics\Renderer\ToneMappingRenderer.h" />
     <ClInclude Include="..\Graphics\SceneNode\DirectionalLightSceneNode.h" />
     <ClInclude Include="..\Graphics\SceneNode\MeshSceneNode.h" />
     <ClInclude Include="..\Graphics\SceneNode\SceneNodes.h" />

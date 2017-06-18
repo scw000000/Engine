@@ -40,10 +40,15 @@ int OpenGLRenderManager::VOnRestore( Scene* pScene )
 #ifdef _DEBUG
                                      , m_SST[ SST_TileDebugging ]
 #endif // _DEBUG                        
+                                     , m_SST[ SST_Lighting ]
                                      );
    m_MainRenderer.VOnRestore( pScene );
    m_SSAORenderer.OnRestoreTextures( m_SST[ SST_Depth ], m_SST[ SST_MRT0 ], m_SST[ SST_SSAO ], m_SST[ SST_SSAOBlur ] );
    m_SSAORenderer.VOnRestore( pScene );
+
+   m_ToneMappingRenderer.OnRestoreTextures( m_SST[ SST_Lighting ] );
+   m_ToneMappingRenderer.VOnRestore( pScene );
+
    m_TextureDrawer.VOnRestore( pScene );
    return S_OK;
    }
@@ -52,6 +57,7 @@ int OpenGLRenderManager::VPreRender( void )
    {
    m_MainRenderer.VPreRender();
    m_SSAORenderer.VPreRender();
+   m_ToneMappingRenderer.VPreRender();
    m_TextureDrawer.VPreRender();
    return S_OK;
    }
@@ -91,6 +97,7 @@ int OpenGLRenderManager::VBloomPass( void )
 
 int OpenGLRenderManager::VToneMappingPass( void )
    {
+   m_ToneMappingRenderer.OnRender();
    return S_OK;
    }
 
@@ -108,7 +115,9 @@ void OpenGLRenderManager::VShutDown( void )
    m_TextureDrawer.VShutdown();
    m_MainRenderer.VShutdown();
    m_SSAORenderer.VShutdown();
+   m_ToneMappingRenderer.VShutdown();
    }
+
 
 void OpenGLRenderManager::CheckError( void ) 
    {
@@ -183,6 +192,12 @@ int OpenGLRenderManager::OnRestoreTextures( void )
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
    glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
+   glBindTexture( GL_TEXTURE_2D, m_SST[ SST_Lighting ] );
+   glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB16F, screenSize.x, screenSize.y, 0, GL_RGBA, GL_FLOAT, NULL );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
+   glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 
 #ifdef _DEBUG
    // Tile debugging

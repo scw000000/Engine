@@ -14,6 +14,7 @@
 #include "TBDRMainRenderer.h"
 #include "TextureRenderer.h"
 #include "SSAORenderer.h"
+#include "ToneMappingRenderer.h"
 
 class OpenGLRenderManager : public IRenderManager
    {
@@ -43,8 +44,10 @@ class OpenGLRenderManager : public IRenderManager
          SST_Depth,
          SST_MRT0,
          SST_MRT1,
+         SST_MRT2,
          SST_SSAO,
          SST_SSAOBlur,
+         SST_Lighting,
 #ifdef _DEBUG
          SST_TileDebugging,
 #endif // _DEBUG   
@@ -55,5 +58,6 @@ class OpenGLRenderManager : public IRenderManager
 
       TBDRMainRenderer m_MainRenderer;
       SSAORenderer m_SSAORenderer;
+      ToneMappingRenderer m_ToneMappingRenderer;
       TextureRenderer m_TextureDrawer;
    };

@@ -208,6 +208,7 @@ int TBDRMainRenderer::OnRestoreTextures( GLuint depTex
 #ifdef _DEBUG
                                              , GLuint tileDebugTex
 #endif // _DEBUG
+                                             , GLuint lightingTex
                                              )
    {
    m_UsedTextures[ UsdTex_Depth ] = depTex;
@@ -216,7 +217,7 @@ int TBDRMainRenderer::OnRestoreTextures( GLuint depTex
 #ifdef _DEBUG
    m_UsedTextures[ UsdTex_TileDebugging ] = tileDebugTex;
 #endif // _DEBUG
-
+   m_UsedTextures[ UsdTex_Lighting ] = lightingTex;
    return S_OK;
    }
 
@@ -346,6 +347,19 @@ int TBDRMainRenderer::OnRestourLightCullPass( Scene* pScene )
 
    glUseProgram( m_Programs[ RenderPass_LightCulling ] );
 
+   glGenFramebuffers( 1, &m_FBO[ RenderPass_Lighting ] );
+   ENG_ASSERT( m_FBO[ RenderPass_Lighting ] );
+   glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Lighting ] );
+
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Lighting ] );
+   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_UsedTextures[ UsdTex_Lighting ], 0 );
+
+   GLuint outputAttatchments[] = { GL_COLOR_ATTACHMENT0 };
+   glDrawBuffers( 1, outputAttatchments );
+
+   glBindTexture( GL_TEXTURE_2D, 0 );
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
    m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_DepthTex ] = glGetUniformLocation( m_Programs[ RenderPass_LightCulling ], "uDepthTex" );
    glUniform1i( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_DepthTex ], 0 );
 
@@ -445,6 +459,8 @@ void TBDRMainRenderer::CalculateLighting( void )
    {
    glMemoryBarrier( GL_SHADER_STORAGE_BARRIER_BIT );
 
+   glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Lighting ] );
+
    glUseProgram( m_Programs[ RenderPass_Lighting ] );
 
    glBindBufferBase( GL_SHADER_STORAGE_BUFFER, 0, m_SSBOs[ SSBO_LightIndexList ] );
@@ -466,6 +482,8 @@ void TBDRMainRenderer::CalculateLighting( void )
    glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_SSAOBlur ] );
 
    OpenglRenderHelper::RenderQuad();
+
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
    glUseProgram( 0 );
 

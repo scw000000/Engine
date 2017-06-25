@@ -248,8 +248,8 @@ void BaseEngineLogic::VOnRender( double fTime, float fElapsedTime )
       }
    m_pRenderManager->VSSAOPass();
    m_pRenderManager->VLightingPass( m_pWrold.get() );
-   m_pRenderManager->VMotionBlurPass();
    m_pRenderManager->VBloomPass();
+   m_pRenderManager->VMotionBlurPass();
    m_pRenderManager->VToneMappingPass();
    VRenderDiagnostics();
    //Render GUI last

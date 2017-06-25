@@ -37,6 +37,7 @@ class TBDRMainRenderer : public IMainRenderer
                              , GLuint tileDebugTex
 #endif // _DEBUG
                              , GLuint lightingTex
+                             , GLuint lightThresHoldTex
                              );
 
    protected:
@@ -62,6 +63,7 @@ class TBDRMainRenderer : public IMainRenderer
 #endif // _DEBUG
          UsdTex_SSAOBlur,
          UsdTex_Lighting,
+         UsdTex_LightThreshold,
          UsdTex_Num
          };
       GLuint m_UsedTextures[ UsdTex_Num ];

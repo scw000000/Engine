@@ -210,6 +210,7 @@ int TBDRMainRenderer::OnRestoreTextures( GLuint depTex
                                              , GLuint tileDebugTex
 #endif // _DEBUG
                                              , GLuint lightingTex
+                                             , GLuint lightThresHoldTex
                                              )
    {
    m_UsedTextures[ UsdTex_Depth ] = depTex;
@@ -220,6 +221,7 @@ int TBDRMainRenderer::OnRestoreTextures( GLuint depTex
    m_UsedTextures[ UsdTex_TileDebugging ] = tileDebugTex;
 #endif // _DEBUG
    m_UsedTextures[ UsdTex_Lighting ] = lightingTex;
+   m_UsedTextures[ UsdTex_LightThreshold ] = lightThresHoldTex;
    return S_OK;
    }
 
@@ -288,7 +290,6 @@ int TBDRMainRenderer::OnRestoreTileFrustum( Scene* pScene )
 
 int TBDRMainRenderer::OnRestoreGeometryPass()
    {
-
    GenerateProgram( RenderPass_Geometry );
    
    glGenFramebuffers( 1, &m_FBO[ RenderPass_Geometry ] );
@@ -363,8 +364,11 @@ int TBDRMainRenderer::OnRestourLightCullPass( Scene* pScene )
    glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Lighting ] );
    glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_UsedTextures[ UsdTex_Lighting ], 0 );
 
-   GLuint outputAttatchments[] = { GL_COLOR_ATTACHMENT0 };
-   glDrawBuffers( 1, outputAttatchments );
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_LightThreshold ] );
+   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_UsedTextures[ UsdTex_LightThreshold ], 0 );
+
+   GLuint outputAttatchments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+   glDrawBuffers( 2, outputAttatchments );
 
    glBindTexture( GL_TEXTURE_2D, 0 );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );

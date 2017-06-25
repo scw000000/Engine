@@ -64,7 +64,8 @@ uniform mat4        uProj;
 
 in vec2 vUV;
 
-out vec4 oColor;
+layout(location = 0) out vec3 oColor; 
+layout(location = 1) out vec3 oLightThreshold; 
 
 // input: [ 0, 1 ].xyz
 vec3 ToViewSpace( vec3 p )
@@ -283,6 +284,14 @@ void main()
         }
     outputColor += albedo * 0.04 * occlusion;
     
+    // outputColor = clamp( outputColor, 0.0f, 50.f );
+    
+    oLightThreshold = vec3( 0.0f );
+    if( dot( outputColor.rgb, vec3( 0.2126, 0.7152, 0.0722 ) ) > 0.03f )
+        {
+        oLightThreshold = outputColor;
+        }
+    
     // doing the tone mapping
     // outputColor = outputColor / ( outputColor + vec3( 0.187 ) ) * 1.035;
     
@@ -298,7 +307,7 @@ void main()
   // outputColor = diffuse;
    // outputColor = vec4( vUV * 2.0 - vec2( 1.0, 1.0), 0.0, 1.0 );
    // outputColor = ToViewSpace( vec3( vUV, depth ) );
-  
-    oColor = vec4( outputColor, 1.0f );
+    oColor = outputColor;
+    // oColor = vec4( outputColor, 1.0f );
     }
 

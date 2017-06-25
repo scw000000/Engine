@@ -14,12 +14,10 @@
 
 #include "EngineStd.h"
 #include "MotionBlurRenderer.h"
-
-
 #include "RendererLoader.h"
 #include "RenderHelper.h"
 
-const char* const VERTEX_SHADER_FILE_NAME = "Effects\\MotionBlur.vs.glsl";
+const char* const VERTEX_SHADER_FILE_NAME = "Effects\\QuadShader.vs.glsl";
 const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\MotionBlur.fs.glsl";
 
 MotionBlurRenderer::MotionBlurRenderer( void )

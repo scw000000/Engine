@@ -30,7 +30,7 @@ void main(){
     // transform from [+-1] to [0,1]
     oMRT0.xyz = ( oMRT0.xyz + 1.0 ) * 0.5;
     
-    oMRT0.w = 0.8;
+    oMRT0.w = 0.9;
     
     oMRT1.xyz = texture( uAlbedoTex, vUV ).rgb;
     oMRT1.w = 0.01;

@@ -131,6 +131,7 @@
     <ClCompile Include="..\Event\EventFactory.cpp" />
     <ClCompile Include="..\Graphics\Light.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
+    <ClCompile Include="..\Graphics\Renderer\BloomRenderer.cpp" />
     <ClCompile Include="..\Graphics\Renderer\MotionBlurRenderer.cpp" />
     <ClCompile Include="..\Graphics\Renderer\SSAORenderer.cpp" />
     <ClCompile Include="..\Graphics\Renderer\TBDRMainRenderer.cpp" />
@@ -231,6 +232,7 @@
     <ClInclude Include="..\Event\EventFactory.h" />
     <ClInclude Include="..\Graphics\Light.h" />
     <ClInclude Include="..\Graphics\Material.h" />
+    <ClInclude Include="..\Graphics\Renderer\BloomRenderer.h" />
     <ClInclude Include="..\Graphics\Renderer\MotionBlurRenderer.h" />
     <ClInclude Include="..\Graphics\Renderer\SSAORenderer.h" />
     <ClInclude Include="..\Graphics\Renderer\TBDRMainRenderer.h" />

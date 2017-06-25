@@ -14,6 +14,7 @@
 #include "TBDRMainRenderer.h"
 #include "TextureRenderer.h"
 #include "SSAORenderer.h"
+#include "BloomRenderer.h"
 #include "MotionBlurRenderer.h"
 #include "ToneMappingRenderer.h"
 
@@ -49,6 +50,8 @@ class OpenGLRenderManager : public IRenderManager
          SST_SSAO,
          SST_SSAOBlur,
          SST_Lighting,
+         SST_LightThreshold,
+         SST_Bloom,
          SST_MotionBlur,
 #ifdef _DEBUG
          SST_TileDebugging,
@@ -60,6 +63,7 @@ class OpenGLRenderManager : public IRenderManager
 
       TBDRMainRenderer m_MainRenderer;
       SSAORenderer m_SSAORenderer;
+      BloomRenderer m_BloomRenderer;
       MotionBlurRenderer m_MotionBlurRenderer;
       ToneMappingRenderer m_ToneMappingRenderer;
       TextureRenderer m_TextureDrawer;

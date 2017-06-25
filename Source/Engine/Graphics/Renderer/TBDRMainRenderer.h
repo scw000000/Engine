@@ -32,6 +32,7 @@ class TBDRMainRenderer : public IMainRenderer
       int OnRestoreTextures( GLuint depTex 
                              , GLuint mrt0Tex 
                              , GLuint mrt1Tex
+                             , GLuint mrt2Tex
 #ifdef _DEBUG
                              , GLuint tileDebugTex
 #endif // _DEBUG
@@ -55,6 +56,7 @@ class TBDRMainRenderer : public IMainRenderer
          UsdTex_Depth,
          UsdTex_Mrt0,
          UsdTex_Mrt1,
+         UsdTex_Mrt2,
 #ifdef _DEBUG
          UsdTex_TileDebugging,
 #endif // _DEBUG
@@ -94,6 +96,7 @@ class TBDRMainRenderer : public IMainRenderer
       enum GeometryPassUniforms
          {
          GeometryPassUni_MVP,
+         GeometryPassUni_PrevMVP,
          GeometryPassUni_NormalMat,
          GeometryPassUni_AlbedoTexture,
          GeometryPassUni_NormalMapTexture,

@@ -95,4 +95,6 @@ class MeshSceneNode : public SceneNode
 
       bool              m_UseNormalMap;
       GLuint            m_NormalMapTextureObj;
+
+      Mat4x4            m_PrevMVP;
    };

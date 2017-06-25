@@ -726,7 +726,7 @@ void EngineApp::OnFrameRender( double fTime, float fElapsedTime )
    }
 
 // This is a WINDOWS dedicated function
-// LATER: This function doesn't work as expected, it won't "blink" on and off, and I cann't find a solution yet
+// LATER: This function doesn't work as expected, it won't "blink" on and off
 void EngineApp::FlashWhileMinimized( void )
    {
 #if !defined( _WINDOWS ) && !defined( WINDOWS )
@@ -739,7 +739,7 @@ void EngineApp::FlashWhileMinimized( void )
       }
    HWND hwnd = GetHwnd();
    ENG_ASSERT( hwnd );
-   // If the window is minized
+   // If the window is minimized
    if( GetWindowState() & SDL_WINDOW_MINIMIZED )
       {
       GetGlobalTimer()->GetElapsedTime();

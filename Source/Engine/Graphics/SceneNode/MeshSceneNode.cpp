@@ -224,6 +224,9 @@ int MeshSceneNode::VRender( Scene *pScene )
    auto mvp = proj * view * model;
    glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_MVP ], 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
    
+   glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_PrevMVP ], 1, GL_FALSE, &m_PrevMVP[ 0 ][ 0 ] );
+
+   m_PrevMVP = mvp;
    Mat4x4 normalMat = ( view * model );
    normalMat = normalMat.Inverse().Transpose();
    glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_NormalMat ], 1, GL_FALSE, &normalMat[ 0 ][ 0 ] );

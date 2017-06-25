@@ -310,6 +310,9 @@
     <ClCompile Include="..\Graphics\Renderer\ToneMappingRenderer.cpp">
       <Filter>Graphics\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\Graphics\Renderer\MotionBlurRenderer.cpp">
+      <Filter>Graphics\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -576,6 +579,9 @@
       <Filter>Graphics\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\Graphics\Renderer\ToneMappingRenderer.h">
+      <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Graphics\Renderer\MotionBlurRenderer.h">
       <Filter>Graphics\Renderer</Filter>
     </ClInclude>
   </ItemGroup>

@@ -45,8 +45,8 @@ int ToneMappingRenderer::VOnRestore( Scene* pScene )
      
    glUseProgram( m_Program );
 
-   m_Uniforms[ Uniforms_Num ] = glGetUniformLocation( m_Program, "uDepthTex" );
-   glUniform1i( m_Uniforms[ Uniforms_Num ], 0 );
+   m_Uniforms[ Uniforms_LightingTex ] = glGetUniformLocation( m_Program, "uLightingTex" );
+   glUniform1i( m_Uniforms[ Uniforms_LightingTex ], 0 );
 
    glUseProgram( 0 );
 

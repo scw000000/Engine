@@ -102,7 +102,7 @@ int TBDRMainRenderer::VOnRestore( Scene* pScene )
 int TBDRMainRenderer::VPreRender( void )
    {
    glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
-   glClear( GL_DEPTH_BUFFER_BIT );
+   glClear( GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    glClear( GL_DEPTH_BUFFER_BIT );
    return S_OK;
@@ -205,6 +205,7 @@ int TBDRMainRenderer::OnRestoreSSBO( void )
 int TBDRMainRenderer::OnRestoreTextures( GLuint depTex
                                              , GLuint mrt0Tex
                                              , GLuint mrt1Tex
+                                             , GLuint mrt2Tex
 #ifdef _DEBUG
                                              , GLuint tileDebugTex
 #endif // _DEBUG
@@ -214,6 +215,7 @@ int TBDRMainRenderer::OnRestoreTextures( GLuint depTex
    m_UsedTextures[ UsdTex_Depth ] = depTex;
    m_UsedTextures[ UsdTex_Mrt0 ] = mrt0Tex;
    m_UsedTextures[ UsdTex_Mrt1 ] = mrt1Tex;
+   m_UsedTextures[ UsdTex_Mrt2 ] = mrt2Tex;
 #ifdef _DEBUG
    m_UsedTextures[ UsdTex_TileDebugging ] = tileDebugTex;
 #endif // _DEBUG
@@ -306,8 +308,12 @@ int TBDRMainRenderer::OnRestoreGeometryPass()
    glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt1 ] );
    glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_UsedTextures[ UsdTex_Mrt1 ], 0 );
 
-   GLuint outputAttatchments[ ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, /*GL_COLOR_ATTACHMENT2*/ };
-   glDrawBuffers( 2, outputAttatchments );
+   // MRT 2
+   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt2 ] );
+   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, m_UsedTextures[ UsdTex_Mrt2 ], 0 );
+
+   GLuint outputAttatchments[ ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+   glDrawBuffers( 3, outputAttatchments );
 
    glBindTexture( GL_TEXTURE_2D, 0 );
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
@@ -315,6 +321,9 @@ int TBDRMainRenderer::OnRestoreGeometryPass()
   //  glDrawBuffer( GL_NONE );
    m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMVP" );
    ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
+   
+   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_PrevMVP ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uPrevMVP" );
+   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_PrevMVP ] != -1 );
 
    m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uNormal" );
    ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] != -1 );

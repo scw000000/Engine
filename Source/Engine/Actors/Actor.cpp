@@ -66,7 +66,7 @@ void Actor::Update( float deltaSeconds )
    {
    for (ActorComponents::iterator it = m_Components.begin(); it != m_Components.end(); ++it)
       {
-      it->second->VUpdate(deltaSeconds);
+      it->second->VUpdate( deltaSeconds );
       }
    }
 

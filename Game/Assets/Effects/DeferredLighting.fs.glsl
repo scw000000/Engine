@@ -185,6 +185,10 @@ vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 albedo, float m
         {
         case LIGHT_TYPE_POINT:
             lightDir = light.m_PositionVS - meshPosVS;
+            if( dot( lightDir, lightDir ) > light.m_Attenuation.w * light.m_Attenuation.w )
+                {
+                return vec3( 0.0, 0.0, 0.0 );
+                }
             lightDir = normalize( lightDir );
             luminosity = GetLuminosity( light.m_PositionVS, light.m_Attenuation.xyz, meshPosVS );
             break;
@@ -197,12 +201,6 @@ vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 albedo, float m
         default:
             return vec3( 0.0, 0.0, 0.0 );  
         };
-    
-    // not directional light and outside of range of light
-    if( dist >= 0.0 && dist > light.m_Attenuation.w )
-        {
-        return vec3( 0.0, 0.0, 0.0 );
-        } 
     
     vec3 halfway = normalize( lightDir + viewDir );
     float ndotl = max( dot( lightDir, normal ), 0.0 );
@@ -268,6 +266,7 @@ void main()
         //    break;
         //    }
         //Light light = LightPropsSSBO.data[ LightIdxListSSBO.data[ listOffset + i ] ];
+        
         outputColor += CalcLight(    LightIdxListSSBO.data[ listOffset + i ], 
                                 meshPosVS, 
                                 normal, 

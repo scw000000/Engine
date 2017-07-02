@@ -50,7 +50,7 @@ namespace EngLogger
 	} \
 	while (0)\
 
-#if 1 //ndef NDEBUG
+#ifdef DEBUG
 
 // Errors are bad and potentially fatal.  They are presented as a dialog with Abort, Retry, and Ignore.  Abort will
 // break into the debugger, retry will continue the game, and ignore will continue the game and ignore every subsequent 
@@ -111,10 +111,10 @@ namespace EngLogger
 
 // These are the release mode definitions for the macros above.  They are all defined in such a way as to be 
 // ignored completely by the compiler.
-#define ENG_ERROR(str) do { (void)sizeof(str); } while(0) 
-#define ENG_WARNING(str) do { (void)sizeof(str); } while(0) 
-#define ENG_INFO(str) do { (void)sizeof(str); } while(0) 
-#define ENG_LOG(tag, str) do { (void)sizeof(tag); (void)sizeof(str); } while(0) 
-#define ENG_ASSERT(expr) do { (void)sizeof(expr); } while(0) 
+#define ENG_ERROR(str) do { str; } while(0) 
+#define ENG_WARNING(str) do { str; } while(0) 
+#define ENG_INFO(str) do { str; } while(0) 
+#define ENG_LOG(tag, str) do { str; } while(0) 
+#define ENG_ASSERT(expr) do { expr; } while(0) 
 
 #endif  // !defined NDEBUG

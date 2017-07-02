@@ -156,18 +156,18 @@ void LightManager::CalcLighting( Scene *pScene )
      // lightIt->get()->VPreRenderShadowMap();
       }
 
-   if( pScene->m_pRoot ) 
-      {
-      //auto pStaticGroup = pScene->m_pRoot->m_Children[ RenderPass_Static ];
-     // CalcShadow( pStaticGroup );
-      auto pActorGroup = pScene->m_pRoot->m_Children[ RenderGroup_Actor ];
-      auto& childrenList = pActorGroup->VGetChildrenSceneNodes();
-      for( auto pChild : childrenList )
-         {
-         CalcShadow( pScene, pChild );
-         }
-    //  CalcShadow( pScene, pActorGroup );
-      }
+   //if( pScene->m_pRoot ) 
+   //   {
+   //   //auto pStaticGroup = pScene->m_pRoot->m_Children[ RenderPass_Static ];
+   //  // CalcShadow( pStaticGroup );
+   //   auto pActorGroup = pScene->m_pRoot->m_Children[ RenderGroup_Actor ];
+   //   auto& childrenList = pActorGroup->VGetChildrenSceneNodes();
+   //   for( auto pChild : childrenList )
+   //      {
+   //      CalcShadow( pScene, pChild );
+   //      }
+   // //  CalcShadow( pScene, pActorGroup );
+   //   }
 
    int i = 0;
    for( Lights::iterator lightIt = m_ActiveLights.begin(); lightIt != m_ActiveLights.end(); ++lightIt, ++i )

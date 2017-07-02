@@ -796,12 +796,12 @@ void EngineApp::OnClose()
    m_bIsRunning = false;
 	// release all the game systems in reverse order from which they were created
    ENG_LOG( "Test", "On close" );
-   SInputManager::DeleteSingleton();
 	SAFE_DELETE( m_pEngineLogic );
    SAFE_DELETE( m_pVideoResCache );
    IMG_Quit();
    SDL_DestroyWindow( m_pWindow );
    SDL_Quit();
+   SInputManager::DeleteSingleton();
    SAFE_DELETE( m_pEventManager );
    SAFE_DELETE( m_pResCache );
 

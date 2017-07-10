@@ -42,10 +42,11 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\..\Lib\Win32Release\</OutputPath>
+    <OutputPath>..\..\..\Game\Bin\Win32Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="SDL2-CS, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">

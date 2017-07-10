@@ -123,6 +123,7 @@ StrongActorPtr BaseEngineLogic::VCreateActor( shared_ptr< Resource > pActorRes, 
        {
        // Insert into actor map
        m_Actors.insert( std::make_pair( pActor->GetId(), pActor ) );
+       ENG_LOG( "Actor", std::string( "Actor " ) + std::to_string( pActor->GetId() ) + " added" );
        return pActor;
        }
     else
@@ -265,6 +266,50 @@ void BaseEngineLogic::VRenderDiagnostics( void ) const
       }
    }
 
+void BaseEngineLogic::VOnFileDrop( const char* filePath, const Point& dropLocation ) 
+   {
+   shared_ptr< Resource > pFileRes( ENG_NEW Resource( filePath ) );
+   // std::string extension = fileRes.GetExtension();
+   // this means it's drag-dropped from folder directly
+   if( WildcardMatch( "*game*", pFileRes->m_Name.c_str() ) )
+      {
+      // int startIdx = std::string::find_last_of( pFileRes->m_Name.c_str(), "assets" );
+      auto startIdx = pFileRes->m_Name.find_first_of( "game" );
+      if( startIdx != std::string::npos )
+         {
+         std::cout << pFileRes->m_Name.substr( startIdx ) << " ddddd";
+         //pFileRes->m_Name = pFileRes->m_Name.substr( startIdx + std::string( "assets\\" ).length() );
+         }
+      
+      }
+   if( WildcardMatch( "*.xml", pFileRes->m_Name.c_str() ) )
+      {
+      TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( pFileRes );
+      std::string rootName = pRoot->Value();
+      TransformPtr pTransform( m_pWrold->GetCamera()->VGetProperties().GetTransformPtr() );
+      Vec3 projStart;
+      Vec3 projEnd;
+      m_pWrold->GetCamera()->GetScreenProjectPoint( projStart, projEnd, dropLocation, 17.f );
+      pTransform->SetPosition( projEnd );
+      if( !std::strcmp( rootName.c_str(), "ActorClass" ) )
+         {
+         VCreateActor( pFileRes, pTransform );
+         }
+      else if( !std::strcmp( rootName.c_str(), "World" ) )
+         {
+         VClearWorld();
+         std::string newLevelInstanceDir = pFileRes->GetFileName();
+         auto rBound = pFileRes->m_Name.find_last_of( "\\" );
+         auto firstIdx = pFileRes->m_Name.find_last_of( "\\", rBound - 1 );
+         ++firstIdx;
+         std::string levelFolderName = pFileRes->m_Name.substr( firstIdx, rBound + 1 - firstIdx );
+         g_pApp->m_EngineOptions.SetLevelInstanceDirectory( levelFolderName );
+         VLoadLevel();
+         }
+      }
+   }
+
+
 // this function is called by EngineApp::VLoadGame
 // LATER: finish implementation
 bool BaseEngineLogic::VLoadLevel()
@@ -341,8 +386,8 @@ bool BaseEngineLogic::VLoadLevel()
       {
       float x = random.Random() * ( 1421.f + 1290.f ) - 1290.f;
       float z = random.Random() * ( 634 + 565 ) - 565.f;
-      TransformPtr pTransform( ENG_NEW Transform( Vec3( x, 20.f, z ) ) );
-      VCreateActor( shared_ptr< Resource >( ENG_NEW Resource( "actors\\light.xml" ) ), pTransform );
+      //TransformPtr pTransform( ENG_NEW Transform( Vec3( x, 20.f, z ) ) );
+     // VCreateActor( shared_ptr< Resource >( ENG_NEW Resource( "actors\\light.xml" ) ), pTransform );
       }
    return true;
    }

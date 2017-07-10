@@ -56,8 +56,8 @@ EngineApp::~EngineApp( void )
 
 Renderer EngineApp::GetRendererImpl( void )
    {
-   GLint majVer;
-   GLint minVer;
+   GLint majVer = 0;
+   GLint minVer = 0;
    glGetIntegerv( GL_MINOR_VERSION, &majVer );
    glGetIntegerv( GL_MAJOR_VERSION, &minVer );
    std::stringstream  ss;
@@ -229,7 +229,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
       }
 
    // Only if execute under editor can engine allow file drop 
-   if( m_EngineOptions.GetEngineEnvironment() == Environment_Editor )
+   if( true || m_EngineOptions.GetEngineEnvironment() == Environment_Editor )
       {
       SDL_EventState( SDL_DROPFILE, SDL_ENABLE );
       }

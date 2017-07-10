@@ -44,6 +44,11 @@ void EditorLogic::VOnFileDrop( const char* filePath, const Point& dropLocation )
          {
          VClearWorld();
          std::string newLevelInstanceDir = pFileRes->GetFileName();
+         auto rBound = pFileRes->m_Name.find_last_of( "\\" );
+         auto firstIdx = pFileRes->m_Name.find_last_of( "\\", rBound - 1 );
+         ++firstIdx;
+         std::string levelFolderName = pFileRes->m_Name.substr( firstIdx, rBound + 1 - firstIdx );
+         g_pApp->m_EngineOptions.SetLevelInstanceDirectory( levelFolderName );
          VLoadLevel();
          }
       }

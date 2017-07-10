@@ -79,7 +79,7 @@ int Scene::OnRender( void )
       // Base pass rendering
 		if ( m_pRoot->VPreRender( this ) == S_OK )
 		   {
-			m_pRoot->VRender( this );
+			// m_pRoot->VRender( this );
 			m_pRoot->VRenderChildren( this );
 			m_pRoot->VPostRender( this );
 		   }

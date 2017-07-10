@@ -58,7 +58,7 @@ namespace LevelEditorApp
                m_Width,
                m_Height,
                SDL.SDL_WindowFlags.SDL_WINDOW_BORDERLESS | SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL );
-            //IntPtr pContext = SDL2.SDL.SDL_GL_CreateContext( m_pSDLWindow );
+            IntPtr pContext = SDL2.SDL.SDL_GL_CreateContext( m_pSDLWindow );
             SDL.SDL_SysWMinfo info = new SDL.SDL_SysWMinfo();
             SDL.SDL_GetWindowWMInfo( m_pSDLWindow, ref info );
             m_pSDLWindowHandle = info.info.win.window;

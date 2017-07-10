@@ -71,7 +71,7 @@ void LoadLevel( BSTR levelPath )
    std::string temp = levelFilePath.substr( 0, levelFilePath.find_last_of( "\\" ) ); // remove string after last "\\"
    auto leftBound = temp.find_last_of( "\\" ) + 1;// find the index of second last "\\" + 1
    std::string levelInstanceDir = levelFilePath.substr( leftBound, rightBound - leftBound );
-   
+   ENG_LOG("Test", "Clear world");
    g_pApp->m_pEngineLogic->VClearWorld();
    g_pApp->m_EngineOptions.SetLevelInstanceDirectory( levelInstanceDir );
    g_pApp->m_pEngineLogic->VLoadLevel();

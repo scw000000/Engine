@@ -222,7 +222,8 @@ bool SceneNode::VAddChild( shared_ptr<ISceneNode> child )
 
 bool SceneNode::VRemoveChild( ActorId id )
    {
-   for( auto it = m_Children.begin(); it != m_Children.end(); ++it )
+   bool success = false;
+   for( auto it = m_Children.begin(); it != m_Children.end(); /*++it */)
 	   {
 		ActorId childId = (*it)->VGetProperties().GetActorId();
       if( childId != INVALID_ACTOR_ID && childId == id )
@@ -230,11 +231,15 @@ bool SceneNode::VRemoveChild( ActorId id )
          shared_ptr< IEvent > pEvent( ENG_NEW Event_Destroy_Scene_Node( *it ) );
          EventManager::GetSingleton()->VTriggerEvent( pEvent );
          ( *it )->VRemoveChild( id );
-			m_Children.erase( it );	//this can be expensive for vectors
-			return true;
+			it = m_Children.erase( it );	//this can be expensive for vectors
+         success = true;
 		   }
+      else 
+         {
+         ++it;
+         }
 	   }
-	return false;
+	return success;
    }
 
 int SceneNode::VOnLostDevice( Scene *pScene )

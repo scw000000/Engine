@@ -127,6 +127,7 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
    m_Buffers[ Normal_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Normal ];
    m_Buffers[ Tangent_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Tangent ];
    m_Buffers[ Bitangent_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Bitangent ];
+   // ENG_LOG( "Actor", std::to_string( this->m_pRenderComponent->VGetActorComponentId() ) + " " + std::to_string( meshIdx ) );
    //if(  )
    //   {
    //   }

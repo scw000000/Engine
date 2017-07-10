@@ -35,6 +35,7 @@ class LevelManager
    public:
       Level GetCurrentLevel() const { return pCurrentLevelRes->m_Name; }
       void Init( void );
+      void SetCurrentLevel( const Level& level );
 
    protected:
       shared_ptr<Resource> pCurrentLevelRes;
@@ -91,7 +92,7 @@ class BaseEngineLogic : public IEngineLogic
       virtual void VOnRender( double fTime, float fElapsedTime ) override;
       virtual void VRenderDiagnostics( void ) const override;
 
-      virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) override { }
+      virtual void VOnFileDrop( const char* filePath, const Point& dropLocation ) override;
 
       void AttachProcess(StrongProcessPtr pProcess) { if (m_pProcessManager) {m_pProcessManager->AttachProcess(pProcess);} }
       virtual void VClearWorld( void ) override;

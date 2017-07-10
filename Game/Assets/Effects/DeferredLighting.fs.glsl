@@ -193,7 +193,6 @@ vec3 CalcLight( uint lightIdx, vec3 meshPosVS, vec3 normal, vec3 albedo, float m
             luminosity = GetLuminosity( light.m_PositionVS, light.m_Attenuation.xyz, meshPosVS );
             break;
         case LIGHT_TYPE_DIRECTIONAL:
-            return vec3( 0.0, 1.0, 0.0 );  
             lightDir = -light.m_DirectionVS;
             dist = -1.0;
             luminosity = 1.0;

@@ -11,7 +11,11 @@ namespace LevelEditorApp
    {
    static class NativeMethods
       {
-      const string editorDllName = "EditorDLLWin32Debug.dll";
+#if DEBUG  
+    const string editorDllName = "EditorDLLWin32Debug.dll";
+#else
+    const string editorDllName = "EditorDLLWin32Release.dll";
+#endif
 
       [DllImport( editorDllName, CallingConvention = CallingConvention.Cdecl )]
       public unsafe static extern int EditorMain( IntPtr pSDLWindow, int screenWidth, int screenHeight );

@@ -77,11 +77,10 @@ int OpenGLRenderManager::VLightingPass( Scene* pScene )
    float xSize = 300.f;
    float ySize = xSize * ( float ) screensize.y / ( float ) screensize.x;
 #ifdef _DEBUG
-   // m_TextureDrawer.DrawTexture( m_SST[ SST_TileDebugging ], Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
+   m_TextureDrawer.DrawTexture( m_SST[ SST_TileDebugging ], Point( 600, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
 #endif // DEBUG
-   m_TextureDrawer.DrawTexture( m_SST[ SST_Bloom ], Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ), false );
-   m_TextureDrawer.DrawTexture( m_SST[ SST_LightThreshold ], Point( 300, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ), true );
-   m_TextureDrawer.DrawTexture( m_SST[ SST_MRT1 ], Point( 600, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
+   m_TextureDrawer.DrawTexture( m_SST[ SST_MRT0 ], Point( 0, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
+   m_TextureDrawer.DrawTexture( m_SST[ SST_MRT1 ], Point( 300, 0 ), Point( xSize, ( Sint32 ) ( ySize ) ) );
 
    m_MainRenderer.LightCulling( pScene );
    m_MainRenderer.CalculateLighting();

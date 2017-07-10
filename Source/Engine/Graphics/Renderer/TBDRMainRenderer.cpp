@@ -137,24 +137,33 @@ void TBDRMainRenderer::VLoadLight( Lights& lights )
    glUseProgram( m_Programs[ RenderPass_LightCulling ] );
       glUniform1ui( m_Uniforms[ RenderPass_LightCulling ][ LightCullPassUni_ValidLightNum ], std::min( lights.size(), MAXIMUM_LIGHTS_SUPPORTED ) );
    glUseProgram( 0 );
-   //ptr = ( LightProperties * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );
-   //
-   //for( int i = 0; i < MAXIMUM_LIGHTS_SUPPORTED; ++i )
-   //   {
-   //   std::stringstream ss;
-   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_Color ) );
-   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_Type ) );
 
-   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_PositionVS ) );
-   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_Enabled ) );
+#ifdef _DEBUG
+   /*bool test = false;
+   if( test )
+   {
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, m_SSBOs[ SSBO_LightProperties ] );
+   ptr = ( LightProperties * ) glMapBuffer( GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY );
+   if( ptr )
+   {
+   for( int i = 0; i < lights.size(); ++i )
+   {
+   std::stringstream ss;
+   ENG_LOG( "Test", ToStr( ptr[ i ].m_Color ) );
+   ENG_LOG( "Test", ToStr( ptr[ i ].m_Type ) );
 
-   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_DirectionVS ) );
+   ENG_LOG( "Test", ToStr( ptr[ i ].m_PositionVS ) );
+   ENG_LOG( "Test", ToStr( ptr[ i ].m_Enabled ) );
 
-   //   ENG_LOG( "Test", ToStr( ptr[ i ].m_Attenuation ) );
-   //   }
-   //glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
+   ENG_LOG( "Test", ToStr( ptr[ i ].m_DirectionVS ) );
 
-   
+   ENG_LOG( "Test", ToStr( ptr[ i ].m_Attenuation ) );
+   }
+   glUnmapBuffer( GL_SHADER_STORAGE_BUFFER );
+   glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
+   }
+   }*/
+#endif // _DEBUG
    OpenGLRenderManager::CheckError();
    }
 

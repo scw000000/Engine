@@ -50,6 +50,8 @@ void EditorLogic::VOnFileDrop( const char* filePath, const Point& dropLocation )
          std::string levelFolderName = pFileRes->m_Name.substr( firstIdx, rBound + 1 - firstIdx );
          g_pApp->m_EngineOptions.SetLevelInstanceDirectory( levelFolderName );
          VLoadLevel();
+         VSetIsSimulating( true );
+         m_HasStarted = true;
          }
       }
    }

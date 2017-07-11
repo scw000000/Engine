@@ -75,13 +75,13 @@ MeshSceneNode::MeshSceneNode( const ActorId actorId,
 
 MeshSceneNode::~MeshSceneNode( void )
    {
-   ReleaseResource();
+   // ReleaseResource();
    }
 
 // now load the reouce into VRam
 int MeshSceneNode::VOnRestore( Scene *pScene )
    {
-   ReleaseResource();
+   // ReleaseResource();
 
    /*m_VertexShader.VOnRestore();
    m_FragmentShader.VOnRestore();
@@ -392,15 +392,15 @@ ShadowVertexInfo MeshSceneNode::VGetShadowVertexInfo( void ) const
 
 void MeshSceneNode::ReleaseResource( void )
    {
-   glDeleteVertexArrays( 1, &m_VAO );
+   /*glDeleteVertexArrays( 1, &m_VAO );
    m_VAO = 0;
-
-   glDeleteBuffers( ENG_ARRAY_LENGTH( m_Buffers ), &m_Buffers[ 0 ] );
+   */
+   /*glDeleteBuffers( ENG_ARRAY_LENGTH( m_Buffers ), &m_Buffers[ 0 ] );
    ENG_ZERO_MEM( m_Buffers );
 
    glDeleteTextures( 1, &m_MeshTextureObj );
    m_MeshTextureObj = 0;
-   
+
    glDeleteProgram( m_Program );
-   m_Program = 0;
+   m_Program = 0;*/
    }

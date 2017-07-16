@@ -45,7 +45,8 @@ MeshResourceExtraData::MeshResourceExtraData( unsigned int meshNum )
 
 void MeshResourceExtraData::LoadBones( void )
    {
-   BoneId currentBoneId = 0;
+   BoneId totalBones = 0;
+   m_BoneMappingData.resize( m_pScene->mNumMeshes );
    for( unsigned int meshIdx = 0; meshIdx < m_pScene->mNumMeshes; ++meshIdx )
       {
       auto pMesh = m_pScene->mMeshes[ meshIdx ];
@@ -53,14 +54,14 @@ void MeshResourceExtraData::LoadBones( void )
          {
          auto pBone = pMesh->mBones[ boneIdx ];
          std::string boneName = pBone->mName.C_Str();
-         if( m_BoneMappingData.find( boneName ) == m_BoneMappingData.end() )
+         if( m_BoneMappingData[ meshIdx ].find( boneName ) == m_BoneMappingData[ meshIdx ].end() )
             {
-            m_BoneMappingData[ boneName ] = BoneData( pBone->mOffsetMatrix, currentBoneId );
-            ++currentBoneId;
+            m_BoneMappingData[ meshIdx ][ boneName ] = BoneData( pBone->mOffsetMatrix, boneIdx );
+            ++totalBones;
             }
          }
       }
-   m_NumBones = currentBoneId;
+   m_NumBones = totalBones;
    ENG_ASSERT( m_NumBones <= MAXIMUM_BONES_PER_ACTOR );
    }
 

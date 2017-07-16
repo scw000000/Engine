@@ -386,8 +386,8 @@ bool BaseEngineLogic::VLoadLevel()
       {
       float x = random.Random() * ( 1421.f + 1290.f ) - 1290.f;
       float z = random.Random() * ( 634 + 565 ) - 565.f;
-      //TransformPtr pTransform( ENG_NEW Transform( Vec3( x, 20.f, z ) ) );
-     // VCreateActor( shared_ptr< Resource >( ENG_NEW Resource( "actors\\light.xml" ) ), pTransform );
+      TransformPtr pTransform( ENG_NEW Transform( Vec3( x, 20.f, z ) ) );
+      VCreateActor( shared_ptr< Resource >( ENG_NEW Resource( "actors\\light.xml" ) ), pTransform );
       }
    return true;
    }

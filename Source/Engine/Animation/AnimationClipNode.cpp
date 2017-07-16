@@ -69,8 +69,9 @@ bool AnimationClipNode::VDelegateVInit( void )
 
    for( unsigned int nodeIdx = 0; nodeIdx < m_pAnimation->mNumChannels; ++nodeIdx )
       {
-      auto BoneDataIt = m_pMeshExtraData->m_BoneMappingData.find( m_pAnimation->mChannels[ nodeIdx ]->mNodeName.C_Str() );
-      ENG_ASSERT( BoneDataIt != m_pMeshExtraData->m_BoneMappingData.end() );
+      // TODO : get mesh index
+      auto BoneDataIt = m_pMeshExtraData->m_BoneMappingData[ 0 ].find( m_pAnimation->mChannels[ nodeIdx ]->mNodeName.C_Str() );
+      ENG_ASSERT( BoneDataIt != m_pMeshExtraData->m_BoneMappingData[ 0 ].end() );
       m_BoneIdToNodeAnimMapping[ BoneDataIt->second.m_BoneId ] = m_pAnimation->mChannels[ nodeIdx ];
       }
    return true;

@@ -17,23 +17,6 @@
 #include "..\ResourceCache\TextureResource.h"
 #include "..\ResourceCache\MeshResource.h"
 
-
-void VertexToBoneMapping::AddBoneData( BoneId boneID, float boneWeight )
-   {
-   for( unsigned i = 0; i < MAXIMUM_BONES_PER_VEREX; i++ )
-      {
-      if( m_BoneWeights[ i ] == 0.0 )
-         {
-         m_BoneIDs[ i ] = boneID;
-         m_BoneWeights[ i ] = boneWeight;
-         return;
-         }
-      }
-
-   // should never get here - more bones than we have space for
-   ENG_ASSERT( 0 );
-   }
-
 void OpenGLRendererLoader::LoadTexture2D( GLuint* textureId, shared_ptr< Resource > pTextureResource )
    {
    glGenTextures( 1, textureId );
@@ -190,11 +173,11 @@ void OpenGLRendererLoader::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, G
 
 void OpenGLRendererLoader::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle> pMeshResHandle )
    {
-   ENG_ASSERT( pBoneBuffer && pMeshResHandle );
+   /*ENG_ASSERT( pBoneBuffer && pMeshResHandle );
    shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
    auto pAiScene = pMeshExtra->m_pScene;
    unsigned int vertexIdOffest = 0;
-   std::vector< VertexToBoneMapping > vertexToBoneMappings( pMeshExtra->m_NumVertices );
+   std::vector< BoneDataOfVertex > vertexToBoneMappings( pMeshExtra->m_NumVertices );
    for( unsigned int meshIdx = 0; meshIdx < pAiScene->mNumMeshes; ++meshIdx )
       {
       auto pMesh = pAiScene->mMeshes[ meshIdx ];
@@ -217,7 +200,7 @@ void OpenGLRendererLoader::LoadBones( GLuint* pBoneBuffer, shared_ptr<ResHandle>
    glBufferData( GL_ARRAY_BUFFER,
                  vertexToBoneMappings.size() * sizeof( vertexToBoneMappings[ 0 ] ),
                  &vertexToBoneMappings[ 0 ],
-                 GL_STATIC_DRAW );
+                 GL_STATIC_DRAW );*/
    }
 
 void OpenGLRendererLoader::CompileAndLoadShader( GLuint& shaderObj, shared_ptr< Resource > pResource, GLuint shaderType )

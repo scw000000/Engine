@@ -14,21 +14,6 @@
 #include "..\Shaders.h"
 #include "..\ResourceCache\MeshResource.h"
 
-struct VertexToBoneMapping
-   {
-   public:
-      VertexToBoneMapping( void )
-         {
-         ENG_ZERO_MEM( m_BoneIDs );
-         ENG_ZERO_MEM( m_BoneWeights );
-         }
-      void AddBoneData( BoneId boneID, float boneWeight );
-
-   public:
-      BoneId m_BoneIDs[ MAXIMUM_BONES_PER_VEREX ];
-      float m_BoneWeights[ MAXIMUM_BONES_PER_VEREX ];
-   };
-
 class OpenGLRendererLoader
    {
    public:

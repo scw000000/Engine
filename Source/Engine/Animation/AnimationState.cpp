@@ -93,7 +93,8 @@ void AnimationState::UpdatetGlobalBoneTransform( aiNode* pAiNode, const aiMatrix
    std::string nodeName( pAiNode->mName.C_Str() );
 
    aiMatrix4x4 globalBonePoseTransform;
-   BoneMappingData& boneMappingData = m_pMeshExtraData->m_BoneMappingData;
+   // TODO: get correct mesh index
+   BoneMappingData& boneMappingData = m_pMeshExtraData->m_BoneMappingData[ 0 ];
    auto boneMappingDataIt = boneMappingData.find( nodeName );
    
    if( boneMappingDataIt != boneMappingData.end() )

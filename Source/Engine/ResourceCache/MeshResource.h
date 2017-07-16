@@ -54,7 +54,7 @@ class MeshResourceExtraData : public IResourceExtraData
       unsigned int m_NumVertices;
       unsigned int m_NumVertexIndex;
       unsigned int m_NumBones;
-      BoneMappingData m_BoneMappingData;
+      std::vector<BoneMappingData> m_BoneMappingData;
       aiMatrix4x4  m_GlobalInverseTransform;
 
    protected:

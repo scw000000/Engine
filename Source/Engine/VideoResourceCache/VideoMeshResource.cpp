@@ -20,6 +20,28 @@
 #include <assimp/cimport.h>
 #include <assimp/postprocess.h>
 
+void BoneDataOfVertex::SetBoneData( BoneId boneID, float boneWeight, int idx )
+   {
+   if( idx >= MAXIMUM_BONES_PER_VEREX )
+      {
+      // should never get here - more bones than we have space for
+      ENG_ASSERT( 0 );
+      }
+   m_BoneIDs[ idx ] = boneID;
+   m_BoneWeights[ idx ] = boneWeight;
+   return;
+   /*for( unsigned i = 0; i < MAXIMUM_BONES_PER_VEREX; i++ )
+      {
+      if( m_BoneWeights[ i ] == 0.0 )
+      {
+      m_BoneIDs[ i ] = boneID;
+      m_BoneWeights[ i ] = boneWeight;
+      return;
+      }
+      }
+      */
+   }
+
 const std::vector< std::string > MESH_LOADER_PATTERNS( { "*.obj", "*.fbx", "*.3ds", "*.fbx", "*.blend" } );
 
 VideoMeshResourceExtraData::VideoMeshResourceExtraData( unsigned int meshCount ) :
@@ -90,9 +112,11 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
       ENG_ASSERT( pMesh->mPrimitiveTypes == aiPrimitiveType_TRIANGLE );
 
       unsigned int vertexCount = pMesh->mNumVertices;
-      unsigned int indicesCOunt = pMesh->mNumFaces * 3u;
+      unsigned int indicesCount = pMesh->mNumFaces * 3u;
+      unsigned int boneCount = pMesh->mNumBones;
       pData->m_MeshCount[ meshIdx ][ VideoMeshResourceExtraData::MeshCount_Vertex ] = vertexCount;
-      pData->m_MeshCount[ meshIdx ][ VideoMeshResourceExtraData::MeshCount_Index ] = indicesCOunt;
+      pData->m_MeshCount[ meshIdx ][ VideoMeshResourceExtraData::MeshCount_Index ] = indicesCount;
+      pData->m_MeshCount[ meshIdx ][ VideoMeshResourceExtraData::MeshCount_Bone ] = boneCount;
 
       for( unsigned int vertexIdx = 0; vertexIdx < pMesh->mNumVertices; ++vertexIdx )
          {
@@ -153,7 +177,7 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
 
       ENG_ASSERT( pData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Index ] );
       glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, pData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Index ] );
-      glBufferData( GL_ELEMENT_ARRAY_BUFFER, indicesCOunt * sizeof( unsigned int ), NULL, GL_STATIC_DRAW );
+      glBufferData( GL_ELEMENT_ARRAY_BUFFER, indicesCount * sizeof( unsigned int ), NULL, GL_STATIC_DRAW );
 
       unsigned int indexsSize = sizeof( unsigned int );
       for( unsigned int faceIdx = 0; faceIdx < pMesh->mNumFaces; ++faceIdx )
@@ -164,9 +188,38 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
                           pMesh->mFaces[ faceIdx ].mIndices );
          }
 
+      if( pMesh->HasBones() )
+         {
+         // Loading bones
+         unsigned int vertexIdOffest = 0;
+         std::vector< BoneDataOfVertex > vertexToBoneMappings( pMeshExtra->m_NumVertices );
+         std::vector< unsigned int > numBoneDataLoaded( pMeshExtra->m_NumVertices, 0 );
+         for( unsigned int boneIdx = 0; boneIdx < pMesh->mNumBones; boneIdx++ )
+            {
+            auto pBone = pMesh->mBones[ boneIdx ];
+            ENG_ASSERT( pMeshExtra->m_BoneMappingData[ meshIdx ].find( pBone->mName.C_Str() ) != pMeshExtra->m_BoneMappingData[ meshIdx ].end() );
+            BoneId boneId = pMeshExtra->m_BoneMappingData[ meshIdx ][ pBone->mName.C_Str() ].m_BoneId;
+            for( unsigned int weightIdx = 0; weightIdx < pBone->mNumWeights; weightIdx++ )
+               {
+               const aiVertexWeight& boneWeight = pBone->mWeights[ weightIdx ];
+               vertexToBoneMappings[ boneWeight.mVertexId ].SetBoneData( boneId, boneWeight.mWeight, numBoneDataLoaded[ boneWeight.mVertexId ] );
+               ++numBoneDataLoaded[ boneWeight.mVertexId ];
+               }
+            }
+
+         // ENG_ASSERT( vertexIdOffest == pMeshExtra->m_NumVertices );
+         glBindBuffer( GL_ARRAY_BUFFER, pData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_BoneData ] );
+         glBufferData( GL_ARRAY_BUFFER,
+                       sizeof( vertexToBoneMappings ),
+                       &vertexToBoneMappings[ 0 ],
+                       GL_STATIC_DRAW );
+         glBindBuffer( GL_ARRAY_BUFFER, 0 );
+         }
+      
       }
    videoHandle->SetExtraData( pExtraData );
    OpenGLRenderManager::CheckError();
+
    return S_OK;
    }
 

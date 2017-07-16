@@ -15,7 +15,9 @@
 #include "..\Shaders.h"
 #include "..\ResourceCache\MeshResource.h"
 
+
 class MeshResourceExtraData;
+class TBDRMainRenderer;
 
 struct aiAnimation;
 struct aiNodeAnim;
@@ -62,41 +64,33 @@ class SkeletalMeshSceneNode : public SceneNode
       VertexShader		m_VertexShader;
       FragmentShader		m_FragmentShader;
 
-      GLuint            m_VertexArrayObj;
+      GLuint            m_VAO;
 
       enum VB_TYPES
          {
          Vertex_Buffer,
          UV_Buffer,
-         Normal_Buffer,
-         Bone_Buffer,
          Index_Buffer,
+         Normal_Buffer,
+         Tangent_Buffer,
+         Bitangent_Buffer,
+         Bone_Buffer,
          Num_Buffers
          };
 
       GLuint            m_Buffers[ Num_Buffers ];
 
-      GLuint            m_MVPUni;
       GLuint            m_MeshTextureObj;
-      GLuint            m_NeshTextureUni;
-
-      GLuint            m_MUni;
-      GLuint            m_LightPosWorldSpaceUni;
-      GLuint            m_LigthDirWorldSpaceUni;
-      GLuint            m_LightColorUni;
-      GLuint            m_LightPowerUni;
-      GLuint            m_LightNumberUni;
-
-      GLuint            m_EyePosWorldSpaceUni;
-
-      GLuint            m_MaterialAmbientUni;
-      GLuint            m_MaterialDiffuseUni;
-      GLuint            m_MaterialSpecularUni;
-
-      GLuint            m_BoneTransformUni;
-
+      
       unsigned long     m_VerticesIndexCount;
 
       shared_ptr< AnimationState > m_pAnimationState;
       MaterialPtr       m_pMaterial;
+
+      TBDRMainRenderer *m_pDeferredMainRenderer;
+
+      bool              m_UseNormalMap;
+      GLuint            m_NormalMapTextureObj;
+
+      Mat4x4            m_PrevMVP;
    };

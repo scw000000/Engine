@@ -24,8 +24,10 @@
 
 
 #define VERTEX_LOCATION    0
-#define UV_LOCATION        1
-#define NORMAL_LOCATION    2
+#define NORMAL_LOCATION    1
+#define UV_LOCATION        2
+#define TANGENT_LOCATION   3
+#define BITANGENT_LOCATION 4
 
 const char* const VERTEX_SHADER_FILE_NAME = "Effects\\MeshShader.vs.glsl";
 const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\MeshShader.fs.glsl";
@@ -109,7 +111,6 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
       {
       m_UseNormalMap = false;
       }
- //  OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_Props.GetMaterialPtr()->GetTextureResource() );
 
   // shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( *m_pMeshResource );
   // shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
@@ -202,6 +203,76 @@ int MeshSceneNode::VOnRestore( Scene *pScene )
   // m_MaterialAmbientUni    = glGetUniformLocation( m_Program, "uMaterialAmbient" );
   // m_MaterialSpecularUni   = glGetUniformLocation( m_Program, "uMaterialSpecular" );
 
+   glGenVertexArrays( 1, &m_VAO );
+   glBindVertexArray( m_VAO );
+
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
+   glEnableVertexAttribArray( VERTEX_LOCATION );
+   glVertexAttribPointer(
+      VERTEX_LOCATION,                  // attribute
+      3,                  // size
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      ( const GLvoid* ) 0            // array buffer offset
+      );
+
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
+   glEnableVertexAttribArray( UV_LOCATION );
+   glVertexAttribPointer(
+      UV_LOCATION,                                // attribute
+      2,                                // size
+      GL_FLOAT,                         // type
+      GL_FALSE,                         // normalized?
+      0,                                // stride
+      ( const GLvoid* ) 0                          // array buffer offset
+      );
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Normal_Buffer ] );
+   glEnableVertexAttribArray( NORMAL_LOCATION );
+   glVertexAttribPointer(
+      NORMAL_LOCATION,                  // attribute
+      3,                  // size
+      GL_FLOAT,           // type
+      GL_FALSE,           // normalized?
+      0,                  // stride
+      ( const GLvoid* ) 0            // array buffer offset
+      );
+
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
+   glEnableVertexAttribArray( UV_LOCATION );
+   glVertexAttribPointer(
+      UV_LOCATION,
+      2,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      ( void* ) 0
+      );
+
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Tangent_Buffer ] );
+   glEnableVertexAttribArray( TANGENT_LOCATION );
+   glVertexAttribPointer(
+      TANGENT_LOCATION,
+      3,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      ( void* ) 0
+      );
+
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Bitangent_Buffer ] );
+   glEnableVertexAttribArray( BITANGENT_LOCATION );
+   glVertexAttribPointer(
+      BITANGENT_LOCATION,
+      3,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      ( void* ) 0
+      );
+
+   glBindVertexArray( 0 );
+
    glUseProgram( 0 );
    // restore all of its children
 	SceneNode::VOnRestore( pScene );
@@ -214,7 +285,7 @@ int MeshSceneNode::VRender( Scene *pScene )
    auto renderPass = TBDRMainRenderer::RenderPass_Geometry;
    glUseProgram( m_pDeferredMainRenderer->m_Programs[ renderPass ] );
 
-   glBindVertexArray( 0 );
+   glBindVertexArray( m_VAO );
    glBindFramebuffer( GL_FRAMEBUFFER, m_pDeferredMainRenderer->m_FBO[ renderPass ] );
 
    auto view = pScene->GetCamera()->GetView();
@@ -246,61 +317,6 @@ int MeshSceneNode::VRender( Scene *pScene )
       {
       glUniform1ui( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_UseNormalMap ], 0u );
       }
-
-   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
-   glEnableVertexAttribArray( 0 );
-   glVertexAttribPointer(
-         0,
-         3,                
-         GL_FLOAT,           
-         GL_FALSE,           
-         0,               
-         ( void* ) 0         
-         );
-   
-   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Normal_Buffer ] );
-   glEnableVertexAttribArray( 1 );
-   glVertexAttribPointer(
-         1,
-         3,
-         GL_FLOAT,
-         GL_FALSE,
-         0,
-         ( void* ) 0
-         );
-
-   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
-   glEnableVertexAttribArray( 2 );
-   glVertexAttribPointer(
-         2,
-         2,
-         GL_FLOAT,
-         GL_FALSE,
-         0,
-         ( void* ) 0
-         );
-   
-   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Tangent_Buffer ] );
-   glEnableVertexAttribArray( 3 );
-   glVertexAttribPointer(
-      3,
-      3,
-      GL_FLOAT,
-      GL_FALSE,
-      0,
-      ( void* ) 0
-      );
-
-   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Bitangent_Buffer ] );
-   glEnableVertexAttribArray( 4 );
-   glVertexAttribPointer(
-      4,
-      3,
-      GL_FLOAT,
-      GL_FALSE,
-      0,
-      ( void* ) 0
-      );
 
    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ Index_Buffer ] );
 

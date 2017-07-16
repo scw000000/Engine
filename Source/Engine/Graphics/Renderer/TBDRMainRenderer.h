@@ -19,6 +19,7 @@
 class TBDRMainRenderer : public IMainRenderer
    {
    friend class MeshSceneNode;
+   friend class SkeletalMeshSceneNode;
    friend class OpenGLRenderManager;
    public:
       TBDRMainRenderer( void );

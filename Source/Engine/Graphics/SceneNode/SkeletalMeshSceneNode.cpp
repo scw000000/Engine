@@ -5,9 +5,9 @@
  * \author SCW
  * Contact: scw000000@gmail.com
  *
- * \brief 
+ * \brief
  *
- *  
+ *
  *
  * \note
  */
@@ -16,6 +16,11 @@
 #include "SkeletalMeshSceneNode.h"
 #include "..\ResourceCache\MeshResource.h"
 #include "..\ResourceCache\TextureResource.h"
+#include "..\VideoResourceCache\VideoTextureResource.h"
+#include "..\VideoResourceCache\VideoMeshResource.h"
+#include "..\Renderer\RenderManager.h"
+#include "..\Renderer\TBDRMainRenderer.h"
+
 #include "..\Renderer\RendererLoader.h"
 #include "..\ResourceCache\ScriptResource.h"
 #include "..\LuaScripting\LuaStateManager.h"
@@ -56,11 +61,11 @@ SkeletalMeshSceneNode::SkeletalMeshSceneNode(
 
    ENG_ZERO_MEM( m_Buffers );
 
-   m_BoneTransformUni = -1;
+   /*m_BoneTransformUni = -1;
    m_MVPUni = -1;
    m_MeshTextureObj = 0;
-   m_NeshTextureUni = -1;
-   m_VertexArrayObj = -1;
+   m_MeshTextureUni = -1;
+   m_VAO = -1;
 
    m_MUni = -1;
    m_LightPosWorldSpaceUni = -1;
@@ -71,9 +76,10 @@ SkeletalMeshSceneNode::SkeletalMeshSceneNode(
    m_EyePosWorldSpaceUni = -1;
    m_MaterialAmbientUni = -1;
    m_MaterialDiffuseUni = -1;
-   m_MaterialSpecularUni = -1;
+   m_MaterialSpecularUni = -1;*/
 
    m_VerticesIndexCount = 0;
+   m_UseNormalMap = false;
    }
 
 SkeletalMeshSceneNode::~SkeletalMeshSceneNode( void )
@@ -86,45 +92,148 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    {
    ReleaseResource();
 
-   glGenVertexArrays( 1, &m_VertexArrayObj );
-   glBindVertexArray( m_VertexArrayObj );
+   // glGenVertexArrays( 1, &m_VertexArrayObj );
+   // glBindVertexArray( m_VertexArrayObj );
 
-   m_VertexShader.VOnRestore();
-   m_FragmentShader.VOnRestore();
+   // m_VertexShader.VOnRestore();
+   // m_FragmentShader.VOnRestore();
 
-   m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.GetShaderObject(), m_FragmentShader.GetShaderObject() } );
-  // m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
+   // m_Program = OpenGLRendererLoader::GenerateProgram( { m_VertexShader.GetShaderObject(), m_FragmentShader.GetShaderObject() } );
+   //// m_Program = OpenGLRenderer::GenerateProgram( m_VertexShader.VGetShaderObject(), m_FragmentShader.VGetShaderObject() );
 
-   m_VertexShader.VReleaseShader( m_Program );
-   m_FragmentShader.VReleaseShader( m_Program );
+   // m_VertexShader.VReleaseShader( m_Program );
+   // m_FragmentShader.VReleaseShader( m_Program );
 
-   // Not function now
-   // OpenGLRendererLoader::LoadTexture2D( &m_MeshTextureObj, m_pMaterial->m_pDiffuseTextureRes );
+   // shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( m_pMeshResource );
+   // shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
 
-   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( m_pMeshResource );
-   shared_ptr<MeshResourceExtraData> pMeshExtra = static_pointer_cast< MeshResourceExtraData >( pMeshResHandle->GetExtraData() );
+   // m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
+   //// SetRadius( pMeshExtra->m_Radius );
 
-   m_VerticesIndexCount = pMeshExtra->m_NumVertexIndex;
-  // SetRadius( pMeshExtra->m_Radius );
+   // OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
+   // OpenGLRendererLoader::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
 
-   OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
-   OpenGLRendererLoader::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
+   // shared_ptr<ResHandle> pScriptResHandle = g_pApp->m_pResCache->GetHandle( m_pAnimScriptResource );
+   // if( pScriptResHandle )
+   //    {
+   //    auto luaAnimState = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( "scriptRet" );
+   //    ENG_ASSERT( luaAnimState.IsTable() && IsBaseClassOf< AnimationState >( luaAnimState ) );
+   //    m_pAnimationState.reset( GetObjUserDataPtr< AnimationState >( luaAnimState ) );
+   //    m_pAnimationState->SetMeshResourcePtr( pMeshResHandle );
+   //    }
+   // else
+   //    {
+   //    m_pAnimationState.reset( ENG_NEW AnimationState( pMeshResHandle, NULL ) );
+   //    }
+   // ENG_ASSERT( m_pAnimationState->Init() );
+   // m_pAnimationState->SetOwner( m_pRenderComponent->VGetOwner().lock() );
+   // AnimationManager::GetSingleton().VAddAnimationState( m_pAnimationState );
 
-   shared_ptr<ResHandle> pScriptResHandle = g_pApp->m_pResCache->GetHandle( m_pAnimScriptResource );
-   if( pScriptResHandle )
+   // glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
+   // glEnableVertexAttribArray( VERTEX_LOCATION );
+   // glVertexAttribPointer(
+   //    VERTEX_LOCATION,                  // attribute
+   //    3,                  // size
+   //    GL_FLOAT,           // type
+   //    GL_FALSE,           // normalized?
+   //    0,                  // stride
+   //    ( const GLvoid* ) 0            // array buffer offset
+   //    );
+
+   // glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
+   // glEnableVertexAttribArray( UV_LOCATION );
+   // glVertexAttribPointer(
+   //    UV_LOCATION,                                // attribute
+   //    2,                                // size
+   //    GL_FLOAT,                         // type
+   //    GL_FALSE,                         // normalized?
+   //    0,                                // stride
+   //    ( const GLvoid* ) 0                          // array buffer offset
+   //    );
+
+   // glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Normal_Buffer ] );
+   // glEnableVertexAttribArray( NORMAL_LOCATION );
+   // glVertexAttribPointer(
+   //    NORMAL_LOCATION,                  // attribute
+   //    3,                  // size
+   //    GL_FLOAT,           // type
+   //    GL_FALSE,           // normalized?
+   //    0,                  // stride
+   //    ( const GLvoid* ) 0            // array buffer offset
+   //    );
+
+   // glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Bone_Buffer ] );
+
+   // glEnableVertexAttribArray( BONE_ID_LOCATION );
+   // glVertexAttribIPointer( 
+   //    BONE_ID_LOCATION, 
+   //    MAXIMUM_BONES_PER_VEREX,
+   //    GL_UNSIGNED_INT, 
+   //    sizeof( BoneDataOfVertex ), 
+   //    ( const GLvoid* ) 0 );
+
+   // glEnableVertexAttribArray( BONE_WEIGHT_LOCATION );
+   // glVertexAttribPointer( 
+   //    BONE_WEIGHT_LOCATION, 
+   //    MAXIMUM_BONES_PER_VEREX,
+   //    GL_FLOAT,
+   //    GL_FALSE, 
+   //    sizeof( BoneDataOfVertex ), 
+   //    ( const GLvoid* ) ( sizeof( BoneId ) * MAXIMUM_BONES_PER_VEREX ) // Starting from the beginning of VertexToBoneMappingData
+   //    );
+
+   // m_MVPUni = glGetUniformLocation( m_Program, "uMVP" );
+   // m_MeshTextureUni = glGetUniformLocation( m_Program, "uMeshTexture" );
+
+   // m_MUni = glGetUniformLocation( m_Program, "uM" );
+   // m_LightPosWorldSpaceUni = glGetUniformLocation( m_Program, "uLightPosition_WorldSpace" );
+   // m_LigthDirWorldSpaceUni = glGetUniformLocation( m_Program, "uLighDirection_WorldSpace" );
+   // m_LightColorUni = glGetUniformLocation( m_Program, "uLightColor" );
+   // m_LightPowerUni = glGetUniformLocation( m_Program, "uLightPower" );
+   // m_LightNumberUni = glGetUniformLocation( m_Program, "uLightNumber" );
+
+   // m_EyePosWorldSpaceUni = glGetUniformLocation( m_Program, "uEyePosition_WorldSpace" );
+
+   // m_MaterialDiffuseUni = glGetUniformLocation( m_Program, "uMaterialDiffuse" );
+   // m_MaterialAmbientUni = glGetUniformLocation( m_Program, "uMaterialAmbient" );
+   // m_MaterialSpecularUni = glGetUniformLocation( m_Program, "uMaterialSpecular" );
+
+   // m_BoneTransformUni = glGetUniformLocation( m_Program, "uBoneTransform" );
+
+
+   //////////////////////////////////////////////////
+   // Load textures for mesh
+   m_MeshTextureObj = VideoTextureResourceLoader::LoadAndReturnTextureObject( m_pMaterial->m_pDiffuseTextureRes );
+
+   if( m_pMaterial->m_pNormalTextureRes && m_pMaterial->m_pNormalTextureRes->m_Name.size() )
       {
-      auto luaAnimState = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( "scriptRet" );
-      ENG_ASSERT( luaAnimState.IsTable() && IsBaseClassOf< AnimationState >( luaAnimState ) );
-      m_pAnimationState.reset( GetObjUserDataPtr< AnimationState >( luaAnimState ) );
-      m_pAnimationState->SetMeshResourcePtr( pMeshResHandle );
+      m_NormalMapTextureObj = VideoTextureResourceLoader::LoadAndReturnTextureObject( m_pMaterial->m_pNormalTextureRes );
+      m_UseNormalMap = true;
       }
    else
       {
-      m_pAnimationState.reset( ENG_NEW AnimationState( pMeshResHandle, NULL ) );
+      m_UseNormalMap = false;
       }
-   ENG_ASSERT( m_pAnimationState->Init() );
-   m_pAnimationState->SetOwner( m_pRenderComponent->VGetOwner().lock() );
-   AnimationManager::GetSingleton().VAddAnimationState( m_pAnimationState );
+
+   unsigned int meshIdx = m_pMaterial->GetMeshIndex();
+   auto pMeshResData = VideoMeshResourceLoader::LoadAndReturnMeshResourceExtraData( m_pMeshResource );
+   SetRadius( pMeshResData->m_Radius[ meshIdx ] );
+
+   m_VerticesIndexCount = pMeshResData->m_MeshCount[ meshIdx ][ VideoMeshResourceExtraData::MeshCount_Index ];
+   m_Buffers[ Vertex_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Vertex ];
+   m_Buffers[ UV_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_UV ];
+   m_Buffers[ Index_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Index ];
+   m_Buffers[ Normal_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Normal ];
+   m_Buffers[ Tangent_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Tangent ];
+   m_Buffers[ Bitangent_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Bitangent ];
+   m_Buffers[ Bone_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_BoneData ];
+
+   // restore all of its children
+   SceneNode::VOnRestore( pScene );
+   OpenGLRenderManager::CheckError();
+
+   glGenVertexArrays( 1, &m_VAO );
+   glBindVertexArray( m_VAO );
 
    // 1st attribute buffer : vertices
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
@@ -149,7 +258,6 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       0,                                // stride
       ( const GLvoid* ) 0                          // array buffer offset
       );
-
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Normal_Buffer ] );
    glEnableVertexAttribArray( NORMAL_LOCATION );
    glVertexAttribPointer(
@@ -161,94 +269,151 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       ( const GLvoid* ) 0            // array buffer offset
       );
 
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
+   glEnableVertexAttribArray( 2 );
+   glVertexAttribPointer(
+      2,
+      2,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      ( void* ) 0
+      );
+
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Tangent_Buffer ] );
+   glEnableVertexAttribArray( 3 );
+   glVertexAttribPointer(
+      3,
+      3,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      ( void* ) 0
+      );
+
+   glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Bitangent_Buffer ] );
+   glEnableVertexAttribArray( 4 );
+   glVertexAttribPointer(
+      4,
+      3,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      ( void* ) 0
+      );
+
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Bone_Buffer ] );
 
    glEnableVertexAttribArray( BONE_ID_LOCATION );
-   glVertexAttribIPointer( 
-      BONE_ID_LOCATION, 
+   glVertexAttribIPointer(
+      BONE_ID_LOCATION,
       MAXIMUM_BONES_PER_VEREX,
-      GL_UNSIGNED_INT, 
-      sizeof( VertexToBoneMapping ), 
+      GL_UNSIGNED_INT,
+      sizeof( BoneDataOfVertex ),
       ( const GLvoid* ) 0 );
 
    glEnableVertexAttribArray( BONE_WEIGHT_LOCATION );
-   glVertexAttribPointer( 
-      BONE_WEIGHT_LOCATION, 
+   glVertexAttribPointer(
+      BONE_WEIGHT_LOCATION,
       MAXIMUM_BONES_PER_VEREX,
-      GL_FLOAT, GL_FALSE, 
-      sizeof( VertexToBoneMapping ), 
-      ( const GLvoid* ) ( sizeof( unsigned int ) * MAXIMUM_BONES_PER_VEREX ) );
+      GL_FLOAT,
+      GL_FALSE,
+      sizeof( BoneDataOfVertex ),
+      ( const GLvoid* ) ( sizeof( BoneId ) * MAXIMUM_BONES_PER_VEREX ) // Starting from the beginning of VertexToBoneMappingData
+      );
 
-   m_MVPUni = glGetUniformLocation( m_Program, "uMVP" );
-   m_NeshTextureUni = glGetUniformLocation( m_Program, "uMeshTexture" );
-
-   m_MUni = glGetUniformLocation( m_Program, "uM" );
-   m_LightPosWorldSpaceUni = glGetUniformLocation( m_Program, "uLightPosition_WorldSpace" );
-   m_LigthDirWorldSpaceUni = glGetUniformLocation( m_Program, "uLighDirection_WorldSpace" );
-   m_LightColorUni = glGetUniformLocation( m_Program, "uLightColor" );
-   m_LightPowerUni = glGetUniformLocation( m_Program, "uLightPower" );
-   m_LightNumberUni = glGetUniformLocation( m_Program, "uLightNumber" );
-
-   m_EyePosWorldSpaceUni = glGetUniformLocation( m_Program, "uEyePosition_WorldSpace" );
-
-   m_MaterialDiffuseUni = glGetUniformLocation( m_Program, "uMaterialDiffuse" );
-   m_MaterialAmbientUni = glGetUniformLocation( m_Program, "uMaterialAmbient" );
-   m_MaterialSpecularUni = glGetUniformLocation( m_Program, "uMaterialSpecular" );
-
-   m_BoneTransformUni = glGetUniformLocation( m_Program, "uBoneTransform" );
-
-   // restore all of its children
-   SceneNode::VOnRestore( pScene );
+   glBindVertexArray( 0 );
 
    return S_OK;
    }
 
 int SkeletalMeshSceneNode::VRender( Scene *pScene )
    {
-   glUseProgram( m_Program );
-   glBindVertexArray( m_VertexArrayObj );
+   //glUseProgram( m_Program );
+   //glBindVertexArray( m_VAO );
 
-   Mat4x4 globalToWorld = VGetGlobalTransformPtr()->GetToWorld();
+   //Mat4x4 globalToWorld = VGetGlobalTransformPtr()->GetToWorld();
 
-   // Get the projection & view matrix from the camera class
-   Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * globalToWorld;
+   //// Get the projection & view matrix from the camera class
+   //Mat4x4 mWorldViewProjection = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * globalToWorld;
 
-   glUniformMatrix4fv( m_MVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
+   //glUniformMatrix4fv( m_MVPUni, 1, GL_FALSE, &mWorldViewProjection[ 0 ][ 0 ] );
 
-   glUniformMatrix4fv( m_MUni, 1, GL_FALSE, &( globalToWorld[ 0 ][ 0 ] ) );
+   //glUniformMatrix4fv( m_MUni, 1, GL_FALSE, &( globalToWorld[ 0 ][ 0 ] ) );
 
-   auto pLightManager = pScene->GetLightManagerPtr();
+   //auto pLightManager = pScene->GetLightManagerPtr();
 
-   glUniform3fv( m_LightPosWorldSpaceUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPosWorldSpace() );
-   glUniform3fv( m_LigthDirWorldSpaceUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightDirection() );
-   glUniform3fv( m_LightColorUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightColor() );
-   glUniform1fv( m_LightPowerUni, MAXIMUM_LIGHTS_SUPPORTED, ( const GLfloat* ) pLightManager->GetLightPower() );
-   glUniform1i( m_LightNumberUni, pLightManager->GetActiveLightCount() );
+   //const auto& globalBoneTransform = m_pAnimationState->m_GlobalBoneTransform;
+   //glUniformMatrix4fv( m_BoneTransformUni, globalBoneTransform.size(), GL_TRUE, &( globalBoneTransform[ 0 ][ 0 ][ 0 ] ) );
 
-   glUniform3fv( m_EyePosWorldSpaceUni, 1, ( const GLfloat* ) &pScene->GetCamera()->GetToWorldPosition() );
+   //// Bind our texture in Texture Unit 0
+   //glActiveTexture( GL_TEXTURE0 );
+   //glBindTexture( GL_TEXTURE_2D, m_MeshTextureObj );
+   //// Set our "myTextureSampler" sampler to user Texture Unit 0
+   //glUniform1i( m_MeshTextureUni, 0 );
 
-   glUniform4fv( m_MaterialDiffuseUni, 1, ( const GLfloat* ) m_pMaterial->GetDiffuse() );
-   glUniform3fv( m_MaterialAmbientUni, 1, ( const GLfloat* ) m_pMaterial->GetAmbient() );
-   glUniform3fv( m_MaterialSpecularUni, 1, ( const GLfloat* ) m_pMaterial->GetSpecular() );
+   //// Draw the triangles !
+   //glDrawElements(
+   //   GL_TRIANGLES,      // mode
+   //   m_VerticesIndexCount,    // count
+   //   GL_UNSIGNED_INT,   // type
+   //   ( void* ) 0           // element array buffer offset
+   //   );
+   //glBindVertexArray( 0 );
 
-   const auto& globalBoneTransform = m_pAnimationState->m_GlobalBoneTransform;
-   glUniformMatrix4fv( m_BoneTransformUni, globalBoneTransform.size(), GL_TRUE, &( globalBoneTransform[ 0 ][ 0 ][ 0 ] ) );
+
+   ////////
+   glBindVertexArray( m_VAO  );
+   auto renderPass = TBDRMainRenderer::RenderPass_Geometry;
+   glUseProgram( m_pDeferredMainRenderer->m_Programs[ renderPass ] );
+
    
-   // Bind our texture in Texture Unit 0
+   glBindFramebuffer( GL_FRAMEBUFFER, m_pDeferredMainRenderer->m_FBO[ renderPass ] );
+
+   auto view = pScene->GetCamera()->GetView();
+   auto proj = pScene->GetCamera()->GetProjection();
+   auto model = VGetGlobalTransformPtr()->GetToWorld();
+   //auto mvp = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView() * pNode->VGetGlobalTransformPtr()->GetToWorld();
+   // auto mvp = pScene->GetCamera()->GetProjection() * viewTest * pNode->VGetGlobalTransformPtr()->GetToWorld();
+   auto mvp = proj * view * model;
+   glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_MVP ], 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
+
+   glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_PrevMVP ], 1, GL_FALSE, &m_PrevMVP[ 0 ][ 0 ] );
+
+   m_PrevMVP = mvp;
+   Mat4x4 normalMat = ( view * model );
+   normalMat = normalMat.Inverse().Transpose();
+   glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_NormalMat ], 1, GL_FALSE, &normalMat[ 0 ][ 0 ] );
+
    glActiveTexture( GL_TEXTURE0 );
    glBindTexture( GL_TEXTURE_2D, m_MeshTextureObj );
-   // Set our "myTextureSampler" sampler to user Texture Unit 0
-   glUniform1i( m_NeshTextureUni, 0 );
 
-   // Draw the triangles !
+   if( m_UseNormalMap )
+      {
+      glActiveTexture( GL_TEXTURE1 );
+      glBindTexture( GL_TEXTURE_2D, m_NormalMapTextureObj );
+      glUniform1ui( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_UseNormalMap ], 1u );
+      }
+   else
+      {
+      glUniform1ui( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_UseNormalMap ], 0u );
+      }
+
+   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ Index_Buffer ] );
+
    glDrawElements(
-      GL_TRIANGLES,      // mode
-      m_VerticesIndexCount,    // count
-      GL_UNSIGNED_INT,   // type
-      ( void* ) 0           // element array buffer offset
+      GL_TRIANGLES,
+      m_VerticesIndexCount,
+      GL_UNSIGNED_INT,
+      ( void* ) 0
       );
 
+   OpenGLRenderManager::CheckError();
+
+   glUseProgram( 0 );
+   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
    glBindVertexArray( 0 );
+   ////////////////////////////////
 
    return S_OK;
    }
@@ -264,26 +429,12 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
 
 void SkeletalMeshSceneNode::ReleaseResource( void )
    {
-   if( m_VertexArrayObj )
+   if( m_VAO )
       {
-      glDeleteVertexArrays( 1, &m_VertexArrayObj );
-      m_VertexArrayObj = 0;
+      glDeleteVertexArrays( 1, &m_VAO );
+      m_VAO = 0;
       }
 
-   glDeleteBuffers( ENG_ARRAY_LENGTH( m_Buffers ), &m_Buffers[ 0 ] );
-   ENG_ZERO_MEM( m_Buffers );
-
-   if( m_NeshTextureUni )
-      {
-      glDeleteTextures( 1, &m_MeshTextureObj );
-      m_MeshTextureObj = 0;
-      }
-
-   if( m_Program )
-      {
-      glDeleteProgram( m_Program );
-      m_Program = 0;
-      }
    if( m_pAnimationState )
       {
       AnimationManager::GetSingleton().VRemoveAnimationState( m_pAnimationState->m_pOwner->GetId() );
@@ -341,7 +492,7 @@ unsigned int SkeletalMeshSceneNode::FindPosition( float aiAnimTicks, const aiNod
 
 unsigned int SkeletalMeshSceneNode::FindRotation( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const
    {
-   ENG_ASSERT( pNodeAnim->mNumRotationKeys > 0 );
+   ENG_ASSERT( pNodeAnim->mNumRotationKeys > 0u );
 
    for( unsigned int i = 0; i < pNodeAnim->mNumRotationKeys - 1; i++ )
       {
@@ -357,7 +508,7 @@ unsigned int SkeletalMeshSceneNode::FindRotation( float aiAnimTicks, const aiNod
 
 unsigned int SkeletalMeshSceneNode::FindScaling( float aiAnimTicks, const aiNodeAnim* pNodeAnim ) const
    {
-   ENG_ASSERT( pNodeAnim->mNumScalingKeys > 0 );
+   ENG_ASSERT( pNodeAnim->mNumScalingKeys > 0u );
 
    for( unsigned int i = 0; i < pNodeAnim->mNumScalingKeys - 1; i++ )
       {
@@ -384,7 +535,7 @@ aiAnimation* SkeletalMeshSceneNode::FindAnimation( const std::string& animationN
 
 aiNodeAnim* SkeletalMeshSceneNode::FindNodeAnim( const std::string& boneName, const aiAnimation* pAnimation ) const
    {
-   for( unsigned int nodeIdx = 0; nodeIdx < pAnimation->mNumChannels; ++ nodeIdx )
+   for( unsigned int nodeIdx = 0; nodeIdx < pAnimation->mNumChannels; ++nodeIdx )
       {
       if( !std::strcmp( boneName.c_str(), pAnimation->mChannels[ nodeIdx ]->mNodeName.C_Str() ) )
          {

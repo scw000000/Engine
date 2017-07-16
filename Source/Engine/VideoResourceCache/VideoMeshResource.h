@@ -14,6 +14,22 @@
 */
 #include "VideoResourceCache.h"
 #include "assimp/material.h"
+#include "../../ResourceCache/MeshResource.h"
+
+struct BoneDataOfVertex
+   {
+      public:
+      BoneDataOfVertex( void )
+         {
+         ENG_ZERO_MEM( m_BoneIDs );
+         ENG_ZERO_MEM( m_BoneWeights );
+         }
+      void SetBoneData( BoneId boneID, float boneWeight, int idx );
+
+      public:
+      BoneId m_BoneIDs[ MAXIMUM_BONES_PER_VEREX ];
+      float m_BoneWeights[ MAXIMUM_BONES_PER_VEREX ];
+   };
 
 class VideoMeshResourceExtraData : public IVideoResourceExtraData
    {
@@ -30,6 +46,7 @@ class VideoMeshResourceExtraData : public IVideoResourceExtraData
          MeshBufferData_Tangent,
          MeshBufferData_Bitangent,
          MeshBufferData_Index,
+         MeshBufferData_BoneData,
          MeshBufferData_Num
          };
       std::vector< GLuint[ MeshBufferData_Num ] > m_BufferObjects;
@@ -37,9 +54,10 @@ class VideoMeshResourceExtraData : public IVideoResourceExtraData
          {
          MeshCount_Vertex,
          MeshCount_Index,
+         MeshCount_Bone,
          MeshCount_Num
          };
-      std::vector< unsigned int[ MeshCount_Num ] > m_MeshCount;
+      std::vector< unsigned int[ MeshCount_Num ] > m_MeshCount; // Stores # of it's data per mesh
       std::vector< float > m_Radius;
    };
 

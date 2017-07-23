@@ -64,15 +64,20 @@ bool AnimationClipNode::VDelegateVInit( void )
       {
       return false;
       }
-   m_AiTicksPerMs = ( float ) ( m_pAnimation->mTicksPerSecond != 0 ? m_pAnimation->mTicksPerSecond : 25.f ) / 1000.f;
-   m_DurationInMs = 1000.0f * ( float ) ( m_pAnimation->mDuration / m_pAnimation->mTicksPerSecond );
+   float tickPerSec = ( float ) ( m_pAnimation->mTicksPerSecond != 0 ? m_pAnimation->mTicksPerSecond : 25.f );
+   m_DurationInSec = ( float ) ( m_pAnimation->mDuration / tickPerSec );
 
-   for( unsigned int nodeIdx = 0; nodeIdx < m_pAnimation->mNumChannels; ++nodeIdx )
+   // Each channel is actually a bone
+   // Setup the bone id to animation data mapping
+   for( unsigned int channelIdx = 0; channelIdx < m_pAnimation->mNumChannels; ++channelIdx )
       {
-      // TODO : get mesh index
-      auto BoneDataIt = m_pMeshExtraData->m_BoneMappingData[ 0 ].find( m_pAnimation->mChannels[ nodeIdx ]->mNodeName.C_Str() );
-      ENG_ASSERT( BoneDataIt != m_pMeshExtraData->m_BoneMappingData[ 0 ].end() );
-      m_BoneIdToNodeAnimMapping[ BoneDataIt->second.m_BoneId ] = m_pAnimation->mChannels[ nodeIdx ];
+      auto BoneDataIt = m_pMeshExtraData->m_BoneMappingData[ m_MeshIdx ].find( m_pAnimation->mChannels[ channelIdx ]->mNodeName.C_Str() );
+      // If we could fine the mapping from animation data to our mesh bone, add the mapping to 
+      // the table
+      if( BoneDataIt != m_pMeshExtraData->m_BoneMappingData[ m_MeshIdx ].end() )
+         {
+         m_BoneIdToNodeAnimMapping[ BoneDataIt->second.m_BoneId ] = m_pAnimation->mChannels[ channelIdx ];
+         }
       }
    return true;
    }
@@ -98,12 +103,13 @@ bool AnimationClipNode::VDelegateVInit( void )
 
 void AnimationClipNode::VDelegateUpdate( float deltaSeconds )
    {
-   VAddTimeOffset( m_PlaybackRate * deltaSeconds / m_DurationInMs );
+   VAddTimeOffset( m_PlaybackRate * deltaSeconds / m_DurationInSec );
    
    }
 
 bool AnimationClipNode::VGetLocalBoneTransform( BoneTransform& boneTransform, BoneId boneId ) const
    {
+   // Find the bone animation
    auto pNodeAnim = FindNodeAnim( boneId );
 
    if( !pNodeAnim )

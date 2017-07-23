@@ -48,15 +48,15 @@ class ResHandle
       void SetSize( unsigned size ){ m_Size = size; }
       char *GetBuffer() const { return m_pBuffer; }
      // char *WritableBuffer() { return m_pBuffer; }
-      shared_ptr<IResourceExtraData> GetExtraData() const { return m_Extra; }
-      void SetExtraData( shared_ptr<IResourceExtraData> extra ) { m_Extra = extra; }
+      shared_ptr<IResourceExtraData> GetExtraData() const { return m_pExtraData; }
+      void SetExtraData( shared_ptr<IResourceExtraData> extra ) { m_pExtraData = extra; }
       shared_ptr< Resource > GetResource( void ) const { return m_pResource; }
 
    protected:
       shared_ptr< Resource > m_pResource;
       char *m_pBuffer;
       unsigned int m_Size;
-      shared_ptr<IResourceExtraData> m_Extra;
+      shared_ptr<IResourceExtraData> m_pExtraData;
       ResourceCache *m_pResCache;
    };
 

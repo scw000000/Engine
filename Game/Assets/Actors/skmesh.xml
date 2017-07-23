@@ -1,6 +1,6 @@
 <ActorClass>
     <Data type="Cube">
-        <ActorClassResource path="actors\cube.xml" />
+        <ActorClassResource path="actors\skmesh.xml" />
     </Data>
     <SkeletalMeshRenderComponent>
         <Data>

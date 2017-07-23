@@ -176,9 +176,8 @@ void LuaStateManager::ClearLuaState( void )
       }
    }
 
-LuaStateManager::LuaStateManager(void)
+LuaStateManager::LuaStateManager( void ) : m_pLuaState( NULL )
    {
-   m_pLuaState = NULL;
    }
 
 LuaStateManager::~LuaStateManager( void )

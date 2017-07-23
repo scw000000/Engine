@@ -17,13 +17,15 @@
 #include "BoneTransform.h"
 #include "AnimationClipNode.h"
 
-AnimationState::AnimationState( shared_ptr< ResHandle > pMeshRes, shared_ptr< IAnimationNode > pAnimRootNode ) : m_pMeshResource( pMeshRes )
+AnimationState::AnimationState( shared_ptr< ResHandle > pMeshRes, shared_ptr< IAnimationNode > pAnimRootNode ) 
+   : m_pMeshResource( pMeshRes )
    {
    ENG_ASSERT( pMeshRes );
    m_pMeshExtraData = static_pointer_cast< MeshResourceExtraData >( m_pMeshResource->GetExtraData() );
-   m_GlobalBoneTransform.resize( m_pMeshExtraData->m_NumBones );
+   m_GlobalBoneTransform.resize( m_pMeshExtraData->m_pScene->mMeshes[ m_MeshIdx ]->mNumBones );
 
    m_pRootAnimNode = pAnimRootNode;
+   m_MeshIdx = 0;
    }
 
 bool AnimationState::Init( void )
@@ -93,8 +95,7 @@ void AnimationState::UpdatetGlobalBoneTransform( aiNode* pAiNode, const aiMatrix
    std::string nodeName( pAiNode->mName.C_Str() );
 
    aiMatrix4x4 globalBonePoseTransform;
-   // TODO: get correct mesh index
-   BoneMappingData& boneMappingData = m_pMeshExtraData->m_BoneMappingData[ 0 ];
+   BoneMappingData& boneMappingData = m_pMeshExtraData->m_BoneMappingData[ m_MeshIdx ];
    auto boneMappingDataIt = boneMappingData.find( nodeName );
    
    if( boneMappingDataIt != boneMappingData.end() )
@@ -107,6 +108,7 @@ void AnimationState::UpdatetGlobalBoneTransform( aiNode* pAiNode, const aiMatrix
          }
       else
          {
+         // If cannot find animation, just set it to T-pose
          globalBonePoseTransform = parentTransfrom * pAiNode->mTransformation;
          }
 
@@ -171,10 +173,20 @@ void AnimationState::SetMeshResourcePtr( shared_ptr< ResHandle > pMeshRes )
    ENG_ASSERT( pMeshRes );
    m_pMeshResource = pMeshRes;
    m_pMeshExtraData = static_pointer_cast< MeshResourceExtraData >( m_pMeshResource->GetExtraData() );
-   m_GlobalBoneTransform.resize( m_pMeshExtraData->m_NumBones );
+   m_GlobalBoneTransform.resize( m_pMeshExtraData->m_pScene->mMeshes[ m_MeshIdx ]->mNumBones );
    if( !m_pRootAnimNode )
       {
       return;
       }
    m_pRootAnimNode->VSetMeshExtraDataPtr( m_pMeshExtraData );
+   }
+
+void AnimationState::SetMeshIndex( unsigned int meshIdx )
+   {
+   m_MeshIdx = meshIdx;
+   if( !m_pRootAnimNode )
+      {
+      return;
+      }
+   m_pRootAnimNode->VSetMeshIdx( meshIdx );
    }

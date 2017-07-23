@@ -59,20 +59,23 @@ void OpenGLRendererLoader::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, G
 
    glGenBuffers( 1, pVertexBuffer );
    glBindBuffer( GL_ARRAY_BUFFER, *pVertexBuffer );
-   glBufferData( GL_ARRAY_BUFFER, pMeshExtra->m_NumVertices * sizeof( aiVector3t<float> ), NULL, GL_STATIC_DRAW );
+   // deprecated
+   // glBufferData( GL_ARRAY_BUFFER, pMeshExtra->m_NumVertices * sizeof( aiVector3t<float> ), NULL, GL_STATIC_DRAW );
 
    if( pUvBuffer )
       {
       glGenBuffers( 1, pUvBuffer );
       glBindBuffer( GL_ARRAY_BUFFER, *pUvBuffer );
-      glBufferData( GL_ARRAY_BUFFER, pMeshExtra->m_NumVertices * sizeof( aiVector2t<float> ), NULL, GL_STATIC_DRAW );
+      // deprecated
+      // glBufferData( GL_ARRAY_BUFFER, pMeshExtra->m_NumVertices * sizeof( aiVector2t<float> ), NULL, GL_STATIC_DRAW );
       }
 
    if( pNormalBuffer )
       {
       glGenBuffers( 1, pNormalBuffer );
       glBindBuffer( GL_ARRAY_BUFFER, *pNormalBuffer );
-      glBufferData( GL_ARRAY_BUFFER, pMeshExtra->m_NumVertices * sizeof( aiVector3t<float> ), NULL, GL_STATIC_DRAW );
+      // deprecated
+      // glBufferData( GL_ARRAY_BUFFER, pMeshExtra->m_NumVertices * sizeof( aiVector3t<float> ), NULL, GL_STATIC_DRAW );
       }
 
    if( pIndexBuffer )
@@ -159,7 +162,7 @@ void OpenGLRendererLoader::LoadMesh( GLuint* pVertexBuffer, GLuint* pUvBuffer, G
       verticesIndexOffset += pMesh->mNumVertices;
       indexOffset += pMesh->mNumFaces * 3u;
       }
-   ENG_ASSERT( pMeshExtra->m_NumVertices == verticesIndexOffset );
+   // ENG_ASSERT( pMeshExtra->m_NumVertices == verticesIndexOffset );
    if( pIndexBuffer )
       {
       /*glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, *pIndexBuffer );

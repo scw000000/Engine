@@ -38,14 +38,11 @@ extern Mat4x4 aiMat4x4ToMat4( aiMatrix4x4 aiMat44 )
 MeshResourceExtraData::MeshResourceExtraData( unsigned int meshNum ) 
    : m_pScene( NULL )
    {
-   m_NumVertices = 0; 
    m_NumVertexIndex = 0;
-   m_NumBones = 0; 
    }
 
 void MeshResourceExtraData::LoadBones( void )
    {
-   BoneId totalBones = 0;
    m_BoneMappingData.resize( m_pScene->mNumMeshes );
    for( unsigned int meshIdx = 0; meshIdx < m_pScene->mNumMeshes; ++meshIdx )
       {
@@ -57,12 +54,9 @@ void MeshResourceExtraData::LoadBones( void )
          if( m_BoneMappingData[ meshIdx ].find( boneName ) == m_BoneMappingData[ meshIdx ].end() )
             {
             m_BoneMappingData[ meshIdx ][ boneName ] = BoneData( pBone->mOffsetMatrix, boneIdx );
-            ++totalBones;
             }
          }
       }
-   m_NumBones = totalBones;
-   ENG_ASSERT( m_NumBones <= MAXIMUM_BONES_PER_ACTOR );
    }
 
 aiAnimation* MeshResourceExtraData::FindAnimation( const std::string& animationName ) const

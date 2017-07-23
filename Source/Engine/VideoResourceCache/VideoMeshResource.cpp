@@ -192,8 +192,8 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
          {
          // Loading bones
          unsigned int vertexIdOffest = 0;
-         std::vector< BoneDataOfVertex > vertexToBoneMappings( pMeshExtra->m_NumVertices );
-         std::vector< unsigned int > numBoneDataLoaded( pMeshExtra->m_NumVertices, 0 );
+         std::vector< BoneDataOfVertex > vertexToBoneMappings( pMesh->mNumVertices );
+         std::vector< unsigned int > numBoneDataLoaded( pMesh->mNumVertices, 0 );
          for( unsigned int boneIdx = 0; boneIdx < pMesh->mNumBones; boneIdx++ )
             {
             auto pBone = pMesh->mBones[ boneIdx ];

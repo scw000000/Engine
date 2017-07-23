@@ -96,7 +96,7 @@ ResHandle::ResHandle( shared_ptr< Resource > pResource, char *buffer, unsigned i
    {
    m_pBuffer = buffer;
 	m_Size = size;
-	m_Extra = NULL;
+	m_pExtraData = NULL;
 	m_pResCache = pResCache;
    }
 

@@ -49,6 +49,7 @@ do
 	require = function(script)
 		-- If we haven't already loaded this file, try to load it now
 		if (not resourceIdMap[script]) then
+            -- this function is inside C++ InternalScriptExports::LoadAndExecuteScriptResource
 			if (LoadAndExecuteScriptResource(script)) then
 				resourceIdMap[script] = true;
 			else
@@ -241,19 +242,31 @@ function class(baseClass, body)
 	--						   automatically.  It's used in case the C++ side needs access to the leaf 
 	--						   subclass that is being instantiated.  For an example, see ScriptProcess 
 	--						   in C++.
+    -- Example:
+    -- TestScriptProcess = class(ScriptProcess, { count = 0;});
+    -- In this case, the create function of TestScriptProcess
+    -- will call TestScriptProcess.Create -> ScriptProcess.Create -> ScriptProcess::CreateFromScript
 	ret.Create = function(self, constructionData, originalSubClass)
 		local obj;
-		if (self.__index ~= nil) then
-			if (originalSubClass ~= nil) then
+        -- If this class is a subclass. then call Create function recursivelly
+        if (self.__index ~= nil) then
+            -- This class is not leaf class, so just obtain the leaf class object
+            if (originalSubClass ~= nil) then
 				obj = self.__index:Create(constructionData, originalSubClass);
-			else
+			else 
+            -- This means this function is called in lua for the first time
+            -- then just pass this class to the third param
 				obj = self.__index:Create(constructionData, self);
 			end
 		else
+        -- this is a pure lua class, just copy the data
+        -- this maks suree that construction data passed in leaf class
+        -- can access the data
 			obj = constructionData or {};
 		end
 		
 		setmetatable(obj, obj);
+        -- Setup class of the obj
 		obj.__index = self;
 		
 		-- copy any operators over

@@ -16,7 +16,7 @@
 #include "assimp/cimport.h"
 #include "assimp/scene.h"
 
-#define MAXIMUM_BONES_PER_ACTOR 100
+#define MAXIMUM_BONES_PER_ACTOR 200
 #define MAXIMUM_BONES_PER_VEREX 4
 
 struct aiScene;
@@ -51,9 +51,7 @@ class MeshResourceExtraData : public IResourceExtraData
 
    public:
       const struct aiScene* m_pScene;
-      unsigned int m_NumVertices;
       unsigned int m_NumVertexIndex;
-      unsigned int m_NumBones;
       std::vector<BoneMappingData> m_BoneMappingData;
       aiMatrix4x4  m_GlobalInverseTransform;
 

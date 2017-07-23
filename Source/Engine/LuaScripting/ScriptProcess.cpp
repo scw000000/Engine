@@ -19,12 +19,13 @@ const char* SCRIPT_PROCESS_NAME = "ScriptProcess";
 
 void ScriptProcess::RegisterScriptClass( void )
    {
+   // create a ScriptProcess class in lua state
    LuaPlus::LuaObject metaTableObj = LuaStateManager::GetSingleton().GetGlobalVars().CreateTable( SCRIPT_PROCESS_NAME );
    metaTableObj.SetObject( "__index", metaTableObj ); // set itself as index table
    metaTableObj.SetObject( "base", metaTableObj );
    metaTableObj.SetBoolean( "cpp", true );
    RegisterScriptClassFunctions( metaTableObj );
-   metaTableObj.RegisterDirect( "Create", &ScriptProcess::CreateFromScript ); // Let user can call create function to generate instance from lua 
+   metaTableObj.RegisterDirect( "Create", &ScriptProcess::CreateFromScript ); // Let user call create function to generate instance from lua 
    }
 
 void ScriptProcess::VOnInit( void ) 
@@ -102,7 +103,7 @@ LuaPlus::LuaObject ScriptProcess::CreateFromScript( LuaPlus::LuaObject self, Lua
       // Find class defination (table) in global variables 
       LuaPlus::LuaObject metaTableObj = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( SCRIPT_PROCESS_NAME );
       ENG_ASSERT( !metaTableObj.IsNil() );
-      // Set C++ pointer in local tabale, because this variable is belong to instance, to class 
+      // Set C++ pointer in local tabale, because we'll  need to call menber function of pObj
       pObj->m_LuaInstance.SetLightUserdata( "__object", pObj );
       // But still set metaTable to Class definition
       pObj->m_LuaInstance.SetMetatable( metaTableObj );

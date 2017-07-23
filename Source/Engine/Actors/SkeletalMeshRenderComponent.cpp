@@ -36,9 +36,52 @@ SkeletalMeshRenderComponent::SkeletalMeshRenderComponent( void ) : m_pSkeletalMe
 // This function is called by  ActorFactory Actor::PostInit->BaseRenderCompoenent::PostInit->VGetSceneNode->VCreateSceneNode
 shared_ptr<SceneNode> SkeletalMeshRenderComponent::VCreateSceneNode( void )
    {
-   shared_ptr< SceneNode > pSKMeshSceneNode( ENG_NEW SkeletalMeshSceneNode( m_pOwner->GetId(), this, m_pSkeletalMeshResource, m_pAnimScriptResource, m_pMaterial, RenderGroup::RenderGroup_Actor, m_pTransform ) );
+   /*shared_ptr< SceneNode > pSKMeshSceneNode( ENG_NEW SkeletalMeshSceneNode( m_pOwner->GetId(), this, m_pSkeletalMeshResource, m_pAnimScriptResource, m_pMaterial, RenderGroup::RenderGroup_Actor, m_pTransform ) );
 
-   return pSKMeshSceneNode;
+   return pSKMeshSceneNode;*/
+
+   //
+   auto pScene = MeshResourceLoader::LoadAndReturnScene( m_pSkeletalMeshResource );
+   shared_ptr< SceneNode > pMeshRootNode( ENG_NEW SceneNode( m_pOwner->GetId(), this, RenderGroup_Actor, m_pTransform ) );
+
+   std::queue< std::pair< shared_ptr< SceneNode >, aiNode* > > nodeQueue;
+   nodeQueue.push( std::pair< shared_ptr< SceneNode >, aiNode* >( pMeshRootNode, pScene->mRootNode ) );
+
+   std::vector< MaterialPtr > pMaterials;
+   pMaterials.reserve( pScene->mNumMeshes );
+   std::string filePath = m_pSkeletalMeshResource->GetPath();
+   // Setup all material for all meshes
+   for( unsigned int i = 0; i < pScene->mNumMeshes; ++i )
+      {
+      pMaterials.push_back( MaterialPtr( ENG_NEW Material( pScene, i, filePath ) ) );
+      if( !pMaterials[ i ]->m_pDiffuseTextureRes )
+         {
+         pMaterials[ i ]->m_pDiffuseTextureRes = m_pMaterial->m_pDiffuseTextureRes;
+         }
+      }
+   while( nodeQueue.size() )
+      {
+      auto nodePair = nodeQueue.front();
+      auto pSceneNode = nodePair.first;
+      auto pAiNode = nodePair.second;
+      nodeQueue.pop();
+      for( unsigned int i = 0; i < pAiNode->mNumChildren; ++i )
+         {
+         auto pAiChildNode = pAiNode->mChildren[ i ];
+         shared_ptr< SceneNode > pChildSceneNode( ENG_NEW SceneNode( m_pOwner->GetId(), this, RenderGroup_Actor, TransformPtr( ENG_NEW Transform( pAiChildNode->mTransformation ) ) ) );
+         pSceneNode->VAddChild( pChildSceneNode );
+         pChildSceneNode->VSetParentNode( pSceneNode.get() );
+         nodeQueue.push( std::pair< shared_ptr< SceneNode >, aiNode* >( pChildSceneNode, pAiChildNode ) );
+         }
+      for( unsigned int i = 0; i < pAiNode->mNumMeshes; ++i )
+         {
+         shared_ptr< SceneNode > pChildSceneNode( ENG_NEW SkeletalMeshSceneNode( m_pOwner->GetId(), this, m_pSkeletalMeshResource, m_pAnimScriptResource, pMaterials[ pAiNode->mMeshes[ i ] ], RenderGroup_Actor, TransformPtr( ENG_NEW Transform() ) ) );
+         pChildSceneNode->VSetParentNode( pSceneNode.get() );
+         pSceneNode->VAddChild( pChildSceneNode );
+         }
+      }
+
+   return pMeshRootNode;
    }
 
 bool SkeletalMeshRenderComponent::VDelegateInit( TiXmlElement* pData )

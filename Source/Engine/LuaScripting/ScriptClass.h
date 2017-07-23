@@ -40,6 +40,7 @@ template< typename T > bool IsBaseClassOf( LuaPlus::LuaObject other )
    return false;
    }
 
+// Create an empty metaTable for itself
 template< typename T > void RegisterAbstractScriptClass( void )
    {
    LuaPlus::LuaObject metaTableObj = LuaStateManager::GetSingleton().GetGlobalVars().CreateTable( GetLuaClassTableName<T>().c_str() );
@@ -49,6 +50,7 @@ template< typename T > void RegisterAbstractScriptClass( void )
    metaTableObj.SetBoolean( "cpp", true );
    }
 
+// This class has no base parameter
 template< typename T > void RegisterScriptClass( void )
    {
    if( !std::is_base_of< BaseScriptClass< T >, T >::value )
@@ -78,7 +80,10 @@ template< typename T > class BaseScriptClass
       // this class should be used when inherited only
       explicit BaseScriptClass( void ) { };
       static LuaPlus::LuaObject CreateFromScript( LuaPlus::LuaObject self, LuaPlus::LuaObject constructionData, LuaPlus::LuaObject originalSubClass );
+      // Get mapping lua class object in C++
       static LuaPlus::LuaObject GetLuaClassMetatable( void );
+      // This function should be overrided in subclass, the purpose of this function is to 
+      // iterate all of the constructionData in lua and set it up in CPP class
       virtual bool VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData ) { return true; };
       virtual void VRegisterExposedMemberFunctions( LuaPlus::LuaObject& metaTableObj ) {};
      
@@ -91,31 +96,39 @@ template< typename T > LuaPlus::LuaObject BaseScriptClass<T>::CreateFromScript( 
    // Note: The self parameter is not use in this function, but it allows us to be consistent when calling
    // Create().  The Lua version of this function needs self.
    ENG_LOG( "Script", std::string( "Creating instance of " ) + typeid( T ).name() );
-   auto pObj = ENG_NEW T;
+   auto pCPPObj = ENG_NEW T;
    //BaseScriptClass<T>* pObj = static_cast< BaseScriptClass<T>* >( orig );
 
-   pObj->m_LuaInstance.AssignNewTable( LuaStateManager::GetSingleton().GetLuaState() );
-   if( pObj->VBuildCppDataFromScript( originalSubClass, constructionData ) )
+   // Link lua instance to currently lua state
+   pCPPObj->m_LuaInstance.AssignNewTable( LuaStateManager::GetSingleton().GetLuaState() );
+   if( pCPPObj->VBuildCppDataFromScript( originalSubClass, constructionData ) )
       {
+      // metaTableObj represents the Lua class table
       LuaPlus::LuaObject metaTableObj = GetLuaClassMetatable();
-      pObj->m_LuaInstance.SetLightUserdata( "__object", pObj );
-      pObj->m_LuaInstance.SetMetatable( pObj->m_LuaInstance );
-      pObj->m_LuaInstance.SetObject( "__index", metaTableObj );
-      pObj->m_LuaInstance.SetObject( "base", metaTableObj );
-      pObj->VRegisterExposedMemberFunctions( metaTableObj );
+      // Point light user data to itself
+      pCPPObj->m_LuaInstance.SetLightUserdata( "__object", pCPPObj );
+      pCPPObj->m_LuaInstance.SetMetatable( pCPPObj->m_LuaInstance );
+      // If you cannot find anything in current lua instance, it will look up __index in metaTable, which is itself
+      // and the index will be the lua class metatable
+      pCPPObj->m_LuaInstance.SetObject( "__index", metaTableObj );
+      pCPPObj->m_LuaInstance.SetObject( "base", metaTableObj );
+      // this function should be implemented by class implementation
+      pCPPObj->VRegisterExposedMemberFunctions( metaTableObj );
+      metaTableObj.SetBoolean( "cpp", true );
+      // setup variables
       for( LuaPlus::LuaTableIterator childNodesIt( constructionData ); childNodesIt; childNodesIt.Next() )
          {
-         pObj->m_LuaInstance.SetObject( childNodesIt.GetKey(), childNodesIt.GetValue() );
+         pCPPObj->m_LuaInstance.SetObject( childNodesIt.GetKey(), childNodesIt.GetValue() );
          }
       }
    else
       {
-      pObj->m_LuaInstance.AssignNil( LuaStateManager::GetSingleton().GetLuaState() );
-      SAFE_DELETE( pObj );
+      pCPPObj->m_LuaInstance.AssignNil( LuaStateManager::GetSingleton().GetLuaState() );
+      SAFE_DELETE( pCPPObj );
       ENG_WARNING( "Create C++ class from lua obj failed" );
       }
 
-   return pObj->m_LuaInstance;
+   return pCPPObj->m_LuaInstance;
    }
 
 template< typename T > LuaPlus::LuaObject BaseScriptClass<T>::GetLuaClassMetatable( void )
@@ -125,14 +138,16 @@ template< typename T > LuaPlus::LuaObject BaseScriptClass<T>::GetLuaClassMetatab
    return metaTableObj;
    }
 
+// To specify inherit relation between C++ classes, D = derived class, B = base class
 template< typename D, typename B > void RegisterScriptClass( void )
    {
    if( !std::is_base_of< BaseScriptClass< D >, D >::value || !std::is_base_of< B, D >::value )
       {
-      ENG_WARNING( "Register class failed, this class is not derived from BaseScriptClass" );
+      ENG_ERROR( "Register class failed, this class is not derived from BaseScriptClass" );
       return;
       }
    auto baseClassMetaTableObj = BaseScriptClass< B >::GetLuaClassMetatable();
+   // Register base class first 
    if( baseClassMetaTableObj.IsNil() )
       {
       RegisterAbstractScriptClass< B >();

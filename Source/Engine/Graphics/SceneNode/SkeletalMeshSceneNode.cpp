@@ -77,7 +77,8 @@ SkeletalMeshSceneNode::SkeletalMeshSceneNode(
    m_MaterialAmbientUni = -1;
    m_MaterialDiffuseUni = -1;
    m_MaterialSpecularUni = -1;*/
-
+   m_pDeferredMainRenderer = dynamic_cast< TBDRMainRenderer* >( &g_pApp->m_pRenderManager->VGetMainRenderer() );
+   ENG_ASSERT( m_pDeferredMainRenderer );
    m_VerticesIndexCount = 0;
    m_UseNormalMap = false;
    }
@@ -112,22 +113,6 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
 
    // OpenGLRendererLoader::LoadMesh( &m_Buffers[ Vertex_Buffer ], &m_Buffers[ UV_Buffer ], &m_Buffers[ Index_Buffer ], &m_Buffers[ Normal_Buffer ], pMeshResHandle );
    // OpenGLRendererLoader::LoadBones( &m_Buffers[ Bone_Buffer ], pMeshResHandle );
-
-   // shared_ptr<ResHandle> pScriptResHandle = g_pApp->m_pResCache->GetHandle( m_pAnimScriptResource );
-   // if( pScriptResHandle )
-   //    {
-   //    auto luaAnimState = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( "scriptRet" );
-   //    ENG_ASSERT( luaAnimState.IsTable() && IsBaseClassOf< AnimationState >( luaAnimState ) );
-   //    m_pAnimationState.reset( GetObjUserDataPtr< AnimationState >( luaAnimState ) );
-   //    m_pAnimationState->SetMeshResourcePtr( pMeshResHandle );
-   //    }
-   // else
-   //    {
-   //    m_pAnimationState.reset( ENG_NEW AnimationState( pMeshResHandle, NULL ) );
-   //    }
-   // ENG_ASSERT( m_pAnimationState->Init() );
-   // m_pAnimationState->SetOwner( m_pRenderComponent->VGetOwner().lock() );
-   // AnimationManager::GetSingleton().VAddAnimationState( m_pAnimationState );
 
    // glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Vertex_Buffer ] );
    // glEnableVertexAttribArray( VERTEX_LOCATION );
@@ -228,10 +213,25 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
    m_Buffers[ Bitangent_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_Bitangent ];
    m_Buffers[ Bone_Buffer ] = pMeshResData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_BoneData ];
 
-   // restore all of its children
-   SceneNode::VOnRestore( pScene );
-   OpenGLRenderManager::CheckError();
+   shared_ptr<ResHandle> pMeshResHandle = g_pApp->m_pResCache->GetHandle( m_pMeshResource );
+   shared_ptr<ResHandle> pScriptResHandle = g_pApp->m_pResCache->GetHandle( m_pAnimScriptResource );
+   if( pScriptResHandle )
+      {
+      auto luaAnimState = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( "scriptRet" );
+      ENG_ASSERT( luaAnimState.IsTable() && IsBaseClassOf< AnimationState >( luaAnimState ) );
+      m_pAnimationState.reset( GetObjUserDataPtr< AnimationState >( luaAnimState ) );
+      m_pAnimationState->SetMeshIndex( meshIdx );
+      m_pAnimationState->SetMeshResourcePtr( pMeshResHandle );
+      }
+   else
+      {
+      m_pAnimationState.reset( ENG_NEW AnimationState( pMeshResHandle, NULL ) );
+      }
+   ENG_ASSERT( m_pAnimationState->Init() );
+   m_pAnimationState->SetOwner( m_pRenderComponent->VGetOwner().lock() );
+   AnimationManager::GetSingleton().VAddAnimationState( m_pAnimationState );
 
+   // Setup VAO
    glGenVertexArrays( 1, &m_VAO );
    glBindVertexArray( m_VAO );
 
@@ -323,6 +323,9 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       );
 
    glBindVertexArray( 0 );
+   // restore all of its children
+   SceneNode::VOnRestore( pScene );
+   OpenGLRenderManager::CheckError();
 
    return S_OK;
    }
@@ -364,12 +367,13 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
 
    ////////
    glBindVertexArray( m_VAO  );
+   OpenGLRenderManager::CheckError();
    auto renderPass = TBDRMainRenderer::RenderPass_Geometry;
    glUseProgram( m_pDeferredMainRenderer->m_Programs[ renderPass ] );
 
    
    glBindFramebuffer( GL_FRAMEBUFFER, m_pDeferredMainRenderer->m_FBO[ renderPass ] );
-
+   OpenGLRenderManager::CheckError();
    auto view = pScene->GetCamera()->GetView();
    auto proj = pScene->GetCamera()->GetProjection();
    auto model = VGetGlobalTransformPtr()->GetToWorld();
@@ -377,7 +381,6 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
    // auto mvp = pScene->GetCamera()->GetProjection() * viewTest * pNode->VGetGlobalTransformPtr()->GetToWorld();
    auto mvp = proj * view * model;
    glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_MVP ], 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
-
    glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_PrevMVP ], 1, GL_FALSE, &m_PrevMVP[ 0 ][ 0 ] );
 
    m_PrevMVP = mvp;
@@ -387,7 +390,6 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
 
    glActiveTexture( GL_TEXTURE0 );
    glBindTexture( GL_TEXTURE_2D, m_MeshTextureObj );
-
    if( m_UseNormalMap )
       {
       glActiveTexture( GL_TEXTURE1 );

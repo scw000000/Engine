@@ -39,6 +39,7 @@ class IAnimationNode
       virtual void VSetLoopCount( unsigned int count ) = 0;
       virtual bool VGetLocalBoneTransform( BoneTransform& boneTransform, BoneId boneId ) const = 0;
       virtual void VSetMeshExtraDataPtr( shared_ptr< MeshResourceExtraData > pMeshExtraData ) = 0;
+      virtual void VSetMeshIdx( unsigned int meshIdx ) = 0;
    };
 
 class MeshResourceExtraData;
@@ -75,12 +76,14 @@ template <typename T>class BaseAnimationNode : public IAnimationNode, public Bas
 
    protected:
       virtual void VSetMeshExtraDataPtr( shared_ptr< MeshResourceExtraData > pMeshExtraData ) override;
+      virtual void VSetMeshIdx( unsigned int meshIdx ) override;
 
    protected:
       float m_PlaybackRate;
       float m_TimePosition;
       bool m_IsRunning;
       unsigned int m_LoopCount;
+      unsigned int m_MeshIdx;
       shared_ptr< MeshResourceExtraData > m_pMeshExtraData;
       std::list< shared_ptr< IAnimationNode > > m_ChildAnimNodes;
    };
@@ -216,4 +219,12 @@ template <typename T> void BaseAnimationNode<T>::VSetMeshExtraDataPtr( shared_pt
       }
    }
 
+template <typename T> void BaseAnimationNode<T>::VSetMeshIdx( unsigned int meshIdx )
+   {
+   m_MeshIdx = meshIdx;
+   for( auto pChildNode : m_ChildAnimNodes )
+      {
+      pChildNode->VSetMeshIdx( meshIdx );
+      }
+   }
 

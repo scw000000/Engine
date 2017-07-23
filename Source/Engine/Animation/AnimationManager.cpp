@@ -53,7 +53,8 @@ void AnimationManager::VUpdate( float deltaSeconds )
 void AnimationManager::VAddAnimationState( shared_ptr< AnimationState > pNewState )
    {
    auto actorId = pNewState->m_pOwner->GetId();
-   ENG_ASSERT( m_AnimationStates.find( actorId ) == m_AnimationStates.end() );
+   // ENG_ASSERT( m_AnimationStates.find( actorId ) == m_AnimationStates.end() );
+   // TODO: make each actor can have multiple anim states
    m_AnimationStates[ actorId ] = pNewState;
    }
 

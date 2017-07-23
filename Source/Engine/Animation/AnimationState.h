@@ -45,11 +45,12 @@ class AnimationState : public BaseScriptClass< AnimationState >
 
    private:
       void SetMeshResourcePtr( shared_ptr< ResHandle > pMeshRes );
-
+      void SetMeshIndex( unsigned int meshIdx );
    private:
       shared_ptr< ResHandle > m_pMeshResource;
       shared_ptr< MeshResourceExtraData > m_pMeshExtraData;
       shared_ptr< IAnimationNode > m_pRootAnimNode;
       shared_ptr< Actor > m_pOwner;
       std::vector< aiMatrix4x4 > m_GlobalBoneTransform;
+      unsigned int m_MeshIdx;
    };

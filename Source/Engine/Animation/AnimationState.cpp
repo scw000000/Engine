@@ -87,6 +87,7 @@ void AnimationState::Update( float deltaSeconds )
       return;
       }
    m_pRootAnimNode->VUpdate( deltaSeconds );
+   ENG_LOG( "Test", std::string( "UPdate: " ) + std::to_string( m_MeshIdx ) );
    UpdatetGlobalBoneTransform( m_pMeshExtraData->m_pScene->mRootNode, m_pMeshExtraData->m_GlobalInverseTransform );
    }
 

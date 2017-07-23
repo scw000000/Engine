@@ -210,7 +210,7 @@ int VideoMeshResourceLoader::VLoadResource( shared_ptr<ResHandle> handle, shared
          // ENG_ASSERT( vertexIdOffest == pMeshExtra->m_NumVertices );
          glBindBuffer( GL_ARRAY_BUFFER, pData->m_BufferObjects[ meshIdx ][ VideoMeshResourceExtraData::MeshBufferData_BoneData ] );
          glBufferData( GL_ARRAY_BUFFER,
-                       sizeof( vertexToBoneMappings ),
+                       pMesh->mNumVertices * sizeof( BoneDataOfVertex ),
                        &vertexToBoneMappings[ 0 ],
                        GL_STATIC_DRAW );
          glBindBuffer( GL_ARRAY_BUFFER, 0 );

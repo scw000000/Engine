@@ -28,10 +28,13 @@
 #include "..\Animation\AnimationManager.h"
 
 #define VERTEX_LOCATION    0
-#define UV_LOCATION        1
-#define NORMAL_LOCATION    2
-#define BONE_ID_LOCATION    3
-#define BONE_WEIGHT_LOCATION    4
+#define NORMAL_LOCATION    1
+#define UV_LOCATION        2
+
+#define TANGENT_LOCATION    3
+#define BITANGENT_LOCATION    4
+#define BONE_ID_LOCATION    5
+#define BONE_WEIGHT_LOCATION    6
 
 const char* const VERTEX_SHADER_FILE_NAME = "Effects\\SKMeshShader.vs.glsl";
 const char* const FRAGMENT_SHADER_FILE_NAME = "Effects\\SKMeshShader.fs.glsl";
@@ -219,6 +222,7 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       {
       auto luaAnimState = LuaStateManager::GetSingleton().GetGlobalVars().Lookup( "scriptRet" );
       ENG_ASSERT( luaAnimState.IsTable() && IsBaseClassOf< AnimationState >( luaAnimState ) );
+      auto pAnimState = GetObjUserDataPtr< AnimationState >( luaAnimState );
       m_pAnimationState.reset( GetObjUserDataPtr< AnimationState >( luaAnimState ) );
       m_pAnimationState->SetMeshIndex( meshIdx );
       m_pAnimationState->SetMeshResourcePtr( pMeshResHandle );
@@ -270,9 +274,9 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       );
 
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ UV_Buffer ] );
-   glEnableVertexAttribArray( 2 );
+   glEnableVertexAttribArray( UV_LOCATION );
    glVertexAttribPointer(
-      2,
+      UV_LOCATION,
       2,
       GL_FLOAT,
       GL_FALSE,
@@ -281,9 +285,9 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       );
 
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Tangent_Buffer ] );
-   glEnableVertexAttribArray( 3 );
+   glEnableVertexAttribArray( TANGENT_LOCATION );
    glVertexAttribPointer(
-      3,
+      TANGENT_LOCATION,
       3,
       GL_FLOAT,
       GL_FALSE,
@@ -292,9 +296,9 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       );
 
    glBindBuffer( GL_ARRAY_BUFFER, m_Buffers[ Bitangent_Buffer ] );
-   glEnableVertexAttribArray( 4 );
+   glEnableVertexAttribArray( BITANGENT_LOCATION );
    glVertexAttribPointer(
-      4,
+      BITANGENT_LOCATION,
       3,
       GL_FLOAT,
       GL_FALSE,
@@ -368,7 +372,7 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
    ////////
    glBindVertexArray( m_VAO  );
    OpenGLRenderManager::CheckError();
-   auto renderPass = TBDRMainRenderer::RenderPass_Geometry;
+   auto renderPass = TBDRMainRenderer::RenderPass_GeometrySK;
    glUseProgram( m_pDeferredMainRenderer->m_Programs[ renderPass ] );
 
    
@@ -400,6 +404,11 @@ int SkeletalMeshSceneNode::VRender( Scene *pScene )
       {
       glUniform1ui( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometryPassUni_UseNormalMap ], 0u );
       }
+
+   const auto& globalBoneTransform = m_pAnimationState->m_GlobalBoneTransform;
+   glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometrySKPassUni_BoneTransform ], globalBoneTransform.size(), GL_TRUE, &( globalBoneTransform[ 0 ][ 0 ][ 0 ] ) );
+   // std::vector< Mat4x4 > fake( m_pAnimationState->m_GlobalBoneTransform.size() );
+   // glUniformMatrix4fv( m_pDeferredMainRenderer->m_Uniforms[ renderPass ][ TBDRMainRenderer::GeometrySKPassUni_BoneTransform ], globalBoneTransform.size(), GL_FALSE, &( fake[ 0 ][ 0 ][ 0 ] ) );
 
    glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_Buffers[ Index_Buffer ] );
 
@@ -437,11 +446,11 @@ void SkeletalMeshSceneNode::ReleaseResource( void )
       m_VAO = 0;
       }
 
-   if( m_pAnimationState )
+   /*if( m_pAnimationState )
       {
       AnimationManager::GetSingleton().VRemoveAnimationState( m_pAnimationState->m_pOwner->GetId() );
       m_pAnimationState.reset();
-      }
+      }*/
    }
 
 void SkeletalMeshSceneNode::UpdateAnimationBones( shared_ptr<MeshResourceExtraData> pMeshExtra, float aiAnimTicks, aiAnimation* pAnimation, aiNode* pAiNode, const aiMatrix4x4& parentTransfrom )

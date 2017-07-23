@@ -389,6 +389,9 @@ bool BaseEngineLogic::VLoadLevel()
       TransformPtr pTransform( ENG_NEW Transform( Vec3( x, 20.f, z ) ) );
       VCreateActor( shared_ptr< Resource >( ENG_NEW Resource( "actors\\light.xml" ) ), pTransform );
       }
+
+   VSetIsSimulating( true );
+
    return true;
    }
 

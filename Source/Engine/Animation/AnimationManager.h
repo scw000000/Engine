@@ -24,7 +24,7 @@ class IAnimationManager : public ENG_Noncopyable
       virtual void VUpdate( float deltaSeconds ) = 0;
       virtual void VAddAnimationState( shared_ptr< AnimationState > pNewState ) = 0;
       virtual void VRemoveAnimationState( ActorId actorId ) = 0;
-      virtual shared_ptr< AnimationState > VGetAnimationState( ActorId actorId ) const = 0;
+      virtual std::vector< shared_ptr< AnimationState > > VGetAnimationStates( ActorId actorId ) const = 0;
            
    private:
       
@@ -39,11 +39,11 @@ class AnimationManager : public IAnimationManager
       virtual void VUpdate( float deltaSeconds ) override;
       virtual void VAddAnimationState( shared_ptr< AnimationState > pNewState ) override;
       virtual void VRemoveAnimationState( ActorId actorId ) override;
-      virtual shared_ptr< AnimationState > VGetAnimationState( ActorId actorId ) const override;
+      virtual std::vector< shared_ptr< AnimationState > > VGetAnimationStates( ActorId actorId ) const override;
       void NewAnimationRootNodedelegate( IEventPtr pEvent );
 
    private:
       AnimationManager( void );
       bool m_IsRunning;
-      std::map< ActorId, shared_ptr< AnimationState > > m_AnimationStates;
+      std::map< ActorId, std::vector< shared_ptr< AnimationState > > > m_AnimationStates;
    };

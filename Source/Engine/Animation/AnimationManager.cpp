@@ -33,9 +33,12 @@ AnimationManager& AnimationManager::GetSingleton( void )
 void AnimationManager::VSetIsRunning( bool isRunning )
    {
    m_IsRunning = isRunning; 
-   for( auto pAnimStateIt : m_AnimationStates )
+   for( auto actorAnimStateIt : m_AnimationStates )
       {
-      pAnimStateIt.second->SetIsRunning( isRunning );
+      for( auto animationState : actorAnimStateIt.second  )
+         {
+         animationState->SetIsRunning( isRunning );
+         }
       }
    }
 
@@ -43,9 +46,12 @@ void AnimationManager::VUpdate( float deltaSeconds )
    {
    if( m_IsRunning )
       {
-      for( auto pAnimStateIt : m_AnimationStates )
+      for( auto actorAnimStateIt : m_AnimationStates )
          {
-         pAnimStateIt.second->Update( deltaSeconds );
+         for( auto animationState : actorAnimStateIt.second )
+            {
+            animationState->Update( deltaSeconds );
+            }
          }
       }
    }
@@ -53,9 +59,13 @@ void AnimationManager::VUpdate( float deltaSeconds )
 void AnimationManager::VAddAnimationState( shared_ptr< AnimationState > pNewState )
    {
    auto actorId = pNewState->m_pOwner->GetId();
-   // ENG_ASSERT( m_AnimationStates.find( actorId ) == m_AnimationStates.end() );
-   // TODO: make each actor can have multiple anim states
-   m_AnimationStates[ actorId ] = pNewState;
+   auto actorAnimStatesIt = m_AnimationStates.find( actorId );
+   if( actorAnimStatesIt == m_AnimationStates.end() || actorAnimStatesIt->second.size() <= pNewState->m_MeshIdx )
+      {
+      m_AnimationStates[ actorId ].resize( pNewState->m_MeshIdx + 1 );
+      }
+   ENG_ASSERT( m_AnimationStates[ actorId ][ pNewState->m_MeshIdx ].get() == nullptr );
+   m_AnimationStates[ actorId ][ pNewState->m_MeshIdx ] = pNewState;
    }
 
 void AnimationManager::VRemoveAnimationState( ActorId actorId )
@@ -68,12 +78,12 @@ void AnimationManager::VRemoveAnimationState( ActorId actorId )
    m_AnimationStates.erase( animStateIt );
    }
 
-shared_ptr< AnimationState > AnimationManager::VGetAnimationState( ActorId actorId ) const
+std::vector< shared_ptr< AnimationState > > AnimationManager::VGetAnimationStates( ActorId actorId ) const
    {
    auto animStateIt = m_AnimationStates.find( actorId );
    if( animStateIt == m_AnimationStates.end() )
       {
-      return shared_ptr< AnimationState >();
+      return std::vector< shared_ptr< AnimationState > >();
       }
    return animStateIt->second;
    }

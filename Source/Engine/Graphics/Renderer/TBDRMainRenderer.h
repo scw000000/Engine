@@ -72,6 +72,7 @@ class TBDRMainRenderer : public IMainRenderer
       enum RenderPass
          {
          RenderPass_Geometry,
+         RenderPass_GeometrySK,
          RenderPass_LightCulling,
          RenderPass_Lighting,
          RenderPass_Num
@@ -105,6 +106,18 @@ class TBDRMainRenderer : public IMainRenderer
          GeometryPassUni_NormalMapTexture,
          GeometryPassUni_UseNormalMap,
          GeometryPassUni_Num
+         };
+
+      enum GeometrySKPassUniforms
+         {
+         GeometrySKPassUni_MVP,
+         GeometrySKPassUni_PrevMVP,
+         GeometrySKPassUni_NormalMat,
+         GeometrySKPassUni_AlbedoTexture,
+         GeometrySKPassUni_NormalMapTexture,
+         GeometrySKPassUni_UseNormalMap,
+         GeometrySKPassUni_BoneTransform,
+         GeometrySKPassUni_Num
          };
 
       enum LightCullingPassUniforms

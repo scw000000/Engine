@@ -33,6 +33,9 @@ const char* const LIGHT_CULL_COMPUTE_SHADER_FILE_NAME = "Effects\\LightCulling.c
 const char* const GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DeferredGeometry.vs.glsl";
 const char* const GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredGeometry.fs.glsl";
 
+const char* const GEOMETRY_SK_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DeferredGeometrySK.vs.glsl";
+const char* const GEOMETRY_SK_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredGeometry.fs.glsl";
+
 const char* const LIGHT_PASS_VERTEX_SHADER_FILE_NAME = "Effects\\DeferredLighting.vs.glsl";
 const char* const LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME = "Effects\\DeferredLighting.fs.glsl";
 
@@ -41,6 +44,9 @@ TBDRMainRenderer::TBDRMainRenderer( void ) :
    {
    m_Shaders[ RenderPass_Geometry ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( shared_ptr< Resource >( ENG_NEW Resource( GEOMETRY_PASS_VERTEX_SHADER_FILE_NAME ) ) ) ) );
    m_Shaders[ RenderPass_Geometry ].push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( shared_ptr< Resource >( ENG_NEW Resource( GEOMETRY_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ) ) );
+
+   m_Shaders[ RenderPass_GeometrySK ].push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( shared_ptr< Resource >( ENG_NEW Resource( GEOMETRY_SK_PASS_VERTEX_SHADER_FILE_NAME ) ) ) ) );
+   m_Shaders[ RenderPass_GeometrySK ].push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( shared_ptr< Resource >( ENG_NEW Resource( GEOMETRY_SK_PASS_FRAGMENT_SHADER_FILE_NAME ) ) ) ) );
 
    m_Shaders[ RenderPass_LightCulling ].push_back( shared_ptr< OpenGLShader >( ENG_NEW ComputeShader( shared_ptr< Resource >( ENG_NEW Resource( LIGHT_CULL_COMPUTE_SHADER_FILE_NAME ) ) ) ) );
    
@@ -51,6 +57,7 @@ TBDRMainRenderer::TBDRMainRenderer( void ) :
    //m_FragmentShaders[ RenderPass_LightCalc ].VSetResource( Resource( LIGHT_PASS_FRAGMENT_SHADER_FILE_NAME ) );
 
    m_Uniforms[ RenderPass_Geometry ] = std::vector< GLuint >( GeometryPassUni_Num, -1 );
+   m_Uniforms[ RenderPass_GeometrySK ] = std::vector< GLuint >( GeometrySKPassUni_Num, -1 );
    m_Uniforms[ RenderPass_LightCulling ] = std::vector< GLuint >( LightCullPassUni_Num, -1 );
    m_Uniforms[ RenderPass_Lighting ] = std::vector< GLuint >( LightingPassUni_Num, -1 );
 
@@ -299,64 +306,75 @@ int TBDRMainRenderer::OnRestoreTileFrustum( Scene* pScene )
 
 int TBDRMainRenderer::OnRestoreGeometryPass()
    {
-   GenerateProgram( RenderPass_Geometry );
+   std::vector< RenderPass > geometryPasses = { RenderPass_Geometry, RenderPass_GeometrySK };
+   for( auto geometryPass : geometryPasses )
+      {
+      GenerateProgram( geometryPass );
+
+      glGenFramebuffers( 1, &m_FBO[ geometryPass ] );
+      ENG_ASSERT( m_FBO[ geometryPass ] );
+      glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ geometryPass ] );
+
+      // glDrawBuffer( GL_NONE );
+      // Depth buffer
+      glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Depth ] );
+      glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Depth ], 0 );
+
+      // MRT 0 
+      glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt0 ] );
+      glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_UsedTextures[ UsdTex_Mrt0 ], 0 );
+
+      // MRT 1
+      glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt1 ] );
+      glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_UsedTextures[ UsdTex_Mrt1 ], 0 );
+
+      // MRT 2
+      glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt2 ] );
+      glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, m_UsedTextures[ UsdTex_Mrt2 ], 0 );
+
+      GLuint outputAttatchments[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+      glDrawBuffers( 3, outputAttatchments );
+
+      glBindTexture( GL_TEXTURE_2D, 0 );
+      glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+
+      //  glDrawBuffer( GL_NONE );
+      m_Uniforms[ geometryPass ][ GeometryPassUni_MVP ] = glGetUniformLocation( m_Programs[ geometryPass ], "uMVP" );
+      ENG_ASSERT( m_Uniforms[ geometryPass ][ GeometryPassUni_MVP ] != -1 );
+
+      m_Uniforms[ geometryPass ][ GeometryPassUni_PrevMVP ] = glGetUniformLocation( m_Programs[ geometryPass ], "uPrevMVP" );
+      ENG_ASSERT( m_Uniforms[ geometryPass ][ GeometryPassUni_PrevMVP ] != -1 );
+
+      m_Uniforms[ geometryPass ][ GeometryPassUni_NormalMat ] = glGetUniformLocation( m_Programs[ geometryPass ], "uNormal" );
+      ENG_ASSERT( m_Uniforms[ geometryPass ][ GeometryPassUni_NormalMat ] != -1 );
+
+      m_Uniforms[ geometryPass ][ GeometryPassUni_AlbedoTexture ] = glGetUniformLocation( m_Programs[ geometryPass ], "uAlbedoTex" );
+      ENG_ASSERT( m_Uniforms[ geometryPass ][ GeometryPassUni_AlbedoTexture ] != -1 );
+
+      m_Uniforms[ geometryPass ][ GeometryPassUni_NormalMapTexture ] = glGetUniformLocation( m_Programs[ geometryPass ], "uNormalMapTex" );
+      ENG_ASSERT( m_Uniforms[ geometryPass ][ GeometryPassUni_MVP ] != -1 );
+
+      m_Uniforms[ geometryPass ][ GeometryPassUni_UseNormalMap ] = glGetUniformLocation( m_Programs[ geometryPass ], "uUseNormalMap" );
+      ENG_ASSERT( m_Uniforms[ geometryPass ][ GeometryPassUni_MVP ] != -1 );
+
+      if( geometryPass == RenderPass_GeometrySK )
+         {
+         m_Uniforms[ geometryPass ][ GeometrySKPassUni_BoneTransform ] = glGetUniformLocation( m_Programs[ geometryPass ], "uBoneTransform" );
+         ENG_ASSERT( m_Uniforms[ geometryPass ][ GeometrySKPassUni_BoneTransform ] != -1 );
+         }
+
+      glUseProgram( m_Programs[ geometryPass ] );
+      glUniform1i( m_Uniforms[ geometryPass ][ GeometryPassUni_AlbedoTexture ], 0 );
+      glUniform1i( m_Uniforms[ geometryPass ][ GeometryPassUni_NormalMapTexture ], 1 );
+      glUseProgram( 0 );
+
+      auto result = glCheckFramebufferStatus( GL_FRAMEBUFFER );
+      ENG_ASSERT( glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE && "Frame buffer error" );
+
+      glBindVertexArray( 0 );
+      OpenGLRenderManager::CheckError();
+      }
    
-   glGenFramebuffers( 1, &m_FBO[ RenderPass_Geometry ] );
-   ENG_ASSERT( m_FBO[ RenderPass_Geometry ] );
-   glBindFramebuffer( GL_FRAMEBUFFER, m_FBO[ RenderPass_Geometry ] );
-
-  // glDrawBuffer( GL_NONE );
-   // Depth buffer
-   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Depth ] );
-   glFramebufferTexture2D( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Depth ], 0 );
-
-   // MRT 0 
-   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt0 ] );
-   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_UsedTextures[ UsdTex_Mrt0 ], 0 );
-
-   // MRT 1
-   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt1 ] );
-   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, m_UsedTextures[ UsdTex_Mrt1 ], 0 );
-
-   // MRT 2
-   glBindTexture( GL_TEXTURE_2D, m_UsedTextures[ UsdTex_Mrt2 ] );
-   glFramebufferTexture( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, m_UsedTextures[ UsdTex_Mrt2 ], 0 );
-
-   GLuint outputAttatchments[ ] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-   glDrawBuffers( 3, outputAttatchments );
-
-   glBindTexture( GL_TEXTURE_2D, 0 );
-   glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-
-  //  glDrawBuffer( GL_NONE );
-   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uMVP" );
-   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
-   
-   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_PrevMVP ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uPrevMVP" );
-   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_PrevMVP ] != -1 );
-
-   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uNormal" );
-   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMat ] != -1 );
-    
-   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_AlbedoTexture ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uAlbedoTex" );
-   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_AlbedoTexture ] != -1 );
-
-   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMapTexture ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uNormalMapTex" );
-   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
-
-   m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_UseNormalMap ] = glGetUniformLocation( m_Programs[ RenderPass_Geometry ], "uUseNormalMap" );
-   ENG_ASSERT( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_MVP ] != -1 );
-
-   glUseProgram( m_Programs[ RenderPass_Geometry ] );
-      glUniform1i( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_AlbedoTexture ], 0 );
-      glUniform1i( m_Uniforms[ RenderPass_Geometry ][ GeometryPassUni_NormalMapTexture ], 1 );
-   glUseProgram( 0 );
-
-   auto result = glCheckFramebufferStatus( GL_FRAMEBUFFER );
-   ENG_ASSERT( glCheckFramebufferStatus( GL_FRAMEBUFFER ) == GL_FRAMEBUFFER_COMPLETE && "Frame buffer error" );
-
-   glBindVertexArray( 0 );
-   OpenGLRenderManager::CheckError();
    return S_OK;
    }
 

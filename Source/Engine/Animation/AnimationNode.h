@@ -90,7 +90,7 @@ template <typename T>class BaseAnimationNode : public IAnimationNode, public Bas
 
 template <typename T> BaseAnimationNode<T>::BaseAnimationNode( void )
    {
-   m_PlaybackRate = 1.f;
+   m_PlaybackRate = 0.5f;
    m_TimePosition = 0.f;
    m_IsRunning = false;
    m_LoopCount = 0;

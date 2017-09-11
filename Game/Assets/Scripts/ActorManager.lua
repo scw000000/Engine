@@ -120,6 +120,7 @@ ActorManager = class(nil,
 	_enemyUpdater = nil,  -- process that updates all enemy states
 });
 
+-- This function is called by the constructor of script component
 function ActorManager:AddPlayer(scriptObject)
 	if (self._player ~= nil) then
 		print("Attempting to add player to ActorManager when one already exists; id = " .. self._player:GetActorId());

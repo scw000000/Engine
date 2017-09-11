@@ -176,7 +176,7 @@ bool EngineApp::InitInstance( SDL_Window* window, int screenWidth, int screenHei
    RegisterScriptClass< AnimationClipNode, IAnimationNode >();
    RegisterScriptClass< AnimationLerpNode, IAnimationNode >();
    RegisterScriptClass< AnimationState >();
-
+   RegisterScriptClass< AnimationManager >();
    //--------------------------------- 
    //  Initialize Lua scripting
    //---------------------------------

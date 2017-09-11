@@ -231,10 +231,11 @@ int SkeletalMeshSceneNode::VOnRestore( Scene *pScene )
       {
       m_pAnimationState.reset( ENG_NEW AnimationState( pMeshResHandle, NULL ) );
       }
-   ENG_ASSERT( m_pAnimationState->Init() );
+   bool animStateInitSuccess = m_pAnimationState->Init();
+   ENG_ASSERT( animStateInitSuccess );
    m_pAnimationState->SetOwner( m_pRenderComponent->VGetOwner().lock() );
    AnimationManager::GetSingleton().VAddAnimationState( m_pAnimationState );
-
+   // LuaPlus::LuaFunction< LuaPlus::LuaObject > zzz;
    // Setup VAO
    glGenVertexArrays( 1, &m_VAO );
    glBindVertexArray( m_VAO );

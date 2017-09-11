@@ -68,6 +68,15 @@ void AnimationManager::VAddAnimationState( shared_ptr< AnimationState > pNewStat
    m_AnimationStates[ actorId ][ pNewState->m_MeshIdx ] = pNewState;
    }
 
+void AnimationManager::VAddAnimationState( LuaPlus::LuaObject luaObj )
+   {
+   ENG_ASSERT( luaObj.IsTable() && IsBaseClassOf< AnimationState >( luaObj ) );
+   // Need to add luaObj to lua instance as well
+   auto pAnimState = GetObjUserDataPtr< AnimationState >( luaObj );
+
+   // m_LuaInstance
+   }
+
 void AnimationManager::VRemoveAnimationState( ActorId actorId )
    {
    auto animStateIt = m_AnimationStates.find( actorId );
@@ -86,5 +95,17 @@ std::vector< shared_ptr< AnimationState > > AnimationManager::VGetAnimationState
       return std::vector< shared_ptr< AnimationState > >();
       }
    return animStateIt->second;
+   }
+
+bool AnimationManager::VBuildCppDataFromScript( LuaPlus::LuaObject scriptClass, LuaPlus::LuaObject constructionData )
+   {
+   // should not require any initial data for now
+   
+   return true;
+   }
+
+void AnimationManager::VRegisterExposedMemberFunctions( LuaPlus::LuaObject& metaTableObj ) 
+   {
+   
    }
 

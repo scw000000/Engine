@@ -2,7 +2,7 @@
 
 print("Loading script");
        
-scriptRet = cppClassTable_AnimationState:Create(
+local animState = cppClassTable_AnimationState:Create(
 		{
         RootAnimNode = cppClassTable_AnimationClipNode:Create( {
                             ClipName = "art\\run_right_inPlace_Mirrored.fbx"

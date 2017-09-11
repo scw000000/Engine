@@ -35,6 +35,7 @@ class IAnimationManager : public ENG_Noncopyable
 class AnimationManager : public IAnimationManager, public BaseScriptClass< AnimationManager >
    {
    public:
+      AnimationManager( void );
       static AnimationManager& GetSingleton( void );
       virtual void VSetIsRunning( bool isRunning ) override;
       virtual bool VGetIsRunning( void ) const override { return m_IsRunning; };
@@ -49,7 +50,7 @@ class AnimationManager : public IAnimationManager, public BaseScriptClass< Anima
       virtual void VRegisterExposedMemberFunctions( LuaPlus::LuaObject& metaTableObj ) override;
 
    private:
-      AnimationManager( void );
+      
       bool m_IsRunning;
       std::map< ActorId, std::vector< shared_ptr< AnimationState > > > m_AnimationStates;
       // This lua obj is for when adding animation state in lua, the mesh index and actor id hasn't beeen

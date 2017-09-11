@@ -6,14 +6,14 @@
         <Actor actorinstance="volume.xml" />
         <Actor actorinstance="cube.xml" /> -->
         
-        <Actor actorinstance="skmesh.xml" />
+     <!--   <Actor actorinstance="skmesh.xml" />-->
         
         <Actor actorinstance="cube2.xml" />
        
         <Actor actorinstance="cube4.xml" />
         
-        <!-- <Actor actorinstance="sponza.xml" />
-          <Actor actorinstance="cube3.xml" />-->
+         <Actor actorinstance="sponza.xml"
+       <!--   <Actor actorinstance="cube3.xml" />-->
      <!--  <Actor actorinstance="sky.xml" />
       <Actor actorinstance="floor.xml" />-->
     </StaticActors>

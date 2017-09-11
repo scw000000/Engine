@@ -25,6 +25,7 @@
 #include "..\Animation\AnimationClipNode.h"
 #include "..\Animation\AnimationLerpNode.h"
 #include "..\Animation\AnimationState.h"
+#include "..\Animation\AnimationManager.h"
 #include "..\Controller\InputManager.h"
 #include "SDL_image.h"
 

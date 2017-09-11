@@ -316,6 +316,12 @@
     <ClCompile Include="..\Graphics\Renderer\BloomRenderer.cpp">
       <Filter>Graphics\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\Physics\BulletPhysicsAttributes.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Physics\PEPhysicsAttributes.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -589,6 +595,12 @@
     </ClInclude>
     <ClInclude Include="..\Graphics\Renderer\BloomRenderer.h">
       <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\BulletPhysicsAttributes.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\PEPhysicsAttributes.h">
+      <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

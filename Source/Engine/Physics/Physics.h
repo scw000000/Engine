@@ -13,7 +13,7 @@
  * \note
  */
 #include "btBulletCollisionCommon.h"
-#include "PhysicsAttributes.h"
+#include "BulletPhysicsAttributes.h"
 
 class btVector3;
 class btTransform;
@@ -78,7 +78,7 @@ class IGamePhysics : public ENG_Noncopyable
       template< typename T > static void RegisterImplementation( void );
       static IGamePhysics& GetSingleton( void );
       static void Shutdown( void );
-      // Initialiazation and Maintenance of the Physics World
+      // Initialization and Maintenance of the Physics World
       virtual bool VInitialize() = 0;
       virtual void VSyncVisibleScene() = 0;
       virtual void VSyncRigidBodyToRenderComponent( StrongRenderComponentPtr pRenderComp ) = 0;

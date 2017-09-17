@@ -22,7 +22,7 @@
 #include "..\UserInterface\GUIManager.h"
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Event\EventManager.h"
-#include "..\Physics\Physics.h"
+#include "..\Physics\BulletPhysics.h"
 #include "..\Physics\Raycast.h"
 #include "..\Animation\AnimationManager.h"
 

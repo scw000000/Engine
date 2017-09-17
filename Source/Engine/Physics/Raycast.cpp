@@ -15,6 +15,7 @@
 #include "EngineStd.h"
 #include "Raycast.h"
 #include "Physics.h"
+#include "BulletPhysics.h"
 #include "btBulletDynamicsCommon.h"
 
 RayCastManager* RayCastManager::s_pSingleton = NULL;

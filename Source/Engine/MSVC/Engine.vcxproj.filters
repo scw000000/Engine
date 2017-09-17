@@ -322,6 +322,12 @@
     <ClCompile Include="..\Physics\PEPhysicsAttributes.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Physics\BulletPhysics.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Physics\PEPhysics.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -600,6 +606,12 @@
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\Physics\PEPhysicsAttributes.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\BulletPhysics.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\PEPhysics.h">
       <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>

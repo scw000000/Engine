@@ -184,7 +184,7 @@ int BaseEngineLogic::VOnRestore( void )
    //   }
    //// render manager need the information of camera to restore, which is in the scene
    //m_pRenderManager->VOnRestore( m_pWrold.get() );
-   //return S_OK;
+   return S_OK;
    }
 
 void BaseEngineLogic::VOnMsgProc( SDL_Event event )

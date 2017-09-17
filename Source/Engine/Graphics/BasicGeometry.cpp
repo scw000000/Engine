@@ -24,7 +24,7 @@ bool BasicGeometry::Init()
    {
    m_Shader.push_back( shared_ptr< OpenGLShader >( ENG_NEW VertexShader( shared_ptr< Resource >( ENG_NEW Resource( VERTEX_SHADER_FILE_NAME ) ) ) ) );
    m_Shader.push_back( shared_ptr< OpenGLShader >( ENG_NEW FragmentShader( shared_ptr< Resource >( ENG_NEW Resource( FRAGMENT_SHADER_FILE_NAME ) ) ) ) );
-   glUseProgram( m_Program );
+   
 
    for( auto shader : m_Shader )
       {
@@ -35,7 +35,7 @@ bool BasicGeometry::Init()
       {
       shader->VReleaseShader( m_Program );
       }
-
+   glUseProgram( m_Program );
    m_Uniforms[ Uniforms_MVP ] = glGetUniformLocation( m_Program, "uMVP" );
    m_Uniforms[ Uniforms_Color ] = glGetUniformLocation( m_Program, "uColor" );
    glUniform3f( m_Uniforms[ Uniforms_Color ], 1.f, 0.f, 0.f );
@@ -80,12 +80,13 @@ bool BasicGeometry::Init()
 
 void BasicGeometry::RenderGeometry( BasicGeometry::GeometryTypes geometryType, Color color, Mat4x4 mvp )
    {
+   // glLineWidth(10.f);
+   glDepthFunc( GL_ALWAYS );
    // save previous render mode
-   GLint prevPolygonMode;
-   glGetIntegerv( GL_POLYGON_MODE, &prevPolygonMode );
-
+   GLint prevPolygonMode[2];
+   glGetIntegerv( GL_POLYGON_MODE, prevPolygonMode );
    glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-   
+
    glBindBuffer( GL_ARRAY_BUFFER, m_VBOs[ geometryType ][ VBOs_Vertex ] );
    glEnableVertexAttribArray( VERTEX_LOCATION );
    glVertexAttribPointer(
@@ -102,7 +103,6 @@ void BasicGeometry::RenderGeometry( BasicGeometry::GeometryTypes geometryType, C
    glUseProgram( m_Program );
    glUniform3f( m_Uniforms[ Uniforms_Color ], color.m_Component.r, color.m_Component.g, color.m_Component.b );
    glUniformMatrix4fv( m_Uniforms[ Uniforms_MVP ], 1, GL_FALSE, &mvp[ 0 ][ 0 ] );
-
    glDrawElements(
       GL_TRIANGLES,
       m_IndexCount[ geometryType ],
@@ -113,6 +113,7 @@ void BasicGeometry::RenderGeometry( BasicGeometry::GeometryTypes geometryType, C
    glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
    glUseProgram( 0 );
-
-   glPolygonMode( GL_FRONT_AND_BACK, prevPolygonMode );
+   glDepthFunc( GL_LEQUAL );
+   glPolygonMode( GL_BACK, prevPolygonMode[0] );
+   glPolygonMode( GL_FRONT, prevPolygonMode[1] );
    }

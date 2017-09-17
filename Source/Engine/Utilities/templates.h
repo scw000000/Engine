@@ -52,7 +52,7 @@ class ENG_Noncopyable
 //	virtual ~singleton() { *m_pGlobalValue = m_OldValue; }
 //};
 
-template < typename T > class Singleton : public ENG_Noncopyable
+template < typename T > class ENG_Singleton : public ENG_Noncopyable
    {
    public:
       static T& GetSingleton( void )
@@ -76,17 +76,17 @@ template < typename T > class Singleton : public ENG_Noncopyable
          }
    
    private:
-      Singleton( void ) { m_bHasBeenCreated = true }
-      virtual ~Singleton( void ) { }
+      ENG_Singleton( void ) { m_bHasBeenCreated = true }
+      virtual ~ENG_Singleton( void ) { }
 
    private:
       static T* m_pInstance;
       static bool m_bHasBeenCreated;
    };
 
-#define REGISTER_SINGLETON( x ) class x; typedef Singleton< x > S##x; bool Singleton< x >::m_bHasBeenCreated = false; x* Singleton< x >::m_pInstance = nullptr
+#define REGISTER_SINGLETON( x ) class x; typedef ENG_Singleton< x > S##x; bool ENG_Singleton< x >::m_bHasBeenCreated = false; x* ENG_Singleton< x >::m_pInstance = nullptr
 
-#define EXPOSE_CONSTRUCTOR( x ) friend class Singleton< x >
+#define EXPOSE_CONSTRUCTOR( x ) friend class ENG_Singleton< x >
 
 template <class Type>
 shared_ptr<Type> MakeStrongPtr(weak_ptr<Type> pWeakPtr)

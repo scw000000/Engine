@@ -129,6 +129,7 @@
     <ClCompile Include="..\Event\PhysicsEvents.cpp" />
     <ClCompile Include="..\Event\ScriptEvent.cpp" />
     <ClCompile Include="..\Event\EventFactory.cpp" />
+    <ClCompile Include="..\Graphics\BasicGeometry.cpp" />
     <ClCompile Include="..\Graphics\Light.cpp" />
     <ClCompile Include="..\Graphics\Material.cpp" />
     <ClCompile Include="..\Graphics\Renderer\BloomRenderer.cpp" />
@@ -234,6 +235,7 @@
     <ClInclude Include="..\Event\PhysicsEvents.h" />
     <ClInclude Include="..\Event\ScriptEvent.h" />
     <ClInclude Include="..\Event\EventFactory.h" />
+    <ClInclude Include="..\Graphics\BasicGeometry.h" />
     <ClInclude Include="..\Graphics\Light.h" />
     <ClInclude Include="..\Graphics\Material.h" />
     <ClInclude Include="..\Graphics\Renderer\BloomRenderer.h" />

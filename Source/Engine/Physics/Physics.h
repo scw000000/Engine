@@ -75,6 +75,8 @@ struct RenderCompMotionState : public btMotionState
 class IGamePhysics : public ENG_Noncopyable
    {
    public:
+      virtual ~IGamePhysics( void ) {};
+
       template< typename T > static void RegisterImplementation( void );
       static IGamePhysics& GetSingleton( void );
       static void Shutdown( void );
@@ -116,7 +118,7 @@ class IGamePhysics : public ENG_Noncopyable
 
       virtual void VDestroyRenderCompDelegate( IEventPtr pEvent ) = 0;
 
-      virtual ~IGamePhysics( void ) {};
+      
       
       virtual void VSetSimulation( bool isOn ) = 0;
 

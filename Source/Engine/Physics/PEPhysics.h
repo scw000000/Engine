@@ -19,7 +19,7 @@ class PEPhysics : public IGamePhysics
    friend class RayCastManager;
       public:
 
-      virtual ~PEPhysics();
+      ~PEPhysics();
       // Initialization and Maintenance of the Physics World
       virtual bool VInitialize() override;
       virtual void VSyncVisibleScene() override;
@@ -69,7 +69,7 @@ class PEPhysics : public IGamePhysics
       virtual void VSetSimulation( bool isOn ) override { m_IsSimulating = isOn; };
 
       protected:
-      //PEPhysics( void );		
+      PEPhysics( void );		
       //void LoadXml();
       //float LookupSpecificGravity( const std::string& densityStr );
       //MaterialData LookupMaterialData( const std::string& materialStr );

@@ -23,7 +23,9 @@
 #include "..\ResourceCache\XmlResource.h"
 #include "..\Event\EventManager.h"
 #include "..\Physics\BulletPhysics.h"
+#include "..\Physics\PEPhysics.h"
 #include "..\Physics\Raycast.h"
+#include "..\Graphics\BasicGeometry.h"
 #include "..\Animation\AnimationManager.h"
 
 void LevelManager::Init(void)
@@ -73,7 +75,9 @@ BaseEngineLogic::~BaseEngineLogic()
 
 bool BaseEngineLogic::Init()
    {
-   IGamePhysics::RegisterImplementation< BulletPhysics >();
+   SBasicGeometry::GetSingleton().Init();
+   // IGamePhysics::RegisterImplementation< BulletPhysics >();
+   IGamePhysics::RegisterImplementation< PEPhysics >();
    IGamePhysics::GetSingleton().VInitialize();
    m_pLevelManager->Init();
    m_pWrold->OnRestore();
@@ -170,16 +174,17 @@ void BaseEngineLogic::VModifyActor( ActorId actorId, TiXmlElement *overrides )
       }
    }
 
+// I don't think it will be called for now
 int BaseEngineLogic::VOnRestore( void )
    {
-   m_pWrold->OnRestore();
-   for( auto pView : m_ViewList )
-      {
-      pView->VOnRestore();
-      }
-   // render manager need the information of camera to restore, which is in the scene
-   m_pRenderManager->VOnRestore( m_pWrold.get() );
-   return S_OK;
+   //m_pWrold->OnRestore();
+   //for( auto pView : m_ViewList )
+   //   {
+   //   pView->VOnRestore();
+   //   }
+   //// render manager need the information of camera to restore, which is in the scene
+   //m_pRenderManager->VOnRestore( m_pWrold.get() );
+   //return S_OK;
    }
 
 void BaseEngineLogic::VOnMsgProc( SDL_Event event )

@@ -19,7 +19,7 @@ class BulletPhysics : public IGamePhysics
    friend class RayCastManager;
       public:
 
-      virtual ~BulletPhysics();
+      ~BulletPhysics();
       // Initialization and Maintenance of the Physics World
       virtual bool VInitialize() override;
       virtual void VSyncVisibleScene() override;

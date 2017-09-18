@@ -73,7 +73,7 @@ void PEPhysics::VRenderDiagnostics( void )
    auto pScene = g_pApp->m_pEngineLogic->m_pWrold;
    auto v = pScene->GetCamera()->GetView();
    auto p = pScene->GetCamera()->GetProjection();
-   SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Box, g_Red, p * v );
+   SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, p * v );
    } 
 
 void PEPhysics::VCreateTrigger( WeakActorPtr pActor, const Vec3 &pos, const float dim ) 

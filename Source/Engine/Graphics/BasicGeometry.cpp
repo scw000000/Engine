@@ -75,6 +75,78 @@ bool BasicGeometry::Init()
    glBufferData( GL_ELEMENT_ARRAY_BUFFER, ENG_ARRAY_SIZE( boxIndices ), boxIndices, GL_STATIC_DRAW );
 
    m_IndexCount[ GeometryTypes_Box ] = ENG_ARRAY_LENGTH( boxIndices );
+
+   // sphere vertices
+   const unsigned int sliceNum = 10;
+   const unsigned int sectorNum = ( sliceNum - 1 ) * 2;
+   std::vector<Vec3> sphereVerts;
+   Vec3 sphericalcoord( 0.f, -1.f, 0.f );
+   float deltaRad = ENG_PI / ( sliceNum - 1 );
+   // X rotation
+   for( int polar = 0; polar < sliceNum; ++polar )
+      {
+      // Y rotation
+      for( int azimuthal = 0; azimuthal < sectorNum; ++azimuthal )
+         {
+         sphereVerts.push_back( sphericalcoord );
+         // skip if it's top or bottom point
+         if( polar == 0 || polar == sliceNum - 1 )
+            {
+            break;
+            }
+         Quaternion rot;
+         rot.BuildAxisRad(g_Up, deltaRad);
+         sphericalcoord = rot.XForm( sphericalcoord );
+
+         }
+      Quaternion rot;
+      rot.BuildAxisRad( -g_Right, deltaRad );
+      sphericalcoord = rot.XForm( sphericalcoord );
+      }
+
+   glGenBuffers( 1, &m_VBOs[ GeometryTypes_Sphere ][ VBOs_Vertex ] );
+   glBindBuffer( GL_ARRAY_BUFFER, m_VBOs[ GeometryTypes_Sphere ][ VBOs_Vertex ] );
+   glBufferData( GL_ARRAY_BUFFER, sphereVerts.size() * sizeof(sphereVerts[0]), &sphereVerts[0], GL_STATIC_DRAW );
+   
+   std::vector<int> sphereIndices;
+
+   for( int i = 0; i < sectorNum; ++i )
+      {
+      sphereIndices.push_back( ( i + sectorNum - 1 ) % sectorNum + 1 );
+      sphereIndices.push_back( 0 );
+      sphereIndices.push_back( i + 1 );
+
+      sphereIndices.push_back( sphereVerts.size() - 1 );
+      sphereIndices.push_back( ( i + sectorNum - 1 ) % sectorNum + sphereVerts.size() - 1 - sectorNum );
+      sphereIndices.push_back( i + sphereVerts.size() - 1 - sectorNum );
+      }
+
+   for( int polarStride = 1; polarStride + sectorNum < sphereVerts.size() - 1; polarStride += sectorNum )
+      {
+      for( int i = 0; i < sectorNum; ++i )
+         {
+         // Left-down
+         sphereIndices.push_back( polarStride + i );
+         // Right-down
+         sphereIndices.push_back( polarStride + ( i + 1 ) % sectorNum );
+         //Right-up
+         sphereIndices.push_back( polarStride + sectorNum + ( i + 1 ) % sectorNum );
+
+         // Left-down
+         sphereIndices.push_back( polarStride + i );
+         //Right-up
+         sphereIndices.push_back( polarStride + sectorNum + ( i + 1 ) % sectorNum );
+         //Left-up
+         sphereIndices.push_back( polarStride + sectorNum + i );
+         }
+      }
+
+   glGenBuffers( 1, &m_VBOs[ GeometryTypes_Sphere ][ VBOs_Index ] );
+   glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, m_VBOs[ GeometryTypes_Sphere ][ VBOs_Index ] );
+   glBufferData( GL_ELEMENT_ARRAY_BUFFER, sphereIndices.size() * sizeof( sphereIndices[ 0 ] ), &sphereIndices[ 0 ], GL_STATIC_DRAW );
+
+   m_IndexCount[ GeometryTypes_Sphere ] = sphereIndices.size();
+
    return true;
    }
 

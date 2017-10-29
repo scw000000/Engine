@@ -9,7 +9,7 @@
  *
  * \brief 
  *
- * TODO: long description
+ * Some methods have been modified, remember to uncomment some of them
  *
  * \note
 */
@@ -35,8 +35,11 @@ class BulletPhysicsAttributes : public IPhysicsAttributes
       virtual void VSetIsLinkedToPhysicsWorld( bool isLinked ) override { m_IsLinkedToPhysicsWorld = isLinked; }
       virtual void VSetTransform( const Transform& transform ) override;
       virtual void VSetScale( const Vec3& scale ) {}
-      virtual RigidBody* VGetBtRigidBody( void ) const override { return m_pRigidBody; }
-      virtual void VSetRigidBody( RigidBody* body ) override { m_pRigidBody = body; };
+      virtual shared_ptr<RigidBody> VGetBtRigidBody( void ) const override { 
+         return NULL;
+        /* return m_pRigidBody; */
+         }
+      virtual void VSetRigidBody( shared_ptr<RigidBody> body ) override { /*m_pRigidBody = body;*/ };
       virtual int VGetCollisionFlags( void ) const override { return m_CollisionFlags; }
       virtual TiXmlElement* VGenerateXML( void ) const override;
       virtual void VDelegateGenerateXML( TiXmlElement* pParent ) const override {};
@@ -55,7 +58,7 @@ class BulletPhysicsAttributes : public IPhysicsAttributes
       std::string m_Density;
       std::string m_Material;
 
-      RigidBody* m_pRigidBody;
+      btRigidBody* m_pRigidBody;
       bool m_IsLinkedToPhysicsWorld;
       int m_CollisionFlags;
       bool m_IsActive;

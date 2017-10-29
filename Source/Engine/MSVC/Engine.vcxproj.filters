@@ -331,6 +331,9 @@
     <ClCompile Include="..\Graphics\BasicGeometry.cpp">
       <Filter>Graphics\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="..\Physics\RigidBody.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -619,6 +622,9 @@
     </ClInclude>
     <ClInclude Include="..\Graphics\BasicGeometry.h">
       <Filter>Graphics\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\RigidBody.h">
+      <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

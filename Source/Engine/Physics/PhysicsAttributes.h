@@ -13,11 +13,13 @@
  * \note
  */
 
+
 #include "CollisionTable.h"
 #include "..\Actors\RenderComponent.h"
 
 class btRigidBody;
-typedef btRigidBody RigidBody;
+class RigidBody;
+// typedef btRigidBody RigidBody;
 class IPhysicsAttributes
    {
    public:
@@ -35,12 +37,14 @@ class IPhysicsAttributes
       virtual bool VIsLinkedToPhysicsWorld( void ) const = 0;
       virtual void VSetIsLinkedToPhysicsWorld( bool isLinked ) = 0;
       virtual void VSetTransform( const Transform& transform ) = 0;
-      virtual RigidBody* VGetBtRigidBody( void ) const = 0;
-      virtual void VSetRigidBody( RigidBody* body ) = 0;
+      virtual shared_ptr< RigidBody > VGetBtRigidBody( void ) const = 0;
+      virtual void VSetRigidBody( shared_ptr< RigidBody > body ) = 0;
       virtual int VGetCollisionFlags( void ) const = 0;
       virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp ) = 0;
       virtual TiXmlElement* VGenerateXML( void ) const = 0;
       virtual void VDelegateGenerateXML( TiXmlElement* pParent ) const = 0;
       virtual TiXmlElement* VGenerateOverridesXML( TiXmlElement* pResourceNode ) const = 0;
       virtual void VDelegateGenerateOverridesXML( TiXmlElement* pBaseElement, TiXmlElement* pResourceNode ) const = 0;
+
+     private:
    };

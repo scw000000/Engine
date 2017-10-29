@@ -405,7 +405,7 @@ string ToStr( const Quaternion& quat )
 
 std::string ToStr(const Mat4x4& mat)
    {
-   return ToStr( mat.GetRow( 0 ) ) + "\n" + ToStr( mat.GetRow( 1 ) ) + "\n" + ToStr( mat.GetRow( 2 ) ) + "\n" + ToStr( mat.GetRow( 3 ) );
+   return ToStr( mat.GetCol( 0 ) ) + "\n" + ToStr( mat.GetCol( 1 ) ) + "\n" + ToStr( mat.GetCol( 2 ) ) + "\n" + ToStr( mat.GetCol( 3 ) );
    }
 
 //---------------------------------------------------------------------------------------------------------------------

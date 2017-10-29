@@ -27,10 +27,10 @@ BoneData::BoneData( const aiMatrix4x4& offset, BoneId id )
 extern Mat4x4 aiMat4x4ToMat4( aiMatrix4x4 aiMat44 )
    {
    Mat4x4 toWorld;
-   toWorld.SetRow( 0, Vec4( aiMat44.a1, aiMat44.b1, aiMat44.c1, aiMat44.d1 ) );
-   toWorld.SetRow( 1, Vec4( aiMat44.a2, aiMat44.b2, aiMat44.c2, aiMat44.d2 ) );
-   toWorld.SetRow( 2, Vec4( aiMat44.a3, aiMat44.b3, aiMat44.c3, aiMat44.d3 ) );
-   toWorld.SetRow( 3, Vec4( aiMat44.a4, aiMat44.b4, aiMat44.c4, aiMat44.d4 ) );
+   toWorld.SetCol( 0, Vec4( aiMat44.a1, aiMat44.b1, aiMat44.c1, aiMat44.d1 ) );
+   toWorld.SetCol( 1, Vec4( aiMat44.a2, aiMat44.b2, aiMat44.c2, aiMat44.d2 ) );
+   toWorld.SetCol( 2, Vec4( aiMat44.a3, aiMat44.b3, aiMat44.c3, aiMat44.d3 ) );
+   toWorld.SetCol( 3, Vec4( aiMat44.a4, aiMat44.b4, aiMat44.c4, aiMat44.d4 ) );
 
    return toWorld;
    }

@@ -12,6 +12,7 @@
  * \note
 */
 
+class RigidBody;
 
 class PEPhysics : public IGamePhysics
    {
@@ -61,7 +62,7 @@ class PEPhysics : public IGamePhysics
       virtual void VSetAngularVelocity( ActorId actorId, const Vec3& vel );
       virtual void VTranslate( ActorId actorId, const Vec3& vec );
 
-      virtual void VSetTransform( const ActorId id, const Transform &trans );
+      virtual void VSetTransform( const ActorId actorId, const Transform &trans );
 
       virtual Transform VGetTransform( ActorId actorId );
       virtual void VLinkRenderCompAttribute( StrongRenderComponentPtr pRenderComp ) override;
@@ -74,17 +75,17 @@ class PEPhysics : public IGamePhysics
       //float LookupSpecificGravity( const std::string& densityStr );
       //MaterialData LookupMaterialData( const std::string& materialStr );
 
-      //btRigidBody * FindBulletRigidBody( StrongRenderComponentPtr pRenderComp ) const;
+      shared_ptr<RigidBody> FindRigidBody( StrongRenderComponentPtr pRenderComp ) const;
+      shared_ptr<RigidBody> FindRigidBody( ActorId actorId ) const;
 
-      //StrongRenderComponentPtr FindRenderComponent( btRigidBody const * ) const;
+      StrongRenderComponentPtr FindRenderComponent( shared_ptr<RigidBody> pRigidBody ) const;
 
 
       //// helpers for sending events relating to collision pairs
       //void SendCollisionPairAddEvent( btPersistentManifold const * manifold, btRigidBody const * body0, btRigidBody const * body1 );
       //void SendCollisionPairRemoveEvent( btRigidBody const * body0, btRigidBody const * body1 );
 
-      //// common functionality used by VAddSphere, VAddBox, etc
-      //void AddShape( StrongRenderComponentPtr pRenderComp, btCollisionShape* shape, float mass );
+      void AddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<RigidBody> pRB );
 
       //// helper for cleaning up objects
       //void RemoveCollisionObject( btCollisionObject * removeMe );
@@ -99,7 +100,6 @@ class PEPhysics : public IGamePhysics
 
       //// these are all of the objects that Bullet uses to do its work.
       ////   see BulletPhysics::VInitialize() for some more info.
-      //btDynamicsWorld*                 m_DynamicsWorld;
       //btBroadphaseInterface*           m_Broadphase;
       //btCollisionDispatcher*           m_Dispatcher;
       //btConstraintSolver*              m_Solver;
@@ -113,23 +113,15 @@ class PEPhysics : public IGamePhysics
       //typedef std::map<std::string, MaterialData> MaterialTable;
       //MaterialTable m_MaterialTable;
 
-      //// data used to store which collision pair (bodies that are touching) need
-      ////   Collision events sent.  When a new pair of touching bodies are detected,
-      ////   they are added to m_PrevTickCollisionPairs and an event is sent.
-      ////   When the pair is no longer detected, they are removed and another event
-      ////   is sent.
-      //typedef std::pair< btRigidBody const *, btRigidBody const * > CollisionPair;
-      //typedef std::set< CollisionPair > CollisionPairs;
-      //CollisionPairs m_PrevTickCollisionPairs;
+      typedef std::pair< shared_ptr<RigidBody>, shared_ptr<RigidBody> > CollisionPair;
+      typedef std::set< CollisionPair > CollisionPairs;
+      CollisionPairs m_CollisionPairs;
 
-      //// keep track of the existing rigid bodies:  To check them for updates
-      ////   to the actors' positions, and to remove them when their lives are over.
-      //typedef std::unordered_map< shared_ptr< IRenderComponent >, btRigidBody*> RenderCompToRigidBodyMap;
-      //RenderCompToRigidBodyMap m_RenderCompToRigidBody;
+      typedef std::unordered_map< shared_ptr< IRenderComponent >, shared_ptr<RigidBody>> RenderCompToRigidBodyMap;
+      RenderCompToRigidBodyMap m_RenderCompToRigidBody;
 
-      //// also keep a map to get the actor id from the btRigidBody*
-      //typedef std::map<btRigidBody const *, shared_ptr< IRenderComponent > > RigidBodyToRenderCompMap;
-      //RigidBodyToRenderCompMap m_RigidBodyToRenderComp;
+      typedef std::map< shared_ptr<RigidBody>, shared_ptr< IRenderComponent > > RigidBodyToRenderCompMap;
+      RigidBodyToRenderCompMap m_RigidBodyToRenderComp;
 
       bool m_IsSimulating;
    };

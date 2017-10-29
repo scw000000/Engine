@@ -14,6 +14,7 @@
  */
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_access.hpp>
@@ -93,6 +94,8 @@ class Vec2 : public glm::vec2
       private:
    };
 
+class Mat3x3;
+
 class Vec3 : public glm::vec3
    {
    public:
@@ -139,6 +142,7 @@ class Vec3 : public glm::vec3
       bool Init( TiXmlElement* pData );
       TiXmlElement* GenerateXML( void ) const;
       TiXmlElement* GenerateOverridesXML( TiXmlElement* pResource ) const;
+      Mat3x3 OuterProduct( const Vec3& other ) const;
 
    public:
       static const Vec3 g_Zero;
@@ -172,6 +176,11 @@ class Vec4 : public glm::vec4
       inline float Length() { return glm::length<float, glm::highp, glm::tvec4>( *this ); }
       inline Vec4* Normalize() { *this = glm::normalize<float, glm::highp, glm::tvec4>( *this ); return this;  }
       inline float Dot( const Vec4 &b ) { return glm::dot<float, glm::highp, glm::tvec4>( *this, b ); }
+
+   public:
+      static const Vec4 g_ZeroVector;
+      static const Vec4 g_ZeroPoint;
+      static const Vec4 g_Identity;
    };
 
 inline Vec3::Vec3( const Vec4 &v4 ) : glm::vec3( v4.x, v4.y, v4.z ) {}
@@ -211,6 +220,13 @@ class Quaternion : public glm::fquat
       void BuildAxisRad( const Vec3& axis, const float& radian ) { Vec3 nAxis = axis;
       nAxis.Normalize();
       *this = glm::angleAxis( radian, nAxis ); }
+
+      void BuildAxisDeg( const Vec3& axis, const float& degree )
+         {
+         Vec3 nAxis = axis;
+         nAxis.Normalize();
+         *this = glm::angleAxis( DEGREES_TO_RADIANS(degree), nAxis );
+         }
       
       void BuildPitchYawRollRad( const Vec3& pitchYawRoll ) { *this = glm::fquat( pitchYawRoll ); }
       void BuildPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad ) { this->BuildPitchYawRollRad( Vec3( pitchRad, yawRad, rollRad ) ); }
@@ -247,13 +263,34 @@ class Quaternion : public glm::fquat
 
 template<typename TReal>class aiMatrix4x4t;
 
+class Mat3x3 : public glm::mat3
+   {
+   public:
+   Mat3x3( void ) : glm::mat3() {}
+   Mat3x3( const glm::tmat3x3<float, glm::highp>& mat ) : glm::mat3( mat ) {}
+   Mat3x3( const glm::mat4& mat ) : glm::mat3( mat ) {}
+   Mat3x3( const Mat3x3& mat ) : glm::mat3( mat ) {}
+   Mat3x3( float diagVal ) : glm::mat3( diagVal ){}
+   Mat3x3( const Vec3& col0, const Vec3& col1, const Vec3& col2 ) : glm::mat3(col0, col1, col2) {}
+   // input: 0, 1, 2 is for different column vector
+   Mat3x3( float x0, float y0, float z0,
+           float x1, float y1, float z1,
+           float x2, float y2, float z2)
+           : glm::mat3( x0, y0, z0, x1, y1, z1, x2, y2, z2 ) {}
+
+   inline Mat3x3 Inverse( void ) const { return glm::inverse( *this ); }
+   float Determinant( void ) const { return glm::determinant( *this ); }
+   static const Mat3x3 g_Identity;
+   static const Mat3x3 g_Zero;
+   };
+
 class Mat4x4 : public glm::mat4
    {
    public:
       Mat4x4( void ) : glm::mat4() { }
       Mat4x4( const glm::mat4& mat ) : glm::mat4( mat ) { }
       Mat4x4( const Mat4x4& mat ) : glm::mat4( mat ) {}
-      // input: row major order
+      // input: 0, 1, 2, 3 is for different column vector
       Mat4x4( float x0, float y0, float z0, float w0,
               float x1, float y1, float z1, float w1,
               float x2, float y2, float z2, float w2,
@@ -277,12 +314,12 @@ class Mat4x4 : public glm::mat4
 
       inline Vec3 GetToWorldPosition( void ) const { return Vec3( (*this)[3] ); }
       
-      inline Vec4 GetRow( const int index ) const { return Vec4( (*this)[index] ); }
-      inline void SetRow( const int index, const Vec4& newRow ) { ( *this )[ index ] = newRow; }
-      inline Vec4 GetCol( const int index ) const { return Vec4( glm::row( *this, index ) ); }
+      inline Vec4 GetCol( const int index ) const { return Vec4( (*this)[index] ); }
+      inline void SetCol( const int index, const Vec4& newRow ) { ( *this )[ index ] = newRow; }
+      // inline Vec4 GetCol( const int index ) const { return Vec4( glm::row( *this, index ) ); }
 
       // Get Scale from each column's length
-      inline Vec3 GetScale( void ) const { return Vec3( Vec3( GetRow( 0 ) ).Length() , Vec3( GetRow( 1 ) ).Length() , Vec3( GetRow( 2 ) ).Length() ); }
+      inline Vec3 GetScale( void ) const { return Vec3( GetCol( 0 ).Length(), GetCol( 1 ).Length(), GetCol( 2 ).Length() ); }
 
 
       inline Vec3 GetForward( void ) const;
@@ -372,17 +409,17 @@ class Mat4x4 : public glm::mat4
 
 inline Vec3 Mat4x4::GetForward( void ) const
    {
-   return Vec3( GetRow( 2 ) );
+   return Vec3( GetCol( 2 ) );
    }
 
 inline Vec3 Mat4x4::GetRight( void ) const
    {
-   return Vec3( -GetRow( 0 ) );
+   return Vec3( -GetCol( 0 ) );
    }
 
 inline Vec3 Mat4x4::GetUp( void ) const
    {
-   return Vec3( GetRow( 1 ) );
+   return Vec3( GetCol( 1 ) );
    }
 
 inline Vec3 Mat4x4::GetXFormDirection( const Vec3& vec ) const
@@ -697,15 +734,19 @@ inline void Transform::SetScale( const Vec3& scale )
     }
 
 
- //inline void Transform::AddToWorldRotation( const Quaternion& quat )
- //   {
- //   
- //   }
- //
- //inline void Transform::AddFromWorldRotation( const Quaternion& quat )
- //   {
- //  // this->SetRotation( m_Quat * quat );
- //   }
+inline void Transform::AddToWorldRotation( const Quaternion& quat )
+   {
+   auto tempMat = glm::toMat4( quat );
+   m_ToWorld = tempMat * m_ToWorld;
+   m_IsFromWorldDirty = true;
+   }
+ 
+ inline void Transform::AddFromWorldRotation( const Quaternion& quat )
+    {
+    auto tempMat = glm::toMat4( quat );
+    m_ToWorld = m_ToWorld * tempMat;
+    m_IsFromWorldDirty = true;
+    }
  
  inline void Transform::SetPitchYawRollRad( const float pitchRad, const float yawRad, const float rollRad )
     {
@@ -783,7 +824,8 @@ inline Mat4x4 Transform::GetRotationMatrix( void ) const
 inline void Transform::SetScaleRotTrans( const Vec3& scale, const Mat4x4& rotation, const Vec3& position )
    {
    m_ToWorld = rotation;// m = R
-   m_ToWorld.MultScale( scale );// m = R S
+   auto origScale = m_ToWorld.GetScale();
+   m_ToWorld.MultScale( scale / origScale );// m = R S
    m_ToWorld.SetToWorldPosition( position );// m = T R S
    m_IsFromWorldDirty = true;
    }

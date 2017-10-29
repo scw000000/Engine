@@ -22,6 +22,13 @@ const Vec2 Vec2::g_Identity( 1.0f, 1.0f );
 const Vec3 Vec3::g_Zero( 0.0f, 0.0f, 0.0f );
 const Vec3 Vec3::g_Identity( 1.0f, 1.0f, 1.0f );
 
+const Mat3x3 Mat3x3::g_Identity( 1.f );
+const Mat3x3 Mat3x3::g_Zero( 0.f );
+
+const Vec4 Vec4::g_ZeroVector( 0.0f, 0.0f, 0.0f, 0.0f );
+const Vec4 Vec4::g_ZeroPoint( 0.0f, 0.0f, 0.0f, 1.0f );
+const Vec4 Vec4::g_Identity( 1.0f, 1.0f, 1.0f, 1.0f );
+
 const Mat4x4 Mat4x4::g_Identity( glm::mat4( 1.0f ) );
 
 const Quaternion Quaternion::g_Identity( 1.0f, 0.0f, 0.0f, 0.0f );
@@ -115,6 +122,11 @@ TiXmlElement* Vec3::GenerateOverridesXML( TiXmlElement* pResource ) const
       pRetNode->RemoveAttribute( "z" );
       }
    return pRetNode;
+   }
+
+Mat3x3 Vec3::OuterProduct( const Vec3& other ) const
+   {
+   return Mat3x3( other.x * ( *this ), other.y * ( *this ), other.z * ( *this ) );
    }
 
 // aiMat is row major order matrix

@@ -15,6 +15,7 @@
 #include "EngineStd.h"
 #include "PEPhysicsAttributes.h"
 #include "BulletPhysicsAttributes.h"
+#include "RigidBody.h"
 
 PEPhysicsAttributes::PEPhysicsAttributes( void ) // : m_TransLateFactor( Vec3::g_Identity ), m_RotateFactor( Vec3::g_Identity )
    {
@@ -167,7 +168,8 @@ void PEPhysicsAttributes::VSetTransform( const Transform& transform )
       {
       return;
       }
-   btTransform newTransform = Transform_to_btTransform( transform );
+   m_pRigidBody->SetWorldTransform( transform );;
+ //  btTransform newTransform = Transform_to_btTransform( transform );
    // m_pRigidBody->setActivationState( DISABLE_DEACTIVATION );
 //   m_pRigidBody->setWorldTransform( newTransform );
 

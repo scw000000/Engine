@@ -557,7 +557,7 @@ void BulletPhysics::VLinkRenderCompAttribute( StrongRenderComponentPtr pRenderCo
    ENG_ASSERT( bulletPhyAttr );
    btRigidBody * pRigidBody = FindBulletRigidBody( pRenderComp );
    ENG_ASSERT( pRigidBody );
-   bulletPhyAttr->VSetRigidBody( pRigidBody );
+   /*bulletPhyAttr->VSetRigidBody( pRigidBody );*/
    bulletPhyAttr->VSetIsLinkedToPhysicsWorld( true );
    }
 

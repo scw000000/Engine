@@ -124,11 +124,6 @@ BulletPhysics::~BulletPhysics()
    }
 
 
-/////////////////////////////////////////////////////////////////////////////
-// BulletPhysics::LoadXml						- not described in the book
-//
-//    Loads the physics materials from an XML file
-//
 void BulletPhysics::LoadXml()
    {
    // Load the physics config file and grab the root XML node

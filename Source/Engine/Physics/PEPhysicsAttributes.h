@@ -12,6 +12,27 @@
  * \note
 */
 
+struct PEColliderAttributes
+   {
+   public:
+
+   ColliderTypes m_ColliderType;
+   float m_Density;
+   std::string m_Material;
+   };
+
+struct PESphereColliderAttributes : public PEColliderAttributes
+   {
+      public:
+      float m_Radius;
+   };
+
+struct PEBoxColliderAttributes : public PEColliderAttributes
+   {
+      public:
+      Vec3 m_Dimension;
+   };
+
 class PEPhysicsAttributes : public IPhysicsAttributes
    {
    public:
@@ -23,15 +44,16 @@ class PEPhysicsAttributes : public IPhysicsAttributes
       virtual Vec3 VGetTranslateFactor( void ) const override { return m_TransLateFactor; }
       virtual Vec3 VGetRotationFactor( void ) const override { return m_RotateFactor; }
       virtual CollisionId VGetCollisionId( void ) const override { return m_CollisionId; }
-      virtual std::string VGetShpae( void ) const override { return m_Shape; }
-      virtual std::string VGetDensity( void ) const override { return m_Density; }
-      virtual std::string VGetMaterial( void ) const override { return m_Material; }
+      virtual std::string VGetShpae( void ) const override { return "";/*return m_Shape*/; }
+      virtual std::string VGetDensity( void ) const override { return ""; /*return m_Density;*/ }
+      virtual std::string VGetMaterial( void ) const override { return ""; /*return m_Material;*/ }
       virtual bool VIsLinkedToPhysicsWorld( void ) const override { return m_IsLinkedToPhysicsWorld; }
       virtual void VSetIsLinkedToPhysicsWorld( bool isLinked ) override { m_IsLinkedToPhysicsWorld = isLinked; }
       virtual void VSetTransform( const Transform& transform ) override;
       virtual void VSetScale( const Vec3& scale ) {}
       virtual shared_ptr<RigidBody> VGetBtRigidBody( void ) const override { return m_pRigidBody; }
       virtual void VSetRigidBody( shared_ptr<RigidBody> pBody ) override { m_pRigidBody = pBody; };
+      virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp ) override;
       virtual int VGetCollisionFlags( void ) const override { return m_CollisionFlags; }
       virtual TiXmlElement* VGenerateXML( void ) const override;
       virtual void VDelegateGenerateXML( TiXmlElement* pParent ) const override {};
@@ -46,10 +68,7 @@ class PEPhysicsAttributes : public IPhysicsAttributes
       float m_AngularAcceleration;
       float m_MaxAngularVelocity;
 
-      std::string m_Shape;
-      std::string m_Density;
-      std::string m_Material;
-
+      std::vector< shared_ptr<PEColliderAttributes> > m_ColliderAttributes;
       shared_ptr<RigidBody> m_pRigidBody;
       bool m_IsLinkedToPhysicsWorld;
       int m_CollisionFlags;

@@ -27,34 +27,75 @@ PEPhysicsAttributes::PEPhysicsAttributes( void ) // : m_TransLateFactor( Vec3::g
    m_AngularAcceleration = 0;
    m_MaxAngularVelocity = 0;
 
-   m_Shape = "unknown";
-   m_Density = "empty";
-   m_Material = "None";
+ //  m_Shape = "unknown";
+//   m_Density = "empty";
+ //  m_Material = "None";
 
 //   m_pRigidBody = NULL;
    m_IsLinkedToPhysicsWorld = false;
    m_CollisionFlags = 0;
    }
 
+// This function does not work well when there's a overriding xml file
 shared_ptr< IPhysicsAttributes > PEPhysicsAttributes::GetInstanceFromShape( TiXmlElement* pData )
    {
-   TiXmlElement* pShapeNode = pData->FirstChildElement( "ShapeData" );
-
-   if( !pShapeNode ) // first time init
+   auto pFirstShapeNode = pData->FirstChildElement( "ShapeData" );
+   if( !pFirstShapeNode ) // first time init
       {
       return shared_ptr< IPhysicsAttributes >();
       }
-   shared_ptr< IPhysicsAttributes > retAttr;
-   std::string shapeName = pShapeNode->Attribute( "shape" );
-   if( !shapeName.compare( "sphere" ) )
-      {
-      retAttr = shared_ptr< IPhysicsAttributes >( ENG_NEW PESpherePhysicsAttributes() );
-      }
-   else if( !shapeName.compare( "box" ) )
-      {
-      retAttr = shared_ptr< IPhysicsAttributes >( ENG_NEW PEBoxPhysicsAttributes() );
-      }
 
+   shared_ptr< PEPhysicsAttributes > retAttr( ENG_NEW PEPhysicsAttributes() );
+   for( auto pShapeNode = pFirstShapeNode; pShapeNode; pShapeNode = pShapeNode->NextSiblingElement() )
+      {
+      if( std::string( pShapeNode->Value() ).compare( "ShapeData" ) )
+         {
+         break;
+         }
+      auto pShapeAttr = pShapeNode->Attribute( "shape" );
+      if( !pShapeAttr )
+         {
+         return shared_ptr< IPhysicsAttributes >();
+         }
+      std::string shapeName( pShapeAttr );
+      if( !shapeName.compare( "sphere" ) )
+         {
+         auto newColliderAttribute = shared_ptr<PESphereColliderAttributes>( ENG_NEW PESphereColliderAttributes() );
+         retAttr->m_ColliderAttributes.push_back( newColliderAttribute );
+         newColliderAttribute->m_ColliderType = ColliderType_Sphere;
+         if( pShapeNode->QueryFloatAttribute( "radius", &newColliderAttribute->m_Radius ) != TIXML_SUCCESS
+             || newColliderAttribute->m_Radius <= 0.f )
+            {
+            newColliderAttribute->m_Radius = 1.f;
+            return false;
+            }
+         pShapeNode->QueryFloatAttribute( "density", &newColliderAttribute->m_Density );
+
+         if( pShapeNode->Attribute( "material" ) )
+            {
+            newColliderAttribute->m_Material = pShapeNode->Attribute( "material" );
+            }
+         }
+      else if( !shapeName.compare( "box" ) )
+         {
+         auto newColliderAttribute = shared_ptr<PEBoxColliderAttributes>( ENG_NEW PEBoxColliderAttributes() );
+         retAttr->m_ColliderAttributes.push_back( newColliderAttribute );
+
+         newColliderAttribute->m_ColliderType = ColliderType_Box;
+         newColliderAttribute->m_Dimension.Init( pShapeNode );
+         if( newColliderAttribute->m_Dimension.x <= 0.f || newColliderAttribute->m_Dimension.y <= 0.f || newColliderAttribute->m_Dimension.z <= 0.f )
+            {
+            newColliderAttribute->m_Dimension = Vec3::g_Identity;
+            }
+         pShapeNode->QueryFloatAttribute( "density", &newColliderAttribute->m_Density );
+
+         if( pShapeNode->Attribute( "material" ) )
+            {
+            newColliderAttribute->m_Material = pShapeNode->Attribute( "material" );
+            }
+         }
+     }
+  
    if( !retAttr || ( retAttr && !retAttr->VInit( pData ) ) ) // not supported shape or Init failed
       {
       return shared_ptr< IPhysicsAttributes >();
@@ -81,30 +122,23 @@ bool PEPhysicsAttributes::VInit( TiXmlElement* pData )
       pTemp = pMovement->FirstChildElement( "Collision" );
       if( pTemp )
          {
-         if( pTemp->Attribute( "density" ) )
-            {
-            m_Density = pTemp->Attribute( "density" );
-            }
-         if( pTemp->Attribute( "material" ) )
-            {
-            m_Material = pTemp->Attribute( "material" );
-            }
          if( pTemp->Attribute( "collisiongroup" ) )
             {
-            m_CollisionId = CollisionTable::GetSingleton().GetIdFromName( pTemp->Attribute( "collisiongroup" ) );
+            // Need to implement LoadXml in PEPhysics first
+           // m_CollisionId = CollisionTable::GetSingleton().GetIdFromName( pTemp->Attribute( "collisiongroup" ) );
             }
          }
       }
 
-   TiXmlElement* pShape = pData->FirstChildElement( "ShapeData" );
-   if( pShape )
-      {
-      m_Shape = pShape->Attribute( "shape" );
-      if( !VDelegateInit( pShape ) )
-         {
-         return false;
-         }
-      }
+   //TiXmlElement* pShape = pData->FirstChildElement( "ShapeData" );
+   //if( pShape )
+   //   {
+   //   // m_Shape = pShape->Attribute( "shape" );
+   //   if( !VDelegateInit( pShape ) )
+   //      {
+   //      return false;
+   //      }
+   //   }
 
    TiXmlElement* pCollisionFlags = pData->FirstChildElement( "CollisionFlags" );
    bool flagAttr = false;
@@ -179,6 +213,11 @@ void PEPhysicsAttributes::VSetTransform( const Transform& transform )
    //m_pRigidBody->activate();
    }
 
+void PEPhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp )
+   {
+
+   }
+
 TiXmlElement* PEPhysicsAttributes::VGenerateXML( void ) const
    {
    TiXmlElement* pRootNode = ENG_NEW TiXmlElement( "PhysicsAttributes" );
@@ -199,8 +238,8 @@ TiXmlElement* PEPhysicsAttributes::VGenerateXML( void ) const
 
    TiXmlElement* pMaterial = ENG_NEW TiXmlElement( "Collision" );
    pMovementNode->LinkEndChild( pMaterial );
-   pMaterial->SetAttribute( "density", m_Density.c_str() );
-   pMaterial->SetAttribute( "material", m_Material.c_str() );
+   /*pMaterial->SetAttribute( "density", m_Density.c_str() );
+   pMaterial->SetAttribute( "material", m_Material.c_str() );*/
    pMaterial->SetAttribute( "collisiongroup", CollisionTable::GetSingleton().GetNameFromId( m_CollisionId ).c_str() );
 
    TiXmlElement* pCollisionFlags = ENG_NEW TiXmlElement( "CollisionFlags" );

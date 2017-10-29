@@ -14,6 +14,7 @@
 
 #include "EngineStd.h"
 #include "PhysicsComponent.h"
+#include "..\Physics\PEPhysicsAttributes.h"
 #include "..\Physics\PhysicsAttributes.h"
 
 const ComponentRegisterId BaseActorComponent<PhysicsComponent>::s_ComponentId = 0x84646be0;
@@ -35,11 +36,10 @@ bool PhysicsComponent::VDelegateInit( TiXmlElement* pData )
       {
       return false;
       }
-   TiXmlElement* pShapeNode = pPhysicsNode->FirstChildElement( "ShapeData" );
 
    if( !m_pPhysicsAttributes ) // first time init
       {
-      m_pPhysicsAttributes = BulletPhysicsAttributes::GetInstanceFromShape( pPhysicsNode );
+      m_pPhysicsAttributes = PEPhysicsAttributes::GetInstanceFromShape( pPhysicsNode );
       if( !m_pPhysicsAttributes )
          {
          return false;

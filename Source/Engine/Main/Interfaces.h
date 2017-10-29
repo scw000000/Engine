@@ -260,6 +260,14 @@ enum RenderGroup
 	RenderGroup_Last
    };
 
+enum ColliderTypes
+   {
+   ColliderType_Sphere,
+   ColliderType_Box,
+   ColliderType_Num
+   };
+
+
 class Scene;
 class SceneNodeProperties;
 class Material;

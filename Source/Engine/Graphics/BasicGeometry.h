@@ -16,12 +16,12 @@
 class BasicGeometry
    {
    public:
-      enum GeometryTypes
-         {
-         GeometryTypes_Box,
-         GeometryTypes_Sphere,
-         GeometryTypes_Num
-         };
+   enum GeometryTypes
+      {
+      GeometryTypes_Box,
+      GeometryTypes_Sphere,
+      GeometryTypes_Num
+      };
    public:
       bool Init();
       void RenderGeometry( GeometryTypes geometryType, Color color, Mat4x4 mvp );

@@ -121,9 +121,9 @@ void MeshRenderComponent::VDelegatePostInit( void )
    auto pAiScene = MeshResourceLoader::LoadAndReturnScene( m_pMeshResource );
    auto pMesh = pAiScene->mMeshes[ 0 ];
 
-   auto pShpereAttr = static_pointer_cast< BulletSpherePhysicsAttributes >( m_pPhysicsAttributes );
+   /*auto pShpereAttr = static_pointer_cast< BulletSpherePhysicsAttributes >( m_pPhysicsAttributes );
    pShpereAttr->SetRadius( this->m_pSceneNode->VGetProperties().GetRadius() );
-   m_pPhysicsAttributes->VAddRigidBody( VGetSelfStrongRenderCompPtr() );
+   m_pPhysicsAttributes->VAddRigidBody( VGetSelfStrongRenderCompPtr() );*/
    }
 
 void MeshRenderComponent::VDelegateGenerateXML( TiXmlElement* pBaseElement )

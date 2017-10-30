@@ -13,9 +13,28 @@
 */
 
 #include "EngineStd.h"
+#include "PEPhysics.h"
 #include "PEPhysicsAttributes.h"
 #include "BulletPhysicsAttributes.h"
 #include "RigidBody.h"
+
+shared_ptr<ICollider> PESphereColliderAttributes::VCreateCollider( StrongRenderComponentPtr pRenderComp )
+   {
+   auto pCollider = shared_ptr<ICollider>( ENG_NEW SphereCollider(
+      pRenderComp->VGetTransformPtr()->GetScale().x * m_Radius) );
+   pCollider->SetInertia( Mat3x3::g_Identity );
+   pCollider->SetMass( 1.f );
+   return pCollider;
+   }
+
+shared_ptr<ICollider> PEBoxColliderAttributes::VCreateCollider( StrongRenderComponentPtr pRenderComp )
+   {
+   auto pCollider = shared_ptr<ICollider>( ENG_NEW BoxCollider(
+      pRenderComp->VGetTransformPtr()->GetScale() * m_Dimension ) );
+   pCollider->SetInertia( Mat3x3::g_Identity );
+   pCollider->SetMass( 1.f );
+   return pCollider;
+   }
 
 PEPhysicsAttributes::PEPhysicsAttributes( void ) // : m_TransLateFactor( Vec3::g_Identity ), m_RotateFactor( Vec3::g_Identity )
    {
@@ -215,7 +234,16 @@ void PEPhysicsAttributes::VSetTransform( const Transform& transform )
 
 void PEPhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp )
    {
-
+   ENG_ASSERT(pRenderComp);
+   this->m_pRigidBody = shared_ptr<RigidBody>( ENG_NEW RigidBody() );
+   for( auto& pColliderAttr : this->m_ColliderAttributes )
+      {
+      this->m_pRigidBody->AddCollider( pColliderAttr->VCreateCollider( pRenderComp ) );
+ 
+      }
+   PEPhysics::GetSingleton().VAddRigidBody( pRenderComp, this->m_pRigidBody );
+   /*IGamePhysics::GetSingleton().VAddSphere( pRenderComp->VGetTransformPtr()->GetScale().x * m_Radius,
+                                            pRenderComp );*/
    }
 
 TiXmlElement* PEPhysicsAttributes::VGenerateXML( void ) const

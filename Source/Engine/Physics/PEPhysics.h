@@ -19,7 +19,6 @@ class PEPhysics : public IGamePhysics
    friend class IGamePhysics;
    friend class RayCastManager;
       public:
-
       ~PEPhysics();
       // Initialization and Maintenance of the Physics World
       virtual bool VInitialize() override;
@@ -69,6 +68,8 @@ class PEPhysics : public IGamePhysics
       virtual void VDestroyRenderCompDelegate( IEventPtr pEvent ) override;
       virtual void VSetSimulation( bool isOn ) override { m_IsSimulating = isOn; };
 
+      virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<RigidBody> pRB ) override;
+
       protected:
       PEPhysics( void );		
       //void LoadXml();
@@ -80,12 +81,12 @@ class PEPhysics : public IGamePhysics
 
       StrongRenderComponentPtr FindRenderComponent( shared_ptr<RigidBody> pRigidBody ) const;
 
+      void ApplyGravity( shared_ptr<RigidBody> pRigidBody );
+
 
       //// helpers for sending events relating to collision pairs
       //void SendCollisionPairAddEvent( btPersistentManifold const * manifold, btRigidBody const * body0, btRigidBody const * body1 );
       //void SendCollisionPairRemoveEvent( btRigidBody const * body0, btRigidBody const * body1 );
-
-      void AddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<RigidBody> pRB );
 
       //// helper for cleaning up objects
       //void RemoveCollisionObject( btCollisionObject * removeMe );

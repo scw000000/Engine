@@ -12,24 +12,29 @@
  * \note
 */
 
-struct PEColliderAttributes
+class ICollider;
+
+class IPEColliderAttributes
    {
    public:
-
+   virtual ~IPEColliderAttributes(void) {}
+   virtual shared_ptr<ICollider> VCreateCollider( StrongRenderComponentPtr pRenderComp ) = 0;
    ColliderTypes m_ColliderType;
    float m_Density;
    std::string m_Material;
    };
 
-struct PESphereColliderAttributes : public PEColliderAttributes
+class PESphereColliderAttributes : public IPEColliderAttributes
    {
       public:
+      virtual shared_ptr<ICollider> VCreateCollider( StrongRenderComponentPtr pRenderComp ) override;
       float m_Radius;
    };
 
-struct PEBoxColliderAttributes : public PEColliderAttributes
+class PEBoxColliderAttributes : public IPEColliderAttributes
    {
       public:
+      virtual shared_ptr<ICollider> VCreateCollider( StrongRenderComponentPtr pRenderComp ) override;
       Vec3 m_Dimension;
    };
 
@@ -68,7 +73,7 @@ class PEPhysicsAttributes : public IPhysicsAttributes
       float m_AngularAcceleration;
       float m_MaxAngularVelocity;
 
-      std::vector< shared_ptr<PEColliderAttributes> > m_ColliderAttributes;
+      std::vector< shared_ptr<IPEColliderAttributes> > m_ColliderAttributes;
       shared_ptr<RigidBody> m_pRigidBody;
       bool m_IsLinkedToPhysicsWorld;
       int m_CollisionFlags;

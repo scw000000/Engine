@@ -118,7 +118,7 @@ class IGamePhysics : public ENG_Noncopyable
 
       virtual void VDestroyRenderCompDelegate( IEventPtr pEvent ) = 0;
 
-      
+      virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<RigidBody> pRB ) = 0;
       
       virtual void VSetSimulation( bool isOn ) = 0;
 

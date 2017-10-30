@@ -14,9 +14,22 @@
 
 #include "EngineStd.h"
 #include "RigidBody.h"
+#include "..\Graphics\BasicGeometry.h"
+
+void SphereCollider::VRenderShape( const Mat4x4& m, const Mat4x4& pv ) const
+   {
+   SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv * m );
+   }
+
+void BoxCollider::VRenderShape( const Mat4x4& m, const Mat4x4& pv ) const
+   {
+   SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Box, g_Green, pv * m );
+   }
 
 void RigidBody::MoveForOneTimeStep( float deltaSecond )
    {
+   //m_Force = Vec3( 0.f, 0.001f, 0.f );
+   m_Force = Vec3( 0.f, 0.1f, 0.f );
    m_LinearVelocity += m_InverseMass * ( m_Force * deltaSecond );
    m_AngularVelocity += m_GlobalInverseInertia * ( m_Torque * deltaSecond );
 
@@ -28,10 +41,13 @@ void RigidBody::MoveForOneTimeStep( float deltaSecond )
    m_GlobalCentroid = TransformToGlobal( m_LocalCentroid, true );
 
    const float angle = m_AngularVelocity.Length() * deltaSecond;
-   m_AngularVelocity.Normalize();
-   Quaternion q; 
-   q.BuildAxisDeg( m_AngularVelocity, angle );
-   m_Transform.AddToWorldRotation( q );
+   if( angle != 0.0f )
+      {
+      m_AngularVelocity.Normalize();
+      Quaternion q;
+      q.BuildAxisDeg( m_AngularVelocity, angle );
+      m_Transform.AddToWorldRotation( q );
+      }
 
    // UpdateOrientation();
    // UpdatePositionFromGlobalCentroid();
@@ -75,7 +91,7 @@ void RigidBody::UpdateRigidBodyInfo( void )
    m_LocalInverseInertia = m_LocalInertia.Inverse();
    }
 
-void RigidBody::AddCollider( shared_ptr<Collider> collider )
+void RigidBody::AddCollider( shared_ptr<ICollider> collider )
    {
    if( !collider )
       {

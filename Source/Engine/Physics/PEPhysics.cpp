@@ -51,7 +51,15 @@ void PEPhysics::VSyncRigidBodyToRenderComponent( StrongRenderComponentPtr pRende
 
 void PEPhysics::VOnUpdate( const float deltaSeconds )
    {
-
+   if(!m_IsSimulating)
+      {
+      return;
+      }
+   for(auto& pair : m_RigidBodyToRenderComp )
+      {
+      ApplyGravity( pair.first );
+      pair.first->MoveForOneTimeStep( deltaSeconds );
+      }
    }
 
 // Initialization of Physics Objects
@@ -92,10 +100,11 @@ void PEPhysics::VRenderDiagnostics( void )
       {
       auto m = mapPair.first->m_Transform.GetToWorld();
       for(auto& collider : mapPair.first->m_Colliders ){
-         SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, m * pv );
+         collider->VRenderShape( m, pv );
+        // SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, m * pv );
          }
       }
-   SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv );
+   // SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv );
    } 
 
 void PEPhysics::VCreateTrigger( WeakActorPtr pActor, const Vec3 &pos, const float dim ) 
@@ -252,14 +261,21 @@ StrongRenderComponentPtr PEPhysics::FindRenderComponent( shared_ptr<RigidBody> p
    return StrongRenderComponentPtr();
    }
 
-void PEPhysics::AddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<RigidBody> pRB )
+void PEPhysics::VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<RigidBody> pRB )
    {
    if( m_RenderCompToRigidBody.find( pRenderComp ) != m_RenderCompToRigidBody.end()
        || m_RigidBodyToRenderComp.find( pRB ) != m_RigidBodyToRenderComp.end() )
       {
-      ENG_ERROR("This render comp is already registed!");
+      ENG_ERROR( "This render comp is already registed!" );
       }
 
    m_RenderCompToRigidBody[ pRenderComp ] = pRB;
    m_RigidBodyToRenderComp[ pRB ] = pRenderComp;
+
+   pRB->UpdateRigidBodyInfo();
+   }
+
+void PEPhysics::ApplyGravity( shared_ptr<RigidBody> pRigidBody )
+   {
+
    }

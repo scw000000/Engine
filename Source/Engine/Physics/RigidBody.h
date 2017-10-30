@@ -16,18 +16,51 @@
 
 class RigidBody;
 
-class Collider
+class ICollider
    {
    friend class RigidBody;
    friend class PEPhysics;
    friend class PEPhysicsAttributes;
       public:
 
-      private:
+      void SetMass( float mass ) { m_Mass = mass; }
+      void SetLocalCentroid( const Vec3& newCentriod ) { m_LocalCentroid = newCentriod; }
+      void SetInertia( const Mat3x3& newInertia ) { m_Inertia = newInertia; }
+      virtual void VRenderShape( const Mat4x4& m, const Mat4x4& vp ) const = 0;
+
+   private:
       float m_Mass;
       Vec3 m_LocalCentroid;
       Mat3x3 m_Inertia;
       Transform m_Transform;
+   };
+
+class SphereCollider : public ICollider
+   {
+   friend class RigidBody;
+   friend class PEPhysics;
+   friend class PEPhysicsAttributes;
+   friend class PESphereColliderAttributes;
+      public:
+      SphereCollider( float radius ) : m_Radius( radius ) {}
+      virtual void VRenderShape( const Mat4x4& m, const Mat4x4& vp ) const override;
+      private:
+   float m_Radius;
+
+   };
+
+class BoxCollider : public ICollider
+   {
+   friend class RigidBody;
+   friend class PEPhysics;
+   friend class PEPhysicsAttributes;
+   friend class PEBoxColliderAttributes;
+   public:
+      BoxCollider( const Vec3& dimension ) : m_Dimension(dimension) { }
+      virtual void VRenderShape( const Mat4x4& m, const Mat4x4& vp ) const override;
+      private:
+      Vec3 m_Dimension;
+
    };
 
 class RigidBody{
@@ -38,7 +71,7 @@ class RigidBody{
       void UpdateOrientation( void );
       void UpdateRigidBodyInfo( void );
 
-      void AddCollider( shared_ptr<Collider> collider );
+      void AddCollider( shared_ptr<ICollider> collider );
 
       Vec3 TransformToGlobal( const Vec3 &localVec, bool isPoint ) const;
       Vec3 TransformToLocal( const Vec3 &globalVec, bool isPoint );
@@ -70,6 +103,6 @@ class RigidBody{
       Vec3 m_LinearVelocity;
       Vec3 m_AngularVelocity;
       
-      std::vector< shared_ptr<Collider> > m_Colliders;
+      std::vector< shared_ptr<ICollider> > m_Colliders;
       float gravityScale;
    };

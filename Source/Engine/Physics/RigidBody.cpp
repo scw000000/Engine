@@ -14,17 +14,8 @@
 
 #include "EngineStd.h"
 #include "RigidBody.h"
+#include "Colliders.h"
 #include "..\Graphics\BasicGeometry.h"
-
-void SphereCollider::VRenderShape( const Mat4x4& m, const Mat4x4& pv ) const
-   {
-   SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv * m );
-   }
-
-void BoxCollider::VRenderShape( const Mat4x4& m, const Mat4x4& pv ) const
-   {
-   SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Box, g_Green, pv * m );
-   }
 
 void RigidBody::MoveForOneTimeStep( float deltaSecond )
    {

@@ -14,6 +14,7 @@
 
 #include "EngineStd.h"
 #include "PEPhysics.h"
+#include "Colliders.h"
 #include "PEPhysicsAttributes.h"
 #include "BulletPhysicsAttributes.h"
 #include "RigidBody.h"
@@ -29,8 +30,9 @@ shared_ptr<ICollider> PESphereColliderAttributes::VCreateCollider( StrongRenderC
 
 shared_ptr<ICollider> PEBoxColliderAttributes::VCreateCollider( StrongRenderComponentPtr pRenderComp )
    {
+   // The input should be half size of the box
    auto pCollider = shared_ptr<ICollider>( ENG_NEW BoxCollider(
-      pRenderComp->VGetTransformPtr()->GetScale() * m_Dimension ) );
+      pRenderComp->VGetTransformPtr()->GetScale() * m_Dimension * 0.5f ) );
    pCollider->SetInertia( Mat3x3::g_Identity );
    pCollider->SetMass( 1.f );
    return pCollider;

@@ -334,6 +334,12 @@
     <ClCompile Include="..\Physics\RigidBody.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Physics\Colliders.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Physics\CollisionDetector.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -624,6 +630,12 @@
       <Filter>Graphics\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="..\Physics\RigidBody.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\Colliders.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\CollisionDetector.h">
       <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>

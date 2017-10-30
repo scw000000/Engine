@@ -15,6 +15,7 @@
 #include "EngineStd.h"
 #include "PEPhysics.h"
 #include "RigidBody.h"
+#include "Colliders.h"
 #include "PEPhysicsAttributes.h"
 #include "..\Graphics\BasicGeometry.h"
 

@@ -240,9 +240,11 @@ void PEPhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp )
    this->m_pRigidBody = shared_ptr<RigidBody>( ENG_NEW RigidBody() );
    for( auto& pColliderAttr : this->m_ColliderAttributes )
       {
-      this->m_pRigidBody->AddCollider( pColliderAttr->VCreateCollider( pRenderComp ) );
- 
+      auto pNewCollider = pColliderAttr->VCreateCollider( pRenderComp );
+      this->m_pRigidBody->AddCollider( pNewCollider );
+      pNewCollider->SetRigidBody(m_pRigidBody );
       }
+
    PEPhysics::GetSingleton().VAddRigidBody( pRenderComp, this->m_pRigidBody );
    /*IGamePhysics::GetSingleton().VAddSphere( pRenderComp->VGetTransformPtr()->GetScale().x * m_Radius,
                                             pRenderComp );*/

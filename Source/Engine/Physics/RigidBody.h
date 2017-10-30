@@ -18,6 +18,7 @@ class ICollider;
 
 class RigidBody{
    friend class PEPhysics;
+   friend class CollisionDetector;
    public:
       void MoveForOneTimeStep( float deltaSecond );
 

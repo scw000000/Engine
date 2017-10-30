@@ -21,7 +21,7 @@ void SphereCollider::VRenderShape( const Mat4x4& m, const Mat4x4& pv ) const
    SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv * m );
    }
 
-Vec3 SphereCollider::SupportMapping( const Vec3& direction ) const
+Vec3 SphereCollider::VSupportMapping( const Vec3& direction ) const
    {
    // Assume that the direction is normalized
    return direction * m_Radius;
@@ -32,7 +32,7 @@ void BoxCollider::VRenderShape( const Mat4x4& m, const Mat4x4& pv ) const
    SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Box, g_Green, pv * m );
    }
 
-Vec3 BoxCollider::SupportMapping( const Vec3& direction ) const
+Vec3 BoxCollider::VSupportMapping( const Vec3& direction ) const
    {
    /*float sX = direction.x > 0 ? 0.5f : direction.x < 0 ? -0.5f : 0.f;
    float sY = direction.y > 0 ? 0.5f : direction.y < 0 ? -0.5f : 0.f;

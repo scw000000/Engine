@@ -89,7 +89,6 @@ void RigidBody::AddCollider( shared_ptr<ICollider> collider )
       ENG_WARNING("Collider is already existing");
       }
    m_Colliders.push_back( collider );
-
    }
 
 Vec3 RigidBody::TransformToGlobal( const Vec3 &localVec, bool isPoint ) const

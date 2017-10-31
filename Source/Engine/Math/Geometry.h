@@ -577,7 +577,7 @@ typedef struct Color
 class Plane
    {
    public:
-      Plane( void ) { n = g_Up; d = 0.f; };
+      Plane( void ) {};
       // To make a plane with normal vector points upward, The order of the points 
       //should be counter clockwise for right handed system 
       // d is distance to origin (If the normal vector is normalized )
@@ -585,19 +585,24 @@ class Plane
          {
          n = glm::cross( p1 - p0, p2 - p0 );
          // for plane ax + by + cz + d = 0; d = -( ax + by + cz ) = - dot( n, a point on plane )
-         d = -1.0f * n.Dot( p0 );
+         d = -n.Dot( p0 );
          Normalize();
          }
       // constructor based on coefficient
       Plane( const float a, const float b, const float c, const float w ) : n( a, b, c ), d( w )  { }
       void Normalize() { float lengthInv = 1.0f / n.Length(); n *= lengthInv; d *= lengthInv; }
       // Inside is defined as same side of normal
-      bool Inside( Vec3 p ) const ;
+      bool IsAbove( const Vec3& p ) const ;
       // Inside is defined as same side of normal, radius means it is a sphere
-      bool Inside( Vec3 p, const float radius ) const ;
+      bool IsAbove( const Vec3& p, const float radius ) const ;
 
+      inline float SignedDistance( const Vec3& p ) const;
+      float GetD( void ) const { return d; }
+      Vec3 GetNormal( void ) const { return n; }
+
+      Vec3 GetProjectPoint( const Vec3& p ) const;
    public:
-      // normatl vector
+      // normal vector
       Vec3 n;
       // distance
       float d;

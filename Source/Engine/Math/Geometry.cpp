@@ -161,17 +161,33 @@ TiXmlElement* Vec4::GernerateXML( void ) const
    return pRetNode;
    }
 
-bool Plane::Inside( Vec3 p ) const
+bool Plane::IsAbove( const Vec3& p ) const
    {
    return ( p.Dot( n ) + d >= 0.0f );
    }
 
-bool Plane::Inside( Vec3 p, const float radius ) const 
+bool Plane::IsAbove( const Vec3& p, const float radius ) const
    {
-   float distance = p.Dot( n ) + d;
+   float distance = SignedDistance( p );
    // we need to consider if the point is outside the plane, but its radius may compensate for it
    // -> we should test distance + radius >= 0
    return ( distance >= -radius );
+   }
+
+
+Vec3 Plane::GetProjectPoint( const Vec3& p ) const
+   {
+   // project point r = p + tn
+   // r dot n + d = 0
+   // ( p + tn ) dot n + d = 0
+   // n.p + t + d = 0
+   // t = -( np + d )
+   return p + -( SignedDistance( p ) ) * n;
+   }
+
+float Plane::SignedDistance( const Vec3& p ) const
+   {
+   return p.Dot( n ) + d;
    }
 
 Color::Color() 

@@ -18,7 +18,7 @@ bool BaseFrustum::VInside( const Vec3 &point ) const
    {
    for( int i = 0; i < NumPlanes; ++i )
       {
-      if( !m_Planes[ i ].Inside( point ) )
+      if( !m_Planes[ i ].IsAbove( point ) )
          {
          return false;
          }
@@ -33,8 +33,8 @@ bool BaseFrustum::VInside( const Vec3 &pointFrom, const Vec3 &pointTo ) const
    bool toInside = true;
    for( int i = 0; i < NumPlanes; ++i )
       {
-      bool fromTest = m_Planes[ i ].Inside( pointFrom );
-      bool toTest = m_Planes[ i ].Inside( pointTo );
+      bool fromTest = m_Planes[ i ].IsAbove( pointFrom );
+      bool toTest = m_Planes[ i ].IsAbove( pointTo );
       if( !fromTest )
          {
          fromInside = false;
@@ -56,7 +56,7 @@ bool BaseFrustum::VInside( const Vec3 &point, float radius ) const
    {
    for( int i = 0; i < NumPlanes; ++i )
       {
-      if( !m_Planes[ i ].Inside( point, radius ) )
+      if( !m_Planes[ i ].IsAbove( point, radius ) )
          {
          return false;
          }
@@ -85,19 +85,35 @@ void PerspectiveFrustum::Init( const float fovY, const float aspect, const float
    Vec3 nearUp = static_cast< float >( m_NearDis * tanFovOver2 ) * g_Up;
    Vec3 farUp = static_cast< float >( m_FarDis * tanFovOver2 ) * g_Up;
 
-   // These vertiCes start in upper right and go around clockwise
+   // 0 ---------- 1
+   // |            |
+   // |            |
+   // 3 ---------- 2
+   // left up
    m_PlaneVerts[ 0 ] = ( m_NearDis * g_Forward ) - nearRight + nearUp;
+   // right up
    m_PlaneVerts[ 1 ] = ( m_NearDis * g_Forward ) + nearRight + nearUp;
+   // right down
    m_PlaneVerts[ 2 ] = ( m_NearDis * g_Forward ) + nearRight - nearUp;
+   // left down
    m_PlaneVerts[ 3 ] = ( m_NearDis * g_Forward ) - nearRight - nearUp;
 
+   // 4 ---------- 5
+   // |            |
+   // |            |
+   // 7 ---------- 6
+   // left up
    m_PlaneVerts[ 4 ] = ( m_FarDis * g_Forward ) - farRight + farUp;
+   // right up
    m_PlaneVerts[ 5 ] = ( m_FarDis * g_Forward ) + farRight + farUp;
+   // right down
    m_PlaneVerts[ 6 ] = ( m_FarDis * g_Forward ) + farRight - farUp;
+   // left down
    m_PlaneVerts[ 7 ] = ( m_FarDis * g_Forward ) - farRight - farUp;
 
    Vec3 origin( 0.0f, 0.0f, 0.0f );
-
+   
+   // The planes should point inward
    m_Planes[ Near ].Init( m_PlaneVerts[ 0 ], m_PlaneVerts[ 1 ], m_PlaneVerts[ 2 ] );
    m_Planes[ Far ].Init( m_PlaneVerts[ 6 ], m_PlaneVerts[ 5 ], m_PlaneVerts[ 4 ] );
    m_Planes[ Right ].Init( origin, m_PlaneVerts[ 5 ], m_PlaneVerts[ 6 ] );

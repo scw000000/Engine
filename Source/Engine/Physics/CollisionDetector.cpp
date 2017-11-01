@@ -55,21 +55,161 @@ bool CollisionDetector::CollisionDetection( shared_ptr<ICollider> pColliderA, sh
 
 void UpdateSimplex( Simplex& simplex )
    {
+   // No need if it only contains only one vertex
    if( simplex.m_Size < 2 )
       {
       return;
       }
 
-   auto lastPoint = simplex.Last();
-
    if( simplex.m_Size == 2 )
       {
+      //  impossible  |    region 2   | region 1
+      //              a ------------- b (last added point)
+      // Test if it's in region 1
+      const auto& b = simplex.Last().m_PointCSO;
+
+      if( -b.Dot( b - simplex.m_Vertice[0].m_PointCSO ) < 0.f )
+         {
+         simplex.m_Vertice[ 0 ] = simplex.m_Vertice[ 1 ];
+         // std::swap( simplex.m_Vertice[ 0 ], simplex.m_Vertice[ 1 ] );
+         simplex.m_Size = 1;
+         }
+      // If not then do nothing
       }
    else if( simplex.m_Size == 3 )
       {
+      //
+      //     A- -
+      //     |     -  - 
+      //     |          -  C
+      //     |     -  - 
+      //     B- -
+      //
+      // Test vertex C
+      const Vec3& a = simplex.m_Vertice[ 0 ].m_PointCSO;
+      const Vec3& b = simplex.m_Vertice[ 1 ].m_PointCSO;
+      const Vec3& c = simplex.m_Vertice[ 2 ].m_PointCSO;
+      float d5 = ( b - a ).Dot( -c );
+      float d6 = ( c - a ).Dot( -c );
+      if(d6 >= 0.0f && d5 <= d6)
+         {
+         simplex.m_Vertice[ 0 ] = simplex.m_Vertice[ 2 ];
+         // std::swap( simplex.m_Vertice[ 0 ], simplex.m_Vertice[ 3 ] );
+         simplex.m_Size = 1;
+         }
+      float d1 = ( b - a ).Dot( -a );
+      float d2 = ( c - a ).Dot( -a );
+
+      float vb = d5 * d2 - d1 * d6;
+      // Test edge AC
+      if( vb <= 0.0f && d2 >= 0.0f && d6 <= 0.0f )
+         {
+         simplex.m_Vertice[ 1 ] = simplex.m_Vertice[ 2 ];
+         simplex.m_Size = 2;
+         }
+      // Test edge BC
+      float d3 = ( b - a ).Dot( -b );
+      float d4 = ( c - a ).Dot( -b );
+      float va = d3 * d6 - d5*d4;
+      if( va <= 0.0f && ( d4 - d3 ) >= 0.0f && ( d5 - d6 ) >= 0.0f )
+         {
+         simplex.m_Vertice[ 0 ] = simplex.m_Vertice[ 2 ];
+         simplex.m_Size = 2;
+         }
       }
    else 
       {
+      // First swap the vertice to make it facing correct direction
+      Vec3& a = simplex.m_Vertice[ 0 ].m_PointCSO;
+      Vec3& b = simplex.m_Vertice[ 1 ].m_PointCSO;
+      Vec3& c = simplex.m_Vertice[ 2 ].m_PointCSO;
+      Vec3& d = simplex.m_Vertice[ 3 ].m_PointCSO;
+
+      Vec3 ab = b - a;
+      Vec3 ac = c - a;
+      Vec3 n = ab.Cross( ac );
+      if( n.Dot( d - a ) > 0.f )
+         {
+         std::swap( simplex.m_Vertice[ 1 ], simplex.m_Vertice[ 2 ] );
+         ab = b - a;
+         ac = c - a;
+         }
+      // Test vertex D
+      Vec3 ad = d - a;
+      if( -a.Dot( ab ) <= 0.f
+          && -a.Dot( ac ) <= 0.f
+          && -a.Dot( ad ) <= 0.f )
+         {
+         simplex.m_Vertice[ 0 ] = simplex.m_Vertice[ 3 ];
+         // std::swap( simplex.m_Vertice[ 0 ], simplex.m_Vertice[ 3 ] );
+         simplex.m_Size = 1;
+         }
+      Vec3 nACD = ac.Cross( ad );
+      Vec3 nADB = ad.Cross( ab );
+      // Test edge AD
+      if( -a.Dot( ad ) >= 0.f
+          && -d.Dot( -ad ) >= 0.f 
+          && -a.Dot( ad.Cross( nADB ) ) >= 0.f
+          && -a.Dot( nACD.Cross( ad ) ) >= 0.f )
+         {
+         simplex.m_Vertice[ 1 ] = simplex.m_Vertice[ 3 ];
+         // std::swap( simplex.m_Vertice[ 1 ], simplex.m_Vertice[ 3 ] );
+         simplex.m_Size = 2;
+         }
+
+      Vec3 bc = c - b;
+      Vec3 bd = d - b;
+      Vec3 nABC = ab.Cross( ac );
+      Vec3 nBDC = bd.Cross( bc );
+      // Test edge BD
+      if( -b.Dot( bd ) >= 0.f
+          && -d.Dot( -bd ) >= 0.f
+          && -b.Dot( nADB.Cross( bd ) ) >= 0.f
+          && -b.Dot( bd.Cross( nBDC ) ) >= 0.f )
+         {
+         simplex.m_Vertice[ 0 ] = simplex.m_Vertice[ 1 ];
+
+         simplex.m_Vertice[ 1 ] = simplex.m_Vertice[ 3 ];
+         // a = b;
+         // b = d;
+         simplex.m_Size = 2;
+         }
+      // Test edge CD
+      Vec3 cd = d - c;
+      if( -c.Dot( cd ) >= 0.f
+          && -d.Dot( -cd ) >= 0.f
+          &&  -c.Dot( nBDC.Cross( cd ) ) >= 0.f
+          && -c.Dot( cd.Cross( nACD ) ) >= 0.f )
+         {
+         simplex.m_Vertice[ 0 ] = simplex.m_Vertice[ 2 ];
+         simplex.m_Vertice[ 1 ] = simplex.m_Vertice[ 3 ];
+         // a = c;
+         // b = d;
+         simplex.m_Size = 2;
+         }
+      // Test triangle ADB
+      // If origin and the rest point ( c ) are in different face
+      // then it's on the triangle
+      if( ( -a.Dot( nADB ) ) * ( ac.Dot( nADB )  ) < 0.f )
+         {
+         simplex.m_Vertice[ 2 ] = simplex.m_Vertice[ 3 ];
+         // std::swap( simplex.m_Vertice[ 2 ], simplex.m_Vertice[ 3 ] );
+         simplex.m_Size = 3;
+         }
+      // Test triangle ACD
+      if( ( -a.Dot( nACD ) ) * ( ab.Dot( nACD ) ) < 0.f )
+         {
+         simplex.m_Vertice[ 1 ] = simplex.m_Vertice[ 3 ];
+         // std::swap( simplex.m_Vertice[ 1 ], simplex.m_Vertice[ 3 ] );
+         simplex.m_Size = 3;
+         }
+      // Test triangle BDC
+      if( ( -b.Dot( nBDC ) ) * ( -ab.Dot( nBDC ) ) < 0.f )
+         {
+         simplex.m_Vertice[ 0 ] = simplex.m_Vertice[ 3 ];
+         // std::swap( simplex.m_Vertice[ 0 ], simplex.m_Vertice[ 3 ] );
+         simplex.m_Size = 3;
+         }
       }
    }
 

@@ -80,7 +80,8 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
    for(auto& pair : m_RigidBodyToRenderComp )
       {
       ApplyGravity( pair.first );
-      pair.first->MoveForOneTimeStep( deltaSeconds );
+      // pair.first->MoveForOneTimeStep( deltaSeconds );
+      pair.first->MoveForOneTimeStep( 0.1 );
       }
    }
 

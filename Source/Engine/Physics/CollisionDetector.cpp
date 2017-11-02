@@ -132,16 +132,20 @@ void CollisionDetector::UpdateSimplex( Simplex& simplex )
          std::swap( simplex.m_Vertice[ 1 ], simplex.m_Vertice[ 2 ] );
          ab = b - a;
          ac = c - a;
+         n = ab.Cross( ac );
          }
       // Test vertex D
       Vec3 ad = d - a;
-      if( -a.Dot( ab ) <= 0.f
-          && -a.Dot( ac ) <= 0.f
-          && -a.Dot( ad ) <= 0.f )
+      Vec3 cd = d - c;
+      Vec3 bd = d - b;
+      if( -d.Dot( -bd ) <= 0.f
+          && -d.Dot( -cd ) <= 0.f
+          && -d.Dot( -ad ) <= 0.f )
          {
          simplex.m_Vertice[ 0 ] = simplex.m_Vertice[ 3 ];
          // std::swap( simplex.m_Vertice[ 0 ], simplex.m_Vertice[ 3 ] );
          simplex.m_Size = 1;
+         return;
          }
       Vec3 nACD = ac.Cross( ad );
       Vec3 nADB = ad.Cross( ab );
@@ -154,10 +158,10 @@ void CollisionDetector::UpdateSimplex( Simplex& simplex )
          simplex.m_Vertice[ 1 ] = simplex.m_Vertice[ 3 ];
          // std::swap( simplex.m_Vertice[ 1 ], simplex.m_Vertice[ 3 ] );
          simplex.m_Size = 2;
+         return;
          }
 
       Vec3 bc = c - b;
-      Vec3 bd = d - b;
       Vec3 nABC = ab.Cross( ac );
       Vec3 nBDC = bd.Cross( bc );
       // Test edge BD
@@ -172,9 +176,9 @@ void CollisionDetector::UpdateSimplex( Simplex& simplex )
          // a = b;
          // b = d;
          simplex.m_Size = 2;
+         return;
          }
       // Test edge CD
-      Vec3 cd = d - c;
       if( -c.Dot( cd ) >= 0.f
           && -d.Dot( -cd ) >= 0.f
           &&  -c.Dot( nBDC.Cross( cd ) ) >= 0.f
@@ -185,6 +189,7 @@ void CollisionDetector::UpdateSimplex( Simplex& simplex )
          // a = c;
          // b = d;
          simplex.m_Size = 2;
+         return;
          }
       // Test triangle ADB
       // If origin and the rest point ( c ) are in different face
@@ -194,6 +199,7 @@ void CollisionDetector::UpdateSimplex( Simplex& simplex )
          simplex.m_Vertice[ 2 ] = simplex.m_Vertice[ 3 ];
          // std::swap( simplex.m_Vertice[ 2 ], simplex.m_Vertice[ 3 ] );
          simplex.m_Size = 3;
+         return;
          }
       // Test triangle ACD
       if( ( -a.Dot( nACD ) ) * ( ab.Dot( nACD ) ) < 0.f )
@@ -201,6 +207,7 @@ void CollisionDetector::UpdateSimplex( Simplex& simplex )
          simplex.m_Vertice[ 1 ] = simplex.m_Vertice[ 3 ];
          // std::swap( simplex.m_Vertice[ 1 ], simplex.m_Vertice[ 3 ] );
          simplex.m_Size = 3;
+         return;
          }
       // Test triangle BDC
       if( ( -b.Dot( nBDC ) ) * ( -ab.Dot( nBDC ) ) < 0.f )
@@ -208,6 +215,7 @@ void CollisionDetector::UpdateSimplex( Simplex& simplex )
          simplex.m_Vertice[ 0 ] = simplex.m_Vertice[ 3 ];
          // std::swap( simplex.m_Vertice[ 0 ], simplex.m_Vertice[ 3 ] );
          simplex.m_Size = 3;
+         return;
          }
       }
    }
@@ -255,7 +263,19 @@ bool CollisionDetector::ContainsOrigin( Simplex& simplex, Vec3& direction )
       const Vec3& a = simplex.m_Vertice[ 0 ].m_PointCSO;
       const Vec3& b = simplex.m_Vertice[ 1 ].m_PointCSO;
       const Vec3& c = simplex.m_Vertice[ 2 ].m_PointCSO;
+      // just project the origin to the triangle
+      auto nABC = ( b - a ).Cross( c - a );
+      float t = a.Dot( nABC ) / nABC.Dot( nABC );
+      Vec3 p = t * nABC;
+      if( p.Dot( p ) < g_EsplionSqr )
+         {
+         return true;
+         }
+      direction = -p;
+      direction.Normalize();
+      return false;
 
+      ///////
       float d1 = ( b - a ).Dot( -a );
       float d2 = ( c - a ).Dot( -a );
       float d3 = ( b - a ).Dot( -b );
@@ -272,13 +292,14 @@ bool CollisionDetector::ContainsOrigin( Simplex& simplex, Vec3& direction )
       float v = vb / sum;
       float w = 1.f - va - vb;
 
-      auto p = u * a + v * b + w * c;
+      p = u * a + v * b + w * c;
       if( p.Dot( p ) < g_EsplionSqr )
          {
          return true;
          }
       direction = -p;
       direction.Normalize();
+      return false;
       }
    else
       {
@@ -292,7 +313,7 @@ bool CollisionDetector::ContainsOrigin( Simplex& simplex, Vec3& direction )
       Plane planeABC;
       planeABC.Init( a, b, c );
       Plane planeADB;
-      planeADB.Init( a, b, c );
+      planeADB.Init( a, d, b );
       Plane planeACD;
       planeACD.Init( a, c, d );
       Plane planeCBD;
@@ -368,7 +389,7 @@ bool CollisionDetector::ContainsOrigin( Simplex& simplex, Vec3& direction )
          }
       return isInside;
       }
-      
+      return false;
    }
 
 bool CollisionDetector::GJK( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex )

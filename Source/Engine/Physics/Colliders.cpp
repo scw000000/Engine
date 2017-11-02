@@ -18,7 +18,9 @@
 
 void SphereCollider::VRenderShape( const Mat4x4& m, const Mat4x4& pv ) const
    {
-   SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv * m );
+   auto copyM = m;
+   copyM.MultScale( Vec3( m_Radius, m_Radius, m_Radius ) );
+   SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv * copyM );
    }
 
 Vec3 SphereCollider::VSupportMapping( const Vec3& direction ) const
@@ -29,6 +31,8 @@ Vec3 SphereCollider::VSupportMapping( const Vec3& direction ) const
 
 void BoxCollider::VRenderShape( const Mat4x4& m, const Mat4x4& pv ) const
    {
+   auto copyM = m;
+   copyM.MultScale( m_HalfSize * 2.f );
    SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Box, g_Green, pv * m );
    }
 

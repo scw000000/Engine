@@ -58,5 +58,5 @@ class RigidBody{
       Vec3 m_AngularVelocity;
       
       std::vector< shared_ptr<ICollider> > m_Colliders;
-      float gravityScale;
+      float m_GravityScale;
    };

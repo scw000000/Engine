@@ -13,6 +13,7 @@
 */
 
 class RigidBody;
+class CollisionDetector;
 
 class PEPhysics : public IGamePhysics
    {
@@ -83,7 +84,7 @@ class PEPhysics : public IGamePhysics
 
       void ApplyGravity( shared_ptr<RigidBody> pRigidBody );
 
-
+      
       //// helpers for sending events relating to collision pairs
       //void SendCollisionPairAddEvent( btPersistentManifold const * manifold, btRigidBody const * body0, btRigidBody const * body1 );
       //void SendCollisionPairRemoveEvent( btRigidBody const * body0, btRigidBody const * body1 );
@@ -125,4 +126,6 @@ class PEPhysics : public IGamePhysics
       RigidBodyToRenderCompMap m_RigidBodyToRenderComp;
 
       bool m_IsSimulating;
+
+      shared_ptr< CollisionDetector > m_pCollisionDetector;
    };

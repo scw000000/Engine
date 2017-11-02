@@ -1,6 +1,6 @@
 <ActorInstance>
     <Data type="Floor">
-        <ActorClassResource path="actors\SphereRB.xml" />
+        <ActorClassResource path="actors\BoxRB.xml" />
     </Data>
     <PhysicsComponent>
         <Data>

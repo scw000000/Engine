@@ -17,6 +17,7 @@
 #include "RigidBody.h"
 #include "Colliders.h"
 #include "PEPhysicsAttributes.h"
+#include "CollisionDetector.h"
 #include "..\Graphics\BasicGeometry.h"
 
 PEPhysics::~PEPhysics( void )
@@ -33,6 +34,7 @@ PEPhysics::PEPhysics( void )
 
 bool PEPhysics::VInitialize()
    {
+   m_pCollisionDetector = shared_ptr< CollisionDetector >( ENG_NEW CollisionDetector() );
    return true;
    }
 
@@ -56,6 +58,25 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
       {
       return;
       }
+   Manifold manifold;
+   for( auto leftPair = m_RigidBodyToRenderComp.begin(); leftPair != m_RigidBodyToRenderComp.end(); ++leftPair )
+      {
+      for( auto rightPair = std::next(leftPair, 1) ; rightPair != m_RigidBodyToRenderComp.end(); ++rightPair )
+         {
+         if( leftPair->first->m_Transform.GetToWorldPosition().y > -3.92f )
+            {
+            int i = 0;
+            }
+         ENG_ASSERT( m_pCollisionDetector->CollisionDetection(
+            leftPair->first,
+            rightPair->first,
+            manifold
+            ) == false );
+         }
+     // ENG_ASSERT(  )
+      //m_pCollisionDetector->
+      }
+
    for(auto& pair : m_RigidBodyToRenderComp )
       {
       ApplyGravity( pair.first );
@@ -274,9 +295,10 @@ void PEPhysics::VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<
    m_RigidBodyToRenderComp[ pRB ] = pRenderComp;
 
    pRB->UpdateRigidBodyInfo();
+   VLinkRenderCompAttribute( pRenderComp );
    }
 
 void PEPhysics::ApplyGravity( shared_ptr<RigidBody> pRigidBody )
    {
-
+  // pRigidBody->A
    }

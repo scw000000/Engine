@@ -23,7 +23,6 @@ const float g_EsplionSqr = g_Esplion * g_Esplion;
 
 bool CollisionDetector::CollisionDetection( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidBody> pRigidBodyB, Manifold& manifold )
    {
-   Manifold maniFold;
    bool hasCollision = false;
    for(auto& pColliderA : pRigidBodyA->m_Colliders)
       {
@@ -53,7 +52,7 @@ bool CollisionDetector::CollisionDetection( shared_ptr<ICollider> pColliderA, sh
    return true;
    }
 
-void UpdateSimplex( Simplex& simplex )
+void CollisionDetector::UpdateSimplex( Simplex& simplex )
    {
    // No need if it only contains only one vertex
    if( simplex.m_Size < 2 )
@@ -67,8 +66,8 @@ void UpdateSimplex( Simplex& simplex )
       //              a ------------- b (last added point)
       // Test if it's in region 1
       const auto& b = simplex.Last().m_PointCSO;
-
-      if( -b.Dot( b - simplex.m_Vertice[0].m_PointCSO ) < 0.f )
+      // Test BO dot BA
+      if( -b.Dot( simplex.m_Vertice[0].m_PointCSO - b ) < 0.f )
          {
          simplex.m_Vertice[ 0 ] = simplex.m_Vertice[ 1 ];
          // std::swap( simplex.m_Vertice[ 0 ], simplex.m_Vertice[ 1 ] );
@@ -213,7 +212,7 @@ void UpdateSimplex( Simplex& simplex )
       }
    }
 
-bool ContainsOrigin( Simplex& simplex, Vec3& direction )
+bool CollisionDetector::ContainsOrigin( Simplex& simplex, Vec3& direction )
    {
    if( simplex.m_Size == 1 )
       {
@@ -372,12 +371,13 @@ bool ContainsOrigin( Simplex& simplex, Vec3& direction )
       
    }
 
-bool GJK( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex )
+bool CollisionDetector::GJK( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex )
    {
    // Make up a 1D simplex
    auto supportPoint = GetCSOSupportPoint( pColliderA, pColliderB, g_Forward );
    simplex.Push( supportPoint );
    auto direction = -supportPoint.m_PointCSO;
+   direction.Normalize();
    while(true)
       {
       // Find next support point
@@ -399,7 +399,7 @@ bool GJK( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Si
    return false;
    }
 
-void EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Simplex& simplex, Manifold& manifold )
+void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Simplex& simplex, Manifold& manifold )
    {
    // Blow up the simplex to tetrahedron
    if( simplex.m_Size < 4 )
@@ -409,7 +409,7 @@ void EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, co
 
    }
 
-SupportPoint GetCSOSupportPoint( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Vec3& direction )
+SupportPoint CollisionDetector::GetCSOSupportPoint( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Vec3& direction )
    {
    // The input is in world space, must convert it to local space then convert it back
    auto pRigidBodyA = pColliderA->GetRigidBody().lock();
@@ -421,7 +421,7 @@ SupportPoint GetCSOSupportPoint( shared_ptr<ICollider> pColliderA, shared_ptr<IC
    Vec3 pB( pColliderB->VSupportMapping( pRigidBodyB->TransformToLocal( -direction, false ) ) );
 
    pA = pRigidBodyA->TransformToGlobal( pA, true );
-   pB = pRigidBodyA->TransformToGlobal( pB, true );
+   pB = pRigidBodyB->TransformToGlobal( pB, true );
 
    return SupportPoint( pA - pB, pA, pB );
    }

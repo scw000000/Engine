@@ -87,6 +87,36 @@ class Simplex
 
    };
 
+struct Face {
+   Face( shared_ptr<SupportPoint> a, shared_ptr<SupportPoint> b, shared_ptr<SupportPoint> c )
+      {
+      m_Vertices[ 0 ] = a;
+      m_Vertices[ 1 ] = b;
+      m_Vertices[ 2 ] = c;
+      m_Plane.Init( a->m_PointCSO, b->m_PointCSO, c->m_PointCSO );
+      }
+   Plane m_Plane;
+   // These verices must be ordered in CCW order
+   weak_ptr<SupportPoint> m_Vertices[ 3 ];
+   };
+
+class Polyhedron
+   {
+   public:
+      std::unordered_map< shared_ptr< SupportPoint >, std::unordered_set< shared_ptr<Face> > > m_VertexToFace;
+      std::unordered_set< shared_ptr<Face> > m_Faces;
+
+      // The order must be CCW
+      void AddFace( shared_ptr< SupportPoint > a, shared_ptr< SupportPoint > b, shared_ptr< SupportPoint > c )
+         {
+         shared_ptr<Face> face( ENG_NEW Face( a, b, c ) );
+         m_Faces.insert( face );
+         m_VertexToFace[ a ].insert( face );
+         m_VertexToFace[ b ].insert( face );
+         m_VertexToFace[ c ].insert( face );
+         }
+   };
+
 class CollisionDetector
    {
    public:
@@ -94,9 +124,12 @@ class CollisionDetector
    
    private:
    bool CollisionDetection( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Manifold& manifold );
-   void UpdateSimplex( Simplex& simplex );
-   bool ContainsOrigin( Simplex& simplex, Vec3& direction );
+   
+   void GJKUpdateSimplex( Simplex& simplex );
+   bool GJKContainsOrigin( Simplex& simplex, Vec3& direction );
    bool GJK( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex );
+
+   void EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr< SupportPoint > pNewPoint );
    void EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Simplex& simplex, Manifold& manifold );
    SupportPoint GetCSOSupportPoint( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Vec3& direction );
    };

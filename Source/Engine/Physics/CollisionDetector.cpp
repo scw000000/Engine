@@ -52,7 +52,7 @@ bool CollisionDetector::CollisionDetection( shared_ptr<ICollider> pColliderA, sh
    return true;
    }
 
-void CollisionDetector::UpdateSimplex( Simplex& simplex )
+void CollisionDetector::GJKUpdateSimplex( Simplex& simplex )
    {
    // No need if it only contains only one vertex
    if( simplex.m_Size < 2 )
@@ -220,7 +220,7 @@ void CollisionDetector::UpdateSimplex( Simplex& simplex )
       }
    }
 
-bool CollisionDetector::ContainsOrigin( Simplex& simplex, Vec3& direction )
+bool CollisionDetector::GJKContainsOrigin( Simplex& simplex, Vec3& direction )
    {
    if( simplex.m_Size == 1 )
       {
@@ -410,14 +410,76 @@ bool CollisionDetector::GJK( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
          }
       simplex.Push( supportPoint );
       // update simplex
-      UpdateSimplex( simplex );
+      GJKUpdateSimplex( simplex );
       // if contains origin, return true, and update direction as well
-      if( ContainsOrigin( simplex, direction ) )
+      if( GJKContainsOrigin( simplex, direction ) )
          {
          return true;
          }
       }
    return false;
+   }
+
+//  Remove all faces from the polytope that can be ¡§seen¡¨ by this new support point, 
+// and add new faces to cover up the ¡§hole¡¨ on the polytope, new support point is the common vertex
+void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr< SupportPoint > pNewPoint )
+   {
+   std::unordered_set< std::pair< shared_ptr< SupportPoint >, shared_ptr< SupportPoint > > > edgePairs;
+   // For each faces, test the direction
+   for( auto pFaceIt = polyhedron.m_Faces.begin(); pFaceIt != polyhedron.m_Faces.end(); )
+      {
+      // if the face can be seen by the point, try to delete the face
+      if( ( *pFaceIt )->m_Plane.IsAbove( pNewPoint->m_PointCSO ) )
+         {
+         std::vector< shared_ptr< SupportPoint > > verticesInFace = 
+            {
+            ( *pFaceIt )->m_Vertices[ 0 ].lock(),
+            ( *pFaceIt )->m_Vertices[ 1 ].lock(),
+            ( *pFaceIt )->m_Vertices[ 2 ].lock()
+            };
+
+         // For each vertex in face, clear vertex-face mapping
+         for( auto pVertex : verticesInFace )
+            {
+            ENG_ASSERT( polyhedron.m_VertexToFace.find( pVertex ) != polyhedron.m_VertexToFace.end() );
+            ENG_ASSERT( polyhedron.m_VertexToFace[ pVertex ].size() );
+            ENG_ASSERT( polyhedron.m_VertexToFace[ pVertex ].find( ( *pFaceIt ) ) != polyhedron.m_VertexToFace[ pVertex ].end() );
+            polyhedron.m_VertexToFace[ pVertex ].erase( ( *pFaceIt ) );
+            }
+         // Erase the face
+         ENG_ASSERT( polyhedron.m_Faces.find( ( *pFaceIt ) ) != polyhedron.m_Faces.end() );
+         pFaceIt = polyhedron.m_Faces.erase( pFaceIt );
+         
+         for( int i = 0; i < 3; ++i )
+            {
+            int j = ( i + 1 ) % 3;
+            auto findIt = edgePairs.find( std::make_pair( verticesInFace[ j ], verticesInFace[ i ] ) );
+            // for each edge in reverse order, add to temporal edge set if it doesn't exist
+            if( findIt == edgePairs.end() )
+               {
+               edgePairs.insert( std::make_pair( verticesInFace[ i ], verticesInFace[ j ] ) );
+               }
+            // else remove it
+            else
+               {
+               edgePairs.erase( findIt );
+               }
+            }
+         
+         }
+      else
+         {
+         ++pFaceIt;
+         }
+      }
+
+   // for each of the rest edges these are only added to the set once
+   // so new faces are formed by the edge and new point
+   for( auto& edge : edgePairs )
+      {
+      polyhedron.AddFace( edge.first, edge.second, pNewPoint );
+      }
+   
    }
 
 void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Simplex& simplex, Manifold& manifold )
@@ -427,6 +489,24 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
       {
       }
 
+   // Initialize polytope
+
+   while( true )
+      {
+      //  Find closest face of the polytope to the origin.
+      
+      //  If the closest face is no closer by a threshold  
+      // to the origin than the previously picked one, break;
+      if( true )
+         {
+         break;
+         }
+     
+
+      }
+
+   //  Project the origin onto the closest triangle.
+   // Compute the barycentric coordinates of this closest point using the vertices from this triangle.
 
    }
 
@@ -436,7 +516,6 @@ SupportPoint CollisionDetector::GetCSOSupportPoint( shared_ptr<ICollider> pColli
    auto pRigidBodyA = pColliderA->GetRigidBody().lock();
    auto pRigidBodyB = pColliderB->GetRigidBody().lock();
    ENG_ASSERT( pRigidBodyA && pRigidBodyB );
-
 
    Vec3 pA( pColliderA->VSupportMapping( pRigidBodyA->TransformToLocal( direction, false ) ) );
    Vec3 pB( pColliderB->VSupportMapping( pRigidBodyB->TransformToLocal( -direction, false ) ) );

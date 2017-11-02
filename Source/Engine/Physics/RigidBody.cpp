@@ -23,7 +23,7 @@ void RigidBody::MoveForOneTimeStep( float deltaSecond )
    // m_Force = Vec3( 0.f, 0.1f, 0.f );
    if( dynamic_pointer_cast< SphereCollider >( m_Colliders[0] ) )
       {
-      m_Force = Vec3( 0.f, 0.1f, 0.f );
+      m_Force = Vec3( 0.1f, 0.1f, 0.f );
       }
    m_LinearVelocity += m_InverseMass * ( m_Force * deltaSecond );
    m_AngularVelocity += m_GlobalInverseInertia * ( m_Torque * deltaSecond );

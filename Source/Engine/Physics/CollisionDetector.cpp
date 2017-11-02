@@ -21,6 +21,28 @@
 const float g_Esplion = 0.0001f;
 const float g_EsplionSqr = g_Esplion * g_Esplion;
 
+ContactPoint::ContactPoint( const SupportPoint& supportPoint ) 
+   : m_SupportPoint( supportPoint )
+   {
+   // TODO: calculate normal and depth
+   m_PenetrationDepth = ( supportPoint.m_PointA - supportPoint.m_PointB ).Length();
+
+   }
+
+Vec3 Face::FindBarycentricCoords( const Vec3& point )
+   {
+   // TODO: implement
+   return Vec3::g_Zero;
+
+   }
+
+
+void Manifold::AddContactPoint( const SupportPoint& newPoint )
+   {
+   ENG_ASSERT( m_ContactPointCount < MANIFOLD_MAX_NUM );
+   m_ContactPoints[ m_ContactPointCount++ ] = ContactPoint( newPoint );
+   }
+
 bool CollisionDetector::CollisionDetection( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidBody> pRigidBodyB, Manifold& manifold )
    {
    bool hasCollision = false;
@@ -484,30 +506,59 @@ void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr<
 
 void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Simplex& simplex, Manifold& manifold )
    {
-   // Blow up the simplex to tetrahedron
+   // Expand the simplex to tetrahedron
    if( simplex.m_Size < 4 )
       {
+      // TODO: implement
       }
 
    // Initialize polytope
+   Polyhedron polyhedron;
+   // TODO: implement
 
+   float prev_Distance = -std::numeric_limits<float>::max();
+   shared_ptr<Face> best_face;
    while( true )
       {
+      auto faceIt = polyhedron.m_Faces.begin();
+      best_face = *faceIt;
       //  Find closest face of the polytope to the origin.
-      
+      for( std::advance(faceIt, 1); faceIt != polyhedron.m_Faces.end(); ++faceIt )
+         {
+         // Since all faces are facing outward, we wanna find the largest negative value
+         if( best_face->m_Plane.GetD() < (*faceIt)->m_Plane.GetD() )
+            {
+            best_face = ( *faceIt );
+            }
+         }
       //  If the closest face is no closer by a threshold  
       // to the origin than the previously picked one, break;
-      if( true )
+      if( best_face->m_Plane.GetD() - prev_Distance <= g_Esplion )
          {
          break;
          }
-     
-
+      // Find new point;
+      shared_ptr< SupportPoint > newPoint( ENG_NEW SupportPoint( GetCSOSupportPoint( pColliderA, pColliderB, best_face->m_Plane.GetNormal() ) ) );
+      EPAExpandPolyhedron( polyhedron, newPoint );
       }
 
    //  Project the origin onto the closest triangle.
+   auto projPoint = best_face->m_Plane.GetProjectPoint(Vec3::g_Zero);
    // Compute the barycentric coordinates of this closest point using the vertices from this triangle.
+   auto baryCoords = best_face->FindBarycentricCoords( projPoint );
+   auto pA = ( best_face->m_Vertices[ 0 ].lock() );
+   auto pB = ( best_face->m_Vertices[ 1 ].lock() );
+   auto pC = ( best_face->m_Vertices[ 2 ].lock() );
 
+   SupportPoint contactPoint( baryCoords.x * pA->m_PointA
+                              + baryCoords.y * pB->m_PointA
+                              + baryCoords.z * pC->m_PointA
+                              
+                              , baryCoords.x * pA->m_PointB
+                              + baryCoords.y * pB->m_PointB
+                              + baryCoords.z * pC->m_PointB );
+
+   manifold.AddContactPoint( contactPoint );
    }
 
 SupportPoint CollisionDetector::GetCSOSupportPoint( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Vec3& direction )

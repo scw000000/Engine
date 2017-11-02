@@ -15,21 +15,28 @@
 
 class RigidBody;
 class ICollider;
+struct SupportPoint;
 
 struct ContactPoint
    {
    public:
+   ContactPoint( void ) {};
+   ContactPoint( const SupportPoint& supportPoint );
       Vec3 m_Normal;
       float m_PenetrationDepth;
+      SupportPoint m_SupportPoint;
    };
 
 struct Manifold
    {
    public:
+   Manifold( void ) : m_ContactPointCount(0) { }
       shared_ptr<RigidBody> pRigidBodyA;
       shared_ptr<RigidBody> pRigidBodyB;
       int m_ContactPointCount;
       ContactPoint m_ContactPoints[ MANIFOLD_MAX_NUM ];
+
+      void AddContactPoint( const SupportPoint& newPoint );
    };
 
 struct SupportPoint 
@@ -37,6 +44,9 @@ struct SupportPoint
    public:
    SupportPoint( const Vec3& pCSO, const Vec3& pA, const Vec3& pB) 
       : m_PointCSO( pCSO ), m_PointA( pA ), m_PointB( pB ){ }
+   SupportPoint( const Vec3& pA, const Vec3& pB )
+      : m_PointCSO( pA - pB ), m_PointA( pA ), m_PointB( pB )
+      {}
    SupportPoint( void ) {}
    public:
    Vec3 m_PointCSO;
@@ -95,6 +105,10 @@ struct Face {
       m_Vertices[ 2 ] = c;
       m_Plane.Init( a->m_PointCSO, b->m_PointCSO, c->m_PointCSO );
       }
+
+   // The x, y z are the scalars for vertex a, b, and c
+   Vec3 FindBarycentricCoords( const Vec3& point );
+
    Plane m_Plane;
    // These verices must be ordered in CCW order
    weak_ptr<SupportPoint> m_Vertices[ 3 ];

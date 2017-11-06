@@ -207,7 +207,9 @@ class Quaternion : public glm::fquat
       
       Vec3 XForm( const Vec3& vec ){ return *this * vec; }
       
-      inline Mat4x4 GetRotationMatrix( void ) const;
+      inline Mat4x4 GetRotationMatrix44( void ) const;
+
+      inline Mat3x3 GetRotationMatrix33(void ) const;
 
       Quaternion Inverse( void ) const { return glm::inverse( *this ); }
 
@@ -280,6 +282,15 @@ class Mat3x3 : public glm::mat3
 
    inline Mat3x3 Inverse( void ) const { return glm::inverse( *this ); }
    float Determinant( void ) const { return glm::determinant( *this ); }
+   void BuildAxisRad( const Vec3& axis, const float& radian )
+      {
+      Vec3 nAxis = axis;
+      nAxis.Normalize();
+      Quaternion q;
+      q.BuildAxisRad( nAxis, radian );
+      *this = q.GetRotationMatrix33();
+      //glm::angleAxis( radian, nAxis );
+      }
    static const Mat3x3 g_Identity;
    static const Mat3x3 g_Zero;
    };
@@ -384,7 +395,7 @@ class Mat4x4 : public glm::mat4
 
       static Mat4x4 GetScaleMatrix( const Vec3& scale ) { Mat4x4 mat = g_Identity; mat.MultScale( scale ); return mat; }
 
-      static Mat4x4 GetRotationMatrix( const Quaternion& quat ) { return quat.GetRotationMatrix(); }
+      static Mat4x4 GetRotationMatrix( const Quaternion& quat ) { return quat.GetRotationMatrix44(); }
 
       static Mat4x4 GetRotationMatrix( const float pitchRad, const float yawRad, const float rollRad ){  Mat4x4 mat = g_Identity; mat.BuildPitchYawRollRad( pitchRad, yawRad, rollRad ); return mat; }
 
@@ -402,9 +413,14 @@ class Mat4x4 : public glm::mat4
       
    };
 
- inline Mat4x4 Quaternion::GetRotationMatrix( void ) const 
+ inline Mat4x4 Quaternion::GetRotationMatrix44( void ) const 
     {
     return glm::mat4_cast( *this ); 
+    }
+
+ inline Mat3x3 Quaternion::GetRotationMatrix33( void ) const
+    {
+    return glm::mat3_cast( *this );
     }
 
 inline Vec3 Mat4x4::GetForward( void ) const
@@ -725,7 +741,7 @@ class Plane
  
  inline void Transform::SetRotation( const Quaternion& quat )
     {
-    SetScaleRotTrans( GetScale(), quat.GetRotationMatrix(), GetToWorldPosition() );
+    SetScaleRotTrans( GetScale(), quat.GetRotationMatrix44(), GetToWorldPosition() );
     }
 
  inline void Transform::SetRotMatrix( const Mat4x4& rotation )

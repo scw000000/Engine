@@ -19,21 +19,34 @@
 #include <limits>
 
 const float g_Esplion = 0.0001f;
-const float g_EsplionSqr = g_Esplion * g_Esplion;
+const float g_EsplionSq = g_Esplion * g_Esplion;
 
 ContactPoint::ContactPoint( const SupportPoint& supportPoint ) 
    : m_SupportPoint( supportPoint )
    {
-   // TODO: calculate normal and depth
-   m_PenetrationDepth = ( supportPoint.m_PointA - supportPoint.m_PointB ).Length();
-
+   auto vBA = supportPoint.m_PointA - supportPoint.m_PointB;
+   // calculate normal and depth
+   m_PenetrationDepth = vBA.Length();
+   // For rigid body A. since A, B are colliding, the 
+   // Distance from centriod of A to contact point B is shorter than to contact point A
+   // so the normal becomes vector BA = a - b
+   vBA.Normalize();
+   m_Normal = vBA;
    }
 
 Vec3 Face::FindBarycentricCoords( const Vec3& point )
    {
-   // TODO: implement
-   return Vec3::g_Zero;
+   const Vec3& a = m_Vertices[ 0 ].lock()->m_PointCSO;
+   const Vec3& b = m_Vertices[ 1 ].lock()->m_PointCSO;
+   const Vec3& c = m_Vertices[ 2 ].lock()->m_PointCSO;
 
+   float va = m_Plane.GetNormal().Dot( ( b - point ).Cross( c - point ) );
+   float vb = m_Plane.GetNormal().Dot( ( c - point ).Cross( a - point ) );
+   float vc = m_Plane.GetNormal().Dot( ( a - point ).Cross( b - point ) );
+
+   float u = va / ( va + vb + vc );
+   float v = vb / ( va + vb + vc );
+   return Vec3( u, v, 1.f - u - v );
    }
 
 
@@ -247,7 +260,7 @@ bool CollisionDetector::GJKContainsOrigin( Simplex& simplex, Vec3& direction )
    if( simplex.m_Size == 1 )
       {
       auto point = simplex.m_Vertice[ 0 ].m_PointCSO;
-      if( point.Dot( point ) < g_EsplionSqr )
+      if( point.Dot( point ) < g_EsplionSq )
          {
          return true;
          }
@@ -272,7 +285,7 @@ bool CollisionDetector::GJKContainsOrigin( Simplex& simplex, Vec3& direction )
       auto v = ( b - a );
       float t = -v.Dot( a ) / v.Dot( v );
       auto p = a + t * v;
-      if( p.Dot( p ) < g_EsplionSqr )
+      if( p.Dot( p ) < g_EsplionSq )
          {
          return true;
          }
@@ -289,7 +302,7 @@ bool CollisionDetector::GJKContainsOrigin( Simplex& simplex, Vec3& direction )
       auto nABC = ( b - a ).Cross( c - a );
       float t = a.Dot( nABC ) / nABC.Dot( nABC );
       Vec3 p = t * nABC;
-      if( p.Dot( p ) < g_EsplionSqr )
+      if( p.Dot( p ) < g_EsplionSq )
          {
          return true;
          }
@@ -315,7 +328,7 @@ bool CollisionDetector::GJKContainsOrigin( Simplex& simplex, Vec3& direction )
       float w = 1.f - va - vb;
 
       p = u * a + v * b + w * c;
-      if( p.Dot( p ) < g_EsplionSqr )
+      if( p.Dot( p ) < g_EsplionSq )
          {
          return true;
          }
@@ -504,17 +517,115 @@ void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr<
    
    }
 
-void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Simplex& simplex, Manifold& manifold )
+void CollisionDetector::EPAExpandToTetrahedron( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex )
    {
    // Expand the simplex to tetrahedron
    if( simplex.m_Size < 4 )
       {
-      // TODO: implement
+      if( simplex.m_Size == 1 )
+         {
+         const Vec3 searchDirs[] =
+            {
+            g_Right
+            , -g_Right
+            , g_Up
+            , -g_Up
+            , g_Forward
+            , -g_Forward
+            };
+         for(const auto& searchDir : searchDirs)
+            {
+            auto searchPoint = GetCSOSupportPoint( pColliderA, pColliderB, searchDir );
+            auto vec = ( searchPoint.m_PointCSO - simplex.m_Vertice[ 0 ].m_PointCSO );
+            if( vec.Dot( vec ) > g_EsplionSq )
+               {
+               simplex.Push( searchPoint );
+               }
+            }
+         }
+      if( simplex.m_Size == 2)
+         {
+         Vec3 lineDir = simplex.m_Vertice[ 1 ].m_PointCSO - simplex.m_Vertice[ 0 ].m_PointCSO;
+         Vec3 lestSignificantAxis( 1.f, 0.f, 0.f );
+
+         if( std::abs( lineDir.y ) < std::abs( lineDir.z ) && std::abs( lineDir.y ) < std::abs( lineDir.x ) )
+            {
+            lestSignificantAxis = g_Up;
+            
+            }
+         else if( std::abs( lineDir.z ) < std::abs( lineDir.y ) && std::abs( lineDir.z ) < std::abs( lineDir.x ) )
+            {
+            lestSignificantAxis = g_Forward;
+            }
+
+         Vec3 searchDir = lestSignificantAxis.Cross( lineDir );
+         searchDir.Normalize();
+         Mat3x3 rotMat;
+         rotMat.BuildAxisRad( searchDir, ENG_PI / 3.f );
+         for( int i = 0; i < 6; ++i )
+            {
+            auto searchPoint = GetCSOSupportPoint( pColliderA, pColliderB, searchDir );
+            if( searchPoint.m_PointCSO.Dot( searchPoint.m_PointCSO.Dot ) > g_EsplionSq )
+               {
+               simplex.Push( searchPoint );
+               break;
+               }
+            searchDir = rotMat * searchDir;
+            }
+
+
+         }
+
+      // size == 3
+      const Vec3 ab = simplex.m_Vertice[ 1 ].m_PointCSO - simplex.m_Vertice[ 0 ].m_PointCSO;
+      const Vec3 ac = simplex.m_Vertice[ 2 ].m_PointCSO - simplex.m_Vertice[ 0 ].m_PointCSO;
+      Vec3 searchDir = ab.Cross( ac );
+      searchDir.Normalize();
+      
+      auto searchPoint = GetCSOSupportPoint( pColliderA, pColliderB, searchDir );
+      if( searchPoint.m_PointCSO.Dot( searchPoint.m_PointCSO ) > g_EsplionSq )
+         {
+         simplex.Push( searchPoint );
+         }
+      else
+         {
+         GetCSOSupportPoint( pColliderA, pColliderB, -searchDir );
+         simplex.Push( searchPoint );
+         }
       }
 
-   // Initialize polytope
+   ENG_ASSERT( simplex.m_Size == 4 );
+   Vec3& pA = simplex.m_Vertice[ 0 ].m_PointCSO;
+   Vec3& pB = simplex.m_Vertice[ 1 ].m_PointCSO;
+   Vec3& pC = simplex.m_Vertice[ 2 ].m_PointCSO;
+   Vec3& pD = simplex.m_Vertice[ 3 ].m_PointCSO;
+
+   // Ensure the order of simplex
+   Vec3 ab = pB - pA;
+   Vec3 ac = pC - pA;
+   Vec3 n = ab.Cross( ac );
+   if( n.Dot( pD - pA ) > 0.f )
+      {
+      std::swap( simplex.m_Vertice[ 1 ], simplex.m_Vertice[ 2 ] );
+      }
+   }
+
+void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex, Manifold& manifold )
+   {
+   EPAExpandToTetrahedron( pColliderA, pColliderB, simplex );
+      
+   // Initialize polyhedron
    Polyhedron polyhedron;
-   // TODO: implement
+   shared_ptr< SupportPoint > a( ENG_NEW SupportPoint( simplex.m_Vertice[ 0 ] ) );
+   shared_ptr< SupportPoint > b( ENG_NEW SupportPoint( simplex.m_Vertice[ 1 ] ) );
+   shared_ptr< SupportPoint > c( ENG_NEW SupportPoint( simplex.m_Vertice[ 2 ] ) );
+   shared_ptr< SupportPoint > d( ENG_NEW SupportPoint( simplex.m_Vertice[ 3 ] ) );
+
+   polyhedron.AddFace( a, b, c );
+   polyhedron.AddFace( a, d, b );
+   polyhedron.AddFace( a, c, d );
+   polyhedron.AddFace( b, d, c );
+
 
    float prev_Distance = -std::numeric_limits<float>::max();
    shared_ptr<Face> best_face;
@@ -526,7 +637,7 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
       for( std::advance(faceIt, 1); faceIt != polyhedron.m_Faces.end(); ++faceIt )
          {
          // Since all faces are facing outward, we wanna find the largest negative value
-         if( best_face->m_Plane.GetD() < (*faceIt)->m_Plane.GetD() )
+         if( best_face->m_Plane.GetD() > (*faceIt)->m_Plane.GetD() )
             {
             best_face = ( *faceIt );
             }

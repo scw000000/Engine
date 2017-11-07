@@ -180,9 +180,9 @@ Vec3 Plane::GetProjectPoint( const Vec3& p ) const
    // project point r = p + tn
    // r dot n + d = 0
    // ( p + tn ) dot n + d = 0
-   // n.p + t + d = 0
-   // t = -( np + d )
-   return p + -( SignedDistance( p ) ) * n;
+   // n.p + t * (n dot n) + d = 0
+   // t = -( np + d ) / (n dot n)
+   return p -( SignedDistance( p ) ) * n;
    }
 
 float Plane::SignedDistance( const Vec3& p ) const

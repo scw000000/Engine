@@ -299,6 +299,13 @@ bool CollisionDetector::GJKContainsOrigin( Simplex& simplex, Vec3& direction )
       const Vec3& b = simplex.m_Vertice[ 1 ].m_PointCSO;
       const Vec3& c = simplex.m_Vertice[ 2 ].m_PointCSO;
       // just project the origin to the triangle
+      // project point p = O + t*n = tn
+      // (p dot N) + D = 0
+      // (t*N dot N ) + D = 0
+      // t = -D / N dot N
+      // a dot N + D = 0
+      // D = - a dot N
+      // t = (a dot N ) / N dot N
       auto nABC = ( b - a ).Cross( c - a );
       float t = a.Dot( nABC ) / nABC.Dot( nABC );
       Vec3 p = t * nABC;
@@ -627,6 +634,7 @@ void CollisionDetector::EPAExpandToTetrahedron( shared_ptr<ICollider> pColliderA
 
 void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex, Manifold& manifold )
    {
+   GJKContainsOrigin( simplex, g_Up );
    EPAExpandToTetrahedron( pColliderA, pColliderB, simplex );
       
    // Initialize polyhedron
@@ -659,7 +667,7 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
          }
       //  If the closest face is no closer by a threshold  
       // to the origin than the previously picked one, break;
-      if( best_face->m_Plane.GetD() - prev_Distance <= g_Esplion )
+      if( std::abs( prev_Distance ) - std::abs( best_face->m_Plane.GetD() ) <= g_Esplion )
          {
          break;
          }
@@ -670,7 +678,8 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
       }
 
    //  Project the origin onto the closest triangle.
-   auto projPoint = best_face->m_Plane.GetProjectPoint(Vec3::g_Zero);
+   // auto projPoint = best_face->m_Plane.GetProjectPoint(Vec3::g_Zero);
+   auto projPoint = -best_face->m_Plane.GetD() * best_face->m_Plane.GetNormal();
    // Compute the barycentric coordinates of this closest point using the vertices from this triangle.
    auto baryCoords = best_face->FindBarycentricCoords( projPoint );
    auto pA = ( best_face->m_Vertices[ 0 ].lock() );

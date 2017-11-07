@@ -67,11 +67,19 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
             {
             int i = 0;
             }
-         ENG_ASSERT( m_pCollisionDetector->CollisionDetection(
+         if( m_pCollisionDetector->CollisionDetection(
             leftPair->first,
             rightPair->first,
             manifold
-            ) == false );
+            ) )
+            {
+            ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[0].m_PenetrationDepth ) );
+            }
+         /*ENG_ASSERT( m_pCollisionDetector->CollisionDetection(
+            leftPair->first,
+            rightPair->first,
+            manifold
+            ) == false );*/
          }
      // ENG_ASSERT(  )
       //m_pCollisionDetector->

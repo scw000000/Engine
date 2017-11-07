@@ -15,7 +15,22 @@
 
 class RigidBody;
 class ICollider;
-struct SupportPoint;
+
+struct SupportPoint
+   {
+      public:
+      SupportPoint( const Vec3& pCSO, const Vec3& pA, const Vec3& pB )
+         : m_PointCSO( pCSO ), m_PointA( pA ), m_PointB( pB )
+         {}
+      SupportPoint( const Vec3& pA, const Vec3& pB )
+         : m_PointCSO( pA - pB ), m_PointA( pA ), m_PointB( pB )
+         {}
+      SupportPoint( void ) {}
+      public:
+      Vec3 m_PointCSO;
+      Vec3 m_PointA;
+      Vec3 m_PointB;
+   };
 
 struct ContactPoint
    {
@@ -39,20 +54,7 @@ struct Manifold
       void AddContactPoint( const SupportPoint& newPoint );
    };
 
-struct SupportPoint 
-   {
-   public:
-   SupportPoint( const Vec3& pCSO, const Vec3& pA, const Vec3& pB) 
-      : m_PointCSO( pCSO ), m_PointA( pA ), m_PointB( pB ){ }
-   SupportPoint( const Vec3& pA, const Vec3& pB )
-      : m_PointCSO( pA - pB ), m_PointA( pA ), m_PointB( pB )
-      {}
-   SupportPoint( void ) {}
-   public:
-   Vec3 m_PointCSO;
-   Vec3 m_PointA;
-   Vec3 m_PointB;
-   };
+
 
 class Simplex
    {

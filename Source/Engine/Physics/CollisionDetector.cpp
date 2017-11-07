@@ -455,11 +455,22 @@ bool CollisionDetector::GJK( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
    return false;
    }
 
+class EdgePair
+   {
+   public:
+   EdgePair( shared_ptr< SupportPoint > f, shared_ptr< SupportPoint > s ) : first( f ), second( s )
+      {
+      }
+
+   shared_ptr< SupportPoint > first;
+   shared_ptr< SupportPoint > second;
+   };
+
 //  Remove all faces from the polytope that can be ¡§seen¡¨ by this new support point, 
 // and add new faces to cover up the ¡§hole¡¨ on the polytope, new support point is the common vertex
 void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr< SupportPoint > pNewPoint )
    {
-   std::unordered_set< std::pair< shared_ptr< SupportPoint >, shared_ptr< SupportPoint > > > edgePairs;
+   std::unordered_map< shared_ptr< SupportPoint >, std::unordered_set<shared_ptr< SupportPoint >> > edgeMap;
    // For each faces, test the direction
    for( auto pFaceIt = polyhedron.m_Faces.begin(); pFaceIt != polyhedron.m_Faces.end(); )
       {
@@ -488,16 +499,16 @@ void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr<
          for( int i = 0; i < 3; ++i )
             {
             int j = ( i + 1 ) % 3;
-            auto findIt = edgePairs.find( std::make_pair( verticesInFace[ j ], verticesInFace[ i ] ) );
+            auto findIt = edgeMap.find( verticesInFace[ j ] );
             // for each edge in reverse order, add to temporal edge set if it doesn't exist
-            if( findIt == edgePairs.end() )
+            if( findIt == edgeMap.end() || ( *findIt ).second.find( verticesInFace[ i ] ) == ( *findIt ).second.end() )
                {
-               edgePairs.insert( std::make_pair( verticesInFace[ i ], verticesInFace[ j ] ) );
+               edgeMap[ verticesInFace[ i ] ].insert( verticesInFace[ j ] );
                }
             // else remove it
             else
                {
-               edgePairs.erase( findIt );
+               ( *findIt ).second.erase( verticesInFace[ i ] );
                }
             }
          
@@ -510,9 +521,13 @@ void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr<
 
    // for each of the rest edges these are only added to the set once
    // so new faces are formed by the edge and new point
-   for( auto& edge : edgePairs )
+   for( auto& vertexFrom : edgeMap )
       {
-      polyhedron.AddFace( edge.first, edge.second, pNewPoint );
+      for( auto& connectVertex : vertexFrom.second )
+         {
+         polyhedron.AddFace( vertexFrom.first, connectVertex, pNewPoint );
+         }
+    //  polyhedron.AddFace( edge.first, edge.second, pNewPoint );
       }
    
    }
@@ -565,7 +580,7 @@ void CollisionDetector::EPAExpandToTetrahedron( shared_ptr<ICollider> pColliderA
          for( int i = 0; i < 6; ++i )
             {
             auto searchPoint = GetCSOSupportPoint( pColliderA, pColliderB, searchDir );
-            if( searchPoint.m_PointCSO.Dot( searchPoint.m_PointCSO.Dot ) > g_EsplionSq )
+            if( searchPoint.m_PointCSO.Dot( searchPoint.m_PointCSO ) > g_EsplionSq )
                {
                simplex.Push( searchPoint );
                break;
@@ -648,6 +663,7 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
          {
          break;
          }
+      prev_Distance = best_face->m_Plane.GetD();
       // Find new point;
       shared_ptr< SupportPoint > newPoint( ENG_NEW SupportPoint( GetCSOSupportPoint( pColliderA, pColliderB, best_face->m_Plane.GetNormal() ) ) );
       EPAExpandPolyhedron( polyhedron, newPoint );

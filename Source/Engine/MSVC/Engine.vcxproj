@@ -181,6 +181,7 @@
     <ClCompile Include="..\Physics\PhysicsDebugDrawer.cpp" />
     <ClCompile Include="..\Physics\Raycast.cpp" />
     <ClCompile Include="..\Physics\RigidBody.cpp" />
+    <ClCompile Include="..\Physics\RigidBodySolver.cpp" />
     <ClCompile Include="..\ResourceCache\DevResourceFile.cpp" />
     <ClCompile Include="..\ResourceCache\MeshResource.cpp" />
     <ClCompile Include="..\ResourceCache\ResourceCache.cpp" />
@@ -287,6 +288,7 @@
     <ClInclude Include="..\Physics\PhysicsDebugDrawer.h" />
     <ClInclude Include="..\Physics\Raycast.h" />
     <ClInclude Include="..\Physics\RigidBody.h" />
+    <ClInclude Include="..\Physics\RigidBodySolver.h" />
     <ClInclude Include="..\ResourceCache\DevResourceFile.h" />
     <ClInclude Include="..\ResourceCache\MeshResource.h" />
     <ClInclude Include="..\ResourceCache\ResourceCache.h" />

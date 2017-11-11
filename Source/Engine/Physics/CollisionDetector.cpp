@@ -21,8 +21,15 @@
 const float g_Esplion = 0.0001f;
 const float g_EsplionSq = g_Esplion * g_Esplion;
 
+ContactPoint::ContactPoint( void ) :
+   m_AccumulatedImpulse( 0.f )
+   , m_PenetrationDepth( 0.f )
+   {
+   }
+
 ContactPoint::ContactPoint( const SupportPoint& supportPoint ) 
    : m_SupportPoint( supportPoint )
+   , m_AccumulatedImpulse( 0.f )
    {
    auto vBA = supportPoint.m_PointA - supportPoint.m_PointB;
    // calculate normal and depth

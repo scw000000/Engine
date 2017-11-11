@@ -340,6 +340,9 @@
     <ClCompile Include="..\Physics\CollisionDetector.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Physics\RigidBodySolver.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -636,6 +639,9 @@
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\Physics\CollisionDetector.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\RigidBodySolver.h">
       <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>

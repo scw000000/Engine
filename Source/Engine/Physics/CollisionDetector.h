@@ -42,12 +42,12 @@ struct Jacobian
 struct ContactPoint
    {
    public:
-   ContactPoint( void ) {};
+   ContactPoint( void );
    ContactPoint( const SupportPoint& supportPoint );
       Vec3 m_Normal;
       float m_PenetrationDepth;
       SupportPoint m_SupportPoint;
-
+      float m_AccumulatedImpulse;
       Jacobian m_Jacobian;
    };
 

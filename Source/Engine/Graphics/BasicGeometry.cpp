@@ -152,6 +152,7 @@ bool BasicGeometry::Init()
 
 void BasicGeometry::RenderGeometry( BasicGeometry::GeometryTypes geometryType, Color color, Mat4x4 mvp )
    {
+   glDisable( GL_CULL_FACE );
    // glLineWidth(10.f);
    glDepthFunc( GL_ALWAYS );
    // save previous render mode
@@ -188,4 +189,5 @@ void BasicGeometry::RenderGeometry( BasicGeometry::GeometryTypes geometryType, C
    glDepthFunc( GL_LEQUAL );
    glPolygonMode( GL_BACK, prevPolygonMode[0] );
    glPolygonMode( GL_FRONT, prevPolygonMode[1] );
+   glEnable( GL_CULL_FACE );
    }

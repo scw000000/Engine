@@ -39,10 +39,10 @@ Vec3 Face::FindBarycentricCoords( const Vec3& point )
    const Vec3& a = m_Vertices[ 0 ].lock()->m_PointCSO;
    const Vec3& b = m_Vertices[ 1 ].lock()->m_PointCSO;
    const Vec3& c = m_Vertices[ 2 ].lock()->m_PointCSO;
-
-   float va = m_Plane.GetNormal().Dot( ( b - point ).Cross( c - point ) );
-   float vb = m_Plane.GetNormal().Dot( ( c - point ).Cross( a - point ) );
-   float vc = m_Plane.GetNormal().Dot( ( a - point ).Cross( b - point ) );
+   auto n = m_Plane.GetNormal();
+   float va = n.Dot( ( b - point ).Cross( c - point ) );
+   float vb = n.Dot( ( c - point ).Cross( a - point ) );
+   float vc = n.Dot( ( a - point ).Cross( b - point ) );
 
    float u = va / ( va + vb + vc );
    float v = vb / ( va + vb + vc );
@@ -484,6 +484,7 @@ void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr<
       // if the face can be seen by the point, try to delete the face
       if( ( *pFaceIt )->m_Plane.IsAbove( pNewPoint->m_PointCSO ) )
          {
+         // This face can be seen by the point
          std::vector< shared_ptr< SupportPoint > > verticesInFace = 
             {
             ( *pFaceIt )->m_Vertices[ 0 ].lock(),
@@ -505,14 +506,15 @@ void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr<
          
          for( int i = 0; i < 3; ++i )
             {
+            // for each edge i - j 
             int j = ( i + 1 ) % 3;
             auto findIt = edgeMap.find( verticesInFace[ j ] );
-            // for each edge in reverse order, add to temporal edge set if it doesn't exist
+            // if edge j - i does not exist, add edge i - j to temporal edge set 
             if( findIt == edgeMap.end() || ( *findIt ).second.find( verticesInFace[ i ] ) == ( *findIt ).second.end() )
                {
                edgeMap[ verticesInFace[ i ] ].insert( verticesInFace[ j ] );
                }
-            // else remove it
+            // else remove edge j - i
             else
                {
                ( *findIt ).second.erase( verticesInFace[ i ] );
@@ -530,6 +532,7 @@ void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr<
    // so new faces are formed by the edge and new point
    for( auto& vertexFrom : edgeMap )
       {
+      ENG_ASSERT( vertexFrom.second.size() <= 1);
       for( auto& connectVertex : vertexFrom.second )
          {
          polyhedron.AddFace( vertexFrom.first, connectVertex, pNewPoint );
@@ -660,14 +663,14 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
       for( std::advance(faceIt, 1); faceIt != polyhedron.m_Faces.end(); ++faceIt )
          {
          // Since all faces are facing outward, we wanna find the largest negative value
-         if( best_face->m_Plane.GetD() > (*faceIt)->m_Plane.GetD() )
+         if( best_face->m_Plane.GetD() < (*faceIt)->m_Plane.GetD() )
             {
             best_face = ( *faceIt );
             }
          }
-      //  If the closest face is no closer by a threshold  
+      //  If the closest face is no larger by a threshold  
       // to the origin than the previously picked one, break;
-      if( std::abs( prev_Distance ) - std::abs( best_face->m_Plane.GetD() ) <= g_Esplion )
+      if( std::abs( prev_Distance - best_face->m_Plane.GetD() ) <= g_Esplion )
          {
          break;
          }
@@ -679,12 +682,16 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
 
    //  Project the origin onto the closest triangle.
    // auto projPoint = best_face->m_Plane.GetProjectPoint(Vec3::g_Zero);
-   auto projPoint = -best_face->m_Plane.GetD() * best_face->m_Plane.GetNormal();
+   // auto projPoint = -best_face->m_Plane.GetD() * best_face->m_Plane.GetNormal();
    // Compute the barycentric coordinates of this closest point using the vertices from this triangle.
-   auto baryCoords = best_face->FindBarycentricCoords( projPoint );
+   auto baryCoords = best_face->FindBarycentricCoords( Vec3::g_Zero );
    auto pA = ( best_face->m_Vertices[ 0 ].lock() );
    auto pB = ( best_face->m_Vertices[ 1 ].lock() );
    auto pC = ( best_face->m_Vertices[ 2 ].lock() );
+
+   // ENG_ASSERT( baryCoords.x > 0.f && baryCoords.x < 1.f );
+   // ENG_ASSERT( baryCoords.y > 0.f && baryCoords.y < 1.f );
+   // ENG_ASSERT( baryCoords.z > 0.f && baryCoords.z < 1.f );
 
    SupportPoint contactPoint( baryCoords.x * pA->m_PointA
                               + baryCoords.y * pB->m_PointA

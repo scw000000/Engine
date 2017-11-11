@@ -54,45 +54,49 @@ void PEPhysics::VSyncRigidBodyToRenderComponent( StrongRenderComponentPtr pRende
 
 void PEPhysics::VOnUpdate( const float deltaSeconds )
    {
-   if(!m_IsSimulating)
-      {
-      return;
-      }
-   Manifold manifold;
-   for( auto leftPair = m_RigidBodyToRenderComp.begin(); leftPair != m_RigidBodyToRenderComp.end(); ++leftPair )
-      {
-      for( auto rightPair = std::next(leftPair, 1) ; rightPair != m_RigidBodyToRenderComp.end(); ++rightPair )
-         {
-         if( leftPair->first->m_Transform.GetToWorldPosition().y > -3.92f )
-            {
-            int i = 0;
-            }
-         if( m_pCollisionDetector->CollisionDetection(
-            leftPair->first,
-            rightPair->first,
-            manifold
-            ) )
-            {
-            ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[0].m_PenetrationDepth ) );
-            ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
-            ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
-            }
-         /*ENG_ASSERT( m_pCollisionDetector->CollisionDetection(
-            leftPair->first,
-            rightPair->first,
-            manifold
-            ) == false );*/
-         }
-     // ENG_ASSERT(  )
-      //m_pCollisionDetector->
-      }
+   //if(!m_IsSimulating)
+   //   {
+   //   return;
+   //   }
+   //
+   //for( auto leftPair = m_RigidBodyToRenderComp.begin(); leftPair != m_RigidBodyToRenderComp.end(); ++leftPair )
+   //   {
+   //   for( auto rightPair = std::next(leftPair, 1) ; rightPair != m_RigidBodyToRenderComp.end(); ++rightPair )
+   //      {
+   //      Manifold manifold;
+   //      if( m_pCollisionDetector->CollisionDetection(
+   //         leftPair->first,
+   //         rightPair->first,
+   //         manifold
+   //         ) )
+   //         {
+   //         ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[0].m_PenetrationDepth ) );
+   //         ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
+   //         ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
+   //         Mat4x4 m;
+   //         auto pScene = g_pApp->m_pEngineLogic->m_pWrold;
+   //         auto pv = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView();
+   //         m.SetToWorldPosition( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA );
+   //         SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Yellow, pv * m );
+   //         m.SetToWorldPosition( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB );
+   //         SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Yellow, pv * m );
+   //         }
+   //      /*ENG_ASSERT( m_pCollisionDetector->CollisionDetection(
+   //         leftPair->first,
+   //         rightPair->first,
+   //         manifold
+   //         ) == false );*/
+   //      }
+   //  // ENG_ASSERT(  )
+   //   //m_pCollisionDetector->
+   //   }
 
-   for(auto& pair : m_RigidBodyToRenderComp )
-      {
-      ApplyGravity( pair.first );
-      // pair.first->MoveForOneTimeStep( deltaSeconds );
-      pair.first->MoveForOneTimeStep( 0.1 );
-      }
+   //for(auto& pair : m_RigidBodyToRenderComp )
+   //   {
+   //   ApplyGravity( pair.first );
+   //   // pair.first->MoveForOneTimeStep( deltaSeconds );
+   //   pair.first->MoveForOneTimeStep( 0.1 );
+   //   }
    }
 
 // Initialization of Physics Objects
@@ -127,6 +131,54 @@ void PEPhysics::VRemoveRenderComponent( StrongRenderComponentPtr pRenderComp )
 
 void PEPhysics::VRenderDiagnostics( void )
    {
+   if( !m_IsSimulating )
+      {
+    //  return;
+      }
+
+   for( auto leftPair = m_RigidBodyToRenderComp.begin(); leftPair != m_RigidBodyToRenderComp.end(); ++leftPair )
+      {
+      for( auto rightPair = std::next( leftPair, 1 ); rightPair != m_RigidBodyToRenderComp.end(); ++rightPair )
+         {
+         Manifold manifold;
+         if( m_pCollisionDetector->CollisionDetection(
+            leftPair->first,
+            rightPair->first,
+            manifold
+            ) )
+            {
+            ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
+           // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
+            //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
+            Mat4x4 m;
+            m.MultScale( Vec3(0.1f, 0.1f, 0.1f) );
+            auto pScene = g_pApp->m_pEngineLogic->m_pWrold;
+            auto pv = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView();
+            m.SetToWorldPosition( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA );
+            SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv * m );
+            m.SetToWorldPosition( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB );
+            SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Green, pv * m );
+            }
+         /*ENG_ASSERT( m_pCollisionDetector->CollisionDetection(
+         leftPair->first,
+         rightPair->first,
+         manifold
+         ) == false );*/
+         }
+      // ENG_ASSERT(  )
+      //m_pCollisionDetector->
+      }
+   
+   for( auto& pair : m_RigidBodyToRenderComp )
+      {
+      if( !m_IsSimulating )
+         {
+         break;
+         }
+      ApplyGravity( pair.first );
+      // pair.first->MoveForOneTimeStep( deltaSeconds );
+      pair.first->MoveForOneTimeStep( 0.1 );
+      }
    auto pScene = g_pApp->m_pEngineLogic->m_pWrold;
    auto pv = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView();
    for(auto& mapPair : m_RigidBodyToRenderComp)

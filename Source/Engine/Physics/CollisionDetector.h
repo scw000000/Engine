@@ -112,7 +112,7 @@ struct Face {
    Vec3 FindBarycentricCoords( const Vec3& point );
 
    Plane m_Plane;
-   // These verices must be ordered in CCW order
+   // These vertices must be ordered in CCW order
    weak_ptr<SupportPoint> m_Vertices[ 3 ];
    };
 

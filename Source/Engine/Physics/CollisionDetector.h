@@ -32,6 +32,13 @@ struct SupportPoint
       Vec3 m_PointB;
    };
 
+struct Jacobian
+   {
+      public:
+      Vec3 m_NCrossRA;
+      Vec3 m_RBCrossN;
+   };
+
 struct ContactPoint
    {
    public:
@@ -40,6 +47,8 @@ struct ContactPoint
       Vec3 m_Normal;
       float m_PenetrationDepth;
       SupportPoint m_SupportPoint;
+
+      Jacobian m_Jacobian;
    };
 
 struct Manifold

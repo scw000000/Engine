@@ -70,6 +70,8 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
    //         manifold
    //         ) )
    //         {
+   //         manifold.pRigidBodyA = leftPair->first;
+   //         manifold.pRigidBodyB = rightPair->first;
    //         ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[0].m_PenetrationDepth ) );
    //         ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
    //         ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
@@ -147,6 +149,8 @@ void PEPhysics::VRenderDiagnostics( void )
             manifold
             ) )
             {
+            manifold.pRigidBodyA = leftPair->first;
+            manifold.pRigidBodyB = rightPair->first;
             ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
            // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
             //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
@@ -171,6 +175,7 @@ void PEPhysics::VRenderDiagnostics( void )
    
    for( auto& pair : m_RigidBodyToRenderComp )
       {
+      // for debugging
       if( !m_IsSimulating )
          {
          break;

@@ -53,7 +53,7 @@ bool PhysicsComponent::VDelegateInit( TiXmlElement* pData )
 
 void PhysicsComponent::VDelegatePostInit( void )
    {
-   m_pPhysicsAttributes->VAddRigidBody( VGetSelfStrongRenderCompPtr() );
+   m_pPhysicsAttributes->VAddRigidBody( VGetSelfStrongRenderCompPtr(), m_pPhysicsAttributes );
 
    }
 

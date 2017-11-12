@@ -15,6 +15,7 @@
                     <Rotate />
                     <Collision />
                 </Movement>
+                <SubstanceData/>
                 <ShapeData />
                 <CollisionFlags>
                     <StaticObject  />

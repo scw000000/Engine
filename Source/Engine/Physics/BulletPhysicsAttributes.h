@@ -13,8 +13,10 @@
  *
  * \note
 */
-
+#include "Physics.h"
 #include "PhysicsAttributes.h"
+
+// struct MaterialData;
 
 class BulletPhysicsAttributes : public IPhysicsAttributes
    {
@@ -29,8 +31,8 @@ class BulletPhysicsAttributes : public IPhysicsAttributes
       virtual Vec3 VGetRotationFactor( void ) const override { return m_RotateFactor; }
       virtual CollisionId VGetCollisionId( void ) const override { return m_CollisionId; }
       virtual std::string VGetShpae( void ) const override { return m_Shape; }
-      virtual std::string VGetDensity( void ) const override { return m_Density; }
-      virtual std::string VGetMaterial( void ) const override { return m_Material; }
+      virtual float VGetDensity( void ) const override { return 0.f; /*return m_Density;*/ }
+      virtual MaterialData VGetMaterial( void ) const override { return MaterialData(); /*return m_Material; */ }
       virtual bool VIsLinkedToPhysicsWorld( void ) const override { return m_IsLinkedToPhysicsWorld; }
       virtual void VSetIsLinkedToPhysicsWorld( bool isLinked ) override { m_IsLinkedToPhysicsWorld = isLinked; }
       virtual void VSetTransform( const Transform& transform ) override;
@@ -74,7 +76,7 @@ class BulletSpherePhysicsAttributes : public BulletPhysicsAttributes
       virtual bool VDelegateInit( TiXmlElement* pData ) override;
       virtual void VDelegateGenerateXML( TiXmlElement* pParent ) const override;
       virtual void VSetScale( const Vec3& scale ) override;
-      virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp ) override;
+      virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<IPhysicsAttributes> pPhysicsAttr ) override;
       void SetRadius( float radius ) { m_Radius = radius; }
       private:
       float m_Radius;
@@ -88,7 +90,7 @@ class BulletBoxPhysicsAttributes : public BulletPhysicsAttributes
       virtual bool VDelegateInit( TiXmlElement* pData ) override;
       virtual void VDelegateGenerateXML( TiXmlElement* pParent ) const override;
       virtual void VSetScale( const Vec3& scale ) override;
-      virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp ) override;
+      virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<IPhysicsAttributes> pPhysicsAttr ) override;
       void SetSize( const Vec3& size ) { m_Size = size; }
 
       private:

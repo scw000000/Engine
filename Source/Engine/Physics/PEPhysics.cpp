@@ -18,6 +18,7 @@
 #include "PEPhysicsAttributes.h"
 #include "RigidBodySolver.h"
 #include "..\Graphics\BasicGeometry.h"
+#include "..\ResourceCache\XmlResource.h"
 
 PEPhysics::~PEPhysics( void )
    {
@@ -31,10 +32,47 @@ PEPhysics::PEPhysics( void )
 
    }
 
+void PEPhysics::LoadConfig()
+   {
+   // Load the physics config file and grab the root XML node
+   shared_ptr< Resource > pPhysicsRes( ENG_NEW Resource( "config\\Physics.xml", g_pApp->m_EngineOptions.GetIsUsingDevDirectory() ) );
+
+   TiXmlElement* pRoot = XmlResourceLoader::LoadAndReturnRootXmlElement( pPhysicsRes );
+   ENG_ASSERT( pRoot );
+
+   // load all materials
+   TiXmlElement* pParentNode = pRoot->FirstChildElement( "PhysicsMaterials" );
+   ENG_ASSERT( pParentNode );
+   for( TiXmlElement* pNode = pParentNode->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
+      {
+      double restitution = 0;
+      double friction = 0;
+      pNode->Attribute( "restitution", &restitution );
+      pNode->Attribute( "friction", &friction );
+      m_MaterialTable.insert( std::make_pair( pNode->Value(), MaterialData( ( float ) restitution, ( float ) friction ) ) );
+      }
+
+   // load all densities
+   pParentNode = pRoot->FirstChildElement( "DensityTable" );
+   ENG_ASSERT( pParentNode );
+   for( TiXmlElement* pNode = pParentNode->FirstChildElement(); pNode; pNode = pNode->NextSiblingElement() )
+      {
+      // Insert ( substance name, substance density )
+      m_DensityTable.insert( std::make_pair( pNode->Value(), ( float ) atof( pNode->FirstChild()->Value() ) ) );
+      }
+   pParentNode = pRoot->FirstChildElement( "CollisionTable" );
+   ENG_ASSERT( pParentNode );
+
+   ENG_ASSERT( CollisionTable::GetSingleton().Init( pParentNode ) );
+
+   }
+
 bool PEPhysics::VInitialize()
    {
    m_pCollisionDetector = shared_ptr< CollisionDetector >( ENG_NEW CollisionDetector() );
    m_pRigidBodySolver = shared_ptr< RigidBodySolver >( ENG_NEW RigidBodySolver() );
+
+   LoadConfig();
    return true;
    }
 
@@ -151,11 +189,11 @@ void PEPhysics::VRemoveRenderComponent( StrongRenderComponentPtr pRenderComp )
 
 void PEPhysics::VRenderDiagnostics( void )
    {
-   if( !m_IsSimulating )
-      {
-    //  return;
-      }
-   
+   //if( !m_IsSimulating )
+   //   {
+   // //  return;
+   //   }
+   //
    auto pScene = g_pApp->m_pEngineLogic->m_pWrold;
    auto pv = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView();
    for(auto& mapPair : m_RigidBodyToRenderComp)
@@ -163,7 +201,6 @@ void PEPhysics::VRenderDiagnostics( void )
       auto m = mapPair.first->m_Transform.GetToWorld();
       for(auto& collider : mapPair.first->m_Colliders ){
          collider->VRenderShape( m, pv );
-        // SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, m * pv );
          }
       }
 
@@ -353,6 +390,30 @@ void PEPhysics::VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<
 
    pRB->UpdateRigidBodyInfo();
    VLinkRenderCompAttribute( pRenderComp );
+   }
+
+bool PEPhysics::QueryDensity( const std::string& substance, float& returnVal ) const 
+   {
+   auto findIt = m_DensityTable.find( substance );
+   if(findIt == m_DensityTable.end())
+      {
+      return false;
+      }      
+   returnVal = findIt->second;
+
+   return true;
+   }
+
+bool PEPhysics::QueryMaterialData( const std::string& material, MaterialData& returnVal ) const 
+   {
+   auto findIt = m_MaterialTable.find( material );
+   if( findIt == m_MaterialTable.end() )
+      {
+      return false;
+      }
+   returnVal = findIt->second;
+
+   return true;
    }
 
 void PEPhysics::ApplyGravity( shared_ptr<RigidBody> pRigidBody, float deltaSeconds )

@@ -19,22 +19,26 @@
 #include "BulletPhysicsAttributes.h"
 #include "RigidBody.h"
 
-shared_ptr<ICollider> PESphereColliderAttributes::VCreateCollider( StrongRenderComponentPtr pRenderComp )
+shared_ptr<ICollider> PESphereColliderAttributes::VCreateCollider( StrongRenderComponentPtr pRenderComp, shared_ptr< IPhysicsAttributes > pPhtsicsAttr )
    {
    auto pCollider = shared_ptr<ICollider>( ENG_NEW SphereCollider(
       pRenderComp->VGetTransformPtr()->GetScale().x * m_Radius) );
+   float density = pPhtsicsAttr->VGetDensity();
+
    pCollider->SetInertia( Mat3x3::g_Identity );
    pCollider->SetMass( 1.f );
+
    return pCollider;
    }
 
-shared_ptr<ICollider> PEBoxColliderAttributes::VCreateCollider( StrongRenderComponentPtr pRenderComp )
+shared_ptr<ICollider> PEBoxColliderAttributes::VCreateCollider( StrongRenderComponentPtr pRenderComp, shared_ptr< IPhysicsAttributes > pPhtsicsAttr )
    {
+   auto dimenstionWS = pRenderComp->VGetTransformPtr()->GetScale() * m_Dimension;
    // The input should be half size of the box
-   auto pCollider = shared_ptr<ICollider>( ENG_NEW BoxCollider(
-      pRenderComp->VGetTransformPtr()->GetScale() * m_Dimension * 0.5f ) );
+   auto pCollider = shared_ptr<ICollider>( ENG_NEW BoxCollider( dimenstionWS * 0.5f ) );
+   float density = pPhtsicsAttr->VGetDensity();
    pCollider->SetInertia( Mat3x3::g_Identity );
-   pCollider->SetMass( 1.f );
+   pCollider->SetMass( dimenstionWS.x * dimenstionWS.y * dimenstionWS.z * density );
    return pCollider;
    }
 
@@ -49,8 +53,8 @@ PEPhysicsAttributes::PEPhysicsAttributes( void ) // : m_TransLateFactor( Vec3::g
    m_MaxAngularVelocity = 0;
 
  //  m_Shape = "unknown";
-//   m_Density = "empty";
- //  m_Material = "None";
+   m_Density = 0.f;
+   // m_Material = "None";
 
 //   m_pRigidBody = NULL;
    m_IsLinkedToPhysicsWorld = false;
@@ -67,6 +71,11 @@ shared_ptr< IPhysicsAttributes > PEPhysicsAttributes::GetInstanceFromShape( TiXm
       }
 
    shared_ptr< PEPhysicsAttributes > retAttr( ENG_NEW PEPhysicsAttributes() );
+   if( !retAttr || ( retAttr && !retAttr->VInit( pData ) ) ) // not supported shape or Init failed
+      {
+      return shared_ptr< IPhysicsAttributes >();
+      }
+
    for( auto pShapeNode = pFirstShapeNode; pShapeNode; pShapeNode = pShapeNode->NextSiblingElement() )
       {
       if( std::string( pShapeNode->Value() ).compare( "ShapeData" ) )
@@ -90,12 +99,6 @@ shared_ptr< IPhysicsAttributes > PEPhysicsAttributes::GetInstanceFromShape( TiXm
             newColliderAttribute->m_Radius = 1.f;
             return false;
             }
-         pShapeNode->QueryFloatAttribute( "density", &newColliderAttribute->m_Density );
-
-         if( pShapeNode->Attribute( "material" ) )
-            {
-            newColliderAttribute->m_Material = pShapeNode->Attribute( "material" );
-            }
          }
       else if( !shapeName.compare( "box" ) )
          {
@@ -108,19 +111,9 @@ shared_ptr< IPhysicsAttributes > PEPhysicsAttributes::GetInstanceFromShape( TiXm
             {
             newColliderAttribute->m_Dimension = Vec3::g_Identity;
             }
-         pShapeNode->QueryFloatAttribute( "density", &newColliderAttribute->m_Density );
-
-         if( pShapeNode->Attribute( "material" ) )
-            {
-            newColliderAttribute->m_Material = pShapeNode->Attribute( "material" );
-            }
          }
      }
   
-   if( !retAttr || ( retAttr && !retAttr->VInit( pData ) ) ) // not supported shape or Init failed
-      {
-      return shared_ptr< IPhysicsAttributes >();
-      }
    return retAttr;
    }
 
@@ -151,6 +144,22 @@ bool PEPhysicsAttributes::VInit( TiXmlElement* pData )
          }
       }
 
+   TiXmlElement* pSubstance = pData->FirstChildElement( "SubstanceData" );
+   if( pSubstance )
+      {
+      if( pSubstance->Attribute( "density" ) )
+         {
+         std::string densityStr = pSubstance->Attribute( "density" );
+         IGamePhysics::GetSingleton().QueryDensity( densityStr, m_Density );
+         }
+
+      if( pSubstance->Attribute( "material" ) )
+         {
+         std::string materialStr = pSubstance->Attribute( "material" );
+         IGamePhysics::GetSingleton().QueryMaterialData( materialStr, m_Material );
+         // m_Material = pSubstance->Attribute( "material" );
+         }
+      }
    //TiXmlElement* pShape = pData->FirstChildElement( "ShapeData" );
    //if( pShape )
    //   {
@@ -234,13 +243,13 @@ void PEPhysicsAttributes::VSetTransform( const Transform& transform )
    //m_pRigidBody->activate();
    }
 
-void PEPhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp )
+void PEPhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<IPhysicsAttributes> pPhysicsAttr )
    {
    ENG_ASSERT(pRenderComp);
    m_pRigidBody = shared_ptr<RigidBody>( ENG_NEW RigidBody() );
    for( auto& pColliderAttr : m_ColliderAttributes )
       {
-      auto pNewCollider = pColliderAttr->VCreateCollider( pRenderComp );
+      auto pNewCollider = pColliderAttr->VCreateCollider( pRenderComp, pPhysicsAttr );
       m_pRigidBody->AddCollider( pNewCollider );
       pNewCollider->SetRigidBody(m_pRigidBody );
       }
@@ -306,87 +315,4 @@ TiXmlElement* PEPhysicsAttributes::VGenerateXML( void ) const
    XMLHelper::SetAttribute( pFlagSetting, "enable", ( m_CollisionFlags & btCollisionObject::CF_DISABLE_SPU_COLLISION_PROCESSING ) != 0 );
 
    return pRootNode;
-   }
-
-PESpherePhysicsAttributes::PESpherePhysicsAttributes( void )
-   {
-   m_Radius = 1.f;
-   }
-
-bool PESpherePhysicsAttributes::VDelegateInit( TiXmlElement* pData )
-   {
-   std::string shapeName = pData->Attribute( "shape" );
-   if( shapeName.compare( "sphere" ) )
-      {
-      return false;
-      }
-   if( pData->QueryFloatAttribute( "radius", &m_Radius ) != TIXML_SUCCESS || m_Radius <= 0.f )
-      {
-      m_Radius = 1.f;
-      return false;
-      }
-   return true;
-   }
-
-void PESpherePhysicsAttributes::VDelegateGenerateXML( TiXmlElement* pParent ) const
-   {
-   TiXmlElement* pRoot = ENG_NEW TiXmlElement( "ShapeData" );
-   pParent->LinkEndChild( pRoot );
-   pRoot->SetAttribute( "shape", "sphere" );
-   XMLHelper::SetAttribute( pRoot, "radius", m_Radius );
-   }
-
-void PESpherePhysicsAttributes::VSetScale( const Vec3& scale )
-   {
-//   auto pShpereShape = dynamic_cast< btSphereShape* >( m_pRigidBody->getCollisionShape() );
-//   ENG_ASSERT( pShpereShape );
-//   pShpereShape->setUnscaledRadius( m_Radius * scale.x );
-   }
-
-void PESpherePhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp )
-   {
-   IGamePhysics::GetSingleton().VAddSphere( pRenderComp->VGetTransformPtr()->GetScale().x * m_Radius,
-                                            pRenderComp );
-   }
-
-PEBoxPhysicsAttributes::PEBoxPhysicsAttributes( void ) : m_Size( Vec3::g_Identity )
-   {
-
-   }
-
-bool PEBoxPhysicsAttributes::VDelegateInit( TiXmlElement* pData )
-   {
-   std::string shapeName = pData->Attribute( "shape" );
-   if( shapeName.compare( "box" ) )
-      {
-      return false;
-      }
-   m_Size.Init( pData );
-   if( m_Size.x <= 0.f || m_Size.y <= 0.f || m_Size.z <= 0.f )
-      {
-      m_Size = Vec3::g_Identity;
-      return false;
-      }
-   return true;
-   }
-
-void PEBoxPhysicsAttributes::VDelegateGenerateXML( TiXmlElement* pParent ) const
-   {
-   TiXmlElement* pRoot = ENG_NEW TiXmlElement( "ShapeData" );
-   pParent->LinkEndChild( pRoot );
-   pRoot->SetAttribute( "shape", "box" );
-   XMLHelper::SetAttribute( pRoot, m_Size );
-   }
-
-void PEBoxPhysicsAttributes::VSetScale( const Vec3& scale )
-   {
-//   auto pBoxShape = dynamic_cast< btBoxShape* >( m_pRigidBody->getCollisionShape() );
-//   ENG_ASSERT( pBoxShape );
-//s   pBoxShape->setImplicitShapeDimensions( Vec3_to_btVector3( m_Size * scale ) );
-   }
-
-void PEBoxPhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp )
-   {
-   IGamePhysics::GetSingleton().VAddBox( pRenderComp->VGetTransformPtr()->GetScale() * m_Size,
-                                         pRenderComp );
    }

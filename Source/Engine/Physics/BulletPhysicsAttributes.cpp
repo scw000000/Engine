@@ -278,7 +278,7 @@ void BulletSpherePhysicsAttributes::VSetScale( const Vec3& scale )
    pShpereShape->setUnscaledRadius( m_Radius * scale.x );
    }
 
-void BulletSpherePhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp )
+void BulletSpherePhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<IPhysicsAttributes> pPhysicsAttr )
    {
    IGamePhysics::GetSingleton().VAddSphere( pRenderComp->VGetTransformPtr()->GetScale().x * m_Radius,
                                             pRenderComp );
@@ -320,7 +320,7 @@ void BulletBoxPhysicsAttributes::VSetScale( const Vec3& scale )
    pBoxShape->setImplicitShapeDimensions( Vec3_to_btVector3( m_Size * scale ) );
    }
 
-void BulletBoxPhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp )
+void BulletBoxPhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<IPhysicsAttributes> pPhysicsAttr )
    {
    IGamePhysics::GetSingleton().VAddBox( pRenderComp->VGetTransformPtr()->GetScale() * m_Size,
                                          pRenderComp );

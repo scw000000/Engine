@@ -74,9 +74,13 @@ class PEPhysics : public IGamePhysics
 
       virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<RigidBody> pRB ) override;
 
+      virtual bool QueryDensity( const std::string& substance, float& returnVal ) const override;
+
+      virtual bool QueryMaterialData( const std::string& material, MaterialData& returnVal ) const override;
+
       protected:
       PEPhysics( void );		
-      //void LoadXml();
+      void LoadConfig();
       //float LookupSpecificGravity( const std::string& densityStr );
       //MaterialData LookupMaterialData( const std::string& materialStr );
 

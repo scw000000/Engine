@@ -32,24 +32,6 @@ extern btTransform Transform_to_btTransform( Transform const & trans );
 
 extern Transform btTransform_to_Transform( btTransform const & trans );
 
-struct MaterialData 
-   {
-   float m_Restitution;
-   float m_Friction;
-
-   MaterialData( float restitution, float friction )
-      {
-      m_Restitution = restitution;
-      m_Friction = friction;
-      }
-
-   MaterialData( const MaterialData& other )
-      {
-      m_Restitution = other.m_Restitution;
-      m_Friction = other.m_Friction;
-      }
-   };
-
 struct RenderCompMotionState : public btMotionState 
    {
    Transform m_Transform;
@@ -121,6 +103,10 @@ class IGamePhysics : public ENG_Noncopyable
       virtual void VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<RigidBody> pRB ) = 0;
       
       virtual void VSetSimulation( bool isOn ) = 0;
+
+      virtual bool QueryDensity( const std::string& substance, float& returnVal ) const = 0;
+
+      virtual bool QueryMaterialData( const std::string& material, MaterialData& returnVal ) const = 0;
 
    protected:
       IGamePhysics( void );

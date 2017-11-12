@@ -281,7 +281,7 @@ void BulletPhysics::AddShape( StrongRenderComponentPtr pRenderComp,
 
    auto pPhysicsAttr = pRenderComp->VGetPhysicsAttributes();
    // lookup the material
-   MaterialData material( LookupMaterialData( pPhysicsAttr->VGetMaterial() ) );
+   // MaterialData material( LookupMaterialData( pPhysicsAttr->VGetMaterial() ) );
 
    // localInertia defines how the object's mass is distributed
    btVector3 localInertia( 0.f, 0.f, 0.f );
@@ -297,8 +297,8 @@ void BulletPhysics::AddShape( StrongRenderComponentPtr pRenderComp,
    btRigidBody::btRigidBodyConstructionInfo rbInfo( mass, myMotionState, shape, localInertia );
 
    // set up the materal properties
-   rbInfo.m_restitution = material.m_Restitution;
-   rbInfo.m_friction = material.m_Friction;
+   // rbInfo.m_restitution = material.m_Restitution;
+   // rbInfo.m_friction = material.m_Friction;
    btRigidBody * const body = new btRigidBody( rbInfo );
    body->setCollisionFlags( pPhysicsAttr->VGetCollisionFlags() );
    if( !pPhysicsAttr->VGetIsActive() )
@@ -385,11 +385,11 @@ void BulletPhysics::VAddSphere( float radius,
    btSphereShape * const collisionShape = new btSphereShape( radius );
    auto pPhysicsAttr = pRenderComp->VGetPhysicsAttributes();
    // calculate absolute mass from specificGravity
-   float specificGravity = LookupSpecificGravity( pPhysicsAttr->VGetDensity() );
+   // float specificGravity = LookupSpecificGravity( pPhysicsAttr->VGetDensity() );
    float const volume = ( 4.f / 3.f ) * ENG_PI * radius * radius * radius;
-   btScalar const mass = volume * specificGravity;
+   // btScalar const mass = volume * specificGravity;
 
-   AddShape( pRenderComp, /*initialTransform,*/ collisionShape, mass );
+   // AddShape( pRenderComp, /*initialTransform,*/ collisionShape, mass );
    }
 
 void BulletPhysics::VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pRenderComp )
@@ -401,11 +401,11 @@ void BulletPhysics::VAddBox( const Vec3& dimensions, StrongRenderComponentPtr pR
    btBoxShape * const boxShape = new btBoxShape( Vec3_to_btVector3( dimensions ) );
    auto pPhysicsAttr = pRenderComp->VGetPhysicsAttributes();
    // calculate absolute mass from specificGravity
-   float specificGravity = LookupSpecificGravity( pPhysicsAttr->VGetDensity() );
+   // float specificGravity = LookupSpecificGravity( pPhysicsAttr->VGetDensity() );
    float const volume = dimensions.x * dimensions.y * dimensions.z;
-   btScalar const mass = volume * specificGravity;
+   // btScalar const mass = volume * specificGravity;
 
-   AddShape( pRenderComp,/* initialTransform,*/ boxShape, mass );
+   // AddShape( pRenderComp,/* initialTransform,*/ boxShape, mass );
    }
 
 void BulletPhysics::VAddPointCloud( Vec3 *verts,
@@ -428,11 +428,11 @@ void BulletPhysics::VAddPointCloud( Vec3 *verts,
    btVector3 const aabbExtents = aabbMax - aabbMin;
 
    auto pPhysicsAttr = pRenderComp->VGetPhysicsAttributes();
-   float specificGravity = LookupSpecificGravity( pPhysicsAttr->VGetDensity() );
+   // float specificGravity = LookupSpecificGravity( pPhysicsAttr->VGetDensity() );
    float const volume = aabbExtents.x() * aabbExtents.y() * aabbExtents.z(); // approximate the volume as bounding box
-   btScalar const mass = volume * specificGravity;
+   // btScalar const mass = volume * specificGravity;
 
-   AddShape( pRenderComp, shape, mass );
+   // AddShape( pRenderComp, shape, mass );
    }
 
 void BulletPhysics::VRemoveRenderComponent( StrongRenderComponentPtr pRenderComp )

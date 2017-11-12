@@ -133,4 +133,10 @@ class PEPhysics : public IGamePhysics
       shared_ptr< CollisionDetector > m_pCollisionDetector;
       shared_ptr< RigidBodySolver > m_pRigidBodySolver;
       std::vector< Manifold > m_Manifolds;
+
+      typedef std::map<std::string, float> DensityTable;
+      DensityTable m_DensityTable;
+
+      typedef std::map<std::string, MaterialData> MaterialTable;
+      MaterialTable m_MaterialTable;
    };

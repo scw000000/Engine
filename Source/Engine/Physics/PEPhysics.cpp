@@ -54,51 +54,69 @@ void PEPhysics::VSyncRigidBodyToRenderComponent( StrongRenderComponentPtr pRende
 
 void PEPhysics::VOnUpdate( const float deltaSeconds )
    {
-   //if(!m_IsSimulating)
-   //   {
-   //   return;
-   //   }
-   //
-   //for( auto leftPair = m_RigidBodyToRenderComp.begin(); leftPair != m_RigidBodyToRenderComp.end(); ++leftPair )
-   //   {
-   //   for( auto rightPair = std::next(leftPair, 1) ; rightPair != m_RigidBodyToRenderComp.end(); ++rightPair )
-   //      {
-   //      Manifold manifold;
-   //      if( m_pCollisionDetector->CollisionDetection(
-   //         leftPair->first,
-   //         rightPair->first,
-   //         manifold
-   //         ) )
-   //         {
-   //         manifold.pRigidBodyA = leftPair->first;
-   //         manifold.pRigidBodyB = rightPair->first;
-   //         ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[0].m_PenetrationDepth ) );
-   //         ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
-   //         ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
-   //         Mat4x4 m;
-   //         auto pScene = g_pApp->m_pEngineLogic->m_pWrold;
-   //         auto pv = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView();
-   //         m.SetToWorldPosition( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA );
-   //         SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Yellow, pv * m );
-   //         m.SetToWorldPosition( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB );
-   //         SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Yellow, pv * m );
-   //         }
-   //      /*ENG_ASSERT( m_pCollisionDetector->CollisionDetection(
-   //         leftPair->first,
-   //         rightPair->first,
-   //         manifold
-   //         ) == false );*/
-   //      }
-   //  // ENG_ASSERT(  )
-   //   //m_pCollisionDetector->
-   //   }
+   if( !m_IsSimulating )
+      {
+      return;
+      }
 
-   //for(auto& pair : m_RigidBodyToRenderComp )
-   //   {
-   //   ApplyGravity( pair.first );
-   //   // pair.first->MoveForOneTimeStep( deltaSeconds );
-   //   pair.first->MoveForOneTimeStep( 0.1 );
-   //   }
+   // Update manifolds
+   m_Manifolds.clear();
+   for( auto leftPair = m_RigidBodyToRenderComp.begin(); leftPair != m_RigidBodyToRenderComp.end(); ++leftPair )
+      {
+      for( auto rightPair = std::next( leftPair, 1 ); rightPair != m_RigidBodyToRenderComp.end(); ++rightPair )
+         {
+         Manifold manifold;
+         if( m_pCollisionDetector->CollisionDetection(
+            leftPair->first,
+            rightPair->first,
+            manifold
+            ) )
+            {
+            manifold.pRigidBodyA = leftPair->first;
+            manifold.pRigidBodyB = rightPair->first;
+            ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
+            // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
+            //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
+            m_Manifolds.push_back( manifold );
+            }
+         /*ENG_ASSERT( m_pCollisionDetector->CollisionDetection(
+         leftPair->first,
+         rightPair->first,
+         manifold
+         ) == false );*/
+         }
+      }
+
+   // update velocity
+   int i = 0;
+   for( auto& pair : m_RigidBodyToRenderComp )
+      {
+      // for debugging
+      if( !m_IsSimulating )
+         {
+         break;
+         }
+      if( i++ == 0 )
+         {
+         pair.first->m_Force = Vec3::g_Zero;
+         ApplyGravity( pair.first, 0.1f );
+         }
+      pair.first->UpdateVelocity( 0.1f );
+      }
+
+   // Solve constraint
+   m_pRigidBodySolver->SolveConstraint( m_Manifolds, 0.1f );
+
+   // Update transform
+   for( auto& pair : m_RigidBodyToRenderComp )
+      {
+      if( !m_IsSimulating )
+         {
+         break;
+         }
+      // pair.first->MoveForOneTimeStep( deltaSeconds );
+      pair.first->MoveForOneTimeStep( 0.1f );
+      }
    }
 
 // Initialization of Physics Objects
@@ -137,69 +155,7 @@ void PEPhysics::VRenderDiagnostics( void )
       {
     //  return;
       }
-   m_Manifolds.clear();
-   for( auto leftPair = m_RigidBodyToRenderComp.begin(); leftPair != m_RigidBodyToRenderComp.end(); ++leftPair )
-      {
-      for( auto rightPair = std::next( leftPair, 1 ); rightPair != m_RigidBodyToRenderComp.end(); ++rightPair )
-         {
-         Manifold manifold;
-         if( m_pCollisionDetector->CollisionDetection(
-            leftPair->first,
-            rightPair->first,
-            manifold
-            ) )
-            {
-            manifold.pRigidBodyA = leftPair->first;
-            manifold.pRigidBodyB = rightPair->first;
-            ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
-           // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
-            //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
-            Mat4x4 m;
-            m.MultScale( Vec3(0.1f, 0.1f, 0.1f) );
-            auto pScene = g_pApp->m_pEngineLogic->m_pWrold;
-            auto pv = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView();
-            m.SetToWorldPosition( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA );
-            SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv * m );
-            m.SetToWorldPosition( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB );
-            SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Green, pv * m );
-            m_Manifolds.push_back( manifold );
-            }
-         /*ENG_ASSERT( m_pCollisionDetector->CollisionDetection(
-         leftPair->first,
-         rightPair->first,
-         manifold
-         ) == false );*/
-         }
-      // ENG_ASSERT(  )
-      //m_pCollisionDetector->
-      }
-   int i = 0;
-   for( auto& pair : m_RigidBodyToRenderComp )
-      {
-      // for debugging
-      if( !m_IsSimulating )
-         {
-         break;
-         }
-      if(i++ == 0)
-         {
-         pair.first->m_Force = Vec3::g_Zero;
-         ApplyGravity( pair.first, 0.1f );
-         }
-      pair.first->UpdateVelocity(0.1f);
-      }
-
-   m_pRigidBodySolver->SolveConstraint(m_Manifolds, 0.1f );
-
-   for( auto& pair : m_RigidBodyToRenderComp )
-      {
-      if( !m_IsSimulating )
-         {
-         break;
-         }
-      // pair.first->MoveForOneTimeStep( deltaSeconds );
-      pair.first->MoveForOneTimeStep( 0.1f );
-      }
+   
    auto pScene = g_pApp->m_pEngineLogic->m_pWrold;
    auto pv = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView();
    for(auto& mapPair : m_RigidBodyToRenderComp)
@@ -210,7 +166,24 @@ void PEPhysics::VRenderDiagnostics( void )
         // SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, m * pv );
          }
       }
-   // SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv );
+
+   // Draw contact points
+   Mat4x4 m;
+   m.MultScale( Vec3( 0.1f, 0.1f, 0.1f ) );
+   // Draw contact points
+   for( auto& manifold : m_Manifolds )
+      {
+         // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
+         // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
+         //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
+      for( int i = 0; i < manifold.m_ContactPointCount; ++i )
+         {
+         m.SetToWorldPosition( manifold.m_ContactPoints[ i ].m_SupportPoint.m_PointA );
+         SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv * m );
+         m.SetToWorldPosition( manifold.m_ContactPoints[ i ].m_SupportPoint.m_PointB );
+         SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Green, pv * m );
+         }
+      }
    } 
 
 void PEPhysics::VCreateTrigger( WeakActorPtr pActor, const Vec3 &pos, const float dim ) 

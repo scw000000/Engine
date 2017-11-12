@@ -32,8 +32,9 @@ void RigidBody::MoveForOneTimeStep( float deltaSecond )
    // m_Force = Vec3( 0.f, 0.1f, 0.f );
    if( dynamic_pointer_cast< SphereCollider >( m_Colliders[0] ) )
       {
-     // m_LinearVelocity = Vec3::g_Zero;
-    //  m_Force = Vec3( 0.f, 0.1f, 0.f );
+      // m_LinearVelocity = Vec3::g_Zero;
+      // m_Force = Vec3( 0.f, 1.f, 1.f );
+     // UpdateVelocity( deltaSecond );
       }
 
    // Update transform first
@@ -47,8 +48,13 @@ void RigidBody::MoveForOneTimeStep( float deltaSecond )
       Quaternion q;
       q.BuildAxisDeg( m_AngularVelocity, angle );
       m_Transform.AddToWorldRotation( q );
+      // m_Transform.AddFromWorldRotation( q );
       }
 
+   auto rot = m_Transform.GetQuaternion();
+   auto rotMat33 = rot.GetRotationMatrix33();
+   auto invRotMat33 = rotMat33.Transpose();
+   m_GlobalInverseInertia = rotMat33 * m_LocalInverseInertia * invRotMat33;
    // UpdateOrientation();
    // UpdatePositionFromGlobalCentroid();
    }

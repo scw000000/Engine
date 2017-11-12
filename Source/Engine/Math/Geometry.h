@@ -280,6 +280,8 @@ class Mat3x3 : public glm::mat3
            float x2, float y2, float z2)
            : glm::mat3( x0, y0, z0, x1, y1, z1, x2, y2, z2 ) {}
 
+   inline Mat3x3 Transpose( void ) const { return glm::transpose( *this ); }
+
    inline Mat3x3 Inverse( void ) const { return glm::inverse( *this ); }
    float Determinant( void ) const { return glm::determinant( *this ); }
    void BuildAxisRad( const Vec3& axis, const float& radian )

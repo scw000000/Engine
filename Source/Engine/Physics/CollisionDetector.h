@@ -61,7 +61,7 @@ struct Manifold
       int m_ContactPointCount;
       ContactPoint m_ContactPoints[ MANIFOLD_MAX_NUM ];
 
-      void AddContactPoint( const SupportPoint& newPoint );
+      void AddContactPoint( const ContactPoint& newPoint );
    };
 
 

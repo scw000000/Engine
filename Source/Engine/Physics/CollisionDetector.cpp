@@ -31,14 +31,14 @@ ContactPoint::ContactPoint( const SupportPoint& supportPoint )
    : m_SupportPoint( supportPoint )
    , m_AccumulatedImpulse( 0.f )
    {
-   auto vBA = supportPoint.m_PointA - supportPoint.m_PointB;
+   // auto vBA = supportPoint.m_PointA - supportPoint.m_PointB;
    // calculate normal and depth
-   m_PenetrationDepth = vBA.Length();
+   // m_PenetrationDepth = vBA.Length();
    // For rigid body A. since A, B are colliding, the 
    // Distance from centriod of A to contact point B is shorter than to contact point A
    // so the normal becomes vector BA = a - b
-   vBA.Normalize();
-   m_Normal = vBA;
+  // vBA.Normalize();
+   //m_Normal = vBA;
    }
 
 Vec3 Face::FindBarycentricCoords( const Vec3& point )
@@ -57,10 +57,10 @@ Vec3 Face::FindBarycentricCoords( const Vec3& point )
    }
 
 
-void Manifold::AddContactPoint( const SupportPoint& newPoint )
+void Manifold::AddContactPoint( const ContactPoint& newPoint)
    {
    ENG_ASSERT( m_ContactPointCount < MANIFOLD_MAX_NUM );
-   m_ContactPoints[ m_ContactPointCount++ ] = ContactPoint( newPoint );
+   m_ContactPoints[ m_ContactPointCount++ ] = newPoint;
    }
 
 bool CollisionDetector::CollisionDetection( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidBody> pRigidBodyB, Manifold& manifold )
@@ -700,7 +700,7 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
    // ENG_ASSERT( baryCoords.y > 0.f && baryCoords.y < 1.f );
    // ENG_ASSERT( baryCoords.z > 0.f && baryCoords.z < 1.f );
 
-   SupportPoint contactPoint( baryCoords.x * pA->m_PointA
+   SupportPoint spPoint( baryCoords.x * pA->m_PointA
                               + baryCoords.y * pB->m_PointA
                               + baryCoords.z * pC->m_PointA
                               
@@ -708,6 +708,9 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
                               + baryCoords.y * pB->m_PointB
                               + baryCoords.z * pC->m_PointB );
 
+   ContactPoint contactPoint( spPoint );
+   contactPoint.m_Normal = best_face->m_Plane.GetNormal();
+   contactPoint.m_PenetrationDepth = std::abs( best_face->m_Plane.GetD() );
    manifold.AddContactPoint( contactPoint );
    }
 

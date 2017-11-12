@@ -15,8 +15,8 @@
                     <Rotate x="1.000000" y="1.000000" z="1.000000" />
                     <Collision density="air" material="None" collisiongroup="wall" />
                 </Movement>
-                <SubstanceData density="air" material="None" />
-                <ShapeData shape="box" x="1.000000" y="1.000000" z="1.000000" density="air" material="None" />
+                <SubstanceData density="water" material="None" />
+                <ShapeData shape="box" x="1.000000" y="1.000000" z="1.000000"/>
                 <CollisionFlags>
                     <StaticObject enable="yes" />
                     <KinematicObject enable="yes" />

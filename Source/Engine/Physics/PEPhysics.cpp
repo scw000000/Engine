@@ -418,5 +418,4 @@ bool PEPhysics::QueryMaterialData( const std::string& material, MaterialData& re
 
 void PEPhysics::ApplyGravity( shared_ptr<RigidBody> pRigidBody, float deltaSeconds )
    {
-   pRigidBody->ApplyForce( Vec3(0.f, 0.1f, 0.f) );
    }

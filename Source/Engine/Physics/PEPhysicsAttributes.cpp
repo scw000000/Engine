@@ -21,12 +21,12 @@
 
 shared_ptr<ICollider> PESphereColliderAttributes::VCreateCollider( StrongRenderComponentPtr pRenderComp, shared_ptr< IPhysicsAttributes > pPhtsicsAttr )
    {
-   auto pCollider = shared_ptr<ICollider>( ENG_NEW SphereCollider(
-      pRenderComp->VGetTransformPtr()->GetScale().x * m_Radius) );
+   float radius = pRenderComp->VGetTransformPtr()->GetScale().x * m_Radius;
+   auto pCollider = shared_ptr<ICollider>( ENG_NEW SphereCollider( radius ));
    float density = pPhtsicsAttr->VGetDensity();
 
    pCollider->SetInertia( Mat3x3::g_Identity );
-   pCollider->SetMass( 1.f );
+   pCollider->SetMass( 4.f * ENG_PI * radius * radius * radius / 3.f );
 
    return pCollider;
    }

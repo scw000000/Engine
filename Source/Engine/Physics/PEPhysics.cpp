@@ -11,13 +11,12 @@
  *
  * \note
 */
-
 #include "EngineStd.h"
 #include "PEPhysics.h"
 #include "RigidBody.h"
 #include "Colliders.h"
 #include "PEPhysicsAttributes.h"
-#include "CollisionDetector.h"
+#include "RigidBodySolver.h"
 #include "..\Graphics\BasicGeometry.h"
 
 PEPhysics::~PEPhysics( void )
@@ -35,6 +34,7 @@ PEPhysics::PEPhysics( void )
 bool PEPhysics::VInitialize()
    {
    m_pCollisionDetector = shared_ptr< CollisionDetector >( ENG_NEW CollisionDetector() );
+   m_pRigidBodySolver = shared_ptr< RigidBodySolver >( ENG_NEW RigidBodySolver() );
    return true;
    }
 
@@ -137,7 +137,7 @@ void PEPhysics::VRenderDiagnostics( void )
       {
     //  return;
       }
-
+   m_Manifolds.clear();
    for( auto leftPair = m_RigidBodyToRenderComp.begin(); leftPair != m_RigidBodyToRenderComp.end(); ++leftPair )
       {
       for( auto rightPair = std::next( leftPair, 1 ); rightPair != m_RigidBodyToRenderComp.end(); ++rightPair )
@@ -162,6 +162,7 @@ void PEPhysics::VRenderDiagnostics( void )
             SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv * m );
             m.SetToWorldPosition( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB );
             SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Green, pv * m );
+            m_Manifolds.push_back( manifold );
             }
          /*ENG_ASSERT( m_pCollisionDetector->CollisionDetection(
          leftPair->first,
@@ -172,7 +173,7 @@ void PEPhysics::VRenderDiagnostics( void )
       // ENG_ASSERT(  )
       //m_pCollisionDetector->
       }
-   
+   int i = 0;
    for( auto& pair : m_RigidBodyToRenderComp )
       {
       // for debugging
@@ -180,9 +181,24 @@ void PEPhysics::VRenderDiagnostics( void )
          {
          break;
          }
-      ApplyGravity( pair.first );
+      if(i++ == 0)
+         {
+         pair.first->m_Force = Vec3::g_Zero;
+         ApplyGravity( pair.first, 0.1f );
+         }
+      pair.first->UpdateVelocity(0.1f);
+      }
+
+   m_pRigidBodySolver->SolveConstraint(m_Manifolds, 0.1f );
+
+   for( auto& pair : m_RigidBodyToRenderComp )
+      {
+      if( !m_IsSimulating )
+         {
+         break;
+         }
       // pair.first->MoveForOneTimeStep( deltaSeconds );
-      pair.first->MoveForOneTimeStep( 0.1 );
+      pair.first->MoveForOneTimeStep( 0.1f );
       }
    auto pScene = g_pApp->m_pEngineLogic->m_pWrold;
    auto pv = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView();
@@ -366,7 +382,7 @@ void PEPhysics::VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<
    VLinkRenderCompAttribute( pRenderComp );
    }
 
-void PEPhysics::ApplyGravity( shared_ptr<RigidBody> pRigidBody )
+void PEPhysics::ApplyGravity( shared_ptr<RigidBody> pRigidBody, float deltaSeconds )
    {
-  // pRigidBody->A
+   pRigidBody->ApplyForce( Vec3(0.f, 0.1f, 0.f) );
    }

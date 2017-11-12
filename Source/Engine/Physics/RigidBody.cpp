@@ -17,20 +17,24 @@
 #include "Colliders.h"
 #include "..\Graphics\BasicGeometry.h"
 
+void RigidBody::UpdateVelocity( float deltaSecond )
+   {
+   m_LinearVelocity += m_InverseMass * ( m_Force * deltaSecond );
+   m_AngularVelocity += m_GlobalInverseInertia * ( m_Torque * deltaSecond );
+
+   m_Force = Vec3::g_Zero;
+   m_Torque = Vec3::g_Zero;
+   }
+
 void RigidBody::MoveForOneTimeStep( float deltaSecond )
    {
    //m_Force = Vec3( 0.f, 0.001f, 0.f );
    // m_Force = Vec3( 0.f, 0.1f, 0.f );
    if( dynamic_pointer_cast< SphereCollider >( m_Colliders[0] ) )
       {
-      m_LinearVelocity = Vec3::g_Zero;
-      m_Force = Vec3( 0.f, 1.f, 0.f );
+     // m_LinearVelocity = Vec3::g_Zero;
+    //  m_Force = Vec3( 0.f, 0.1f, 0.f );
       }
-   m_LinearVelocity += m_InverseMass * ( m_Force * deltaSecond );
-   m_AngularVelocity += m_GlobalInverseInertia * ( m_Torque * deltaSecond );
-
-   m_Force = Vec3::g_Zero;
-   m_AngularVelocity = Vec3::g_Zero;
 
    // Update transform first
    m_Transform.AddToWorldPosition( m_LinearVelocity * deltaSecond );
@@ -69,8 +73,15 @@ void RigidBody::UpdateRigidBodyInfo( void )
       m_LocalCentroid += pCollider->m_Mass * pCollider->m_Transform.GetToWorld().Xform( m_LocalCentroid, 1.f );
       }
 
-   m_InverseMass = 1.f / m_Mass;
-
+   if(m_Mass > 0.f )
+      {
+      m_InverseMass = 1.f / m_Mass;
+      }
+   else
+      {
+      m_InverseMass = 0.f;
+      }
+   
    m_LocalCentroid *= m_InverseMass;
    m_GlobalCentroid = TransformToGlobal( m_LocalCentroid, true );
 
@@ -106,9 +117,14 @@ Vec3 RigidBody::TransformToLocal( const Vec3 &globalVec, bool isPoint )
    return m_Transform.GetFromWorld().Xform( globalVec, isPoint ? 1.f : 0.f );
    }
 
-void RigidBody::ApplyForce( const Vec3& force, const Vec3& globalPosition )
+void RigidBody::ApplyForceAt( const Vec3& force, const Vec3& globalPosition )
    {
- 
+   
+   }
+
+void RigidBody::ApplyForce( const Vec3& force )
+   {
+   m_Force += force;
    }
 
 void RigidBody::UpdateGlobalInertia( void )

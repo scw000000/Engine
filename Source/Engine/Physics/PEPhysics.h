@@ -1,3 +1,4 @@
+#pragma once
 /*!
  * \file PEPhysics.h
  * \date 2017/09/16 22:12
@@ -11,9 +12,11 @@
  *
  * \note
 */
+#include "CollisionDetector.h"
 
 class RigidBody;
 class CollisionDetector;
+class RigidBodySolver;
 
 class PEPhysics : public IGamePhysics
    {
@@ -82,7 +85,7 @@ class PEPhysics : public IGamePhysics
 
       StrongRenderComponentPtr FindRenderComponent( shared_ptr<RigidBody> pRigidBody ) const;
 
-      void ApplyGravity( shared_ptr<RigidBody> pRigidBody );
+      void ApplyGravity( shared_ptr<RigidBody> pRigidBody, float deltaSeconds );
 
       
       //// helpers for sending events relating to collision pairs
@@ -128,4 +131,6 @@ class PEPhysics : public IGamePhysics
       bool m_IsSimulating;
 
       shared_ptr< CollisionDetector > m_pCollisionDetector;
+      shared_ptr< RigidBodySolver > m_pRigidBodySolver;
+      std::vector< Manifold > m_Manifolds;
    };

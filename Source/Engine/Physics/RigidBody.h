@@ -21,6 +21,7 @@ class RigidBody{
    friend class CollisionDetector;
    friend class RigidBodySolver;
    public:
+   void UpdateVelocity( float deltaSecond );
       void MoveForOneTimeStep( float deltaSecond );
 
       void UpdateOrientation( void );
@@ -31,7 +32,8 @@ class RigidBody{
       Vec3 TransformToGlobal( const Vec3 &localVec, bool isPoint ) const;
       Vec3 TransformToLocal( const Vec3 &globalVec, bool isPoint );
 
-      void ApplyForce( const Vec3& force, const Vec3& globalPosition );
+      void ApplyForceAt( const Vec3& force, const Vec3& globalPosition );
+      void ApplyForce( const Vec3& force );
       void UpdateGlobalInertia( void );
 
       void SetWorldTransform( const Transform& transform );

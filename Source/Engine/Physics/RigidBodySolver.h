@@ -1,3 +1,4 @@
+#pragma once
 /*!
  * \file RigidBodySolver.h
  * \date 2017/11/11 10:14
@@ -18,11 +19,11 @@ class RigidBodySolver
    public:
       RigidBodySolver() {};
 
-      void SolveConstraint(std::vector<Manifold>& manifolds);
+      void SolveConstraint(std::vector<Manifold>& manifolds, float deltaSeconds);
 
       private:
       void CalculateJacobian(Manifold& manifold);
-      float CalculateLambda( Manifold& manifold, int contactPtIdx;
+      float CalculateLambda( Manifold& manifold, int contactPtIdx, float deltaSeconds );
       void ApplyImpulse( Manifold& manifold, int contactPtIdx, float lambda );
       
    };

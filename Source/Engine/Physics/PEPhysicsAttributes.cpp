@@ -22,11 +22,13 @@
 shared_ptr<ICollider> PESphereColliderAttributes::VCreateCollider( StrongRenderComponentPtr pRenderComp, shared_ptr< IPhysicsAttributes > pPhtsicsAttr )
    {
    float radius = pRenderComp->VGetTransformPtr()->GetScale().x * m_Radius;
-   auto pCollider = shared_ptr<ICollider>( ENG_NEW SphereCollider( radius ));
-   float density = pPhtsicsAttr->VGetDensity();
-
-   pCollider->SetInertia( Mat3x3::g_Identity );
-   pCollider->SetMass( 4.f * ENG_PI * radius * radius * radius / 3.f );
+   float radiusSq = radius * radius;
+   float mass = 4.f * ENG_PI * radiusSq * radius * pPhtsicsAttr->VGetDensity() / 3.f;
+   auto pCollider = shared_ptr<ICollider>( ENG_NEW SphereCollider( radius ) );
+   pCollider->SetMass( mass );
+   
+   float inertia = 0.4f * mass * radiusSq;
+   pCollider->SetInertia( Mat3x3( Vec3( inertia, 0.f, 0.f ), Vec3( 0.f, inertia, 0.f ), Vec3( 0.f, 0.f, inertia ) ) );
 
    return pCollider;
    }
@@ -35,10 +37,13 @@ shared_ptr<ICollider> PEBoxColliderAttributes::VCreateCollider( StrongRenderComp
    {
    auto dimenstionWS = pRenderComp->VGetTransformPtr()->GetScale() * m_Dimension;
    // The input should be half size of the box
+   float mass = dimenstionWS.x * dimenstionWS.y * dimenstionWS.z * pPhtsicsAttr->VGetDensity();
    auto pCollider = shared_ptr<ICollider>( ENG_NEW BoxCollider( dimenstionWS * 0.5f ) );
-   float density = pPhtsicsAttr->VGetDensity();
-   pCollider->SetInertia( Mat3x3::g_Identity );
-   pCollider->SetMass( dimenstionWS.x * dimenstionWS.y * dimenstionWS.z * density );
+   pCollider->SetMass( mass );
+   float scalar = mass / 12.f;
+   pCollider->SetInertia( Mat3x3( Vec3( scalar * ( dimenstionWS.y * dimenstionWS.y + dimenstionWS.z * dimenstionWS.z ), 0.f, 0.f )
+      , Vec3( 0.f, scalar * ( dimenstionWS.x * dimenstionWS.x + dimenstionWS.z * dimenstionWS.z ), 0.f )
+      , Vec3( 0.f, 0.f, scalar * ( dimenstionWS.y * dimenstionWS.y + dimenstionWS.x * dimenstionWS.x ) ) ) );
    return pCollider;
    }
 

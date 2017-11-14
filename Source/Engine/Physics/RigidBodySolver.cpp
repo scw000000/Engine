@@ -61,11 +61,14 @@ float RigidBodySolver::CalculateLambda( Manifold& manifold, int contactPtIdx, fl
    auto& pRBB = manifold.pRigidBodyB;
 
    // numerator = -( JV + b )
+   // ENG_LOG( "Test", ToStr( contact.m_Normal) );
+
+   /// ENG_LOG( "Test", ToStr( contact.m_Normal.Dot( contact.m_SupportPoint.m_PointB - contact.m_SupportPoint.m_PointA ) ) );
    float numerator = -( -contact.m_Normal.Dot( pRBA->m_LinearVelocity )
                         + contact.m_Jacobian.m_NRACrossN.Dot( pRBA->m_AngularVelocity )
                         + contact.m_Normal.Dot( pRBB->m_LinearVelocity )
                         + contact.m_Jacobian.m_RBCrossN.Dot( pRBB->m_AngularVelocity )
-                        -0.00f / deltaSeconds * contact.m_Normal.Dot( contact.m_SupportPoint.m_PointB - contact.m_SupportPoint.m_PointA ) );
+                        + 0.8f / deltaSeconds * contact.m_Normal.Dot( contact.m_SupportPoint.m_PointB - contact.m_SupportPoint.m_PointA ) );
 
    // denominator = J M-1 J^t
    Vec3 term1 = -contact.m_Normal * pRBA->m_InverseMass;

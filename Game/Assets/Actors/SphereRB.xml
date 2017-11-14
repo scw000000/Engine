@@ -15,7 +15,7 @@
                     <Rotate x="1.000000" y="1.000000" z="1.000000" />
                     <Collision density="air" material="None" collisiongroup="wall" />
                 </Movement>
-                <SubstanceData density="air" material="None" />
+                <SubstanceData density="water" material="None" />
                 <ShapeData shape="sphere" radius="1.000000"/>
                 
                 <!-- <ShapeData shape="box" x="1.000000" y="2.000000" z="3.000000" density="air" material="None" />

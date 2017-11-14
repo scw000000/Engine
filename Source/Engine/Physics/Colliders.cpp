@@ -33,7 +33,7 @@ void BoxCollider::VRenderShape( const Mat4x4& m, const Mat4x4& pv ) const
    {
    auto copyM = m;
    copyM.MultScale( m_HalfSize * 2.f );
-   SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Box, g_Green, pv * m );
+   SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Box, g_Green, pv * copyM );
    }
 
 Vec3 BoxCollider::VSupportMapping( const Vec3& direction ) const

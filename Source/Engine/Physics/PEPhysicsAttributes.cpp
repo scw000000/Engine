@@ -25,10 +25,10 @@ shared_ptr<ICollider> PESphereColliderAttributes::VCreateCollider( StrongRenderC
    float radiusSq = radius * radius;
    float mass = 4.f * ENG_PI * radiusSq * radius * pPhtsicsAttr->VGetDensity() / 3.f;
    auto pCollider = shared_ptr<ICollider>( ENG_NEW SphereCollider( radius ) );
-   pCollider->SetMass( mass );
+   pCollider->VSetMass( mass );
    
    float inertia = 0.4f * mass * radiusSq;
-   pCollider->SetInertia( Mat3x3( Vec3( inertia, 0.f, 0.f ), Vec3( 0.f, inertia, 0.f ), Vec3( 0.f, 0.f, inertia ) ) );
+   pCollider->VSetInertia( Mat3x3( Vec3( inertia, 0.f, 0.f ), Vec3( 0.f, inertia, 0.f ), Vec3( 0.f, 0.f, inertia ) ) );
 
    return pCollider;
    }
@@ -39,9 +39,9 @@ shared_ptr<ICollider> PEBoxColliderAttributes::VCreateCollider( StrongRenderComp
    // The input should be half size of the box
    float mass = dimenstionWS.x * dimenstionWS.y * dimenstionWS.z * pPhtsicsAttr->VGetDensity();
    auto pCollider = shared_ptr<ICollider>( ENG_NEW BoxCollider( dimenstionWS * 0.5f ) );
-   pCollider->SetMass( mass );
+   pCollider->VSetMass( mass );
    float scalar = mass / 12.f;
-   pCollider->SetInertia( Mat3x3( Vec3( scalar * ( dimenstionWS.y * dimenstionWS.y + dimenstionWS.z * dimenstionWS.z ), 0.f, 0.f )
+   pCollider->VSetInertia( Mat3x3( Vec3( scalar * ( dimenstionWS.y * dimenstionWS.y + dimenstionWS.z * dimenstionWS.z ), 0.f, 0.f )
       , Vec3( 0.f, scalar * ( dimenstionWS.x * dimenstionWS.x + dimenstionWS.z * dimenstionWS.z ), 0.f )
       , Vec3( 0.f, 0.f, scalar * ( dimenstionWS.y * dimenstionWS.y + dimenstionWS.x * dimenstionWS.x ) ) ) );
    return pCollider;
@@ -237,7 +237,7 @@ void PEPhysicsAttributes::VSetTransform( const Transform& transform )
       {
       return;
       }
-   m_pRigidBody->SetWorldTransform( transform );;
+   m_pRigidBody->VSetWorldTransform( transform );;
  //  btTransform newTransform = Transform_to_btTransform( transform );
    // m_pRigidBody->setActivationState( DISABLE_DEACTIVATION );
 //   m_pRigidBody->setWorldTransform( newTransform );
@@ -255,10 +255,10 @@ void PEPhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp, s
    for( auto& pColliderAttr : m_ColliderAttributes )
       {
       auto pNewCollider = pColliderAttr->VCreateCollider( pRenderComp, pPhysicsAttr );
-      m_pRigidBody->AddCollider( pNewCollider );
-      pNewCollider->SetRigidBody(m_pRigidBody );
+      m_pRigidBody->VAddCollider( pNewCollider );
+      pNewCollider->VSetRigidBody(m_pRigidBody );
       }
-   m_pRigidBody->SetWorldTransform( *pRenderComp->VGetTransformPtr() );
+   m_pRigidBody->VSetWorldTransform( *pRenderComp->VGetTransformPtr() );
    PEPhysics::GetSingleton().VAddRigidBody( pRenderComp, m_pRigidBody );
    /*IGamePhysics::GetSingleton().VAddSphere( pRenderComp->VGetTransformPtr()->GetScale().x * m_Radius,
                                             pRenderComp );*/

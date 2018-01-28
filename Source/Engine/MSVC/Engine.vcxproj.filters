@@ -343,6 +343,9 @@
     <ClCompile Include="..\Physics\RigidBodySolver.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Physics\BroadPhase.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EngineStd.h" />
@@ -642,6 +645,9 @@
       <Filter>Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\Physics\RigidBodySolver.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Physics\BroadPhase.h">
       <Filter>Physics</Filter>
     </ClInclude>
   </ItemGroup>

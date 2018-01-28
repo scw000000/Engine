@@ -169,6 +169,7 @@
     </ClCompile>
     <ClCompile Include="..\Math\Frustum.cpp" />
     <ClCompile Include="..\Math\Geometry.cpp" />
+    <ClCompile Include="..\Physics\BroadPhase.cpp" />
     <ClCompile Include="..\Physics\BulletPhysics.cpp" />
     <ClCompile Include="..\Physics\BulletPhysicsAttributes.cpp" />
     <ClCompile Include="..\Physics\Colliders.cpp" />
@@ -276,6 +277,7 @@
     <ClInclude Include="..\Math\Geometry.h" />
     <ClInclude Include="..\Memory\MemoryPool.h" />
     <ClInclude Include="..\Multicore\CriticalSection.h" />
+    <ClInclude Include="..\Physics\BroadPhase.h" />
     <ClInclude Include="..\Physics\BulletPhysics.h" />
     <ClInclude Include="..\Physics\BulletPhysicsAttributes.h" />
     <ClInclude Include="..\Physics\Colliders.h" />

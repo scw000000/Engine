@@ -87,7 +87,7 @@ void PEPhysics::VSyncRigidBodyToRenderComponent( StrongRenderComponentPtr pRende
    ENG_ASSERT( renderCompToBodyIt != m_RenderCompToRigidBody.end() );
    TransformPtr pComponentTransform = pRenderComp->VGetTransformPtr();
 
-   renderCompToBodyIt->second->SetWorldTransform( *pComponentTransform );
+   renderCompToBodyIt->second->VSetWorldTransform( *pComponentTransform );
    }
 
 void PEPhysics::VOnUpdate( const float deltaSeconds )
@@ -112,7 +112,7 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
             {
             manifold.pRigidBodyA = leftPair->first;
             manifold.pRigidBodyB = rightPair->first;
-            ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
+            ENG_LOG( "Test", std::string( "Penetration depth: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
             // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
             //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
             m_Manifolds.push_back( manifold );
@@ -139,7 +139,12 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
          pair.first->m_Force = Vec3::g_Zero;
          ApplyGravity( pair.first, 0.1f );
          }
-      pair.first->UpdateVelocity( 0.1f );
+      else
+         {
+         // ENG_LOG( "Test", std::string("loc: ") + ToStr( pair.first->m_GlobalCentroid) );
+        // ENG_LOG("Test", ToStr( pair.first->m_LinearVelocity ));
+         }
+      pair.first->VUpdateVelocity( 0.1f );
       }
 
    // Solve constraint
@@ -153,7 +158,7 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
          break;
          }
       // pair.first->MoveForOneTimeStep( deltaSeconds );
-      pair.first->MoveForOneTimeStep( 0.1f );
+      pair.first->VMoveForOneTimeStep( 0.1f );
       }
    }
 
@@ -320,7 +325,7 @@ void PEPhysics::VSetTransform( const ActorId actorId, const Transform &trans )
       {
       return;
       }
-   pRigidBody->SetWorldTransform( trans );
+   pRigidBody->VSetWorldTransform( trans );
    }
 
 Transform PEPhysics::VGetTransform( ActorId actorId ) 
@@ -388,7 +393,7 @@ void PEPhysics::VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<
    m_RenderCompToRigidBody[ pRenderComp ] = pRB;
    m_RigidBodyToRenderComp[ pRB ] = pRenderComp;
 
-   pRB->UpdateRigidBodyInfo();
+   pRB->VUpdateRigidBodyInfo();
    VLinkRenderCompAttribute( pRenderComp );
    }
 
@@ -418,5 +423,5 @@ bool PEPhysics::QueryMaterialData( const std::string& material, MaterialData& re
 
 void PEPhysics::ApplyGravity( shared_ptr<RigidBody> pRigidBody, float deltaSeconds )
    {
-   pRigidBody->ApplyForce( Vec3(0.f, 0.1f, 0.0f) );
+   pRigidBody->VApplyForce( Vec3(0.f, 0.1f, 0.1f) );
    }

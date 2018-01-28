@@ -14,31 +14,32 @@
 
 class RigidBody;
 
-class ICollider
+class Collider : public ICollider
    {
    friend class RigidBody;
    friend class PEPhysics;
    friend class PEPhysicsAttributes;
-      public:
 
-      void SetMass( float mass ) { m_Mass = mass; }
-      void SetLocalCentroid( const Vec3& newCentriod ) { m_LocalCentroid = newCentriod; }
-      void SetInertia( const Mat3x3& newInertia ) { m_Inertia = newInertia; }
-      weak_ptr<RigidBody> GetRigidBody( void ) const { return m_pRigidBody; }
-      void SetRigidBody( weak_ptr<RigidBody> pRigidBody ) { m_pRigidBody = pRigidBody; }
-      virtual void VRenderShape( const Mat4x4& m, const Mat4x4& vp ) const = 0;
-      // The input and output should be in local space
-      virtual Vec3 VSupportMapping( const Vec3& direction ) const = 0;
+   public:
+      virtual float VGetMass( void ) const override { return m_Mass; };
+      virtual void VSetMass( float mass ) override { m_Mass = mass; }
       
-      private:
-      weak_ptr<RigidBody> m_pRigidBody;
+      virtual void VSetLocalCentroid( const Vec3& newCentriod ) override { m_LocalCentroid = newCentriod; }
+      virtual void VSetInertia( const Mat3x3& newInertia ) override { m_Inertia = newInertia; }
+      virtual weak_ptr<IRigidBody> VGetRigidBody( void ) const override { return m_pRigidBody; }
+      virtual void VSetRigidBody( weak_ptr<IRigidBody> pRigidBody ) override { m_pRigidBody = pRigidBody; }
+      virtual Vec3 VGetRigidBodySpaceCentroid( void ) const override
+         { return m_Transform.GetToWorld().Xform( m_LocalCentroid, 1.f ); };
+      virtual Mat3x3 VGetInertia( void ) const override { return m_Inertia; }
+   private:
+      weak_ptr<IRigidBody> m_pRigidBody;
       float m_Mass;
       Vec3 m_LocalCentroid;
       Mat3x3 m_Inertia;
       Transform m_Transform;
    };
 
-class SphereCollider : public ICollider
+class SphereCollider : public Collider
    {
    friend class RigidBody;
    friend class PEPhysics;
@@ -53,7 +54,7 @@ class SphereCollider : public ICollider
 
    };
 
-class BoxCollider : public ICollider
+class BoxCollider : public Collider
    {
    friend class RigidBody;
    friend class PEPhysics;

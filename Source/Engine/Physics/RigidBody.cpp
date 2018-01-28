@@ -17,7 +17,7 @@
 #include "Colliders.h"
 #include "..\Graphics\BasicGeometry.h"
 
-void RigidBody::UpdateVelocity( float deltaSecond )
+void RigidBody::VUpdateVelocity( float deltaSecond )
    {
    m_LinearVelocity += m_InverseMass * ( m_Force * deltaSecond );
    m_AngularVelocity += m_GlobalInverseInertia * ( m_Torque * deltaSecond );
@@ -26,7 +26,7 @@ void RigidBody::UpdateVelocity( float deltaSecond )
    m_Torque = Vec3::g_Zero;
    }
 
-void RigidBody::MoveForOneTimeStep( float deltaSecond )
+void RigidBody::VMoveForOneTimeStep( float deltaSecond )
    {
    //m_Force = Vec3( 0.f, 0.001f, 0.f );
    // m_Force = Vec3( 0.f, 0.1f, 0.f );
@@ -39,7 +39,7 @@ void RigidBody::MoveForOneTimeStep( float deltaSecond )
 
    // Update transform first
    m_Transform.AddToWorldPosition( m_LinearVelocity * deltaSecond );
-   m_GlobalCentroid = TransformToGlobal( m_LocalCentroid, true );
+   m_GlobalCentroid = VTransformToGlobal( m_LocalCentroid, true );
 
    const float angle = m_AngularVelocity.Length() * deltaSecond;
    if( angle != 0.0f )
@@ -59,12 +59,12 @@ void RigidBody::MoveForOneTimeStep( float deltaSecond )
    // UpdatePositionFromGlobalCentroid();
    }
 
-void RigidBody::UpdateOrientation( void )
+void RigidBody::VUpdateOrientation( void )
    {
 
    }
 
-void RigidBody::UpdateRigidBodyInfo( void )
+void RigidBody::VUpdateRigidBodyInfo( void )
    {
    if( !m_Colliders.size() )
       {
@@ -75,8 +75,9 @@ void RigidBody::UpdateRigidBodyInfo( void )
    m_LocalCentroid = Vec3::g_Zero;
    for( auto& pCollider : m_Colliders )
       {
-      m_Mass += pCollider->m_Mass;
-      m_LocalCentroid += pCollider->m_Mass * pCollider->m_Transform.GetToWorld().Xform( m_LocalCentroid, 1.f );
+      float colliderMass = pCollider->VGetMass();
+      m_Mass += colliderMass;
+      m_LocalCentroid += colliderMass * pCollider->VGetRigidBodySpaceCentroid();
       }
 
    if(m_Mass > 0.f )
@@ -89,56 +90,56 @@ void RigidBody::UpdateRigidBodyInfo( void )
       }
    
    m_LocalCentroid *= m_InverseMass;
-   m_GlobalCentroid = TransformToGlobal( m_LocalCentroid, true );
+   m_GlobalCentroid = VTransformToGlobal( m_LocalCentroid, true );
 
    m_LocalInertia = Mat3x3::g_Zero;
    for( auto& pCollider : m_Colliders )
       {
-      const Vec3 d = m_LocalCentroid - pCollider->m_Transform.GetToWorld().Xform( pCollider->m_LocalCentroid );
+      const Vec3 d = m_LocalCentroid - pCollider->VGetRigidBodySpaceCentroid();
 
       // https://en.wikipedia.org/wiki/Parallel_axis_theorem#Moment_of_inertia_matrix
-      m_LocalInertia += pCollider->m_Inertia + pCollider->m_Mass * ( d.Dot( d ) * Mat3x3::g_Identity - d.OuterProduct( d ) );
+      m_LocalInertia += pCollider->VGetInertia() + pCollider->VGetMass() * ( d.Dot( d ) * Mat3x3::g_Identity - d.OuterProduct( d ) );
       }
 
    // compute inverse inertia tensor
    m_LocalInverseInertia = m_LocalInertia.Inverse();
    }
 
-void RigidBody::AddCollider( shared_ptr<ICollider> collider )
+void RigidBody::VAddCollider( shared_ptr<ICollider> collider )
    {
    if( !collider )
       {
-      ENG_WARNING("Collider is already existing");
+      ENG_WARNING("Collider is is empty");
       }
    m_Colliders.push_back( collider );
    }
 
-Vec3 RigidBody::TransformToGlobal( const Vec3 &localVec, bool isPoint ) const
+Vec3 RigidBody::VTransformToGlobal( const Vec3 &localVec, bool isPoint ) const
    {
    return m_Transform.GetToWorld().Xform( localVec, isPoint ? 1.f: 0.f );
    }
 
-Vec3 RigidBody::TransformToLocal( const Vec3 &globalVec, bool isPoint )
+Vec3 RigidBody::VTransformToLocal( const Vec3 &globalVec, bool isPoint )
    {
    return m_Transform.GetFromWorld().Xform( globalVec, isPoint ? 1.f : 0.f );
    }
 
-void RigidBody::ApplyForceAt( const Vec3& force, const Vec3& globalPosition )
+void RigidBody::VApplyForceAt( const Vec3& force, const Vec3& globalPosition )
    {
    
    }
 
-void RigidBody::ApplyForce( const Vec3& force )
+void RigidBody::VApplyForce( const Vec3& force )
    {
    m_Force += force;
    }
 
-void RigidBody::UpdateGlobalInertia( void )
+void RigidBody::VUpdateGlobalInertia( void )
    {
    m_GlobalInertia = Mat3x3( m_Transform.GetToWorld() ) * m_LocalInertia * Mat3x3( m_Transform.GetFromWorld() );
    }
 
-void RigidBody::SetWorldTransform( const Transform& transform )
+void RigidBody::VSetWorldTransform( const Transform& transform )
    {
    m_Transform.SetRotMatrix( transform.GetToWorld() );
    m_Transform.SetPosition( transform.GetToWorldPosition() );

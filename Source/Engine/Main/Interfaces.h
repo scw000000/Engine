@@ -373,4 +373,57 @@ class IScriptManager
       virtual void VExecuteString( const char* str ) = 0;
    };
 
+class IRigidBody;
+
+class ICollider
+   {
+   public:
+      virtual ~ICollider( void ) {};
+      virtual float VGetMass( void ) const = 0;
+      virtual void VSetMass( float mass ) = 0;
+      virtual void VSetLocalCentroid( const Vec3& newCentriod ) = 0;
+      virtual void VSetInertia( const Mat3x3& newInertia ) = 0;
+      virtual weak_ptr<IRigidBody> VGetRigidBody( void ) const = 0;
+      virtual void VSetRigidBody( weak_ptr<IRigidBody> pRigidBody ) = 0;
+      virtual void VRenderShape( const Mat4x4& m, const Mat4x4& vp ) const = 0;
+      // The input and output should be in local space
+      virtual Vec3 VSupportMapping( const Vec3& direction ) const = 0;
+      virtual Vec3 VGetRigidBodySpaceCentroid( void ) const = 0;
+      virtual Mat3x3 VGetInertia( void ) const = 0;
+   };
+
+class IRigidBody
+   {
+   public:
+      virtual ~IRigidBody() {}
+      virtual void VUpdateVelocity( float deltaSecond ) = 0;
+      virtual void VMoveForOneTimeStep( float deltaSecond ) = 0;
+
+      virtual void VUpdateOrientation( void ) = 0;
+      virtual void VUpdateRigidBodyInfo( void ) = 0;
+
+      virtual void VAddCollider( shared_ptr<ICollider> collider ) = 0;
+
+      virtual Vec3 VTransformToGlobal( const Vec3 &localVec, bool isPoint ) const = 0;
+      virtual Vec3 VTransformToLocal( const Vec3 &globalVec, bool isPoint ) = 0;
+
+      virtual void VApplyForceAt( const Vec3& force, const Vec3& globalPosition ) = 0;
+      virtual void VApplyForce( const Vec3& force ) = 0;
+      virtual void VUpdateGlobalInertia( void ) = 0;
+
+      virtual void VSetWorldTransform( const Transform& transform ) = 0;
+   };
+
+typedef std::pair< shared_ptr<IRigidBody>, shared_ptr<IRigidBody> > CollisionPair;
+typedef std::vector< CollisionPair > CollisionPairs;
+
+class IBroadphase
+   {
+   public:
+   virtual ~IBroadphase( void ) {};
+   virtual void VAddRigidBody() = 0;
+   virtual void VCalcualteCollisionPairs( void ) = 0;
+   virtual CollisionPairs& VGetCollisionPairs( void ) = 0;
+   };
+
 typedef unsigned int BoneId;

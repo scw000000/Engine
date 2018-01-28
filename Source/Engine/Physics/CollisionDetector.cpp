@@ -717,15 +717,15 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
 SupportPoint CollisionDetector::GetCSOSupportPoint( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Vec3& direction )
    {
    // The input is in world space, must convert it to local space then convert it back
-   auto pRigidBodyA = pColliderA->GetRigidBody().lock();
-   auto pRigidBodyB = pColliderB->GetRigidBody().lock();
+   auto pRigidBodyA = pColliderA->VGetRigidBody().lock();
+   auto pRigidBodyB = pColliderB->VGetRigidBody().lock();
    ENG_ASSERT( pRigidBodyA && pRigidBodyB );
 
-   Vec3 pA( pColliderA->VSupportMapping( pRigidBodyA->TransformToLocal( direction, false ) ) );
-   Vec3 pB( pColliderB->VSupportMapping( pRigidBodyB->TransformToLocal( -direction, false ) ) );
+   Vec3 pA( pColliderA->VSupportMapping( pRigidBodyA->VTransformToLocal( direction, false ) ) );
+   Vec3 pB( pColliderB->VSupportMapping( pRigidBodyB->VTransformToLocal( -direction, false ) ) );
 
-   pA = pRigidBodyA->TransformToGlobal( pA, true );
-   pB = pRigidBodyB->TransformToGlobal( pB, true );
+   pA = pRigidBodyA->VTransformToGlobal( pA, true );
+   pB = pRigidBodyB->VTransformToGlobal( pB, true );
 
    return SupportPoint( pA - pB, pA, pB );
    }

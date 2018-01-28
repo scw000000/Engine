@@ -1,3 +1,4 @@
+#pragma once
 /*!
  * \file RigidBody.h
  * \date 2017/10/28 8:14
@@ -16,28 +17,28 @@
 
 class ICollider;
 
-class RigidBody{
+class RigidBody : public IRigidBody
+   {
    friend class PEPhysics;
    friend class CollisionDetector;
    friend class RigidBodySolver;
-   public:
-   void UpdateVelocity( float deltaSecond );
-      void MoveForOneTimeStep( float deltaSecond );
+      public:
+      virtual void VUpdateVelocity( float deltaSecond ) override;
+      virtual void VMoveForOneTimeStep( float deltaSecond ) override;
 
-      void UpdateOrientation( void );
-      void UpdateRigidBodyInfo( void );
+      virtual void VUpdateOrientation( void ) override;
+      virtual void VUpdateRigidBodyInfo( void ) override;
 
-      void AddCollider( shared_ptr<ICollider> collider );
+      virtual void VAddCollider( shared_ptr<ICollider> collider ) override;
 
-      Vec3 TransformToGlobal( const Vec3 &localVec, bool isPoint ) const;
-      Vec3 TransformToLocal( const Vec3 &globalVec, bool isPoint );
+      virtual Vec3 VTransformToGlobal( const Vec3 &localVec, bool isPoint ) const override;
+      virtual Vec3 VTransformToLocal( const Vec3 &globalVec, bool isPoint ) override;
 
-      void ApplyForceAt( const Vec3& force, const Vec3& globalPosition );
-      void ApplyForce( const Vec3& force );
-      void UpdateGlobalInertia( void );
+      virtual void VApplyForceAt( const Vec3& force, const Vec3& globalPosition ) override;
+      virtual void VApplyForce( const Vec3& force ) override;
+      virtual void VUpdateGlobalInertia( void ) override;
 
-      void SetWorldTransform( const Transform& transform );
-
+      virtual void VSetWorldTransform( const Transform& transform ) override;
    private:
       // This transform is between local and global
       Transform m_Transform;
@@ -59,7 +60,55 @@ class RigidBody{
       // Expressed in world space
       Vec3 m_LinearVelocity;
       Vec3 m_AngularVelocity;
-      
+
       std::vector< shared_ptr<ICollider> > m_Colliders;
       float m_GravityScale;
    };
+
+//class RigidBody{
+//   friend class PEPhysics;
+//   friend class CollisionDetector;
+//   friend class RigidBodySolver;
+//   public:
+//   void UpdateVelocity( float deltaSecond );
+//      void MoveForOneTimeStep( float deltaSecond );
+//
+//      void UpdateOrientation( void );
+//      void UpdateRigidBodyInfo( void );
+//
+//      void AddCollider( shared_ptr<ICollider> collider );
+//
+//      Vec3 TransformToGlobal( const Vec3 &localVec, bool isPoint ) const;
+//      Vec3 TransformToLocal( const Vec3 &globalVec, bool isPoint );
+//
+//      void ApplyForceAt( const Vec3& force, const Vec3& globalPosition );
+//      void ApplyForce( const Vec3& force );
+//      void UpdateGlobalInertia( void );
+//
+//      void SetWorldTransform( const Transform& transform );
+//
+//   private:
+//       This transform is between local and global
+//      Transform m_Transform;
+//
+//      Vec3 m_LocalCentroid;
+//      Vec3 m_GlobalCentroid;
+//
+//      float m_Mass;
+//      float m_InverseMass;
+//
+//      Mat3x3 m_LocalInertia;
+//      Mat3x3 m_LocalInverseInertia;
+//      Mat3x3 m_GlobalInertia;
+//      Mat3x3 m_GlobalInverseInertia;
+//
+//      Vec3 m_Force;
+//      Vec3 m_Torque;
+//
+//       Expressed in world space
+//      Vec3 m_LinearVelocity;
+//      Vec3 m_AngularVelocity;
+//      
+//      std::vector< shared_ptr<ICollider> > m_Colliders;
+//      float m_GravityScale;
+//   };

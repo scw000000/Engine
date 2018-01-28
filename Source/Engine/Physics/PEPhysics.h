@@ -122,8 +122,7 @@ class PEPhysics : public IGamePhysics
       //typedef std::map<std::string, MaterialData> MaterialTable;
       //MaterialTable m_MaterialTable;
 
-      typedef std::pair< shared_ptr<RigidBody>, shared_ptr<RigidBody> > CollisionPair;
-      typedef std::set< CollisionPair > CollisionPairs;
+      
       CollisionPairs m_CollisionPairs;
 
       typedef std::unordered_map< shared_ptr< IRenderComponent >, shared_ptr<RigidBody>> RenderCompToRigidBodyMap;

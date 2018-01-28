@@ -414,14 +414,17 @@ class IRigidBody
       virtual void VSetWorldTransform( const Transform& transform ) = 0;
    };
 
-typedef std::pair< shared_ptr<IRigidBody>, shared_ptr<IRigidBody> > CollisionPair;
+class RigidBody;
+
+typedef std::pair< shared_ptr<RigidBody>, shared_ptr<RigidBody> > CollisionPair;
 typedef std::vector< CollisionPair > CollisionPairs;
 
 class IBroadphase
    {
    public:
    virtual ~IBroadphase( void ) {};
-   virtual void VAddRigidBody() = 0;
+   virtual void VAddRigidBody( shared_ptr< RigidBody > pRigidbody ) = 0;
+   virtual void VRemoveRigidBody( shared_ptr< RigidBody > pRigidbody ) = 0;
    virtual void VCalcualteCollisionPairs( void ) = 0;
    virtual CollisionPairs& VGetCollisionPairs( void ) = 0;
    };

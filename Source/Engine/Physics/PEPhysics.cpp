@@ -17,6 +17,7 @@
 #include "Colliders.h"
 #include "PEPhysicsAttributes.h"
 #include "RigidBodySolver.h"
+#include "BroadPhase.h"
 #include "..\Graphics\BasicGeometry.h"
 #include "..\ResourceCache\XmlResource.h"
 
@@ -71,7 +72,7 @@ bool PEPhysics::VInitialize()
    {
    m_pCollisionDetector = shared_ptr< CollisionDetector >( ENG_NEW CollisionDetector() );
    m_pRigidBodySolver = shared_ptr< RigidBodySolver >( ENG_NEW RigidBodySolver() );
-
+   m_pBroadphase = shared_ptr< Broadphase >( ENG_NEW Broadphase() );
    LoadConfig();
    return true;
    }
@@ -99,31 +100,51 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
 
    // Update manifolds
    m_Manifolds.clear();
-   for( auto leftPair = m_RigidBodyToRenderComp.begin(); leftPair != m_RigidBodyToRenderComp.end(); ++leftPair )
+   m_pBroadphase->VCalcualteCollisionPairs();
+   auto collisionPairs = m_pBroadphase->VGetCollisionPairs();
+   for( auto& pair : collisionPairs ) 
       {
-      for( auto rightPair = std::next( leftPair, 1 ); rightPair != m_RigidBodyToRenderComp.end(); ++rightPair )
-         {
-         Manifold manifold;
-         if( m_pCollisionDetector->CollisionDetection(
-            leftPair->first,
-            rightPair->first,
-            manifold
-            ) )
-            {
-            manifold.pRigidBodyA = leftPair->first;
-            manifold.pRigidBodyB = rightPair->first;
-            ENG_LOG( "Test", std::string( "Penetration depth: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
-            // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
-            //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
-            m_Manifolds.push_back( manifold );
-            }
-         /*ENG_ASSERT( m_pCollisionDetector->CollisionDetection(
-         leftPair->first,
-         rightPair->first,
+      Manifold manifold;
+      if( m_pCollisionDetector->CollisionDetection(
+         pair.first,
+         pair.second,
          manifold
-         ) == false );*/
+         ) )
+         {
+         manifold.pRigidBodyA = pair.first;
+         manifold.pRigidBodyB = pair.second;
+         ENG_LOG( "Test", std::string( "Penetration depth: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
+         // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
+         //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
+         m_Manifolds.push_back( manifold );
          }
       }
+
+   //for( auto leftPair = m_RigidBodyToRenderComp.begin(); leftPair != m_RigidBodyToRenderComp.end(); ++leftPair )
+   //   {
+   //   for( auto rightPair = std::next( leftPair, 1 ); rightPair != m_RigidBodyToRenderComp.end(); ++rightPair )
+   //      {
+   //      Manifold manifold;
+   //      if( m_pCollisionDetector->CollisionDetection(
+   //         leftPair->first,
+   //         rightPair->first,
+   //         manifold
+   //         ) )
+   //         {
+   //         manifold.pRigidBodyA = leftPair->first;
+   //         manifold.pRigidBodyB = rightPair->first;
+   //         ENG_LOG( "Test", std::string( "Penetration depth: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
+   //         // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
+   //         //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
+   //         m_Manifolds.push_back( manifold );
+   //         }
+   //      /*ENG_ASSERT( m_pCollisionDetector->CollisionDetection(
+   //      leftPair->first,
+   //      rightPair->first,
+   //      manifold
+   //      ) == false );*/
+   //      }
+   //   }
 
    // update velocity
    int i = 0;
@@ -189,6 +210,7 @@ void PEPhysics::VRemoveRenderComponent( StrongRenderComponentPtr pRenderComp )
       // RemoveCollisionObject( pBody );
       m_RenderCompToRigidBody.erase( pRenderComp );
       m_RigidBodyToRenderComp.erase( pBody );
+      m_pBroadphase->VRemoveRigidBody( pBody );
       }
    }
 
@@ -392,7 +414,7 @@ void PEPhysics::VAddRigidBody( StrongRenderComponentPtr pRenderComp, shared_ptr<
 
    m_RenderCompToRigidBody[ pRenderComp ] = pRB;
    m_RigidBodyToRenderComp[ pRB ] = pRenderComp;
-
+   m_pBroadphase->VAddRigidBody( pRB );
    pRB->VUpdateRigidBodyInfo();
    VLinkRenderCompAttribute( pRenderComp );
    }

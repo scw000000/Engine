@@ -19,31 +19,36 @@ class AABB
    public:
       AABB( void );
       AABB( const Vec3& min, const Vec3& max );
+      AABB( shared_ptr<RigidBody> pRigidBody );
       bool IsIntersect( const AABB& other ) const;
       AABB Union( const AABB& other );
+
+      float GetVolume() const;
+
    private:
       Vec3 m_Min;
       Vec3 m_Max;
    };
 
-class AABBNode
+class AABBNode : public std::enable_shared_from_this<AABBNode>
    {
    friend class Broadphase;
    public:
       AABBNode();
-      bool IsLeaf( void ) const { return m_Children[ 0 ] == nullptr && m_Children[ 1 ] == nullptr; }
-      void SetChildren( AABBNode* pLeft, AABBNode* pRight );
-      void SetLeafData( AABB* pAABB );
-      AABBNode* GetSibling( void ) const;
+      AABBNode( shared_ptr<AABB> pAABB );
+      bool IsLeaf( void ) const { return m_pChildren[ 0 ] == nullptr && m_pChildren[ 1 ] == nullptr; }
+      void SetChildren( shared_ptr<AABBNode> pLeft, shared_ptr<AABBNode> pRight );
+      void SetLeafData( shared_ptr<AABB> pAABB );
+      shared_ptr<AABBNode> GetSibling( void ) const;
       void ResetBoundary( void );
    private:
       static const  Vec3 s_Margin;
       
-      AABBNode* m_Parent;
-      AABBNode* m_Children[ 2 ];
+      weak_ptr<AABBNode> m_pParent;
+      shared_ptr<AABBNode> m_pChildren[ 2 ];
 
       AABB m_Boundary;
-      AABB* m_pLeafData;
+      shared_ptr<AABB> m_pLeafData;
    };
 
 class Broadphase : public IBroadphase
@@ -55,9 +60,12 @@ class Broadphase : public IBroadphase
       virtual CollisionPairs& VGetCollisionPairs( void ) override { return m_CollistionPairs; };
 
    private:
-   std::unordered_map< shared_ptr< RigidBody >, AABB > m_RigidBodyToAABB;
+      void AddAABBNode( shared_ptr<AABBNode> pNode, shared_ptr<AABBNode> pParent );
+      void DeleteAABBSubTree( shared_ptr<AABBNode> pSubRootNode );
+   private:
+   std::unordered_map< shared_ptr< RigidBody >, shared_ptr< AABBNode > > m_RigidBodyToAABBNode;
    // std::vector< shared_ptr< IRigidBody > > m_RigidBodies;
    CollisionPairs m_CollistionPairs;
-   AABB* pAABBRoot;
+   shared_ptr<AABBNode> m_pAABBRoot;
    };
 

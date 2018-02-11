@@ -22,6 +22,7 @@ class RigidBody : public IRigidBody
    friend class PEPhysics;
    friend class CollisionDetector;
    friend class RigidBodySolver;
+   friend class AABB;
       public:
       virtual void VUpdateVelocity( float deltaSecond ) override;
       virtual void VMoveForOneTimeStep( float deltaSecond ) override;

@@ -386,8 +386,8 @@ class ICollider
       virtual weak_ptr<IRigidBody> VGetRigidBody( void ) const = 0;
       virtual void VSetRigidBody( weak_ptr<IRigidBody> pRigidBody ) = 0;
       virtual void VRenderShape( const Mat4x4& m, const Mat4x4& vp ) const = 0;
-      // The input and output should be in local space
-      virtual Vec3 VSupportMapping( const Vec3& direction ) const = 0;
+      // The input and output should be in rigid body local space
+      virtual Vec3 VSupportMapping( const Vec3& direction ) = 0;
       virtual Vec3 VGetRigidBodySpaceCentroid( void ) const = 0;
       virtual Mat3x3 VGetInertia( void ) const = 0;
    };

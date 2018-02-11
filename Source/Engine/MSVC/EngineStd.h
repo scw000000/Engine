@@ -36,6 +36,7 @@
 #include <queue>
 #include <map>
 #include <unordered_set>
+#include <limits>
 
 using std::tr1::shared_ptr;
 using std::tr1::weak_ptr;

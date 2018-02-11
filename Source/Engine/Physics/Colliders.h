@@ -31,7 +31,7 @@ class Collider : public ICollider
       virtual Vec3 VGetRigidBodySpaceCentroid( void ) const override
          { return m_Transform.GetToWorld().Xform( m_LocalCentroid, 1.f ); };
       virtual Mat3x3 VGetInertia( void ) const override { return m_Inertia; }
-   private:
+   protected:
       weak_ptr<IRigidBody> m_pRigidBody;
       float m_Mass;
       Vec3 m_LocalCentroid;
@@ -48,7 +48,7 @@ class SphereCollider : public Collider
       public:
       SphereCollider( float radius ) : m_Radius( radius ) {}
       virtual void VRenderShape( const Mat4x4& m, const Mat4x4& vp ) const override;
-      virtual Vec3 VSupportMapping( const Vec3& direction ) const override;
+      virtual Vec3 VSupportMapping( const Vec3& direction ) override;
       private:
       float m_Radius;
 
@@ -63,7 +63,7 @@ class BoxCollider : public Collider
       public:
       BoxCollider( const Vec3& halfSize ) : m_HalfSize( halfSize ) {}
       virtual void VRenderShape( const Mat4x4& m, const Mat4x4& vp ) const override;
-      virtual Vec3 VSupportMapping( const Vec3& direction ) const override;
+      virtual Vec3 VSupportMapping( const Vec3& direction ) override;
       private:
       Vec3 m_HalfSize;
 

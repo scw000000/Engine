@@ -423,6 +423,7 @@ class IBroadphase
    {
    public:
    virtual ~IBroadphase( void ) {};
+   virtual void VUpdate( const float deltaSeconds ) = 0;
    virtual void VAddRigidBody( shared_ptr< RigidBody > pRigidbody ) = 0;
    virtual void VRemoveRigidBody( shared_ptr< RigidBody > pRigidbody ) = 0;
    virtual void VCalcualteCollisionPairs( void ) = 0;

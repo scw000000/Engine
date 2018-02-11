@@ -30,7 +30,11 @@ AABB::AABB( const Vec3& min, const Vec3& max ) : m_Min( max ), m_Max( min )
 AABB::AABB( shared_ptr<RigidBody> pRigidBody ) : m_Min( Vec3::g_Zero ), m_Max( Vec3::g_Zero )
    {
    ENG_ASSERT( pRigidBody->m_Colliders.size() );
+   Update( pRigidBody );
+   }
 
+void AABB::Update( shared_ptr<RigidBody> pRigidBody )
+   {
    const float minFloat = std::numeric_limits<float>::min();
    const float maxFloat = std::numeric_limits<float>::max();
    m_Min = Vec3( maxFloat, maxFloat, maxFloat );
@@ -70,6 +74,24 @@ bool AABB::IsIntersect( const AABB& other ) const
       return false;
       }
 
+   return true;
+   }
+
+bool AABB::IsContain( const AABB& other ) const
+   {
+   if( m_Max.x < other.m_Max.x
+       || m_Max.y < other.m_Max.y
+       || m_Max.z < other.m_Max.z )
+      {
+      return false;
+      }
+
+   if( m_Min.x > other.m_Min.x
+       || m_Min.y > other.m_Min.y
+       || m_Min.z > other.m_Min.z )
+      {
+      return false;
+      }
    return true;
    }
 
@@ -148,6 +170,40 @@ void AABBNode::ResetBoundary( void )
       {
       m_Boundary = m_pChildren[ 0 ]->m_Boundary.Union( m_pChildren[ 1 ]->m_Boundary );
       }
+   }
+
+void Broadphase::VUpdate( const float deltaSeconds )
+   {
+   if(!m_pAABBRoot)
+      {
+      return;
+      }
+   
+   for(auto& it : m_AABBNodeToRigidBody)
+      {
+      auto& pRigidBody = it.second;
+      auto& pNode = it.first;
+      // recalculate AABB
+      pNode->m_pLeafData->Update( pRigidBody );
+
+      if( !pNode->m_Boundary.IsContain( *pNode->m_pLeafData ) )
+         {
+         //invalidLeaves.push_back( pNode );
+         // delete the node in the tree and re-insert the node
+         DeleteAABBSubTree( pNode );
+         if( m_pAABBRoot )
+            {
+            // do insert
+            AddAABBNode( pNode, m_pAABBRoot );
+            }
+         else
+            {
+            m_pAABBRoot = pNode;
+            }
+         }
+      }
+
+
    }
 
 void Broadphase::VAddRigidBody( shared_ptr< RigidBody > pRigidbody ) 

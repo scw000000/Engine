@@ -21,7 +21,9 @@ class AABB
       AABB( const Vec3& min, const Vec3& max );
       AABB( shared_ptr<RigidBody> pRigidBody );
       bool IsIntersect( const AABB& other ) const;
+      bool IsContain( const AABB& other ) const;
       AABB Union( const AABB& other );
+      void Update( shared_ptr<RigidBody> pRigidBody );
 
       float GetVolume() const;
 
@@ -55,6 +57,7 @@ class AABBNode : public std::enable_shared_from_this<AABBNode>
 class Broadphase : public IBroadphase
    {
    public:
+      virtual void VUpdate( const float deltaSeconds ) override;
       virtual void VAddRigidBody( shared_ptr< RigidBody > pRigidbody ) override;
       virtual void VRemoveRigidBody( shared_ptr< RigidBody > pRigidbody ) override;
       virtual void VCalcualteCollisionPairs( void ) override;

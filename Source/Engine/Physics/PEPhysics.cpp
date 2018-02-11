@@ -97,7 +97,7 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
       {
       return;
       }
-
+   m_pBroadphase->VUpdate( deltaSeconds );
    // Update manifolds
    m_Manifolds.clear();
    m_pBroadphase->VCalcualteCollisionPairs();

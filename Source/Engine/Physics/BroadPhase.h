@@ -49,6 +49,7 @@ class AABBNode : public std::enable_shared_from_this<AABBNode>
 
       AABB m_Boundary;
       shared_ptr<AABB> m_pLeafData;
+      bool m_IsChildrenCrossed;
    };
 
 class Broadphase : public IBroadphase
@@ -62,8 +63,13 @@ class Broadphase : public IBroadphase
    private:
       void AddAABBNode( shared_ptr<AABBNode> pNode, shared_ptr<AABBNode> pParent );
       void DeleteAABBSubTree( shared_ptr<AABBNode> pSubRootNode );
+      void ClearCrossFlag(shared_ptr<AABBNode> pNode);
+      void TestPairCross( shared_ptr<AABBNode> pNode0, shared_ptr<AABBNode> pNode1 );
+      void TestChildrenCross( shared_ptr<AABBNode> pNode );
+
    private:
    std::unordered_map< shared_ptr< RigidBody >, shared_ptr< AABBNode > > m_RigidBodyToAABBNode;
+   std::unordered_map< shared_ptr< AABBNode >, shared_ptr< RigidBody > > m_AABBNodeToRigidBody;
    // std::vector< shared_ptr< IRigidBody > > m_RigidBodies;
    CollisionPairs m_CollistionPairs;
    shared_ptr<AABBNode> m_pAABBRoot;

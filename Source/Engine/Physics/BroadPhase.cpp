@@ -15,6 +15,7 @@
 #include "EngineStd.h"
 #include "BroadPhase.h"
 #include "RigidBody.h"
+#include <utility>
 
 const Vec3 AABBNode::s_Margin = Vec3( 1.f, 1.f, 1.f );
 
@@ -90,13 +91,13 @@ float AABB::GetVolume() const
    return ( m_Max.x - m_Min.x ) * ( m_Max.y - m_Min.y ) * ( m_Max.z - m_Min.z );
    }
 
-AABBNode::AABBNode() 
+AABBNode::AABBNode() : m_IsChildrenCrossed(false)
    {
    m_pChildren[ 0 ] = nullptr;
    m_pChildren[ 1 ] = nullptr;
    }
 
-AABBNode::AABBNode( shared_ptr<AABB> pAABB ) : m_pLeafData( pAABB )
+AABBNode::AABBNode( shared_ptr<AABB> pAABB ) : m_pLeafData( pAABB ), m_IsChildrenCrossed( false )
    {
    m_pChildren[ 0 ] = nullptr;
    m_pChildren[ 1 ] = nullptr;
@@ -159,7 +160,7 @@ void Broadphase::VAddRigidBody( shared_ptr< RigidBody > pRigidbody )
    pAABBNode->ResetBoundary();
 
    m_RigidBodyToAABBNode[ pRigidbody ] = pAABBNode;
-   
+   m_AABBNodeToRigidBody[ pAABBNode ] = pRigidbody;
    if( m_pAABBRoot )
       {
       // do insert
@@ -178,19 +179,98 @@ void Broadphase::VRemoveRigidBody( shared_ptr< RigidBody > pRigidbody )
    ENG_ASSERT( findIt != m_RigidBodyToAABBNode.end() );
    DeleteAABBSubTree( findIt->second );
    m_RigidBodyToAABBNode.erase( pRigidbody );
+   m_AABBNodeToRigidBody.erase( findIt->second );
+   }
+
+void Broadphase::TestPairCross( shared_ptr<AABBNode> pNode0, shared_ptr<AABBNode> pNode1 )
+   {
+   bool bN0IsLeaf = pNode0->IsLeaf();
+   bool bN1IsLeaf = pNode1->IsLeaf();
+
+   // both are leaf
+   if( bN0IsLeaf && bN0IsLeaf == bN1IsLeaf )
+      {
+      if( pNode0->m_pLeafData->IsIntersect( *pNode1->m_pLeafData ) )
+         m_CollistionPairs.push_back(
+         std::make_pair( m_AABBNodeToRigidBody[ pNode0 ], m_AABBNodeToRigidBody[ pNode1 ] )
+         );
+      return;
+      }
+
+   // non-leaf node must test itself
+   if( !bN0IsLeaf )
+      {
+      TestChildrenCross( pNode0 );
+      }
+   if( !bN1IsLeaf )
+      {
+      TestChildrenCross( pNode1 );
+      }
+
+   if( !( pNode0->m_Boundary.IsIntersect( pNode1->m_Boundary ) ) )
+      {
+      return;
+      }
+
+   // one of them is leaf, the other is not
+   if( bN0IsLeaf != bN1IsLeaf )
+      {
+      auto pLeaf = pNode0;
+      auto pNonLeaf = pNode1;
+      if( !bN0IsLeaf )
+         {
+         std::swap( pLeaf, pNonLeaf );
+         }
+      TestPairCross( pLeaf, pNonLeaf->m_pChildren[ 0 ] );
+      TestPairCross( pLeaf, pNonLeaf->m_pChildren[ 1 ] );
+      }
+   else
+      {
+      TestPairCross( pNode0->m_pChildren[ 0 ], pNode1->m_pChildren[ 0 ] );
+      TestPairCross( pNode0->m_pChildren[ 0 ], pNode1->m_pChildren[ 1 ] );
+      TestPairCross( pNode0->m_pChildren[ 1 ], pNode1->m_pChildren[ 0 ] );
+      TestPairCross( pNode0->m_pChildren[ 1 ], pNode1->m_pChildren[ 1 ] );
+      }
+   }
+
+void Broadphase::TestChildrenCross( shared_ptr<AABBNode> pNode )
+   {
+   if(pNode->m_IsChildrenCrossed)
+      {
+      return;
+      }
+   TestPairCross( pNode->m_pChildren[ 0 ], pNode->m_pChildren[ 0 ] );
+   pNode->m_IsChildrenCrossed = true;
+   }
+
+void Broadphase::ClearCrossFlag( shared_ptr<AABBNode> pNode )
+   {
+   pNode->m_IsChildrenCrossed = false;
+   if( !pNode->IsLeaf() )
+      {
+      ClearCrossFlag( pNode->m_pChildren[ 0 ] );
+      ClearCrossFlag( pNode->m_pChildren[ 1 ] );
+      }
    }
 
 void Broadphase::VCalcualteCollisionPairs( void ) 
    {
    m_CollistionPairs.clear();
-   auto last = --m_RigidBodyToAABBNode.end();
-   for( auto leftIt = m_RigidBodyToAABBNode.begin(); leftIt != last; ++leftIt )
+   // auto last = --m_RigidBodyToAABBNode.end();
+   if( !m_pAABBRoot || m_pAABBRoot->IsLeaf() )
+      {
+      return;
+      }
+   ClearCrossFlag( m_pAABBRoot );
+   
+   /*for( auto leftIt = m_RigidBodyToAABBNode.begin(); leftIt != last; ++leftIt )
       {
       for( auto rightIt = std::next( m_RigidBodyToAABBNode.begin(), 1 ); rightIt != m_RigidBodyToAABBNode.end(); ++rightIt )
-         {
-         m_CollistionPairs.push_back( make_pair( leftIt->first, rightIt->first ) );
-         }
+      {
+      m_CollistionPairs.push_back( make_pair( leftIt->first, rightIt->first ) );
       }
+      }*/
+
    }
 
 void Broadphase::AddAABBNode( shared_ptr<AABBNode> pNode, shared_ptr<AABBNode> pParent )
@@ -212,21 +292,36 @@ void Broadphase::AddAABBNode( shared_ptr<AABBNode> pNode, shared_ptr<AABBNode> p
          {
          AddAABBNode( pNode, pParent->m_pChildren[ 1 ] );
          }
-
+      pParent->ResetBoundary();
       }
    else
       {
-      // this old parent Val will become the other leaf
-      auto oldParentVal = *pParent.get();
-      // copy the data to the new leaf
-      shared_ptr<AABBNode> pNewLeaf( ENG_NEW AABBNode( oldParentVal ) );
-      pParent->SetChildren( pNode, pNewLeaf );
-      // since the parent is not leaf anymore, clear its leaf data
-      pParent->m_pLeafData.reset();
-      
+      // This is to make sure that hash table of rigid body to node is still valid
+      auto pGrandParent = pParent->m_pParent.lock();
+      auto pNewParent = std::make_shared<AABBNode>();
+      if(pGrandParent)
+         {
+         // GP insert a new child, which replaces old parent
+         if(pGrandParent->m_pChildren[0] == pParent)
+            {
+            pGrandParent->m_pChildren[ 0 ] = pNewParent;
+            }
+         else
+            {
+            pGrandParent->m_pChildren[ 1 ] = pNewParent;
+            }
+         pNewParent->m_pParent = pGrandParent;
+         }
+      else
+         {
+         // old parent is the root
+         m_pAABBRoot = pNewParent;
+         }
+      pNewParent->SetChildren( pNode, pParent );
+      pNewParent->ResetBoundary();
       }
 
-   pParent->ResetBoundary();
+   
    }
 
 void Broadphase::DeleteAABBSubTree( shared_ptr<AABBNode> pSubRootNode )

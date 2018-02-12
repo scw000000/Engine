@@ -77,7 +77,7 @@ template < typename T > class ENG_Singleton : public ENG_Noncopyable
    
    private:
       ENG_Singleton( void ) { m_bHasBeenCreated = true }
-      virtual ~ENG_Singleton( void ) { }
+      virtual ~ENG_Singleton( void ) { SAFE_DELETE( m_pInstance ) }
 
    private:
       static T* m_pInstance;

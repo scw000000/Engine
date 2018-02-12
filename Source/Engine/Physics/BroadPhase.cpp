@@ -35,27 +35,32 @@ AABB::AABB( shared_ptr<RigidBody> pRigidBody ) : m_Min( Vec3::g_Zero ), m_Max( V
 
 void AABB::Update( shared_ptr<RigidBody> pRigidBody )
    {
-   const float minFloat = std::numeric_limits<float>::min();
    const float maxFloat = std::numeric_limits<float>::max();
    m_Min = Vec3( maxFloat, maxFloat, maxFloat );
-   m_Max = Vec3( minFloat, minFloat, minFloat );
+   m_Max = -m_Min;
+
+   Vec3 localXAxis = pRigidBody->VTransformToLocal( Vec3( 1.f, 0.f, 0.f ), false );
+   Vec3 localYAxis = pRigidBody->VTransformToLocal( Vec3( 0.f, 1.f, 0.f ), false );
+   Vec3 localZAxis = pRigidBody->VTransformToLocal( Vec3( 0.f, 0.f, 1.f ), false );
    // calculate aabb from the rigid body
    for( int i = 0; i < pRigidBody->m_Colliders.size(); ++i )
       {
       auto& collider = pRigidBody->m_Colliders[ i ];
-      float minX = collider->VSupportMapping( pRigidBody->VTransformToLocal( Vec3( -1.f, 0.f, 0.f ), false ) ).x;
-      float minY = collider->VSupportMapping( pRigidBody->VTransformToLocal( Vec3( 0.f, -1.f, 0.f ), false ) ).y;
-      float minZ = collider->VSupportMapping( pRigidBody->VTransformToLocal( Vec3( 0.f, 0.f, -1.f ), false ) ).z;
-      m_Min.x = std::min( m_Min.x, minX );
-      m_Min.y = std::min( m_Min.y, minY );
-      m_Min.z = std::min( m_Min.z, minZ );
+      float minX = collider->VSupportMapping( -localXAxis ).x;
+      float minY = collider->VSupportMapping( -localYAxis ).y;
+      float minZ = collider->VSupportMapping( -localZAxis ).z;
+      Vec3 globalMinPoint = pRigidBody->VTransformToGlobal( Vec3( minX, minY, minZ ), true );
+      m_Min.x = std::min( m_Min.x, globalMinPoint.x );
+      m_Min.y = std::min( m_Min.y, globalMinPoint.y );
+      m_Min.z = std::min( m_Min.z, globalMinPoint.z );
 
-      float maxX = collider->VSupportMapping( pRigidBody->VTransformToLocal( Vec3( 1.f, 0.f, 0.f ), false ) ).x;
-      float maxY = collider->VSupportMapping( pRigidBody->VTransformToLocal( Vec3( 0.f, 1.f, 0.f ), false ) ).y;
-      float maxZ = collider->VSupportMapping( pRigidBody->VTransformToLocal( Vec3( 0.f, 0.f, 1.f ), false ) ).z;
-      m_Max.x = std::max( m_Max.x, maxX );
-      m_Max.y = std::max( m_Max.y, maxY );
-      m_Max.z = std::max( m_Max.z, maxZ );
+      float maxX = collider->VSupportMapping( localXAxis ).x;
+      float maxY = collider->VSupportMapping( localYAxis ).y;
+      float maxZ = collider->VSupportMapping( localZAxis ).z;
+      Vec3 globalMaxPoint = pRigidBody->VTransformToGlobal( Vec3( maxX, maxY, maxZ ), true );
+      m_Max.x = std::max( m_Min.x, globalMaxPoint.x );
+      m_Max.y = std::max( m_Max.y, globalMaxPoint.y );
+      m_Max.z = std::max( m_Max.z, globalMaxPoint.z );
       }
    }
 
@@ -247,6 +252,7 @@ void Broadphase::TestPairCross( shared_ptr<AABBNode> pNode0, shared_ptr<AABBNode
    if( bN0IsLeaf && bN0IsLeaf == bN1IsLeaf )
       {
       if( pNode0->m_pLeafData->IsIntersect( *pNode1->m_pLeafData ) )
+         ENG_LOG( "Test", "Broad phase detected" );
          m_CollistionPairs.push_back(
          std::make_pair( m_AABBNodeToRigidBody[ pNode0 ], m_AABBNodeToRigidBody[ pNode1 ] )
          );
@@ -318,7 +324,7 @@ void Broadphase::VCalcualteCollisionPairs( void )
       return;
       }
    ClearCrossFlag( m_pAABBRoot );
-   
+   TestPairCross( m_pAABBRoot->m_pChildren[ 0 ], m_pAABBRoot->m_pChildren[ 1 ] );
    /*for( auto leftIt = m_RigidBodyToAABBNode.begin(); leftIt != last; ++leftIt )
       {
       for( auto rightIt = std::next( m_RigidBodyToAABBNode.begin(), 1 ); rightIt != m_RigidBodyToAABBNode.end(); ++rightIt )

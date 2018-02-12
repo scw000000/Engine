@@ -301,7 +301,7 @@ void Broadphase::TestChildrenCross( shared_ptr<AABBNode> pNode )
       {
       return;
       }
-   TestPairCross( pNode->m_pChildren[ 0 ], pNode->m_pChildren[ 0 ] );
+   TestPairCross( pNode->m_pChildren[ 0 ], pNode->m_pChildren[ 1 ] );
    pNode->m_IsChildrenCrossed = true;
    }
 
@@ -325,14 +325,6 @@ void Broadphase::VCalcualteCollisionPairs( void )
       }
    ClearCrossFlag( m_pAABBRoot );
    TestPairCross( m_pAABBRoot->m_pChildren[ 0 ], m_pAABBRoot->m_pChildren[ 1 ] );
-   /*for( auto leftIt = m_RigidBodyToAABBNode.begin(); leftIt != last; ++leftIt )
-      {
-      for( auto rightIt = std::next( m_RigidBodyToAABBNode.begin(), 1 ); rightIt != m_RigidBodyToAABBNode.end(); ++rightIt )
-      {
-      m_CollistionPairs.push_back( make_pair( leftIt->first, rightIt->first ) );
-      }
-      }*/
-
    }
 
 void Broadphase::AddAABBNode( shared_ptr<AABBNode> pNode, shared_ptr<AABBNode> pParent )

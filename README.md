@@ -1,5 +1,8 @@
 # Engine
 A real-time tile-based deferred renderer in C++ using OpenGL
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
 Graphics Features:
 
 •	Tile-Based Deferred Rendering by using compute shader and multiple rendering targets
@@ -16,6 +19,8 @@ Graphics Features:
 
 •	Skinned Mesh
 
+-----------------------------------------------------------------------------------------------------------------------------------------
+
 Physics Features:
 
 •	Constraint-based
@@ -24,6 +29,8 @@ Physics Features:
 
 •	Broadphase AABB tree
 
+-----------------------------------------------------------------------------------------------------------------------------------------
+
 Level Editor Features:
 
 •	Implemented by Windows Form
@@ -31,6 +38,8 @@ Level Editor Features:
 •	Actor XML file editor
 
 •	Actor drag and drop spawner
+
+-----------------------------------------------------------------------------------------------------------------------------------------
 
 Environment:
 

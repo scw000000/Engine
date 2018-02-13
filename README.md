@@ -27,7 +27,7 @@ Physics Features:
 
 •	GJK, AEP, and Sequential Impulses
 
-•	Broadphase AABB tree
+•	Broad-phase AABB tree
 
 -----------------------------------------------------------------------------------------------------------------------------------------
 

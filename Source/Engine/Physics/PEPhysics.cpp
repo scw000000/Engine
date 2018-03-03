@@ -155,16 +155,17 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
          {
          break;
          }
-      if( i++ == 0 )
-         {
-         pair.first->m_Force = Vec3::g_Zero;
-         ApplyGravity( pair.first, 0.1f );
-         }
-      else
-         {
-         // ENG_LOG( "Test", std::string("loc: ") + ToStr( pair.first->m_GlobalCentroid) );
-        // ENG_LOG("Test", ToStr( pair.first->m_LinearVelocity ));
-         }
+      pair.first->m_Force = Vec3::g_Zero;
+      ApplyGravity( pair.first, 0.1f );
+      //if( true || i++ == 0 )
+      //   {
+      //   
+      //   }
+      //else
+      //   {
+      //   // ENG_LOG( "Test", std::string("loc: ") + ToStr( pair.first->m_GlobalCentroid) );
+      //  // ENG_LOG("Test", ToStr( pair.first->m_LinearVelocity ));
+      //   }
       pair.first->VUpdateVelocity( 0.1f );
       }
 
@@ -445,5 +446,5 @@ bool PEPhysics::QueryMaterialData( const std::string& material, MaterialData& re
 
 void PEPhysics::ApplyGravity( shared_ptr<RigidBody> pRigidBody, float deltaSeconds )
    {
-   pRigidBody->VApplyForce( Vec3(0.f, 0.1f, 0.1f) );
+   pRigidBody->VApplyForce( pRigidBody->m_GravityScale *  Vec3( 0.f, 0.1f, 0.1f ) );
    }

@@ -24,6 +24,7 @@ class RigidBody : public IRigidBody
    friend class RigidBodySolver;
    friend class AABB;
       public:
+      RigidBody();
       virtual void VUpdateVelocity( float deltaSecond ) override;
       virtual void VMoveForOneTimeStep( float deltaSecond ) override;
 
@@ -40,6 +41,11 @@ class RigidBody : public IRigidBody
       virtual void VUpdateGlobalInertia( void ) override;
 
       virtual void VSetWorldTransform( const Transform& transform ) override;
+      virtual void VApplyLock() override;
+      virtual void VSetPositionLock( bool xLock, bool yLock, bool zLock ) override;
+      virtual void VSetRotationLock( bool xLock, bool yLock, bool zLock ) override;
+      virtual void VSetGravityScale( float gravScale ) override { m_GravityScale = gravScale; };
+
    private:
       // This transform is between local and global
       Transform m_Transform;
@@ -61,9 +67,11 @@ class RigidBody : public IRigidBody
       // Expressed in world space
       Vec3 m_LinearVelocity;
       Vec3 m_AngularVelocity;
-
-      std::vector< shared_ptr<ICollider> > m_Colliders;
       float m_GravityScale;
+      bool m_PositionLock[ 3 ];
+      bool m_RotationLock[ 3 ];
+      std::vector< shared_ptr<ICollider> > m_Colliders;
+      
    };
 
 //class RigidBody{

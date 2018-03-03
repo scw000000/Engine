@@ -17,6 +17,17 @@
 #include "Colliders.h"
 #include "..\Graphics\BasicGeometry.h"
 
+RigidBody::RigidBody()
+   {
+   m_PositionLock[ 0 ] = false;
+   m_PositionLock[ 1 ] = false;
+   m_PositionLock[ 2 ] = false;
+
+   m_RotationLock[ 0 ] = false;
+   m_RotationLock[ 1 ] = false;
+   m_RotationLock[ 2 ] = false;
+   }
+
 void RigidBody::VUpdateVelocity( float deltaSecond )
    {
    m_LinearVelocity += m_InverseMass * ( m_Force * deltaSecond );
@@ -36,18 +47,22 @@ void RigidBody::VMoveForOneTimeStep( float deltaSecond )
       // m_Force = Vec3( 0.f, 1.f, 1.f );
      // UpdateVelocity( deltaSecond );
       }
-
+   VApplyLock();
    // Update transform first
    m_Transform.AddToWorldPosition( m_LinearVelocity * deltaSecond );
    m_GlobalCentroid = VTransformToGlobal( m_LocalCentroid, true );
-
+ //  m_LocalCentroid = VTransformToLocal( m_GlobalCentroid, true );
+   
    const float angle = m_AngularVelocity.Length() * deltaSecond;
    if( angle != 0.0f )
       {
       m_AngularVelocity.Normalize();
       Quaternion q;
       q.BuildAxisDeg( m_AngularVelocity, angle );
+      auto origPos = m_Transform.GetToWorldPosition();
+      m_Transform.SetPosition( Vec3::g_Zero );
       m_Transform.AddToWorldRotation( q );
+      m_Transform.SetPosition( origPos );
       // m_Transform.AddFromWorldRotation( q );
       }
 
@@ -143,4 +158,29 @@ void RigidBody::VSetWorldTransform( const Transform& transform )
    {
    m_Transform.SetRotMatrix( transform.GetToWorld() );
    m_Transform.SetPosition( transform.GetToWorldPosition() );
+   }
+
+void RigidBody::VApplyLock()
+   {
+   m_LinearVelocity.x = m_PositionLock[ 0 ] ? 0.f : m_LinearVelocity.x;
+   m_LinearVelocity.y = m_PositionLock[ 1 ] ? 0.f : m_LinearVelocity.y;
+   m_LinearVelocity.z = m_PositionLock[ 2 ] ? 0.f : m_LinearVelocity.z;
+
+   m_AngularVelocity.x = m_RotationLock[ 0 ] ? 0.f : m_AngularVelocity.x;
+   m_AngularVelocity.y = m_RotationLock[ 1 ] ? 0.f : m_AngularVelocity.y;
+   m_AngularVelocity.z = m_RotationLock[ 2 ] ? 0.f : m_AngularVelocity.z;
+   }
+
+void RigidBody::VSetPositionLock( bool xLock, bool yLock, bool zLock )
+   {
+   m_PositionLock[ 0 ] = xLock;
+   m_PositionLock[ 1 ] = yLock;
+   m_PositionLock[ 2 ] = zLock;
+   }
+
+void RigidBody::VSetRotationLock( bool xLock, bool yLock, bool zLock )
+   {
+   m_RotationLock[ 0 ] = xLock;
+   m_RotationLock[ 1 ] = yLock;
+   m_RotationLock[ 2 ] = zLock;
    }

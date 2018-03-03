@@ -29,7 +29,6 @@ shared_ptr<ICollider> PESphereColliderAttributes::VCreateCollider( StrongRenderC
    
    float inertia = 0.4f * mass * radiusSq;
    pCollider->VSetInertia( Mat3x3( Vec3( inertia, 0.f, 0.f ), Vec3( 0.f, inertia, 0.f ), Vec3( 0.f, 0.f, inertia ) ) );
-
    return pCollider;
    }
 
@@ -64,6 +63,15 @@ PEPhysicsAttributes::PEPhysicsAttributes( void ) // : m_TransLateFactor( Vec3::g
 //   m_pRigidBody = NULL;
    m_IsLinkedToPhysicsWorld = false;
    m_CollisionFlags = 0;
+   m_PositionLock[ 0 ] = false;
+   m_PositionLock[ 1 ] = false;
+   m_PositionLock[ 2 ] = false;
+
+   m_RotationLock[ 0 ] = false;
+   m_RotationLock[ 1 ] = false;
+   m_RotationLock[ 2 ] = false;
+
+   m_GravityScale = 1.f;
    }
 
 // This function does not work well when there's a overriding xml file
@@ -127,6 +135,7 @@ bool PEPhysicsAttributes::VInit( TiXmlElement* pData )
    TiXmlElement* pMovement = pData->FirstChildElement( "Movement" );
    if( pMovement )
       {
+      // Warning: this is not implemented yet
       pMovement->QueryBoolAttribute( "active", &m_IsActive );
       TiXmlElement* pTemp = pMovement->FirstChildElement( "Translate" );
       if( pTemp )
@@ -147,6 +156,28 @@ bool PEPhysicsAttributes::VInit( TiXmlElement* pData )
            // m_CollisionId = CollisionTable::GetSingleton().GetIdFromName( pTemp->Attribute( "collisiongroup" ) );
             }
          }
+      pTemp = pMovement->FirstChildElement( "PositionLock" );
+      bool setting = false;
+      if( pTemp )
+         {
+         pTemp->QueryBoolAttribute( "x", &m_PositionLock[ 0 ] );
+         pTemp->QueryBoolAttribute( "y", &m_PositionLock[ 1 ] );
+         pTemp->QueryBoolAttribute( "z", &m_PositionLock[ 2 ] );
+         }
+      pTemp = pMovement->FirstChildElement( "RotationLock" );
+      if( pTemp )
+         {
+         pTemp->QueryBoolAttribute( "x", &m_RotationLock[ 0 ] );
+         pTemp->QueryBoolAttribute( "y", &m_RotationLock[ 1 ] );
+         pTemp->QueryBoolAttribute( "z", &m_RotationLock[ 2 ] );
+         }
+
+      pTemp = pMovement->FirstChildElement( "GravityScale" );
+      if( pTemp )
+         {
+         pTemp->QueryFloatAttribute( "value", &m_GravityScale );
+         }
+      
       }
 
    TiXmlElement* pSubstance = pData->FirstChildElement( "SubstanceData" );
@@ -259,6 +290,9 @@ void PEPhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp, s
       pNewCollider->VSetRigidBody(m_pRigidBody );
       }
    m_pRigidBody->VSetWorldTransform( *pRenderComp->VGetTransformPtr() );
+   m_pRigidBody->VSetPositionLock( m_PositionLock[0], m_PositionLock[1], m_PositionLock[2] );
+   m_pRigidBody->VSetRotationLock( m_RotationLock[ 0 ], m_RotationLock[ 1 ], m_RotationLock[ 2 ] );
+   m_pRigidBody->VSetGravityScale( m_GravityScale );
    PEPhysics::GetSingleton().VAddRigidBody( pRenderComp, m_pRigidBody );
    /*IGamePhysics::GetSingleton().VAddSphere( pRenderComp->VGetTransformPtr()->GetScale().x * m_Radius,
                                             pRenderComp );*/

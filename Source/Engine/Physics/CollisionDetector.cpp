@@ -31,14 +31,6 @@ ContactPoint::ContactPoint( const SupportPoint& supportPoint )
    : m_SupportPoint( supportPoint )
    , m_AccumulatedImpulse( 0.f )
    {
-   // auto vBA = supportPoint.m_PointA - supportPoint.m_PointB;
-   // calculate normal and depth
-   // m_PenetrationDepth = vBA.Length();
-   // For rigid body A. since A, B are colliding, the 
-   // Distance from centriod of A to contact point B is shorter than to contact point A
-   // so the normal becomes vector BA = a - b
-  // vBA.Normalize();
-   //m_Normal = vBA;
    }
 
 Vec3 Face::FindBarycentricCoords( const Vec3& point )
@@ -47,6 +39,8 @@ Vec3 Face::FindBarycentricCoords( const Vec3& point )
    const Vec3& b = m_Vertices[ 1 ].lock()->m_PointCSO;
    const Vec3& c = m_Vertices[ 2 ].lock()->m_PointCSO;
    auto n = m_Plane.GetNormal();
+   // Cross: area of sub triangle * 2
+   // Dot: project the sub-triangle to the triangle
    float va = n.Dot( ( b - point ).Cross( c - point ) );
    float vb = n.Dot( ( c - point ).Cross( a - point ) );
    float vc = n.Dot( ( a - point ).Cross( b - point ) );
@@ -306,6 +300,8 @@ bool CollisionDetector::GJKContainsOrigin( Simplex& simplex, Vec3& direction )
       const Vec3& b = simplex.m_Vertice[ 1 ].m_PointCSO;
       const Vec3& c = simplex.m_Vertice[ 2 ].m_PointCSO;
       // just project the origin to the triangle
+      // We don't need to worry about the origin will lay outside of the triangle
+      // because the simplex has been updated
       // project point p = O + t*n = tn
       // (p dot N) + D = 0
       // (t*N dot N ) + D = 0
@@ -316,32 +312,6 @@ bool CollisionDetector::GJKContainsOrigin( Simplex& simplex, Vec3& direction )
       auto nABC = ( b - a ).Cross( c - a );
       float t = a.Dot( nABC ) / nABC.Dot( nABC );
       Vec3 p = t * nABC;
-      if( p.Dot( p ) < g_EsplionSq )
-         {
-         return true;
-         }
-      direction = -p;
-      direction.Normalize();
-      return false;
-
-      ///////
-      float d1 = ( b - a ).Dot( -a );
-      float d2 = ( c - a ).Dot( -a );
-      float d3 = ( b - a ).Dot( -b );
-      float d4 = ( c - a ).Dot( -b );
-      float d5 = ( b - a ).Dot( -c );
-      float d6 = ( c - a ).Dot( -c );
-      
-      float va = d3 * d6 - d5 * d4;
-      float vb = d5 * d2 - d1 * d6;
-      float vc = d1 * d4 - d3 * d2;
-      
-      float sum = va + vb + vc;
-      float u = va / sum;
-      float v = vb / sum;
-      float w = 1.f - va - vb;
-
-      p = u * a + v * b + w * c;
       if( p.Dot( p ) < g_EsplionSq )
          {
          return true;

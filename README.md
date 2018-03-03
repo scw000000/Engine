@@ -1,21 +1,45 @@
 # Engine
 A real-time tile-based deferred renderer in C++ using OpenGL
 
-•	Reformed conventional forward rendering by using Compute Shader and Multiple Rendering Targets
+-----------------------------------------------------------------------------------------------------------------------------------------
 
-•	Adopted component-based and data-driven actor format in XML (Extensible Markup Language)
+Graphics Features:
 
-•	Integrated Bullet Physics Library into physics system, which is an industrial level physics library
+•	Tile-Based Deferred Rendering by using compute shader and multiple rendering targets
 
-•	Developed animation blend tree system for actor animation generation
+•	Screen Space Ambient Occlusion
 
-•	Employed Lua scripting system for event, animation and gameplay
+•	Bloom
 
-•	Implemented Level editor by Windows Form for creating and editing actors and their components
+•	Motion Blur
 
-•	Provided resource cache for assets loading and memory management
+•	HDR and Tone Mapping
 
+•	Normal Mapping
 
+•	Skinned Mesh
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+Physics Features:
+
+•	Constraint-based
+
+•	GJK, AEP, and Sequential Impulses
+
+•	Broad-phase AABB tree
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+Level Editor Features:
+
+•	Implemented by Windows Form
+
+•	Actor XML file editor
+
+•	Actor drag and drop spawner
+
+-----------------------------------------------------------------------------------------------------------------------------------------
 
 Environment:
 

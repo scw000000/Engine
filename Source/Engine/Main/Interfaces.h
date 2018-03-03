@@ -412,9 +412,9 @@ class IRigidBody
       virtual void VUpdateGlobalInertia( void ) = 0;
 
       virtual void VSetWorldTransform( const Transform& transform ) = 0;
-      virtual void VApplyLock() = 0;
-      virtual void VSetPositionLock(bool xLock, bool yLock, bool zLock) = 0;
-      virtual void VSetRotationLock( bool xLock, bool yLock, bool zLock ) = 0;
+      virtual void VApplyFactor() = 0;
+      virtual void VSetTranslateFactor( const Vec3& factor ) = 0;
+      virtual void VSetRotateFactor( const Vec3& factor ) = 0;
       virtual void VSetGravityScale( float gravScale ) = 0;
    };
 

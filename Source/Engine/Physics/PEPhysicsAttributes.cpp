@@ -46,7 +46,7 @@ shared_ptr<ICollider> PEBoxColliderAttributes::VCreateCollider( StrongRenderComp
    return pCollider;
    }
 
-PEPhysicsAttributes::PEPhysicsAttributes( void ) // : m_TransLateFactor( Vec3::g_Identity ), m_RotateFactor( Vec3::g_Identity )
+PEPhysicsAttributes::PEPhysicsAttributes( void ) : m_TransLateFactor( Vec3::g_Identity ), m_RotateFactor( Vec3::g_Identity )
    {
    m_IsActive = true;
    m_CollisionId = 1; // Must be selectable by ray test in PE physics
@@ -63,13 +63,6 @@ PEPhysicsAttributes::PEPhysicsAttributes( void ) // : m_TransLateFactor( Vec3::g
 //   m_pRigidBody = NULL;
    m_IsLinkedToPhysicsWorld = false;
    m_CollisionFlags = 0;
-   m_PositionLock[ 0 ] = false;
-   m_PositionLock[ 1 ] = false;
-   m_PositionLock[ 2 ] = false;
-
-   m_RotationLock[ 0 ] = false;
-   m_RotationLock[ 1 ] = false;
-   m_RotationLock[ 2 ] = false;
 
    m_GravityScale = 1.f;
    }
@@ -156,22 +149,6 @@ bool PEPhysicsAttributes::VInit( TiXmlElement* pData )
            // m_CollisionId = CollisionTable::GetSingleton().GetIdFromName( pTemp->Attribute( "collisiongroup" ) );
             }
          }
-      pTemp = pMovement->FirstChildElement( "PositionLock" );
-      bool setting = false;
-      if( pTemp )
-         {
-         pTemp->QueryBoolAttribute( "x", &m_PositionLock[ 0 ] );
-         pTemp->QueryBoolAttribute( "y", &m_PositionLock[ 1 ] );
-         pTemp->QueryBoolAttribute( "z", &m_PositionLock[ 2 ] );
-         }
-      pTemp = pMovement->FirstChildElement( "RotationLock" );
-      if( pTemp )
-         {
-         pTemp->QueryBoolAttribute( "x", &m_RotationLock[ 0 ] );
-         pTemp->QueryBoolAttribute( "y", &m_RotationLock[ 1 ] );
-         pTemp->QueryBoolAttribute( "z", &m_RotationLock[ 2 ] );
-         }
-
       pTemp = pMovement->FirstChildElement( "GravityScale" );
       if( pTemp )
          {
@@ -290,8 +267,9 @@ void PEPhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp, s
       pNewCollider->VSetRigidBody(m_pRigidBody );
       }
    m_pRigidBody->VSetWorldTransform( *pRenderComp->VGetTransformPtr() );
-   m_pRigidBody->VSetPositionLock( m_PositionLock[0], m_PositionLock[1], m_PositionLock[2] );
-   m_pRigidBody->VSetRotationLock( m_RotationLock[ 0 ], m_RotationLock[ 1 ], m_RotationLock[ 2 ] );
+
+   m_pRigidBody->VSetTranslateFactor( m_TransLateFactor );
+   m_pRigidBody->VSetRotateFactor( m_RotateFactor );
    m_pRigidBody->VSetGravityScale( m_GravityScale );
    PEPhysics::GetSingleton().VAddRigidBody( pRenderComp, m_pRigidBody );
    /*IGamePhysics::GetSingleton().VAddSphere( pRenderComp->VGetTransformPtr()->GetScale().x * m_Radius,

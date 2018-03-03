@@ -41,9 +41,9 @@ class RigidBody : public IRigidBody
       virtual void VUpdateGlobalInertia( void ) override;
 
       virtual void VSetWorldTransform( const Transform& transform ) override;
-      virtual void VApplyLock() override;
-      virtual void VSetPositionLock( bool xLock, bool yLock, bool zLock ) override;
-      virtual void VSetRotationLock( bool xLock, bool yLock, bool zLock ) override;
+      virtual void VApplyFactor() override;
+      virtual void VSetTranslateFactor( const Vec3& factor ) override;
+      virtual void VSetRotateFactor( const Vec3& factor ) override;
       virtual void VSetGravityScale( float gravScale ) override { m_GravityScale = gravScale; };
 
    private:
@@ -68,8 +68,8 @@ class RigidBody : public IRigidBody
       Vec3 m_LinearVelocity;
       Vec3 m_AngularVelocity;
       float m_GravityScale;
-      bool m_PositionLock[ 3 ];
-      bool m_RotationLock[ 3 ];
+      Vec3 m_TransLateFactor;
+      Vec3 m_RotateFactor;
       std::vector< shared_ptr<ICollider> > m_Colliders;
       
    };

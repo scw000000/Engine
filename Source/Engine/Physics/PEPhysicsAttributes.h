@@ -80,7 +80,5 @@ class PEPhysicsAttributes : public IPhysicsAttributes
       Vec3 m_RotateFactor;
       float m_Density;
       MaterialData m_Material;
-      bool m_PositionLock[ 3 ];
-      bool m_RotationLock[ 3 ];
       float m_GravityScale;
    };

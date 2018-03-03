@@ -17,15 +17,8 @@
 #include "Colliders.h"
 #include "..\Graphics\BasicGeometry.h"
 
-RigidBody::RigidBody()
+RigidBody::RigidBody() : m_TransLateFactor( Vec3::g_Identity ), m_RotateFactor( Vec3::g_Identity )
    {
-   m_PositionLock[ 0 ] = false;
-   m_PositionLock[ 1 ] = false;
-   m_PositionLock[ 2 ] = false;
-
-   m_RotationLock[ 0 ] = false;
-   m_RotationLock[ 1 ] = false;
-   m_RotationLock[ 2 ] = false;
    }
 
 void RigidBody::VUpdateVelocity( float deltaSecond )
@@ -41,13 +34,13 @@ void RigidBody::VMoveForOneTimeStep( float deltaSecond )
    {
    //m_Force = Vec3( 0.f, 0.001f, 0.f );
    // m_Force = Vec3( 0.f, 0.1f, 0.f );
-   if( dynamic_pointer_cast< SphereCollider >( m_Colliders[0] ) )
-      {
-      // m_LinearVelocity = Vec3::g_Zero;
-      // m_Force = Vec3( 0.f, 1.f, 1.f );
-     // UpdateVelocity( deltaSecond );
-      }
-   VApplyLock();
+   //if( dynamic_pointer_cast< SphereCollider >( m_Colliders[0] ) )
+   //   {
+   //   // m_LinearVelocity = Vec3::g_Zero;
+   //   // m_Force = Vec3( 0.f, 1.f, 1.f );
+   //  // UpdateVelocity( deltaSecond );
+   //   }
+   VApplyFactor();
    // Update transform first
    m_Transform.AddToWorldPosition( m_LinearVelocity * deltaSecond );
    m_GlobalCentroid = VTransformToGlobal( m_LocalCentroid, true );
@@ -160,27 +153,19 @@ void RigidBody::VSetWorldTransform( const Transform& transform )
    m_Transform.SetPosition( transform.GetToWorldPosition() );
    }
 
-void RigidBody::VApplyLock()
-   {
-   m_LinearVelocity.x = m_PositionLock[ 0 ] ? 0.f : m_LinearVelocity.x;
-   m_LinearVelocity.y = m_PositionLock[ 1 ] ? 0.f : m_LinearVelocity.y;
-   m_LinearVelocity.z = m_PositionLock[ 2 ] ? 0.f : m_LinearVelocity.z;
 
-   m_AngularVelocity.x = m_RotationLock[ 0 ] ? 0.f : m_AngularVelocity.x;
-   m_AngularVelocity.y = m_RotationLock[ 1 ] ? 0.f : m_AngularVelocity.y;
-   m_AngularVelocity.z = m_RotationLock[ 2 ] ? 0.f : m_AngularVelocity.z;
+void RigidBody::VSetTranslateFactor( const Vec3& factor )
+   {
+   m_TransLateFactor = factor;
    }
 
-void RigidBody::VSetPositionLock( bool xLock, bool yLock, bool zLock )
+void RigidBody::VSetRotateFactor( const Vec3& factor )
    {
-   m_PositionLock[ 0 ] = xLock;
-   m_PositionLock[ 1 ] = yLock;
-   m_PositionLock[ 2 ] = zLock;
+   m_RotateFactor = factor;
    }
 
-void RigidBody::VSetRotationLock( bool xLock, bool yLock, bool zLock )
+void RigidBody::VApplyFactor()
    {
-   m_RotationLock[ 0 ] = xLock;
-   m_RotationLock[ 1 ] = yLock;
-   m_RotationLock[ 2 ] = zLock;
+   m_LinearVelocity *= m_TransLateFactor;
+   m_AngularVelocity *= m_RotateFactor;
    }

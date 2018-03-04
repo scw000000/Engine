@@ -163,7 +163,7 @@ TiXmlElement* Vec4::GernerateXML( void ) const
 
 bool Plane::IsAbove( const Vec3& p ) const
    {
-   return ( p.Dot( n ) + d > 0.0f );
+   return ( p.Dot( n ) + d > fESPLION );
    }
 
 bool Plane::IsAbove( const Vec3& p, const float radius ) const

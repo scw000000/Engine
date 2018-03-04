@@ -42,6 +42,9 @@ const int iTRANSPARENT = 0;
 const int MEGABYTE = 1024 * 1024;
 const float SIXTY_HERTZ = 16.66f;
 
+const float fESPLION = 0.0001f;
+const float fESPLIONSQ = fESPLION * fESPLION;
+
 //#define MEM_LOG
 #if defined(_DEBUG) && defined(MEM_LOG)
 

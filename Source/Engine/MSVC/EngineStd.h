@@ -62,7 +62,8 @@ extern const float SIXTY_HERTZ;
 extern const int SCREEN_WIDTH;
 extern const int SCREEN_HEIGHT;
 
-
+extern const float fESPLION;
+extern const float fESPLIONSQ;
 
 #if !defined(SAFE_DELETE)
 #define SAFE_DELETE(x) if(x) delete x; x=NULL;

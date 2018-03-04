@@ -18,9 +18,6 @@
 #include "Colliders.h"
 #include <limits>
 
-const float g_Esplion = 0.0001f;
-const float g_EsplionSq = g_Esplion * g_Esplion;
-
 ContactPoint::ContactPoint( void ) :
    m_AccumulatedImpulse( 0.f )
    , m_PenetrationDepth( 0.f )
@@ -261,7 +258,7 @@ bool CollisionDetector::GJKContainsOrigin( Simplex& simplex, Vec3& direction )
    if( simplex.m_Size == 1 )
       {
       auto point = simplex.m_Vertice[ 0 ].m_PointCSO;
-      if( point.Dot( point ) < g_EsplionSq )
+      if( point.Dot( point ) < fESPLIONSQ )
          {
          return true;
          }
@@ -286,7 +283,7 @@ bool CollisionDetector::GJKContainsOrigin( Simplex& simplex, Vec3& direction )
       auto v = ( b - a );
       float t = -v.Dot( a ) / v.Dot( v );
       auto p = a + t * v;
-      if( p.Dot( p ) < g_EsplionSq )
+      if( p.Dot( p ) < fESPLIONSQ )
          {
          return true;
          }
@@ -312,7 +309,7 @@ bool CollisionDetector::GJKContainsOrigin( Simplex& simplex, Vec3& direction )
       auto nABC = ( b - a ).Cross( c - a );
       float t = a.Dot( nABC ) / nABC.Dot( nABC );
       Vec3 p = t * nABC;
-      if( p.Dot( p ) < g_EsplionSq )
+      if( p.Dot( p ) < fESPLIONSQ )
          {
          return true;
          }
@@ -454,6 +451,8 @@ class EdgePair
 // and add new faces to cover up the ¡§hole¡¨ on the polytope, new support point is the common vertex
 void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr< SupportPoint > pNewPoint )
    {
+
+   static int c = 0;
    std::unordered_map< shared_ptr< SupportPoint >, std::unordered_set<shared_ptr< SupportPoint >> > edgeMap;
    // For each faces, test the direction
    for( auto pFaceIt = polyhedron.m_Faces.begin(); pFaceIt != polyhedron.m_Faces.end(); )
@@ -512,11 +511,12 @@ void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr<
       ENG_ASSERT( vertexFrom.second.size() <= 1);
       for( auto& connectVertex : vertexFrom.second )
          {
+         ENG_ASSERT( vertexFrom.first->m_PointCSO != connectVertex->m_PointCSO );
          polyhedron.AddFace( vertexFrom.first, connectVertex, pNewPoint );
          }
     //  polyhedron.AddFace( edge.first, edge.second, pNewPoint );
       }
-   
+   ++c;
    }
 
 void CollisionDetector::EPAExpandToTetrahedron( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex )
@@ -535,47 +535,46 @@ void CollisionDetector::EPAExpandToTetrahedron( shared_ptr<ICollider> pColliderA
             , g_Forward
             , -g_Forward
             };
+         // Search along fixed direction, if the distance is long enough then push it into the simplex
          for(const auto& searchDir : searchDirs)
             {
             auto searchPoint = GetCSOSupportPoint( pColliderA, pColliderB, searchDir );
             auto vec = ( searchPoint.m_PointCSO - simplex.m_Vertice[ 0 ].m_PointCSO );
-            if( vec.Dot( vec ) > g_EsplionSq )
+            if( vec.Dot( vec ) > fESPLIONSQ )
                {
                simplex.Push( searchPoint );
+               break;
                }
             }
          }
       if( simplex.m_Size == 2)
          {
          Vec3 lineDir = simplex.m_Vertice[ 1 ].m_PointCSO - simplex.m_Vertice[ 0 ].m_PointCSO;
-         Vec3 lestSignificantAxis( 1.f, 0.f, 0.f );
+         Vec3 leastSignificantAxis( 1.f, 0.f, 0.f );
 
          if( std::abs( lineDir.y ) < std::abs( lineDir.z ) && std::abs( lineDir.y ) < std::abs( lineDir.x ) )
             {
-            lestSignificantAxis = g_Up;
-            
+            leastSignificantAxis = g_Up;
             }
          else if( std::abs( lineDir.z ) < std::abs( lineDir.y ) && std::abs( lineDir.z ) < std::abs( lineDir.x ) )
             {
-            lestSignificantAxis = g_Forward;
+            leastSignificantAxis = g_Forward;
             }
 
-         Vec3 searchDir = lestSignificantAxis.Cross( lineDir );
+         Vec3 searchDir = leastSignificantAxis.Cross( lineDir );
          searchDir.Normalize();
          Mat3x3 rotMat;
          rotMat.BuildAxisRad( searchDir, ENG_PI / 3.f );
          for( int i = 0; i < 6; ++i )
             {
             auto searchPoint = GetCSOSupportPoint( pColliderA, pColliderB, searchDir );
-            if( searchPoint.m_PointCSO.Dot( searchPoint.m_PointCSO ) > g_EsplionSq )
+            if( searchPoint.m_PointCSO.Dot( searchPoint.m_PointCSO ) > fESPLIONSQ )
                {
                simplex.Push( searchPoint );
                break;
                }
             searchDir = rotMat * searchDir;
             }
-
-
          }
 
       // size == 3
@@ -585,7 +584,7 @@ void CollisionDetector::EPAExpandToTetrahedron( shared_ptr<ICollider> pColliderA
       searchDir.Normalize();
       
       auto searchPoint = GetCSOSupportPoint( pColliderA, pColliderB, searchDir );
-      if( searchPoint.m_PointCSO.Dot( searchPoint.m_PointCSO ) > g_EsplionSq )
+      if( searchPoint.m_PointCSO.Dot( searchPoint.m_PointCSO ) > fESPLIONSQ )
          {
          simplex.Push( searchPoint );
          }
@@ -639,21 +638,29 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
       //  Find closest face of the polytope to the origin.
       for( std::advance(faceIt, 1); faceIt != polyhedron.m_Faces.end(); ++faceIt )
          {
-         // Since all faces are facing outward, we wanna find the largest negative value
+         // All faces are facing outward, and we wanna find the face which is closest to original
          if( best_face->m_Plane.GetD() < (*faceIt)->m_Plane.GetD() )
             {
             best_face = ( *faceIt );
             }
          }
+     // Vec3 out( prev_Distance, best_face->m_Plane.GetD(), std::numeric_limits<float>::signaling_NaN() );
+      // ENG_LOG( "Test", ToStr( out ));
       //  If the closest face is no larger by a threshold  
       // to the origin than the previously picked one, break;
-      if( std::abs( prev_Distance - best_face->m_Plane.GetD() ) <= g_Esplion )
+      if( std::abs( prev_Distance - best_face->m_Plane.GetD() ) <= fESPLION )
          {
          break;
          }
       prev_Distance = best_face->m_Plane.GetD();
       // Find new point;
       shared_ptr< SupportPoint > newPoint( ENG_NEW SupportPoint( GetCSOSupportPoint( pColliderA, pColliderB, best_face->m_Plane.GetNormal() ) ) );
+      if(best_face->m_Vertices[0].lock()->m_PointCSO == newPoint->m_PointCSO
+          || best_face->m_Vertices[ 1 ].lock()->m_PointCSO == newPoint->m_PointCSO 
+          || best_face->m_Vertices[ 2 ].lock()->m_PointCSO == newPoint->m_PointCSO )
+         {
+         break;
+         }
       EPAExpandPolyhedron( polyhedron, newPoint );
       }
 

@@ -602,13 +602,20 @@ class Plane
       void Init( const Vec3& p0, const Vec3& p1, const Vec3& p2 )
          {
          n = glm::cross( p1 - p0, p2 - p0 );
+         
          // for plane ax + by + cz + d = 0; d = -( ax + by + cz ) = - dot( n, a point on plane )
          d = -n.Dot( p0 );
+         ENG_ASSERT( !std::isnan<float>( d ) );
          Normalize();
          }
       // constructor based on coefficient
       Plane( const float a, const float b, const float c, const float w ) : n( a, b, c ), d( w )  { }
-      void Normalize() { float lengthInv = 1.0f / n.Length(); n *= lengthInv; d *= lengthInv; }
+      void Normalize() { float lengthInv = 1.0f / n.Length();
+      ENG_ASSERT( !std::isnan<float>( d ) && std::isfinite(lengthInv) );
+      n *= lengthInv; 
+      d *= lengthInv; 
+   //   ENG_ASSERT( !std::isnan<float>( d ) ); 
+         }
       // Inside is defined as same side of normal
       bool IsAbove( const Vec3& p ) const ;
       // Inside is defined as same side of normal, radius means it is a sphere

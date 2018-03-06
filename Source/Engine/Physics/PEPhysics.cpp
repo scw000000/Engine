@@ -140,7 +140,8 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
          {
          manifold.pRigidBodyA = pair.first;
          manifold.pRigidBodyB = pair.second;
-         ENG_LOG( "Test", std::string( "PD: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
+         // ENG_LOG( "Test", std::string( "PD: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
+         ENG_LOG( "Test", std::string( "N: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_Normal ) );
          // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
          //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
          m_Manifolds.push_back( manifold );

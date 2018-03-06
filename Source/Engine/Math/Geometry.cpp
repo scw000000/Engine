@@ -509,7 +509,7 @@ AABB AABB::Union( const AABB& other )
                   , std::min( m_Min.y, other.m_Min.y )
                   , std::min( m_Min.z, other.m_Min.z ) );
 
-   return AABB( unionMax, unionMin );
+   return AABB( unionMin, unionMax );
    }
 
 float AABB::GetVolume() const

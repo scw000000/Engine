@@ -63,6 +63,10 @@ void RigidBody::VMoveForOneTimeStep( float deltaSecond )
    auto rotMat33 = rot.GetRotationMatrix33();
    auto invRotMat33 = rotMat33.Transpose();
    m_GlobalInverseInertia = rotMat33 * m_LocalInverseInertia * invRotMat33;
+   if( m_RotateFactor == Vec3::g_Zero )
+      {
+      m_GlobalInverseInertia = Mat3x3::g_Zero;
+      }
    // UpdateOrientation();
    // UpdatePositionFromGlobalCentroid();
    }
@@ -88,12 +92,13 @@ void RigidBody::VUpdateRigidBodyInfo( void )
       m_LocalCentroid += colliderMass * pCollider->VGetRigidBodySpaceCentroid();
       }
 
-   if(m_Mass > 0.f )
+   if(m_Mass > 0.f && m_TransLateFactor != Vec3::g_Zero)
       {
       m_InverseMass = 1.f / m_Mass;
       }
    else
       {
+      m_Mass = std::numeric_limits<float>::max();
       m_InverseMass = 0.f;
       }
    
@@ -108,9 +113,10 @@ void RigidBody::VUpdateRigidBodyInfo( void )
       // https://en.wikipedia.org/wiki/Parallel_axis_theorem#Moment_of_inertia_matrix
       m_LocalInertia += pCollider->VGetInertia() + pCollider->VGetMass() * ( d.Dot( d ) * Mat3x3::g_Identity - d.OuterProduct( d ) );
       }
-
+   
    // compute inverse inertia tensor
    m_LocalInverseInertia = m_LocalInertia.Inverse();
+   
    }
 
 void RigidBody::VAddCollider( shared_ptr<ICollider> collider )

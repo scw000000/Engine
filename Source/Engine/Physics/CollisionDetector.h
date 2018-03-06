@@ -36,7 +36,7 @@ struct SupportPoint
 struct Jacobian
    {
    public:
-      Vec3 m_NRACrossN;
+      Vec3 m_RACrossN;
       Vec3 m_RBCrossN;
    };
 

@@ -128,7 +128,7 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
          }
       }
 #endif
-
+   shared_ptr<RigidBody> pRB;
    for( auto& pair : collisionPairs ) 
       {
       Manifold manifold;
@@ -140,8 +140,10 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
          {
          manifold.pRigidBodyA = pair.first;
          manifold.pRigidBodyB = pair.second;
+         pRB = manifold.pRigidBodyA;
          // ENG_LOG( "Test", std::string( "PD: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
-         ENG_LOG( "Test", std::string( "N: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_Normal ) );
+         
+         // ENG_LOG( "Test", std::string( "N: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_Normal ) );
          // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
          //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
          m_Manifolds.push_back( manifold );
@@ -194,7 +196,12 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
 
    // Solve constraint
    m_pRigidBodySolver->SolveConstraint( m_Manifolds, 0.1f );
+   if( pRB )
+      {
+      ENG_LOG( "Test", std::string( "V: " ) + ToStr( pRB->m_LinearVelocity ) );
+      ENG_LOG( "Test", std::string( "AV: " ) + ToStr( pRB->m_AngularVelocity ) );
 
+      }
    // Update transform
    for( auto& pair : m_RigidBodyToRenderComp )
       {
@@ -244,9 +251,14 @@ void PEPhysics::VRenderDiagnostics( void )
    //
    auto pScene = g_pApp->m_pEngineLogic->m_pWrold;
    auto pv = pScene->GetCamera()->GetProjection() * pScene->GetCamera()->GetView();
+   auto identity = Mat4x4::g_Identity;
+   identity.MultScale( Vec3( 0.1f, 0.1f, 0.1f ) );
    for(auto& mapPair : m_RigidBodyToRenderComp)
       {
       auto m = mapPair.first->m_Transform.GetToWorld();
+      identity.SetToWorldPosition( mapPair.first->m_GlobalCentroid );
+
+      SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Yellow, pv * identity );
       for(auto& collider : mapPair.first->m_Colliders ){
          collider->VRenderShape( m, pv );
          }
@@ -261,6 +273,7 @@ void PEPhysics::VRenderDiagnostics( void )
          // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
          // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
          //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
+
       for( int i = 0; i < manifold.m_ContactPointCount; ++i )
          {
          m.SetToWorldPosition( manifold.m_ContactPoints[ i ].m_SupportPoint.m_PointA );

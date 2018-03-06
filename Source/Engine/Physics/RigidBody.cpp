@@ -51,7 +51,7 @@ void RigidBody::VMoveForOneTimeStep( float deltaSecond )
       {
       m_AngularVelocity.Normalize();
       Quaternion q;
-      q.BuildAxisDeg( m_AngularVelocity, angle );
+      q.BuildAxisRad( m_AngularVelocity, angle );
       auto origPos = m_Transform.GetToWorldPosition();
       m_Transform.SetPosition( Vec3::g_Zero );
       m_Transform.AddToWorldRotation( q );

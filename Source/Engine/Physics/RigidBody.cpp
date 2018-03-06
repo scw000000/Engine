@@ -169,3 +169,50 @@ void RigidBody::VApplyFactor()
    m_LinearVelocity *= m_TransLateFactor;
    m_AngularVelocity *= m_RotateFactor;
    }
+
+AABB RigidBody::VGetAABB() const 
+   {
+   auto toWorld = m_Transform.GetToWorld();
+   auto translation = toWorld.GetToWorldPosition();
+   const float maxFloat = std::numeric_limits<float>::max();
+   Vec3 minPos( maxFloat, maxFloat, maxFloat );
+   Vec3 maxPos( -maxFloat, -maxFloat, -maxFloat );
+   // recompute AABB from rotated AABB
+   for( auto& pCollider : m_Colliders )
+      {
+      // this AABB is in RB local space, need to convert it to world space
+      auto colliderAABB = pCollider->VGetAABB();
+      Vec3 tempMin = translation;
+      Vec3 tempMax = translation;
+      Vec3 localMin = colliderAABB.GetMin();
+      Vec3 localMax = colliderAABB.GetMax();
+      for( int i = 0; i < 3; ++i )
+         {
+         for( int j = 0; j < 3; ++j )
+            {
+            float e = toWorld[ i ][ j ] * localMin[ j ];
+            float f = toWorld[ i ][ j ] * localMax[ j ];
+            if( e < f )
+               {
+               tempMin[ j ] += e;
+               tempMax[ j ] += f;
+               }
+            else
+               {
+               tempMin[ j ] += f;
+               tempMax[ j ] += e;
+               }
+            }
+         }
+      minPos.x = std::min( minPos.x, tempMin.x );
+      minPos.y = std::min( minPos.y, tempMin.y );
+      minPos.z = std::min( minPos.z, tempMin.z );
+
+      maxPos.x = std::max( maxPos.x, tempMax.x );
+      maxPos.y = std::max( maxPos.y, tempMax.y );
+      maxPos.z = std::max( maxPos.z, tempMax.z );
+      }
+
+
+   return AABB(minPos, maxPos);
+   }

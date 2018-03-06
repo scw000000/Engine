@@ -13,25 +13,6 @@
  * \note
 */
 
-class AABB
-   {
-   friend class AABBNode;
-   public:
-      AABB( void );
-      AABB( const Vec3& min, const Vec3& max );
-      AABB( shared_ptr<RigidBody> pRigidBody );
-      bool IsIntersect( const AABB& other ) const;
-      bool IsContain( const AABB& other ) const;
-      AABB Union( const AABB& other );
-      void Update( shared_ptr<RigidBody> pRigidBody );
-
-      float GetVolume() const;
-
-   private:
-      Vec3 m_Min;
-      Vec3 m_Max;
-   };
-
 class AABBNode : public std::enable_shared_from_this<AABBNode>
    {
    friend class Broadphase;

@@ -457,6 +457,67 @@ TiXmlElement* Transform::GenerateOverridesXML( TiXmlElement* pResourceNode ) con
    return pRetXMLNode;
    }
 
+AABB::AABB( void ) : m_Min( Vec3::g_Zero ), m_Max( Vec3::g_Zero )
+   {}
+
+AABB::AABB( const Vec3& min, const Vec3& max ) : m_Min( min ), m_Max( max )
+   {}
+
+bool AABB::IsIntersect( const AABB& other ) const
+   {
+   if( m_Min.x > other.m_Max.x || other.m_Min.x > m_Max.x )
+      {
+      return false;
+      }
+   if( m_Min.y > other.m_Max.y || other.m_Min.y > m_Max.y )
+      {
+      return false;
+      }
+   if( m_Min.z > other.m_Max.z || other.m_Min.z > m_Max.z )
+      {
+      return false;
+      }
+
+   return true;
+   }
+
+bool AABB::IsContain( const AABB& other ) const
+   {
+   if( m_Max.x < other.m_Max.x
+       || m_Max.y < other.m_Max.y
+       || m_Max.z < other.m_Max.z )
+      {
+      return false;
+      }
+
+   if( m_Min.x > other.m_Min.x
+       || m_Min.y > other.m_Min.y
+       || m_Min.z > other.m_Min.z )
+      {
+      return false;
+      }
+   return true;
+   }
+
+AABB AABB::Union( const AABB& other )
+   {
+   Vec3 unionMax( std::max( m_Max.x, other.m_Max.x )
+                  , std::max( m_Max.y, other.m_Max.y )
+                  , std::max( m_Max.z, other.m_Max.z ) );
+
+   Vec3 unionMin( std::min( m_Min.x, other.m_Min.x )
+                  , std::min( m_Min.y, other.m_Min.y )
+                  , std::min( m_Min.z, other.m_Min.z ) );
+
+   return AABB( unionMax, unionMin );
+   }
+
+float AABB::GetVolume() const
+   {
+   return ( m_Max.x - m_Min.x ) * ( m_Max.y - m_Min.y ) * ( m_Max.z - m_Min.z );
+   }
+
+
 //Transform::Transform( const Mat4x4& toWorld )
 //   {
 //   Mat4x4 temp( toWorld );

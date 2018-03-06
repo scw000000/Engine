@@ -508,7 +508,7 @@ void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr<
    // so new faces are formed by the edge and new point
    for( auto& vertexFrom : edgeMap )
       {
-      ENG_ASSERT( vertexFrom.second.size() <= 1);
+   //   ENG_ASSERT( vertexFrom.second.size() <= 1);
       for( auto& connectVertex : vertexFrom.second )
          {
          ENG_ASSERT( vertexFrom.first->m_PointCSO != connectVertex->m_PointCSO );
@@ -631,6 +631,8 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
 
    float prev_Distance = -std::numeric_limits<float>::max();
    shared_ptr<Face> best_face;
+   const int maxItNum = 100;
+   int it = 0;
    while( true )
       {
       auto faceIt = polyhedron.m_Faces.begin();
@@ -648,7 +650,7 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
       // ENG_LOG( "Test", ToStr( out ));
       //  If the closest face is no larger by a threshold  
       // to the origin than the previously picked one, break;
-      if( std::abs( prev_Distance - best_face->m_Plane.GetD() ) <= fESPLION )
+      if( std::abs( prev_Distance - best_face->m_Plane.GetD() ) <= fESPLION || it >= maxItNum)
          {
          break;
          }
@@ -662,6 +664,7 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
          break;
          }
       EPAExpandPolyhedron( polyhedron, newPoint );
+      ++it;
       }
 
    //  Project the origin onto the closest triangle.

@@ -45,6 +45,7 @@ class RigidBody : public IRigidBody
       virtual void VSetTranslateFactor( const Vec3& factor ) override;
       virtual void VSetRotateFactor( const Vec3& factor ) override;
       virtual void VSetGravityScale( float gravScale ) override { m_GravityScale = gravScale; };
+      virtual AABB VGetAABB() const override;
 
    private:
       // This transform is between local and global

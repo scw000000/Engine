@@ -869,6 +869,26 @@ inline void Transform::UpdateFromWorld( void )
    m_IsFromWorldDirty = false;
    }
 
+class RigidBody;
+
+class AABB
+   {
+   friend class AABBNode;
+      public:
+      AABB( void );
+      AABB( const Vec3& min, const Vec3& max );
+      bool IsIntersect( const AABB& other ) const;
+      bool IsContain( const AABB& other ) const;
+      AABB Union( const AABB& other );
+
+      float GetVolume() const;
+      Vec3 GetMin( void ) const { return m_Min; };
+      Vec3 GetMax( void ) const { return m_Max; };
+      private:
+      Vec3 m_Min;
+      Vec3 m_Max;
+   };
+
 //class Transform
 //   {
 //   public:

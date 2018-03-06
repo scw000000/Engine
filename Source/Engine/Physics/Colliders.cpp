@@ -31,6 +31,12 @@ Vec3 SphereCollider::VSupportMapping( const Vec3& direction )
    return m_Transform.GetToWorld().Xform( localPoint, 1.f );
    }
 
+AABB SphereCollider::VGetAABB( void ) const
+   {
+   auto translation = m_Transform.GetToWorldPosition();
+   return AABB( Vec3( -m_Radius, -m_Radius, -m_Radius ) + translation, Vec3( m_Radius, m_Radius, m_Radius ) + translation );
+   }
+
 void BoxCollider::VRenderShape( const Mat4x4& m, const Mat4x4& pv ) const
    {
    auto copyM = m;
@@ -50,4 +56,31 @@ Vec3 BoxCollider::VSupportMapping( const Vec3& direction )
    float localPointZ = localDir.z > 0 ? m_HalfSize.z : -m_HalfSize.z;
 
    return m_Transform.GetToWorld().Xform( Vec4( localPointX, localPointY, localPointZ, 1.f ) );
+   }
+
+AABB BoxCollider::VGetAABB( void ) const
+   {
+   auto toWorld = m_Transform.GetToWorld();
+   Vec3 minPos = toWorld.GetToWorldPosition();
+   Vec3 maxPos(minPos);
+   
+   for( int i = 0; i < 3; ++i )
+      {
+      for( int j = 0; j < 3; ++j )
+         {
+         float e = toWorld[ i ][ j ] * -m_HalfSize[ j ];
+         float f = toWorld[ i ][ j ] * m_HalfSize[ j ];
+         if(e < f)
+            {
+            minPos[ j ] += e;
+            maxPos[ j ] += f;
+            }
+         else
+            {
+            minPos[ j ] += f;
+            maxPos[ j ] += e;
+            }
+         }
+      }
+   return AABB(minPos, maxPos);
    }

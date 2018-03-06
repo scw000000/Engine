@@ -375,6 +375,7 @@ class IScriptManager
 
 class IRigidBody;
 
+
 class ICollider
    {
    public:
@@ -390,6 +391,7 @@ class ICollider
       virtual Vec3 VSupportMapping( const Vec3& direction ) = 0;
       virtual Vec3 VGetRigidBodySpaceCentroid( void ) const = 0;
       virtual Mat3x3 VGetInertia( void ) const = 0;
+      virtual AABB VGetAABB( void ) const = 0;
    };
 
 class IRigidBody
@@ -412,13 +414,13 @@ class IRigidBody
       virtual void VUpdateGlobalInertia( void ) = 0;
 
       virtual void VSetWorldTransform( const Transform& transform ) = 0;
-      virtual void VApplyFactor() = 0;
+      virtual void VApplyFactor( void ) = 0;
       virtual void VSetTranslateFactor( const Vec3& factor ) = 0;
       virtual void VSetRotateFactor( const Vec3& factor ) = 0;
       virtual void VSetGravityScale( float gravScale ) = 0;
-   };
 
-class RigidBody;
+      virtual AABB VGetAABB( void ) const = 0;
+   };
 
 typedef std::pair< shared_ptr<RigidBody>, shared_ptr<RigidBody> > CollisionPair;
 typedef std::vector< CollisionPair > CollisionPairs;

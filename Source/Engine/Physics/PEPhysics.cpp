@@ -97,11 +97,38 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
       {
       return;
       }
-   m_pBroadphase->VUpdate( deltaSeconds );
+   static int it = 0;
+   m_pBroadphase->VUpdate( 0.1f );
    // Update manifolds
    m_Manifolds.clear();
    m_pBroadphase->VCalcualteCollisionPairs();
    auto collisionPairs = m_pBroadphase->VGetCollisionPairs();
+
+#ifdef _DEBUG
+   // broad phase correctness test
+   if( collisionPairs.size() == 0 )
+      {
+      // ENG_LOG("Test", " NO");
+      Manifold manifold;
+      auto it = m_RigidBodyToRenderComp.begin();
+
+      auto next = it;
+      ++next;
+      if( m_pCollisionDetector->CollisionDetection(
+         it->first ,
+         next->first,
+         manifold
+         ) )
+         {
+         if( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth > 0.01f )
+            {
+            m_pBroadphase->VUpdate( 0.1f );
+            m_pBroadphase->VCalcualteCollisionPairs();
+            }
+         }
+      }
+#endif
+
    for( auto& pair : collisionPairs ) 
       {
       Manifold manifold;
@@ -113,7 +140,7 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
          {
          manifold.pRigidBodyA = pair.first;
          manifold.pRigidBodyB = pair.second;
-         ENG_LOG( "Test", std::string( "Penetration depth: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
+         ENG_LOG( "Test", std::string( "PD: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
          // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
          //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
          m_Manifolds.push_back( manifold );
@@ -147,14 +174,9 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
    //   }
 
    // update velocity
-   int i = 0;
+   // should I move it before collision detection?
    for( auto& pair : m_RigidBodyToRenderComp )
       {
-      // for debugging
-      if( !m_IsSimulating )
-         {
-         break;
-         }
       pair.first->m_Force = Vec3::g_Zero;
       ApplyGravity( pair.first, 0.1f );
       //if( true || i++ == 0 )
@@ -175,13 +197,10 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
    // Update transform
    for( auto& pair : m_RigidBodyToRenderComp )
       {
-      if( !m_IsSimulating )
-         {
-         break;
-         }
       // pair.first->MoveForOneTimeStep( deltaSeconds );
       pair.first->VMoveForOneTimeStep( 0.1f );
       }
+   ++it;
    }
 
 // Initialization of Physics Objects

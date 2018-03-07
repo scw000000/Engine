@@ -46,6 +46,9 @@ class RigidBody : public IRigidBody
       virtual void VSetRotateFactor( const Vec3& factor ) override;
       virtual void VSetGravityScale( float gravScale ) override { m_GravityScale = gravScale; };
       virtual AABB VGetAABB() const override;
+      void SetMaterialData( MaterialData& data ) { m_Material = data; };
+      float GetRestitution( void ) const { return m_Material.m_Restitution; }
+      float GetFriction( void ) const { return m_Material.m_Friction; }
 
    private:
       // This transform is between local and global
@@ -72,7 +75,7 @@ class RigidBody : public IRigidBody
       Vec3 m_TransLateFactor;
       Vec3 m_RotateFactor;
       std::vector< shared_ptr<ICollider> > m_Colliders;
-      
+      MaterialData m_Material;
    };
 
 //class RigidBody{

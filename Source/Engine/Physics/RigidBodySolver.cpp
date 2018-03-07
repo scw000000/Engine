@@ -68,7 +68,9 @@ float RigidBodySolver::CalculateLambda( Manifold& manifold, int contactPtIdx, fl
                         + contact.m_Jacobian.m_NRACrossN.Dot( pRBA->m_AngularVelocity )
                         + contact.m_Normal.Dot( pRBB->m_LinearVelocity )
                         + contact.m_Jacobian.m_RBCrossN.Dot( pRBB->m_AngularVelocity )
-                        + 0.1f / deltaSeconds * contact.m_Normal.Dot( contact.m_SupportPoint.m_PointB - contact.m_SupportPoint.m_PointA ) );
+                        + manifold.m_CombinedRestitution * contact.m_Normal.Dot( -pRBA->m_LinearVelocity - pRBA->m_AngularVelocity.Cross( contact.m_SupportPoint.m_PointA - pRBA->m_GlobalCentroid )
+                        + pRBB->m_LinearVelocity + pRBB->m_AngularVelocity.Cross( contact.m_SupportPoint.m_PointB - pRBB->m_GlobalCentroid ) )
+                        + 0.2f / deltaSeconds * contact.m_Normal.Dot( contact.m_SupportPoint.m_PointB - contact.m_SupportPoint.m_PointA ) );
                        // - 0.1f / deltaSeconds * contact.m_PenetrationDepth );
    // denominator = J M-1 J^t
    Vec3 term1 = -contact.m_Normal * pRBA->m_InverseMass;
@@ -99,7 +101,6 @@ void RigidBodySolver::ApplyImpulse( Manifold& manifold, int contactPtIdx, float 
 
    auto& pRBA = manifold.pRigidBodyA;
    // Apply the impulse delta 
-   auto deltaV = pRBA->m_InverseMass * -contact.m_Normal * deltaImpulse;
    pRBA->m_LinearVelocity += pRBA->m_InverseMass * -contact.m_Normal * deltaImpulse;
    pRBA->m_AngularVelocity += (pRBA->m_GlobalInverseInertia * contact.m_Jacobian.m_NRACrossN) * deltaImpulse;
 

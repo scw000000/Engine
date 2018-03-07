@@ -54,6 +54,19 @@ void Manifold::AddContactPoint( const ContactPoint& newPoint)
    m_ContactPoints[ m_ContactPointCount++ ] = newPoint;
    }
 
+void Manifold::CalculateCombinedRestitution( void )
+   {
+   // https://www.gamedev.net/articles/programming/math-and-physics/combining-material-friction-and-restitution-values-r4227/
+   const float sqrtOf2 = 1.41421356237f;
+   const float rX = pRigidBodyA->GetRestitution();
+   const float rY = pRigidBodyB->GetRestitution();
+
+   float wX = sqrtOf2 * std::abs( 2.f * rX - 1 ) + 1.f;
+   float wY = sqrtOf2 * std::abs( 2.f * rY - 1 ) + 1.f;
+   
+   m_CombinedRestitution = ( rX * wX + rY * wY ) / ( wX + wY );
+   }
+
 bool CollisionDetector::CollisionDetection( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidBody> pRigidBodyB, Manifold& manifold )
    {
    bool hasCollision = false;
@@ -81,7 +94,6 @@ bool CollisionDetector::CollisionDetection( shared_ptr<ICollider> pColliderA, sh
       return false;
       }
    EPA( pColliderA, pColliderB, simplex, manifold );
-
    return true;
    }
 

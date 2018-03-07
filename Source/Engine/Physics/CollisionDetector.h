@@ -56,13 +56,14 @@ struct ContactPoint
 struct Manifold
    {
    public:
-      Manifold( void ) : m_ContactPointCount(0) { }
+      Manifold( void ) : m_ContactPointCount( 0 ), m_CombinedRestitution(0.f){}
       shared_ptr<RigidBody> pRigidBodyA;
       shared_ptr<RigidBody> pRigidBodyB;
       int m_ContactPointCount;
       ContactPoint m_ContactPoints[ MANIFOLD_MAX_NUM ];
-
+      float m_CombinedRestitution;
       void AddContactPoint( const ContactPoint& newPoint );
+      void CalculateCombinedRestitution( void );
    };
 
 

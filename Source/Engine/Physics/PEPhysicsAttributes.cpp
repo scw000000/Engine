@@ -170,7 +170,6 @@ bool PEPhysicsAttributes::VInit( TiXmlElement* pData )
          {
          std::string materialStr = pSubstance->Attribute( "material" );
          IGamePhysics::GetSingleton().QueryMaterialData( materialStr, m_Material );
-         // m_Material = pSubstance->Attribute( "material" );
          }
       }
    //TiXmlElement* pShape = pData->FirstChildElement( "ShapeData" );
@@ -266,6 +265,7 @@ void PEPhysicsAttributes::VAddRigidBody( StrongRenderComponentPtr pRenderComp, s
       m_pRigidBody->VAddCollider( pNewCollider );
       pNewCollider->VSetRigidBody(m_pRigidBody );
       }
+   m_pRigidBody->SetMaterialData( m_Material );
    m_pRigidBody->VSetWorldTransform( *pRenderComp->VGetTransformPtr() );
 
    m_pRigidBody->VSetTranslateFactor( m_TransLateFactor );

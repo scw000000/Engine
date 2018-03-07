@@ -141,6 +141,7 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
          manifold.pRigidBodyA = pair.first;
          manifold.pRigidBodyB = pair.second;
          pRB = manifold.pRigidBodyA;
+         manifold.CalculateCombinedRestitution();
          // ENG_LOG( "Test", std::string( "PD: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
          
          // ENG_LOG( "Test", std::string( "N: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_Normal ) );
@@ -479,5 +480,5 @@ bool PEPhysics::QueryMaterialData( const std::string& material, MaterialData& re
 
 void PEPhysics::ApplyGravity( shared_ptr<RigidBody> pRigidBody, float deltaSeconds )
    {
-   pRigidBody->VApplyForce( pRigidBody->m_GravityScale *  Vec3( 0.f, -1.f, 0.f ) );
+   pRigidBody->VApplyForce( pRigidBody->m_GravityScale *  Vec3( 0.f, -9.8f, 0.f ) );
    }

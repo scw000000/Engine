@@ -418,7 +418,7 @@ class IRigidBody
       virtual void VSetTranslateFactor( const Vec3& factor ) = 0;
       virtual void VSetRotateFactor( const Vec3& factor ) = 0;
       virtual void VSetGravityScale( float gravScale ) = 0;
-
+      virtual Vec3 VGetGlobalCentroid( void ) const = 0;
       virtual AABB VGetAABB( void ) const = 0;
    };
 

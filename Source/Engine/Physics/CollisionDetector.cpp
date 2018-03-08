@@ -19,15 +19,46 @@
 #include <limits>
 
 ContactPoint::ContactPoint( void ) :
-   m_AccumulatedImpulse( 0.f )
+   m_AccumulatedImpulseN( 0.f )
+   , m_AccumulatedImpulseT( 0.f )
+   , m_AccumulatedImpulseBT( 0.f )
    , m_PenetrationDepth( 0.f )
    {
    }
 
-ContactPoint::ContactPoint( const SupportPoint& supportPoint ) 
+ContactPoint::ContactPoint( const SupportPoint& supportPoint, const Vec3& normal, const Vec3& ra, const Vec3& rb )
    : m_SupportPoint( supportPoint )
-   , m_AccumulatedImpulse( 0.f )
+   , m_AccumulatedImpulseN( 0.f )
+   , m_AccumulatedImpulseT( 0.f )
+   , m_AccumulatedImpulseBT( 0.f )
+   , m_Normal( normal )
+   , m_RA( ra )
+   , m_RB( rb )
    {
+   // compute tangent and bitangent from normal
+   // http://box2d.org/2014/02/computing-a-basis/
+   // x is significant axis
+   // 0.57735f is sqrt( 1/3 ), for an uniform vector it must have at least one
+   // component which scale is larger than that
+   if( std::abs( m_Normal.x ) >= 0.57735f )
+      {
+      m_Tangent = Vec3( m_Normal.y, -m_Normal.x, 0.f );
+      }
+   else // x is not
+      {
+      m_Tangent = Vec3( 0.f, m_Normal.z, -m_Normal.y );
+      }
+   m_Tangent.Normalize();
+   m_Bitangent = m_Normal.Cross( m_Tangent );
+
+   m_NRACrossN = ( -m_RA ).Cross( m_Normal );
+   m_RBCrossN = ( m_RB ).Cross( m_Normal );
+
+   m_NRACrossT = ( -m_RA ).Cross( m_Tangent );
+   m_RBCrossT = ( m_RB ).Cross( m_Tangent );
+
+   m_NRACrossBT = ( -m_RA ).Cross( m_Bitangent );
+   m_RBCrossBT = ( m_RB ).Cross( m_Bitangent );
    }
 
 Vec3 Face::FindBarycentricCoords( const Vec3& point )
@@ -61,10 +92,22 @@ void Manifold::CalculateCombinedRestitution( void )
    const float rX = pRigidBodyA->GetRestitution();
    const float rY = pRigidBodyB->GetRestitution();
 
-   float wX = sqrtOf2 * std::abs( 2.f * rX - 1 ) + 1.f;
-   float wY = sqrtOf2 * std::abs( 2.f * rY - 1 ) + 1.f;
+   float wX = sqrtOf2 * std::abs( 2.f * rX - 1.f ) + 1.f;
+   float wY = sqrtOf2 * std::abs( 2.f * rY - 1.f ) + 1.f;
    
    m_CombinedRestitution = ( rX * wX + rY * wY ) / ( wX + wY );
+   }
+
+void Manifold::CalculateCombinedFriction( void )
+   {
+   const float sqrtOf2 = 1.41421356237f;
+   const float rX = pRigidBodyA->GetFriction();
+   const float rY = pRigidBodyB->GetFriction();
+
+   float wX = sqrtOf2 * std::abs( 1.f - rX ) + 1.f;
+   float wY = sqrtOf2 * std::abs( 1.f - rY ) + 1.f;
+
+   m_CombinedFriction = ( rX * wX + rY * wY ) / ( wX + wY );
    }
 
 bool CollisionDetector::CollisionDetection( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidBody> pRigidBodyB, Manifold& manifold )
@@ -700,9 +743,11 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
                               + baryCoords.y * pB->m_PointB
                               + baryCoords.z * pC->m_PointB );
 
-   ContactPoint contactPoint( spPoint );
-   contactPoint.m_Normal = best_face->m_Plane.GetNormal();
-   contactPoint.m_PenetrationDepth = std::abs( best_face->m_Plane.GetD() );
+   ContactPoint contactPoint( spPoint
+                              , best_face->m_Plane.GetNormal()
+                              , spPoint.m_PointA - pColliderA->VGetRigidBody().lock()->VGetGlobalCentroid()
+                              , spPoint.m_PointA - pColliderB->VGetRigidBody().lock()->VGetGlobalCentroid() );
+   contactPoint.m_PenetrationDepth = std::abs( best_face->m_Plane.GetD() ); 
    manifold.AddContactPoint( contactPoint );
    }
 

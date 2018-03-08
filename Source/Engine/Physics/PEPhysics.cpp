@@ -142,6 +142,7 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
          manifold.pRigidBodyB = pair.second;
          pRB = manifold.pRigidBodyA;
          manifold.CalculateCombinedRestitution();
+         manifold.CalculateCombinedFriction();
          // ENG_LOG( "Test", std::string( "PD: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
          
          // ENG_LOG( "Test", std::string( "N: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_Normal ) );
@@ -199,9 +200,9 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
    m_pRigidBodySolver->SolveConstraint( m_Manifolds, 0.1f );
    if( pRB )
       {
-      ENG_LOG( "Test", std::string( "V: " ) + ToStr( pRB->m_LinearVelocity ) );
+      /*ENG_LOG( "Test", std::string( "V: " ) + ToStr( pRB->m_LinearVelocity ) );
       ENG_LOG( "Test", std::string( "AV: " ) + ToStr( pRB->m_AngularVelocity ) );
-
+      */
       }
    // Update transform
    for( auto& pair : m_RigidBodyToRenderComp )

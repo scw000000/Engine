@@ -20,12 +20,6 @@ static int const& SEQUENTIAL_IMPULSE_ITERATION_NUM = 4;
 
 void RigidBodySolver::SolveConstraint( std::vector<Manifold>& manifolds, float deltaSeconds )
    {
-   // Calc jacobian first
-   for(auto& manifold : manifolds)
-      {
-      CalculateJacobian( manifold );
-      }
-
    // Do sequential impulses
    for( int i = 0; i < SEQUENTIAL_IMPULSE_ITERATION_NUM; ++i )
       {
@@ -34,80 +28,93 @@ void RigidBodySolver::SolveConstraint( std::vector<Manifold>& manifolds, float d
          for( int j = 0; j < manifold.m_ContactPointCount; ++j )
             {
             // Compute the corrective impulse, but don¡¦t apply it.
-            float lambda = CalculateLambda(manifold, j, deltaSeconds);
-            ApplyImpulse(manifold, j, lambda);
+            float lambda = CalculateLambda(manifold, j, deltaSeconds, 0);
+            ApplyImpulse(manifold, j, lambda, 0);
+            float lambdaT = CalculateLambda( manifold, j, deltaSeconds, 1 );
+            ApplyImpulse( manifold, j, lambdaT, 1 );
+            float lambdaBT = CalculateLambda( manifold, j, deltaSeconds, 2 );
+            ApplyImpulse( manifold, j, lambdaBT, 2 );
             }
          }
       }
    }
 
-void RigidBodySolver::CalculateJacobian( Manifold& manifold )
-   {
-   for( int i = 0; i < manifold.m_ContactPointCount; ++i )
-      {
-      auto& contact = manifold.m_ContactPoints[ i ];
-      auto& jacobian = contact.m_Jacobian;
-      auto& pRBA = manifold.pRigidBodyA;
-      jacobian.m_NRACrossN = ( pRBA->m_GlobalCentroid - contact.m_SupportPoint.m_PointA ).Cross( contact.m_Normal );
-      auto& pRBB = manifold.pRigidBodyB;
-      jacobian.m_RBCrossN = ( contact.m_SupportPoint.m_PointB - pRBB->m_GlobalCentroid ).Cross( contact.m_Normal );
-      }
-   }
-
-float RigidBodySolver::CalculateLambda( Manifold& manifold, int contactPtIdx, float deltaSeconds )
+float RigidBodySolver::CalculateLambda( Manifold& manifold, int contactPtIdx, float deltaSeconds, int axisIdx )
    {
    auto& contact = manifold.m_ContactPoints[ contactPtIdx ];
    auto& pRBA = manifold.pRigidBodyA;
    auto& pRBB = manifold.pRigidBodyB;
-
+   const Vec3& axis = ( axisIdx == 0 ? contact.m_Normal : ( axisIdx == 1 ? contact.m_Tangent : contact.m_Bitangent ) );
+   const Vec3& nRACrossAxis = ( axisIdx == 0 ? contact.m_NRACrossN : ( axisIdx == 1 ? contact.m_NRACrossT : contact.m_NRACrossBT ) );
+   const Vec3& rBCrossAxis = ( axisIdx == 0 ? contact.m_RBCrossN : ( axisIdx == 1 ? contact.m_RBCrossT : contact.m_RBCrossBT ) );
    // numerator = -( JV + b )
    // ENG_LOG( "Test", ToStr( contact.m_Normal) );
-
+   /* float Cr = manifold.m_CombinedRestitution * contact.m_Normal.Dot( -pRBA->m_LinearVelocity - pRBA->m_AngularVelocity.Cross( contact.m_SupportPoint.m_PointA - pRBA->m_GlobalCentroid )
+                                                                      + pRBB->m_LinearVelocity + pRBB->m_AngularVelocity.Cross( contact.m_SupportPoint.m_PointB - pRBB->m_GlobalCentroid ) );
+                                                                      ENG_LOG("Test", ToStr(Cr));*/
    /// ENG_LOG( "Test", ToStr( contact.m_Normal.Dot( contact.m_SupportPoint.m_PointB - contact.m_SupportPoint.m_PointA ) ) );
-   float numerator = -( -contact.m_Normal.Dot( pRBA->m_LinearVelocity )
-                        + contact.m_Jacobian.m_NRACrossN.Dot( pRBA->m_AngularVelocity )
-                        + contact.m_Normal.Dot( pRBB->m_LinearVelocity )
-                        + contact.m_Jacobian.m_RBCrossN.Dot( pRBB->m_AngularVelocity )
-                        + manifold.m_CombinedRestitution * contact.m_Normal.Dot( -pRBA->m_LinearVelocity - pRBA->m_AngularVelocity.Cross( contact.m_SupportPoint.m_PointA - pRBA->m_GlobalCentroid )
-                        + pRBB->m_LinearVelocity + pRBB->m_AngularVelocity.Cross( contact.m_SupportPoint.m_PointB - pRBB->m_GlobalCentroid ) )
-                        + 0.2f / deltaSeconds * contact.m_Normal.Dot( contact.m_SupportPoint.m_PointB - contact.m_SupportPoint.m_PointA ) );
+   // ENG_LOG( "Test", ToStr( 0.2f / deltaSeconds * contact.m_Normal.Dot( contact.m_SupportPoint.m_PointB - contact.m_SupportPoint.m_PointA ) ) );
+   float numerator = -( -axis.Dot( pRBA->m_LinearVelocity )
+                        + nRACrossAxis.Dot( pRBA->m_AngularVelocity )
+                        + axis.Dot( pRBB->m_LinearVelocity )
+                        + rBCrossAxis.Dot( pRBB->m_AngularVelocity )
+                        );
                        // - 0.1f / deltaSeconds * contact.m_PenetrationDepth );
+   if(true || axisIdx == 0)
+      {
+      numerator -= ( manifold.m_CombinedRestitution * axis.Dot( -pRBA->m_LinearVelocity - pRBA->m_AngularVelocity.Cross( contact.m_RA )
+                     + pRBB->m_LinearVelocity + pRBB->m_AngularVelocity.Cross( contact.m_RB ) )
+                   + 0.2f / deltaSeconds * axis.Dot( contact.m_SupportPoint.m_PointB - contact.m_SupportPoint.m_PointA ) );
+      }
    // denominator = J M-1 J^t
-   Vec3 term1 = -contact.m_Normal * pRBA->m_InverseMass;
-   Vec3 term2 = contact.m_Jacobian.m_NRACrossN * pRBA->m_GlobalInverseInertia;
-   Vec3 term3 = contact.m_Normal * pRBB->m_InverseMass;
-   Vec3 term4 = contact.m_Jacobian.m_RBCrossN * pRBB->m_GlobalInverseInertia;
-   float denominator = term1.Dot( -contact.m_Normal ) 
-      + term2.Dot( (contact.m_Jacobian.m_NRACrossN) )
-      + term3.Dot( contact.m_Normal )
-      + term4.Dot( contact.m_Jacobian.m_RBCrossN );
+   Vec3 term1 = -axis * pRBA->m_InverseMass;
+   Vec3 term2 = nRACrossAxis * pRBA->m_GlobalInverseInertia;
+   Vec3 term3 = axis * pRBB->m_InverseMass;
+   Vec3 term4 = rBCrossAxis * pRBB->m_GlobalInverseInertia;
+   float denominator = term1.Dot( -axis )
+      + term2.Dot( nRACrossAxis )
+      + term3.Dot( axis )
+      + term4.Dot( rBCrossAxis );
 
    return numerator / denominator;
    }
 
-void RigidBodySolver::ApplyImpulse( Manifold& manifold, int contactPtIdx, float lambda )
+void RigidBodySolver::ApplyImpulse( Manifold& manifold, int contactPtIdx, float lambda, int axisIdx )
    {
    auto& contact = manifold.m_ContactPoints[ contactPtIdx ];
+   const Vec3& axis = ( axisIdx == 0 ? contact.m_Normal : ( axisIdx == 1 ? contact.m_Tangent : contact.m_Bitangent ) );
+   const Vec3& nRACrossAxis = ( axisIdx == 0 ? contact.m_NRACrossN : ( axisIdx == 1 ? contact.m_NRACrossT : contact.m_NRACrossBT ) );
+   const Vec3& rBCrossAxis = ( axisIdx == 0 ? contact.m_RBCrossN : ( axisIdx == 1 ? contact.m_RBCrossT : contact.m_RBCrossBT ) );
+   float& accumulatedImpulse = ( axisIdx == 0 ? contact.m_AccumulatedImpulseN : ( axisIdx == 1 ? contact.m_AccumulatedImpulseT : contact.m_AccumulatedImpulseBT ) );
 
    // Make a copy of the old accumulated impulse.
-   float prevImpulse = contact.m_AccumulatedImpulse;
+   float prevImpulse = accumulatedImpulse;
    // Add the corrective impulse to the accumulated impulse.
-   contact.m_AccumulatedImpulse += lambda;
+   accumulatedImpulse += lambda;
    // Clamp the accumulated impulse.
-   contact.m_AccumulatedImpulse = std::max( 0.f, contact.m_AccumulatedImpulse );
-
+   if(axisIdx == 0)
+      {
+      accumulatedImpulse = std::max( 0.f, accumulatedImpulse );
+      }
+   else
+      {
+     // accumulatedImpulse += lambda * 3.f;
+      float bound = manifold.m_CombinedFriction * contact.m_AccumulatedImpulseN;
+      accumulatedImpulse = std::max( -bound, std::min( bound, accumulatedImpulse ) );
+      }
+   
    // Compute the change in the accumulated impulse using the copy from step 2.
-   float deltaImpulse = contact.m_AccumulatedImpulse - prevImpulse;
+   float deltaImpulse = accumulatedImpulse - prevImpulse;
 
    auto& pRBA = manifold.pRigidBodyA;
    // Apply the impulse delta 
-   pRBA->m_LinearVelocity += pRBA->m_InverseMass * -contact.m_Normal * deltaImpulse;
-   pRBA->m_AngularVelocity += (pRBA->m_GlobalInverseInertia * contact.m_Jacobian.m_NRACrossN) * deltaImpulse;
+   pRBA->m_LinearVelocity += pRBA->m_InverseMass * -axis * deltaImpulse;
+   pRBA->m_AngularVelocity += ( pRBA->m_GlobalInverseInertia * nRACrossAxis ) * deltaImpulse;
 
    auto& pRBB = manifold.pRigidBodyB;
    // Apply the impulse delta 
-   pRBB->m_LinearVelocity += pRBB->m_InverseMass * contact.m_Normal * deltaImpulse;
-   pRBB->m_AngularVelocity += pRBB->m_GlobalInverseInertia * contact.m_Jacobian.m_RBCrossN * deltaImpulse;
+   pRBB->m_LinearVelocity += pRBB->m_InverseMass * axis * deltaImpulse;
+   pRBB->m_AngularVelocity += pRBB->m_GlobalInverseInertia * rBCrossAxis * deltaImpulse;
 
    //float numerator = ( -contact.m_Normal.Dot( pRBA->m_LinearVelocity )
    //                     + contact.m_Jacobian.m_NRACrossN.Dot( pRBA->m_AngularVelocity )

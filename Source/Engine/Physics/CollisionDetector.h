@@ -33,24 +33,28 @@ struct SupportPoint
       Vec3 m_PointB;
    };
 
-struct Jacobian
-   {
-   public:
-      Vec3 m_NRACrossN;
-      Vec3 m_RBCrossN;
-   };
-
 struct ContactPoint
    {
    public:
       ContactPoint( void );
-      ContactPoint( const SupportPoint& supportPoint );
+      ContactPoint( const SupportPoint& supportPoint, const Vec3& normal, const Vec3& ra, const Vec3& rb );
       
       Vec3 m_Normal;
+      Vec3 m_Tangent;
+      Vec3 m_Bitangent;
       float m_PenetrationDepth;
       SupportPoint m_SupportPoint;
-      float m_AccumulatedImpulse;
-      Jacobian m_Jacobian;
+      float m_AccumulatedImpulseN;
+      float m_AccumulatedImpulseT;
+      float m_AccumulatedImpulseBT;
+      Vec3 m_RA;
+      Vec3 m_RB;
+      Vec3 m_NRACrossN;
+      Vec3 m_RBCrossN;
+      Vec3 m_NRACrossT;
+      Vec3 m_RBCrossT;
+      Vec3 m_NRACrossBT;
+      Vec3 m_RBCrossBT;
    };
 
 struct Manifold
@@ -62,8 +66,10 @@ struct Manifold
       int m_ContactPointCount;
       ContactPoint m_ContactPoints[ MANIFOLD_MAX_NUM ];
       float m_CombinedRestitution;
+      float m_CombinedFriction;
       void AddContactPoint( const ContactPoint& newPoint );
       void CalculateCombinedRestitution( void );
+      void CalculateCombinedFriction( void );
    };
 
 

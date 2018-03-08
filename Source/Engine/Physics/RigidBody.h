@@ -46,6 +46,7 @@ class RigidBody : public IRigidBody
       virtual void VSetRotateFactor( const Vec3& factor ) override;
       virtual void VSetGravityScale( float gravScale ) override { m_GravityScale = gravScale; };
       virtual AABB VGetAABB() const override;
+      virtual Vec3 VGetGlobalCentroid( void ) const override { return m_GlobalCentroid; }
       void SetMaterialData( MaterialData& data ) { m_Material = data; };
       float GetRestitution( void ) const { return m_Material.m_Restitution; }
       float GetFriction( void ) const { return m_Material.m_Friction; }

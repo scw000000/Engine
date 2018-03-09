@@ -60,7 +60,7 @@ float RigidBodySolver::CalculateLambda( Manifold& manifold, int contactPtIdx, fl
                         + rBCrossAxis.Dot( pRBB->m_AngularVelocity )
                         );
                        // - 0.1f / deltaSeconds * contact.m_PenetrationDepth );
-   if(true || axisIdx == 0)
+   if(axisIdx == 0)
       {
       numerator -= ( manifold.m_CombinedRestitution * axis.Dot( -pRBA->m_LinearVelocity - pRBA->m_AngularVelocity.Cross( contact.m_RA )
                      + pRBB->m_LinearVelocity + pRBB->m_AngularVelocity.Cross( contact.m_RB ) )

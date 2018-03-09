@@ -49,9 +49,10 @@ void RigidBody::VMoveForOneTimeStep( float deltaSecond )
    const float angle = m_AngularVelocity.Length() * deltaSecond;
    if( angle != 0.0f )
       {
-      m_AngularVelocity.Normalize();
+      auto normalizedAV = m_AngularVelocity;
+      normalizedAV.Normalize();
       Quaternion q;
-      q.BuildAxisRad( m_AngularVelocity, angle );
+      q.BuildAxisRad( normalizedAV, angle );
       auto origPos = m_Transform.GetToWorldPosition();
       m_Transform.SetPosition( Vec3::g_Zero );
       m_Transform.AddToWorldRotation( q );

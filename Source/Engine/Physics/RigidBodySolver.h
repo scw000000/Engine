@@ -22,8 +22,7 @@ class RigidBodySolver
       void SolveConstraint(std::vector<Manifold>& manifolds, float deltaSeconds);
 
       private:
-      void CalculateJacobian(Manifold& manifold);
-      float CalculateLambda( Manifold& manifold, int contactPtIdx, float deltaSeconds );
-      void ApplyImpulse( Manifold& manifold, int contactPtIdx, float lambda );
+      float CalculateLambda( Manifold& manifold, int contactPtIdx, float deltaSeconds, int axisIdx );
+      void ApplyImpulse( Manifold& manifold, int contactPtIdx, float lambda, int axisIdx );
       
    };

@@ -128,10 +128,12 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
          }
       }
 #endif
+   
    shared_ptr<RigidBody> pRB;
    for( auto& pair : collisionPairs ) 
       {
       Manifold manifold;
+      // get contact point
       if( m_pCollisionDetector->CollisionDetection(
          pair.first,
          pair.second,
@@ -149,8 +151,14 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
          // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
          //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
          m_Manifolds.push_back( manifold );
+         // Insert the points into manifold, Check if manifold exist, if not create one
+         // and push it into it
+         // record colliding pairs
          }
       }
+   // Remove all non-colliding manifolds based on the record
+   
+
 
    //for( auto leftPair = m_RigidBodyToRenderComp.begin(); leftPair != m_RigidBodyToRenderComp.end(); ++leftPair )
    //   {

@@ -81,6 +81,8 @@ Vec3 Face::FindBarycentricCoords( const Vec3& point )
 
 void Manifold::AddContactPoint( const ContactPoint& newPoint)
    {
+   // Scan through the valid points, remove or update them
+
    ENG_ASSERT( m_ContactPointCount < MANIFOLD_MAX_NUM );
    m_ContactPoints[ m_ContactPointCount++ ] = newPoint;
    }

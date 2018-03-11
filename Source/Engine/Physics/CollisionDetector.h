@@ -27,6 +27,8 @@ struct SupportPoint
          : m_PointCSO( pA - pB ), m_PointA( pA ), m_PointB( pB )
          {}
       SupportPoint( void ) {}
+      ;
+
     public:
       Vec3 m_PointCSO;
       Vec3 m_PointA;
@@ -37,16 +39,21 @@ struct ContactPoint
    {
    public:
       ContactPoint( void );
-      ContactPoint( const SupportPoint& supportPoint, const Vec3& normal, const Vec3& ra, const Vec3& rb );
-      
-      Vec3 m_Normal;
-      Vec3 m_Tangent;
-      Vec3 m_Bitangent;
+      // ContactPoint( const SupportPoint& supportPoint, const Vec3& normal, const Vec3& ra, const Vec3& rb );
+      bool IsValid( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidBody> pRigidBodyB ) const;
+      void Update( shared_ptr<IRigidBody> pRigidBodyA, shared_ptr<IRigidBody> pRigidBodyB );
       float m_PenetrationDepth;
-      SupportPoint m_SupportPoint;
       float m_AccumulatedImpulseN;
       float m_AccumulatedImpulseT;
       float m_AccumulatedImpulseBT;
+
+      Vec3 m_Normal;
+      Vec3 m_Tangent;
+      Vec3 m_Bitangent;
+      Vec3 m_PointAWS;
+      Vec3 m_PointALS;
+      Vec3 m_PointBWS;
+      Vec3 m_PointBLS;
       Vec3 m_RA;
       Vec3 m_RB;
       Vec3 m_NRACrossN;
@@ -61,10 +68,10 @@ struct Manifold
    {
    public:
       Manifold( void ) : m_ContactPointCount( 0 ), m_CombinedRestitution(0.f){}
-      shared_ptr<RigidBody> pRigidBodyA;
-      shared_ptr<RigidBody> pRigidBodyB;
+      shared_ptr<RigidBody> m_pRigidBodyA;
+      shared_ptr<RigidBody> m_pRigidBodyB;
       int m_ContactPointCount;
-      ContactPoint m_ContactPoints[ MANIFOLD_MAX_NUM ];
+      ContactPoint m_ContactPoints[ MANIFOLD_MAX_NUM + 1 ];
       float m_CombinedRestitution;
       float m_CombinedFriction;
       void AddContactPoint( const ContactPoint& newPoint );
@@ -159,10 +166,10 @@ class Polyhedron
 class CollisionDetector
    {
    public:
-      bool CollisionDetection( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidBody> pRigidBodyB, Manifold& manifold );
+      bool CollisionDetection( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidBody> pRigidBodyB, ContactPoint& contact );
    
    private:
-      bool CollisionDetection( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Manifold& manifold );
+      bool CollisionDetection( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, ContactPoint& contact );
    
       void GJKUpdateSimplex( Simplex& simplex );
       bool GJKContainsOrigin( Simplex& simplex, Vec3& direction );
@@ -170,6 +177,6 @@ class CollisionDetector
 
       void EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr< SupportPoint > pNewPoint );
       void EPAExpandToTetrahedron( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex );
-      void EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex, Manifold& manifold );
+      void EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex, ContactPoint& contact );
       SupportPoint GetCSOSupportPoint( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Vec3& direction );
    };

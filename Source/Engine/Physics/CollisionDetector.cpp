@@ -18,6 +18,8 @@
 #include "Colliders.h"
 #include <limits>
 
+#define CONTACT_DISTANCE_TOLERANCE fESPLION
+
 ContactPoint::ContactPoint( void ) :
    m_AccumulatedImpulseN( 0.f )
    , m_AccumulatedImpulseT( 0.f )
@@ -26,15 +28,67 @@ ContactPoint::ContactPoint( void ) :
    {
    }
 
-ContactPoint::ContactPoint( const SupportPoint& supportPoint, const Vec3& normal, const Vec3& ra, const Vec3& rb )
-   : m_SupportPoint( supportPoint )
-   , m_AccumulatedImpulseN( 0.f )
-   , m_AccumulatedImpulseT( 0.f )
-   , m_AccumulatedImpulseBT( 0.f )
-   , m_Normal( normal )
-   , m_RA( ra )
-   , m_RB( rb )
+//ContactPoint::ContactPoint( const SupportPoint& supportPoint, const Vec3& normal, const Vec3& ra, const Vec3& rb )
+//   : m_SupportPoint( supportPoint )
+//   , m_AccumulatedImpulseN( 0.f )
+//   , m_AccumulatedImpulseT( 0.f )
+//   , m_AccumulatedImpulseBT( 0.f )
+//   , m_Normal( normal )
+//   , m_RA( ra )
+//   , m_RB( rb )
+//   {
+//   // compute tangent and bitangent from normal
+//   // http://box2d.org/2014/02/computing-a-basis/
+//   // x is significant axis
+//   // 0.57735f is sqrt( 1/3 ), for an uniform vector it must have at least one
+//   // component which scale is larger than that
+//   if( std::abs( m_Normal.x ) >= 0.57735f )
+//      {
+//      m_Tangent = Vec3( m_Normal.y, -m_Normal.x, 0.f );
+//      }
+//   else // x is not
+//      {
+//      m_Tangent = Vec3( 0.f, m_Normal.z, -m_Normal.y );
+//      }
+//   m_Tangent.Normalize();
+//   m_Bitangent = m_Normal.Cross( m_Tangent );
+//
+//   m_NRACrossN = ( -m_RA ).Cross( m_Normal );
+//   m_RBCrossN = ( m_RB ).Cross( m_Normal );
+//
+//   m_NRACrossT = ( -m_RA ).Cross( m_Tangent );
+//   m_RBCrossT = ( m_RB ).Cross( m_Tangent );
+//
+//   m_NRACrossBT = ( -m_RA ).Cross( m_Bitangent );
+//   m_RBCrossBT = ( m_RB ).Cross( m_Bitangent );
+//   }
+
+bool ContactPoint::IsValid( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidBody> pRigidBodyB ) const
    {
+   Vec3 vBA = pRigidBodyA->VTransformToGlobal( m_PointALS, true ) - pRigidBodyB->VTransformToGlobal( m_PointBLS, true );
+   // vBA should be the same direction with normal
+   // if it's negative that means it might be separated
+   if( vBA.Dot( m_Normal ) <= -0.01f )
+      {
+      return false;
+      }
+   // Get projection vector
+   vBA -= m_Normal * ( vBA.Dot( m_Normal ) );
+   if( vBA.Dot( vBA ) >= 0.01f )
+      {
+      return false;
+      }
+
+   return true;
+   }
+
+void ContactPoint::Update( shared_ptr<IRigidBody> pRigidBodyA, shared_ptr<IRigidBody> pRigidBodyB )
+   {
+   m_PointALS = pRigidBodyA->VTransformToLocal( m_PointAWS, true );
+   m_RA = m_PointAWS - pRigidBodyA->VGetGlobalCentroid();
+
+   m_PointBLS = pRigidBodyB->VTransformToLocal( m_PointBWS, true );
+   m_RB = m_PointBWS - pRigidBodyB->VGetGlobalCentroid();
    // compute tangent and bitangent from normal
    // http://box2d.org/2014/02/computing-a-basis/
    // x is significant axis
@@ -59,6 +113,7 @@ ContactPoint::ContactPoint( const SupportPoint& supportPoint, const Vec3& normal
 
    m_NRACrossBT = ( -m_RA ).Cross( m_Bitangent );
    m_RBCrossBT = ( m_RB ).Cross( m_Bitangent );
+
    }
 
 Vec3 Face::FindBarycentricCoords( const Vec3& point )
@@ -78,21 +133,222 @@ Vec3 Face::FindBarycentricCoords( const Vec3& point )
    return Vec3( u, v, 1.f - u - v );
    }
 
+float DistanceSqFromPointToLine( const Vec3& pA, const Vec3& pB, const Vec3& pP )
+   {
+   Vec3 lineDir = ( pB - pA );
+   lineDir.Normalize();
+   Vec3 vAP = pP - pA;
+   return ( vAP - ( vAP.Dot( lineDir ) * lineDir ) ).LengthSq();
+   }
+
+float DistanceSqFromPointToTriangle( const Vec3& pA, const Vec3& pB, const Vec3& pC, const Vec3& pP )
+   {
+   Vec3 vAB = pB - pA;
+   Vec3 vAC = pC - pA;
+   Vec3 vBC = pC - pA;
+
+   Vec3 vAP = pP - pA;
+
+   // vertices region test
+   float snom = vAB.Dot( pP );
+   float tnom = vAC.Dot( pP );
+
+   if( snom <= 0.f && tnom <= 0.f )
+      {
+      return ( vAP ).LengthSq();
+      }
+   
+   Vec3 vBP = pP - pB;
+   float sdenom = vBP.Dot( -vAB );
+   float unom = vBP.Dot( vBC );
+   if( sdenom <= 0.f && unom <= 0.f )
+      {
+      return ( vBP ).LengthSq();
+      }
+
+   Vec3 vCP = pP - pC;
+   float tdenom = vCP.Dot( -vAC );
+   float udenom = vCP.Dot( -vBC );
+   if( tdenom <= 0.f && udenom <= 0.f )
+      {
+      return ( vCP ).LengthSq();
+      }
+
+   Vec3 n = vAB.Cross( vAC );
+   // test edge ab
+   if( n.Dot( -vAP.Cross( -vBP ) ) <= 0.f && snom >= 0.0f && sdenom >= 0.0f )
+      {
+      return DistanceSqFromPointToLine( pA, pB, pP );
+      }
+   // test edge ac
+   if( n.Dot( -vCP.Cross( -vAP ) ) <= 0.f && tnom >= 0.0f && tdenom >= 0.0f )
+      {
+      return DistanceSqFromPointToLine( pA, pC, pP );
+      }
+   // test edge bc
+   if( n.Dot( -vBP.Cross( -vCP ) ) <= 0.f && unom >= 0.0f && udenom >= 0.0f )
+      {
+      return DistanceSqFromPointToLine( pB, pC, pP );
+      }
+
+   float d = -pA.Dot( n );
+   return std::abs( pP.Dot( n ) + d );
+   }
+
+
 
 void Manifold::AddContactPoint( const ContactPoint& newPoint)
    {
+   bool replaced = false;
    // Scan through the valid points, remove or update them
+   int invalidIdx = 0;
+   int validIdx = m_ContactPointCount - 1;
+   while( invalidIdx <= validIdx )
+      {
+      // update invalid idx
+      while( invalidIdx <= validIdx )
+         {
+         auto& currCP = m_ContactPoints[ invalidIdx ];
+         Vec3 vA = currCP.m_PointALS - newPoint.m_PointALS;
+         Vec3 vB = currCP.m_PointBLS - newPoint.m_PointBLS;
+         // test if I can replace it, if true, replace it
+         if( !replaced && vA.Dot( vA ) <= fESPLION || vB.Dot( vB ) <= fESPLION )
+            {
+            replaced = true;
+            currCP = newPoint;
+            }
+         // else if it's not valid, break
+         else if( !currCP.IsValid( m_pRigidBodyA, m_pRigidBodyB ) )
+         {
+            break;
+         }
+         // else then it's valid, recalculate its info?
+         currCP.m_Normal = newPoint.m_Normal;
+         currCP.m_PointAWS = m_pRigidBodyA->VTransformToGlobal( currCP.m_PointALS, true );
+         currCP.m_PointBWS = m_pRigidBodyB->VTransformToGlobal( currCP.m_PointBLS, true );
+         currCP.Update( m_pRigidBodyA, m_pRigidBodyB );
+         ++invalidIdx;
+         }
 
-   ENG_ASSERT( m_ContactPointCount < MANIFOLD_MAX_NUM );
-   m_ContactPoints[ m_ContactPointCount++ ] = newPoint;
+      while( invalidIdx <= validIdx )
+         {  
+         auto& currCP = m_ContactPoints[ validIdx ];
+         Vec3 vA = currCP.m_PointALS - newPoint.m_PointALS;
+         Vec3 vB = currCP.m_PointBLS - newPoint.m_PointBLS;
+         // test if I can replace it, if true, replace it and break
+         if( !replaced && vA.Dot( vA ) <= fESPLION || vB.Dot( vB ) <= fESPLION )
+            {
+            replaced = true;
+            currCP = newPoint;
+            break;
+            }
+         // else if it's valid, break
+         else if( currCP.IsValid( m_pRigidBodyA, m_pRigidBodyB ) )
+            {
+            currCP.m_Normal = newPoint.m_Normal;
+            currCP.m_PointAWS = m_pRigidBodyA->VTransformToGlobal( currCP.m_PointALS, true );
+            currCP.m_PointBWS = m_pRigidBodyB->VTransformToGlobal( currCP.m_PointBLS, true );
+            currCP.Update( m_pRigidBodyA, m_pRigidBodyB );
+            break;
+            }
+         --validIdx;
+         }
+      if( invalidIdx >= validIdx )
+         {
+         m_ContactPointCount = invalidIdx;
+         break;
+         }
+      std::swap( m_ContactPoints[ invalidIdx ], m_ContactPoints[ validIdx ] );
+      ++invalidIdx;
+      --validIdx;
+      }
+   if( !replaced )
+      {
+      // append the newly added one if this manifold has less than 4 cps
+      if( m_ContactPointCount < MANIFOLD_MAX_NUM )
+         {
+         m_ContactPoints[ m_ContactPointCount++ ] = newPoint;
+         }
+      else // find a way to discard new one
+         {
+         // first append the new cp to 5th idx
+         m_ContactPoints[ MANIFOLD_MAX_NUM ] = newPoint;
+
+         ContactPoint* pDeepest = &m_ContactPoints[ 0 ];
+         for( int i = 1; i <= MANIFOLD_MAX_NUM; ++i )
+            {
+            if( m_ContactPoints[ i ].m_PenetrationDepth > pDeepest->m_PenetrationDepth )
+               {
+               pDeepest = &m_ContactPoints[ i ];
+               }
+            }
+
+         ContactPoint* pfarestFromDeepst = &m_ContactPoints[ 0 ];
+         float maxDistSq = ( pfarestFromDeepst->m_PointAWS - pDeepest->m_PointAWS ).LengthSq();
+         for( int i = 1; i <= MANIFOLD_MAX_NUM; ++i )
+            {
+            float distSq = ( m_ContactPoints[ i ].m_PointAWS - pDeepest->m_PointAWS ).LengthSq();
+            if( distSq > maxDistSq )
+               {
+               pfarestFromDeepst = &m_ContactPoints[ i ];
+               maxDistSq = distSq;
+               }
+            }
+
+         ContactPoint* pfarestFromLine = &m_ContactPoints[ 0 ];
+         Vec3 lineDir = ( pfarestFromDeepst->m_PointAWS - pDeepest->m_PointAWS );
+         lineDir.Normalize();
+         Vec3 v = pfarestFromLine->m_PointAWS - pDeepest->m_PointAWS;
+         maxDistSq = ( v - ( v.Dot( lineDir ) * lineDir ) ).LengthSq();
+         for( int i = 1; i <= MANIFOLD_MAX_NUM; ++i )
+            {
+            v = m_ContactPoints[ i ].m_PointAWS - pDeepest->m_PointAWS;
+            float distSq = ( v - ( v.Dot( lineDir ) * lineDir ) ).LengthSq();
+            if( distSq > maxDistSq )
+               {
+               pfarestFromLine = &m_ContactPoints[ i ];
+               maxDistSq = distSq;
+               }
+            }
+
+         ContactPoint* pfarestFromTriangle = &m_ContactPoints[ 0 ];
+         maxDistSq = DistanceSqFromPointToTriangle( pDeepest->m_PointAWS
+                                                    , pfarestFromDeepst->m_PointAWS
+                                                    , pfarestFromLine->m_PointAWS
+                                                    , pfarestFromTriangle->m_PointAWS );
+
+         for( int i = 1; i <= MANIFOLD_MAX_NUM; ++i )
+            {
+            float distSq = DistanceSqFromPointToTriangle( pDeepest->m_PointAWS
+                                                          , pfarestFromDeepst->m_PointAWS
+                                                          , pfarestFromLine->m_PointAWS
+                                                          , m_ContactPoints[ i ].m_PointAWS );
+            if( distSq > maxDistSq )
+               {
+               pfarestFromTriangle = &m_ContactPoints[ i ];
+               maxDistSq = distSq;
+               }
+            }
+         ContactPoint p1( *pDeepest );
+         ContactPoint p2( *pfarestFromDeepst );
+         ContactPoint p3( *pfarestFromLine );
+         ContactPoint p4( *pfarestFromTriangle );
+         m_ContactPoints[ 0 ] = p1;
+         m_ContactPoints[ 1 ] = p2;
+         m_ContactPoints[ 2 ] = p3;
+         m_ContactPoints[ 3 ] = p4;
+
+         // m_ContactPoints[ std::rand() % MANIFOLD_MAX_NUM ] = newPoint;
+         }
+      }
    }
 
 void Manifold::CalculateCombinedRestitution( void )
    {
    // https://www.gamedev.net/articles/programming/math-and-physics/combining-material-friction-and-restitution-values-r4227/
    const float sqrtOf2 = 1.41421356237f;
-   const float rX = pRigidBodyA->GetRestitution();
-   const float rY = pRigidBodyB->GetRestitution();
+   const float rX = m_pRigidBodyA->GetRestitution();
+   const float rY = m_pRigidBodyB->GetRestitution();
 
    float wX = sqrtOf2 * std::abs( 2.f * rX - 1.f ) + 1.f;
    float wY = sqrtOf2 * std::abs( 2.f * rY - 1.f ) + 1.f;
@@ -103,8 +359,8 @@ void Manifold::CalculateCombinedRestitution( void )
 void Manifold::CalculateCombinedFriction( void )
    {
    const float sqrtOf2 = 1.41421356237f;
-   const float rX = pRigidBodyA->GetFriction();
-   const float rY = pRigidBodyB->GetFriction();
+   const float rX = m_pRigidBodyA->GetFriction();
+   const float rY = m_pRigidBodyB->GetFriction();
 
    float wX = sqrtOf2 * std::abs( 1.f - rX ) + 1.f;
    float wY = sqrtOf2 * std::abs( 1.f - rY ) + 1.f;
@@ -112,7 +368,7 @@ void Manifold::CalculateCombinedFriction( void )
    m_CombinedFriction = ( rX * wX + rY * wY ) / ( wX + wY );
    }
 
-bool CollisionDetector::CollisionDetection( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidBody> pRigidBodyB, Manifold& manifold )
+bool CollisionDetector::CollisionDetection( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidBody> pRigidBodyB, ContactPoint& contact )
    {
    bool hasCollision = false;
    for(auto& pColliderA : pRigidBodyA->m_Colliders)
@@ -120,7 +376,9 @@ bool CollisionDetector::CollisionDetection( shared_ptr<RigidBody> pRigidBodyA, s
       for( auto& pColliderB : pRigidBodyB->m_Colliders )
          {
          // Not sure how to generate manifold for composite RB
-         if( CollisionDetection( pColliderA, pColliderB, manifold ) )
+         // this is not correct for composite RB for now, cause you might generate multiple contact point   
+         // Maybe use vector of contact points?
+         if( CollisionDetection( pColliderA, pColliderB, contact ) )
             {
             hasCollision = true;
             }
@@ -130,7 +388,7 @@ bool CollisionDetector::CollisionDetection( shared_ptr<RigidBody> pRigidBodyA, s
    }
 
 // GJK & EPA algorithm
-bool CollisionDetector::CollisionDetection( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Manifold& manifold )
+bool CollisionDetector::CollisionDetection( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, ContactPoint& contact )
    {
    Simplex simplex;
    if( !GJK( pColliderA, pColliderB, simplex ) )
@@ -138,7 +396,7 @@ bool CollisionDetector::CollisionDetection( shared_ptr<ICollider> pColliderA, sh
       // No need for EPA
       return false;
       }
-   EPA( pColliderA, pColliderB, simplex, manifold );
+   EPA( pColliderA, pColliderB, simplex, contact );
    return true;
    }
 
@@ -668,7 +926,7 @@ void CollisionDetector::EPAExpandToTetrahedron( shared_ptr<ICollider> pColliderA
       }
    }
 
-void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex, Manifold& manifold )
+void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, Simplex& simplex, ContactPoint& contact )
    {
    GJKContainsOrigin( simplex, g_Up );
    EPAExpandToTetrahedron( pColliderA, pColliderB, simplex );
@@ -744,13 +1002,18 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
                               , baryCoords.x * pA->m_PointB
                               + baryCoords.y * pB->m_PointB
                               + baryCoords.z * pC->m_PointB );
+   auto pRBA = pColliderA->VGetRigidBody().lock();
+   auto pRBB = pColliderB->VGetRigidBody().lock();
 
-   ContactPoint contactPoint( spPoint
-                              , best_face->m_Plane.GetNormal()
-                              , spPoint.m_PointA - pColliderA->VGetRigidBody().lock()->VGetGlobalCentroid()
-                              , spPoint.m_PointA - pColliderB->VGetRigidBody().lock()->VGetGlobalCentroid() );
-   contactPoint.m_PenetrationDepth = std::abs( best_face->m_Plane.GetD() ); 
-   manifold.AddContactPoint( contactPoint );
+   contact.m_PointAWS = baryCoords.x * pA->m_PointA + baryCoords.y * pB->m_PointA + baryCoords.z * pC->m_PointA;
+
+   contact.m_PointBWS = baryCoords.x * pA->m_PointB + baryCoords.y * pB->m_PointB + baryCoords.z * pC->m_PointB;
+
+
+   contact.m_Normal = best_face->m_Plane.GetNormal(); 
+
+   contact.m_PenetrationDepth = std::abs( best_face->m_Plane.GetD() );
+   contact.Update( pRBA, pRBB );
    }
 
 SupportPoint CollisionDetector::GetCSOSupportPoint( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Vec3& direction )

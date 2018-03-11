@@ -100,7 +100,7 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
    static int it = 0;
    m_pBroadphase->VUpdate( 0.1f );
    // Update manifolds
-   m_Manifolds.clear();
+   // m_Manifolds.clear();
    m_pBroadphase->VCalcualteCollisionPairs();
    auto collisionPairs = m_pBroadphase->VGetCollisionPairs();
 
@@ -109,7 +109,7 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
    if( collisionPairs.size() == 0 )
       {
       // ENG_LOG("Test", " NO");
-      Manifold manifold;
+      ContactPoint cp;
       auto it = m_RigidBodyToRenderComp.begin();
 
       auto next = it;
@@ -117,10 +117,10 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
       if( m_pCollisionDetector->CollisionDetection(
          it->first ,
          next->first,
-         manifold
+         cp
          ) )
          {
-         if( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth > 0.01f )
+         if( cp.m_PenetrationDepth > 0.01f )
             {
             m_pBroadphase->VUpdate( 0.1f );
             m_pBroadphase->VCalcualteCollisionPairs();
@@ -128,35 +128,105 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
          }
       }
 #endif
-   
+   std::unordered_map< shared_ptr<RigidBody>, std::unordered_map<shared_ptr<RigidBody>, ContactPoint> > currCollisions;
    shared_ptr<RigidBody> pRB;
    for( auto& pair : collisionPairs ) 
       {
-      Manifold manifold;
+      ContactPoint contact;
       // get contact point
       if( m_pCollisionDetector->CollisionDetection(
          pair.first,
          pair.second,
-         manifold
+         contact
          ) )
          {
-         manifold.pRigidBodyA = pair.first;
+         /*manifold.pRigidBodyA = pair.first;
          manifold.pRigidBodyB = pair.second;
          pRB = manifold.pRigidBodyA;
          manifold.CalculateCombinedRestitution();
          manifold.CalculateCombinedFriction();
+         */
          // ENG_LOG( "Test", std::string( "PD: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_PenetrationDepth ) );
          
          // ENG_LOG( "Test", std::string( "N: " ) + ToStr( manifold.m_ContactPoints[ 0 ].m_Normal ) );
          // ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointA ) );
          //ENG_LOG( "Test", ToStr( manifold.m_ContactPoints[ 0 ].m_SupportPoint.m_PointB ) );
-         m_Manifolds.push_back( manifold );
+         // m_Manifolds.push_back( manifold );
          // Insert the points into manifold, Check if manifold exist, if not create one
          // and push it into it
          // record colliding pairs
+         currCollisions[ pair.first ][ pair.second ] = contact;
          }
       }
    // Remove all non-colliding manifolds based on the record
+   int validIdx = m_Manifolds.size() - 1;
+   int invalidIdx = 0;
+   while( invalidIdx <= validIdx )
+      {
+      // find first invalid idx from left to right
+      while(invalidIdx <= validIdx )
+         {
+         // if the index is invalid, break
+         auto findIt = currCollisions.find( m_Manifolds[ invalidIdx ].m_pRigidBodyA );
+         if( findIt == currCollisions.end()
+             || findIt->second.find( m_Manifolds[ invalidIdx ].m_pRigidBodyB ) == findIt->second.end() )
+            {
+            break;
+            }
+         // update and eliminate hash table
+         auto& cp = findIt->second[ m_Manifolds[ invalidIdx ].m_pRigidBodyB ];
+         m_Manifolds[ validIdx ].AddContactPoint( cp );
+         findIt->second.erase( m_Manifolds[ invalidIdx ].m_pRigidBodyB );
+         if(findIt->second.size() == 0)
+            {
+            currCollisions.erase( findIt );
+            }
+         
+         ++invalidIdx;
+         }
+
+      while( invalidIdx < validIdx )
+         {
+         // if it's valid, break
+         auto findIt = currCollisions.find( m_Manifolds[ validIdx ].m_pRigidBodyA );
+         if( findIt != currCollisions.end() && findIt->second.find( m_Manifolds[ validIdx ].m_pRigidBodyB ) != findIt->second.end() )
+            {
+            // update and eliminate hash table
+            auto& cp = findIt->second[ m_Manifolds[ validIdx ].m_pRigidBodyB ];
+            m_Manifolds[ validIdx ].AddContactPoint( cp );
+            findIt->second.erase( m_Manifolds[ validIdx ].m_pRigidBodyB );
+            if( findIt->second.size() == 0 )
+               {
+               currCollisions.erase( findIt );
+               }
+            break;
+            }
+         --validIdx;
+         }
+      if( invalidIdx >= validIdx )
+         {
+         m_Manifolds.resize( invalidIdx );
+         break;
+         }
+
+      std::swap( m_Manifolds[ invalidIdx ], m_Manifolds[ validIdx ] );
+      ++invalidIdx;
+      --validIdx;
+      }
+   // for those contacts which still exist, create new manifold for them
+   for( auto itA : currCollisions )
+      {
+      for( auto itCP : itA.second )
+         {
+         Manifold manifold;
+         manifold.AddContactPoint( itCP.second );
+         manifold.m_pRigidBodyA = itA.first;
+         manifold.m_pRigidBodyB = itCP.first;
+         manifold.CalculateCombinedRestitution();
+         manifold.CalculateCombinedFriction();
+         m_Manifolds.push_back( manifold );
+         }
+      }
    
 
 
@@ -286,9 +356,9 @@ void PEPhysics::VRenderDiagnostics( void )
 
       for( int i = 0; i < manifold.m_ContactPointCount; ++i )
          {
-         m.SetToWorldPosition( manifold.m_ContactPoints[ i ].m_SupportPoint.m_PointA );
+         m.SetToWorldPosition( manifold.m_ContactPoints[ i ].m_PointAWS );
          SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Red, pv * m );
-         m.SetToWorldPosition( manifold.m_ContactPoints[ i ].m_SupportPoint.m_PointB );
+         m.SetToWorldPosition( manifold.m_ContactPoints[ i ].m_PointBWS );
          SBasicGeometry::GetSingleton().RenderGeometry( BasicGeometry::GeometryTypes_Sphere, g_Green, pv * m );
          }
       }

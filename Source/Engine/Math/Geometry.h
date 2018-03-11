@@ -126,6 +126,11 @@ class Vec3 : public glm::vec3
 
       inline float Length(){ return glm::length<float, glm::highp, glm::tvec3>( (*this) ); }
 
+      inline float LengthSq( void ) const
+         {
+         return glm::dot<float, glm::highp, glm::tvec3>( *this, *this );
+         }
+
       inline void Normalize()
          {
          (*this) = glm::normalize<float, glm::highp, glm::tvec3>( (*this) ); 

@@ -42,8 +42,8 @@ void RigidBodySolver::SolveConstraint( std::vector<Manifold>& manifolds, float d
 float RigidBodySolver::CalculateLambda( Manifold& manifold, int contactPtIdx, float deltaSeconds, int axisIdx )
    {
    auto& contact = manifold.m_ContactPoints[ contactPtIdx ];
-   auto& pRBA = manifold.pRigidBodyA;
-   auto& pRBB = manifold.pRigidBodyB;
+   auto& pRBA = manifold.m_pRigidBodyA;
+   auto& pRBB = manifold.m_pRigidBodyB;
    const Vec3& axis = ( axisIdx == 0 ? contact.m_Normal : ( axisIdx == 1 ? contact.m_Tangent : contact.m_Bitangent ) );
    const Vec3& nRACrossAxis = ( axisIdx == 0 ? contact.m_NRACrossN : ( axisIdx == 1 ? contact.m_NRACrossT : contact.m_NRACrossBT ) );
    const Vec3& rBCrossAxis = ( axisIdx == 0 ? contact.m_RBCrossN : ( axisIdx == 1 ? contact.m_RBCrossT : contact.m_RBCrossBT ) );
@@ -64,7 +64,7 @@ float RigidBodySolver::CalculateLambda( Manifold& manifold, int contactPtIdx, fl
       {
       numerator -= ( manifold.m_CombinedRestitution * axis.Dot( -pRBA->m_LinearVelocity - pRBA->m_AngularVelocity.Cross( contact.m_RA )
                      + pRBB->m_LinearVelocity + pRBB->m_AngularVelocity.Cross( contact.m_RB ) )
-                   + 0.2f / deltaSeconds * axis.Dot( contact.m_SupportPoint.m_PointB - contact.m_SupportPoint.m_PointA ) );
+                     + 0.2f / deltaSeconds * axis.Dot( contact.m_PointBWS - contact.m_PointAWS ) );
       }
    // denominator = J M-1 J^t
    Vec3 term1 = -axis * pRBA->m_InverseMass;
@@ -106,12 +106,12 @@ void RigidBodySolver::ApplyImpulse( Manifold& manifold, int contactPtIdx, float 
    // Compute the change in the accumulated impulse using the copy from step 2.
    float deltaImpulse = accumulatedImpulse - prevImpulse;
 
-   auto& pRBA = manifold.pRigidBodyA;
+   auto& pRBA = manifold.m_pRigidBodyA;
    // Apply the impulse delta 
    pRBA->m_LinearVelocity += pRBA->m_InverseMass * -axis * deltaImpulse;
    pRBA->m_AngularVelocity += ( pRBA->m_GlobalInverseInertia * nRACrossAxis ) * deltaImpulse;
 
-   auto& pRBB = manifold.pRigidBodyB;
+   auto& pRBB = manifold.m_pRigidBodyB;
    // Apply the impulse delta 
    pRBB->m_LinearVelocity += pRBB->m_InverseMass * axis * deltaImpulse;
    pRBB->m_AngularVelocity += pRBB->m_GlobalInverseInertia * rBCrossAxis * deltaImpulse;

@@ -202,10 +202,18 @@ void Broadphase::TestPairCross( shared_ptr<AABBNode> pNode0, shared_ptr<AABBNode
    if( bN0IsLeaf && bN1IsLeaf )
       {
       if( pNode0->m_pLeafData->IsIntersect( *pNode1->m_pLeafData ) )
-         // ENG_LOG( "Test", "Broad phase detected" );
-         m_CollistionPairs.push_back(
-         std::make_pair( m_AABBNodeToRigidBody[ pNode0 ], m_AABBNodeToRigidBody[ pNode1 ] )
-         );
+         {
+         shared_ptr<RigidBody> pRB0 = m_AABBNodeToRigidBody[ pNode0 ];
+         shared_ptr<RigidBody> pRB1 = m_AABBNodeToRigidBody[ pNode1 ];
+         auto hash0 = std::hash<shared_ptr<RigidBody>>{}( pRB0 );
+         auto hash1 = std::hash<shared_ptr<RigidBody>>{}( pRB1 );
+
+         if( hash1 < hash0 )
+            {
+            std::swap( pRB0, pRB1 );
+            }
+         m_CollistionPairs.push_back( std::make_pair( pRB0, pRB1 ) );
+         }
       return;
       }
 

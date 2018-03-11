@@ -175,7 +175,7 @@ void PEPhysics::VOnUpdate( const float deltaSeconds )
             }
          // update and eliminate hash table
          auto& cp = findIt->second[ m_Manifolds[ invalidIdx ].m_pRigidBodyB ];
-         m_Manifolds[ validIdx ].AddContactPoint( cp );
+         m_Manifolds[ invalidIdx ].AddContactPoint( cp );
          findIt->second.erase( m_Manifolds[ invalidIdx ].m_pRigidBodyB );
          if(findIt->second.size() == 0)
             {

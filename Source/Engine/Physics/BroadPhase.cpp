@@ -201,7 +201,7 @@ void Broadphase::TestPairCross( shared_ptr<AABBNode> pNode0, shared_ptr<AABBNode
    // both are leaf
    if( bN0IsLeaf && bN1IsLeaf )
       {
-      if( pNode0->m_pLeafData->IsIntersect( *pNode1->m_pLeafData ) )
+      if( pNode0->m_pLeafData->IsIntersect( *pNode1->m_pLeafData, 0.1f ) )
          {
          shared_ptr<RigidBody> pRB0 = m_AABBNodeToRigidBody[ pNode0 ];
          shared_ptr<RigidBody> pRB1 = m_AABBNodeToRigidBody[ pNode1 ];

@@ -882,7 +882,7 @@ class AABB
       public:
       AABB( void );
       AABB( const Vec3& min, const Vec3& max );
-      bool IsIntersect( const AABB& other ) const;
+      bool IsIntersect( const AABB& other, float margin = 0.f ) const;
       bool IsContain( const AABB& other ) const;
       AABB Union( const AABB& other );
 

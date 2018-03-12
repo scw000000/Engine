@@ -163,7 +163,7 @@ TiXmlElement* Vec4::GernerateXML( void ) const
 
 bool Plane::IsAbove( const Vec3& p ) const
    {
-   return ( p.Dot( n ) + d > fESPLION );
+   return ( p.Dot( n ) + d > 0.f );
    }
 
 bool Plane::IsAbove( const Vec3& p, const float radius ) const
@@ -463,17 +463,17 @@ AABB::AABB( void ) : m_Min( Vec3::g_Zero ), m_Max( Vec3::g_Zero )
 AABB::AABB( const Vec3& min, const Vec3& max ) : m_Min( min ), m_Max( max )
    {}
 
-bool AABB::IsIntersect( const AABB& other ) const
+bool AABB::IsIntersect( const AABB& other, float margin ) const
    {
-   if( m_Min.x > other.m_Max.x || other.m_Min.x > m_Max.x )
+   if( m_Min.x - margin > other.m_Max.x || other.m_Min.x - margin > m_Max.x )
       {
       return false;
       }
-   if( m_Min.y > other.m_Max.y || other.m_Min.y > m_Max.y )
+   if( m_Min.y - margin > other.m_Max.y || other.m_Min.y - margin > m_Max.y )
       {
       return false;
       }
-   if( m_Min.z > other.m_Max.z || other.m_Min.z > m_Max.z )
+   if( m_Min.z - margin > other.m_Max.z || other.m_Min.z - margin > m_Max.z )
       {
       return false;
       }

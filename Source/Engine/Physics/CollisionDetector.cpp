@@ -68,7 +68,7 @@ bool ContactPoint::IsValid( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidB
    Vec3 vBA = pRigidBodyA->VTransformToGlobal( m_PointALS, true ) - pRigidBodyB->VTransformToGlobal( m_PointBLS, true );
    // vBA should be the same direction with normal
    // if it's negative that means it might be separated
-   if( vBA.Dot( m_Normal ) <= -0.01f )
+   if( vBA.Dot( m_Normal ) <= -0.1f )
       {
       return false;
       }
@@ -199,6 +199,14 @@ float DistanceSqFromPointToTriangle( const Vec3& pA, const Vec3& pB, const Vec3&
 
 void Manifold::AddContactPoint( const ContactPoint& newPoint)
    {
+   if(m_pRigidBodyA)
+      {
+      float distA = ( m_pRigidBodyA->m_GlobalCentroid - newPoint.m_PointAWS ).LengthSq();
+      float distB = ( m_pRigidBodyB->m_GlobalCentroid - newPoint.m_PointBWS ).LengthSq();
+      ENG_ASSERT( m_pRigidBodyA->m_InverseMass == 0.f || ( m_pRigidBodyA->m_GlobalCentroid - newPoint.m_PointAWS ).LengthSq() < 4.f );
+      ENG_ASSERT( m_pRigidBodyB->m_InverseMass == 0.f || ( m_pRigidBodyB->m_GlobalCentroid - newPoint.m_PointBWS ).LengthSq() < 4.f );
+      }
+   
    bool replaced = false;
    // Scan through the valid points, remove or update them
    int invalidIdx = 0;
@@ -212,7 +220,7 @@ void Manifold::AddContactPoint( const ContactPoint& newPoint)
          Vec3 vA = currCP.m_PointALS - newPoint.m_PointALS;
          Vec3 vB = currCP.m_PointBLS - newPoint.m_PointBLS;
          // test if I can replace it, if true, replace it
-         if( !replaced && vA.Dot( vA ) <= fESPLION || vB.Dot( vB ) <= fESPLION )
+         if( !replaced && ( vA.Dot( vA ) <= fESPLION || vB.Dot( vB ) <= fESPLION ) )
             {
             replaced = true;
             currCP = newPoint;
@@ -236,7 +244,7 @@ void Manifold::AddContactPoint( const ContactPoint& newPoint)
          Vec3 vA = currCP.m_PointALS - newPoint.m_PointALS;
          Vec3 vB = currCP.m_PointBLS - newPoint.m_PointBLS;
          // test if I can replace it, if true, replace it and break
-         if( !replaced && vA.Dot( vA ) <= fESPLION || vB.Dot( vB ) <= fESPLION )
+         if( !replaced && ( vA.Dot( vA ) <= fESPLION || vB.Dot( vB ) <= fESPLION ) )
             {
             replaced = true;
             currCP = newPoint;
@@ -297,7 +305,7 @@ void Manifold::AddContactPoint( const ContactPoint& newPoint)
 
          ContactPoint* pfarestFromLine = &m_ContactPoints[ 0 ];
          Vec3 lineDir = ( pfarestFromDeepst->m_PointAWS - pDeepest->m_PointAWS );
-         lineDir.Normalize();
+         // lineDir.Normalize();
          Vec3 v = pfarestFromLine->m_PointAWS - pDeepest->m_PointAWS;
          maxDistSq = ( v - ( v.Dot( lineDir ) * lineDir ) ).LengthSq();
          for( int i = 1; i <= MANIFOLD_MAX_NUM; ++i )
@@ -337,9 +345,16 @@ void Manifold::AddContactPoint( const ContactPoint& newPoint)
          m_ContactPoints[ 1 ] = p2;
          m_ContactPoints[ 2 ] = p3;
          m_ContactPoints[ 3 ] = p4;
-
          // m_ContactPoints[ std::rand() % MANIFOLD_MAX_NUM ] = newPoint;
          }
+      }
+   for( int i = 0; i < m_ContactPointCount && m_pRigidBodyA; ++i )
+      {
+      auto& cp = m_ContactPoints[ i ];
+      float distA = ( m_pRigidBodyA->m_GlobalCentroid - cp.m_PointAWS ).LengthSq();
+      float distB = ( m_pRigidBodyB->m_GlobalCentroid - cp.m_PointBWS ).LengthSq();
+      ENG_ASSERT( m_pRigidBodyA->m_InverseMass == 0.f || ( m_pRigidBodyA->m_GlobalCentroid - cp.m_PointAWS ).LengthSq() < 4.f );
+      ENG_ASSERT( m_pRigidBodyB->m_InverseMass == 0.f || ( m_pRigidBodyB->m_GlobalCentroid - cp.m_PointBWS ).LengthSq() < 4.f );
       }
    }
 
@@ -769,6 +784,14 @@ void CollisionDetector::EPAExpandPolyhedron( Polyhedron& polyhedron, shared_ptr<
 
    static int c = 0;
    std::unordered_map< shared_ptr< SupportPoint >, std::unordered_set<shared_ptr< SupportPoint >> > edgeMap;
+   for( auto& it : polyhedron.m_VertexToFace )
+      {
+      if( ( pNewPoint->m_PointCSO - it.first->m_PointCSO ).LengthSq() < fESPLIONSQ )
+         {
+         return;
+         }
+      }
+   
    // For each faces, test the direction
    for( auto pFaceIt = polyhedron.m_Faces.begin(); pFaceIt != polyhedron.m_Faces.end(); )
       {
@@ -965,16 +988,20 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
       // ENG_LOG( "Test", ToStr( out ));
       //  If the closest face is no larger by a threshold  
       // to the origin than the previously picked one, break;
-      if( std::abs( prev_Distance - best_face->m_Plane.GetD() ) <= fESPLION || it >= maxItNum)
+      if( std::abs( prev_Distance - best_face->m_Plane.GetD() ) <= 0.001f || it >= maxItNum)
          {
          break;
          }
       prev_Distance = best_face->m_Plane.GetD();
       // Find new point;
       shared_ptr< SupportPoint > newPoint( ENG_NEW SupportPoint( GetCSOSupportPoint( pColliderA, pColliderB, best_face->m_Plane.GetNormal() ) ) );
-      if(best_face->m_Vertices[0].lock()->m_PointCSO == newPoint->m_PointCSO
-          || best_face->m_Vertices[ 1 ].lock()->m_PointCSO == newPoint->m_PointCSO 
+      /*if(  best_face->m_Vertices[ 0 ].lock()->m_PointCSO == newPoint->m_PointCSO
+          || best_face->m_Vertices[ 1 ].lock()->m_PointCSO == newPoint->m_PointCSO
           || best_face->m_Vertices[ 2 ].lock()->m_PointCSO == newPoint->m_PointCSO )
+          {
+          break;
+          }*/
+      if( std::abs( best_face->m_Plane.SignedDistance( newPoint->m_PointCSO ) ) <= fESPLION )
          {
          break;
          }
@@ -1014,6 +1041,10 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
 
    contact.m_PenetrationDepth = std::abs( best_face->m_Plane.GetD() );
    contact.Update( pRBA, pRBB );
+   float vA = ( std::dynamic_pointer_cast< RigidBody >( pRBA )->m_GlobalCentroid - contact.m_PointAWS ).LengthSq();
+   float vB = ( std::dynamic_pointer_cast< RigidBody >( pRBB )->m_GlobalCentroid - contact.m_PointBWS ).LengthSq();
+   ENG_ASSERT( std::dynamic_pointer_cast<RigidBody>( pRBA )->m_InverseMass == 0.f || ( std::dynamic_pointer_cast<RigidBody>( pRBA )->m_GlobalCentroid - contact.m_PointAWS ).LengthSq() < 4.f );
+   ENG_ASSERT( std::dynamic_pointer_cast<RigidBody>( pRBB )->m_InverseMass == 0.f || ( std::dynamic_pointer_cast<RigidBody>( pRBB )->m_GlobalCentroid - contact.m_PointBWS ).LengthSq() < 4.f );
    }
 
 SupportPoint CollisionDetector::GetCSOSupportPoint( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Vec3& direction )

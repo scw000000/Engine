@@ -23,6 +23,7 @@ class RigidBody : public IRigidBody
    friend class CollisionDetector;
    friend class RigidBodySolver;
    friend class AABB;
+   friend struct Manifold;
       public:
       RigidBody();
       virtual void VUpdateVelocity( float deltaSecond ) override;

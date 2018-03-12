@@ -51,9 +51,9 @@ Vec3 BoxCollider::VSupportMapping( const Vec3& direction )
    float sZ = direction.z > 0 ? 0.5f : direction.z < 0 ? -0.5f : 0.f;*/
    auto localDir = m_Transform.GetFromWorld().Xform( direction, 0.f );
 
-   float localPointX = localDir.x > 0 ? m_HalfSize.x : -m_HalfSize.x;
-   float localPointY = localDir.y > 0 ? m_HalfSize.y : -m_HalfSize.y;
-   float localPointZ = localDir.z > 0 ? m_HalfSize.z : -m_HalfSize.z;
+   float localPointX = localDir.x > 0.f ? m_HalfSize.x : ( localDir.x < 0.f ? -m_HalfSize.x : 0.f );
+   float localPointY = localDir.y > 0.f ? m_HalfSize.y : ( localDir.y < 0.f ? -m_HalfSize.y : 0.f );
+   float localPointZ = localDir.z > 0.f ? m_HalfSize.z : ( localDir.z < 0.f ? -m_HalfSize.z : 0.f );
 
    return m_Transform.GetToWorld().Xform( Vec4( localPointX, localPointY, localPointZ, 1.f ) );
    }

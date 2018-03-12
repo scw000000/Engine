@@ -68,14 +68,16 @@ bool ContactPoint::IsValid( shared_ptr<RigidBody> pRigidBodyA, shared_ptr<RigidB
    Vec3 vBA = pRigidBodyA->VTransformToGlobal( m_PointALS, true ) - pRigidBodyB->VTransformToGlobal( m_PointBLS, true );
    // vBA should be the same direction with normal
    // if it's negative that means it might be separated
-   if( vBA.Dot( m_Normal ) <= -0.1f )
+   if( vBA.Dot( m_Normal ) <= -0.08f )
       {
+      ENG_LOG("Test", "pen fail");
       return false;
       }
    // Get projection vector
    vBA -= m_Normal * ( vBA.Dot( m_Normal ) );
    if( vBA.Dot( vBA ) >= 0.01f )
       {
+      ENG_LOG( "Test", "hor fail" );
       return false;
       }
 
@@ -145,13 +147,13 @@ float DistanceSqFromPointToTriangle( const Vec3& pA, const Vec3& pB, const Vec3&
    {
    Vec3 vAB = pB - pA;
    Vec3 vAC = pC - pA;
-   Vec3 vBC = pC - pA;
+   Vec3 vBC = pC - pB;
 
    Vec3 vAP = pP - pA;
 
    // vertices region test
-   float snom = vAB.Dot( pP );
-   float tnom = vAC.Dot( pP );
+   float snom = vAP.Dot( vAB );
+   float tnom = vAP.Dot( vAC );
 
    if( snom <= 0.f && tnom <= 0.f )
       {
@@ -305,8 +307,9 @@ void Manifold::AddContactPoint( const ContactPoint& newPoint)
 
          ContactPoint* pfarestFromLine = &m_ContactPoints[ 0 ];
          Vec3 lineDir = ( pfarestFromDeepst->m_PointAWS - pDeepest->m_PointAWS );
-         // lineDir.Normalize();
+         lineDir.Normalize();
          Vec3 v = pfarestFromLine->m_PointAWS - pDeepest->m_PointAWS;
+         
          maxDistSq = ( v - ( v.Dot( lineDir ) * lineDir ) ).LengthSq();
          for( int i = 1; i <= MANIFOLD_MAX_NUM; ++i )
             {
@@ -341,6 +344,12 @@ void Manifold::AddContactPoint( const ContactPoint& newPoint)
          ContactPoint p2( *pfarestFromDeepst );
          ContactPoint p3( *pfarestFromLine );
          ContactPoint p4( *pfarestFromTriangle );
+         ENG_ASSERT( pDeepest != pfarestFromLine );
+         ENG_ASSERT( pDeepest != pfarestFromDeepst );
+         ENG_ASSERT( pDeepest != pfarestFromTriangle );
+         ENG_ASSERT( pfarestFromDeepst != pfarestFromLine );
+         ENG_ASSERT( pfarestFromDeepst != pfarestFromTriangle );
+         ENG_ASSERT( pfarestFromLine != pfarestFromTriangle );
          m_ContactPoints[ 0 ] = p1;
          m_ContactPoints[ 1 ] = p2;
          m_ContactPoints[ 2 ] = p3;

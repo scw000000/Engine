@@ -322,22 +322,23 @@ void Manifold::AddContactPoint( const ContactPoint& newPoint)
                }
             }
 
-         ContactPoint* pfarestFromTriangle = &m_ContactPoints[ 0 ];
-         maxDistSq = DistanceSqFromPointToTriangle( pDeepest->m_PointAWS
-                                                    , pfarestFromDeepst->m_PointAWS
-                                                    , pfarestFromLine->m_PointAWS
-                                                    , pfarestFromTriangle->m_PointAWS );
-
-         for( int i = 1; i <= MANIFOLD_MAX_NUM; ++i )
+         ContactPoint* pfarestFromTriangle = nullptr;
+         
+         for( int i = 0; i <= MANIFOLD_MAX_NUM; ++i )
             {
+            auto pCp = &m_ContactPoints[ i ];
+            if( pCp == pDeepest || pCp == pfarestFromDeepst || pCp == pfarestFromLine )
+               {
+               continue;
+               }
             float distSq = DistanceSqFromPointToTriangle( pDeepest->m_PointAWS
                                                           , pfarestFromDeepst->m_PointAWS
                                                           , pfarestFromLine->m_PointAWS
-                                                          , m_ContactPoints[ i ].m_PointAWS );
-            if( distSq > maxDistSq )
+                                                          , pCp->m_PointAWS );
+            if( pfarestFromTriangle == nullptr || distSq > maxDistSq )
                {
-               pfarestFromTriangle = &m_ContactPoints[ i ];
                maxDistSq = distSq;
+               pfarestFromTriangle = pCp;
                }
             }
          ContactPoint p1( *pDeepest );

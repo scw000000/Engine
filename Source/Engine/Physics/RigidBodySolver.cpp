@@ -16,7 +16,8 @@
 #include "RigidBodySolver.h"
 #include "RigidBody.h"
 
-static int const& SEQUENTIAL_IMPULSE_ITERATION_NUM = 4;
+#define SEQUENTIAL_IMPULSE_ITERATION_NUM 4
+#define WARM_STARGING_RATIO 0.8f
 
 void RigidBodySolver::SolveConstraint( std::vector<Manifold>& manifolds, float deltaSeconds )
    {
@@ -27,6 +28,12 @@ void RigidBodySolver::SolveConstraint( std::vector<Manifold>& manifolds, float d
          {
          for( int j = 0; j < manifold.m_ContactPointCount; ++j )
             {
+            if(i == 0)
+               {
+               manifold.m_ContactPoints[ j ].m_AccumulatedImpulseN *= WARM_STARGING_RATIO;
+               manifold.m_ContactPoints[ j ].m_AccumulatedImpulseT *= WARM_STARGING_RATIO;
+               manifold.m_ContactPoints[ j ].m_AccumulatedImpulseBT *= WARM_STARGING_RATIO;
+               }
             // Compute the corrective impulse, but don¡¦t apply it.
             float lambda = CalculateLambda(manifold, j, deltaSeconds, 0);
             ApplyImpulse(manifold, j, lambda, 0);

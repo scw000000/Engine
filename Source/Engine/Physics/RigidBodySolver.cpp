@@ -17,7 +17,7 @@
 #include "RigidBody.h"
 
 #define SEQUENTIAL_IMPULSE_ITERATION_NUM 4
-#define WARM_STARGING_RATIO 0.8f
+#define WARM_STARTING_RATIO 0.8f
 
 void RigidBodySolver::SolveConstraint( std::vector<Manifold>& manifolds, float deltaSeconds )
    {
@@ -30,9 +30,15 @@ void RigidBodySolver::SolveConstraint( std::vector<Manifold>& manifolds, float d
             {
             if(i == 0)
                {
-               manifold.m_ContactPoints[ j ].m_AccumulatedImpulseN *= WARM_STARGING_RATIO;
-               manifold.m_ContactPoints[ j ].m_AccumulatedImpulseT *= WARM_STARGING_RATIO;
-               manifold.m_ContactPoints[ j ].m_AccumulatedImpulseBT *= WARM_STARGING_RATIO;
+               float lambdas[ 3 ] = { manifold.m_ContactPoints[ j ].m_AccumulatedImpulseN *= WARM_STARTING_RATIO,
+                  manifold.m_ContactPoints[ j ].m_AccumulatedImpulseT *= WARM_STARTING_RATIO,
+                  manifold.m_ContactPoints[ j ].m_AccumulatedImpulseBT *= WARM_STARTING_RATIO };
+               manifold.m_ContactPoints[ j ].m_AccumulatedImpulseN = 0.f;
+               manifold.m_ContactPoints[ j ].m_AccumulatedImpulseT = 0.f;
+               manifold.m_ContactPoints[ j ].m_AccumulatedImpulseBT = 0.f;
+               ApplyImpulse( manifold, j, lambdas[0], 0 );
+               ApplyImpulse( manifold, j, lambdas[ 1 ], 1 );
+               ApplyImpulse( manifold, j, lambdas[ 2 ], 2 );
                }
             // Compute the corrective impulse, but don¡¦t apply it.
             float lambda = CalculateLambda(manifold, j, deltaSeconds, 0);
@@ -69,9 +75,12 @@ float RigidBodySolver::CalculateLambda( Manifold& manifold, int contactPtIdx, fl
                        // - 0.1f / deltaSeconds * contact.m_PenetrationDepth );
    if(axisIdx == 0)
       {
+      float penDepth = axis.Dot( contact.m_PointBWS - contact.m_PointAWS );
+      // ENG_LOG("Test", ToStr(penDepth));
       numerator -= ( manifold.m_CombinedRestitution * axis.Dot( -pRBA->m_LinearVelocity - pRBA->m_AngularVelocity.Cross( contact.m_RA )
                      + pRBB->m_LinearVelocity + pRBB->m_AngularVelocity.Cross( contact.m_RB ) )
                      + 0.2f / deltaSeconds * axis.Dot( contact.m_PointBWS - contact.m_PointAWS ) );
+                     // + ( penDepth + 0.00001f > 0.f ? 0.f : 0.2f / deltaSeconds * penDepth ) );
       }
    // denominator = J M-1 J^t
    Vec3 term1 = -axis * pRBA->m_InverseMass;

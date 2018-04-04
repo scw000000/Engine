@@ -1,11 +1,11 @@
 <ActorClass>
     <Data type="Floor">
-        <ActorClassResource path="actors\SphereRB.xml" />
+        <ActorClassResource path="actors\BoxRB.xml" />
     </Data>
     <PhysicsComponent>
         <Data>
             <Transform>
-                <Position x="0.000000" y="4.000000" z="0.000000" />
+                <Position x="0.000000" y="-2.5.000000" z="0.000000" />
                 <PitchYawRoll x="-0.000000" y="0.000000" z="0.000000" />
                 <Scale x="1.000000" y="1.000000" z="1.000000" />
             </Transform>
@@ -14,14 +14,12 @@
                     <GravityScale value="1.00000"/>
                     <Translate x="1.000000" y="1.000000" z="1.000000" />
                     <Rotate x="1.000000" y="1.000000" z="1.000000" />
-                    <Collision density="air" material="None" collisiongroup="wall" />
+                    <Collision density="air" material="Normal" collisiongroup="wall" />
                 </Movement>
-                <SubstanceData density="water" material="None" />
-                <ShapeData shape="sphere" radius="1.000000"/>
-                
-                <!-- <ShapeData shape="box" x="1.000000" y="2.000000" z="3.000000" density="air" material="None" />
-                -->
+                <SubstanceData density="water" material="Normal" />
+                <ShapeData shape="box" x="2.000000" y="2.000000" z="2.000000"/>
                 <CollisionFlags>
+                    
                     <StaticObject enable="yes" />
                     <KinematicObject enable="yes" />
                     <NoContactResponse enable="no" />

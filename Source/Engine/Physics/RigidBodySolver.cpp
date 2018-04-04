@@ -16,8 +16,8 @@
 #include "RigidBodySolver.h"
 #include "RigidBody.h"
 
-#define SEQUENTIAL_IMPULSE_ITERATION_NUM 4
-#define WARM_STARTING_RATIO 0.8f
+#define SEQUENTIAL_IMPULSE_ITERATION_NUM 8
+#define WARM_STARTING_RATIO 0.7f
 
 void RigidBodySolver::SolveConstraint( std::vector<Manifold>& manifolds, float deltaSeconds )
    {
@@ -30,15 +30,17 @@ void RigidBodySolver::SolveConstraint( std::vector<Manifold>& manifolds, float d
             {
             if(i == 0)
                {
-               float lambdas[ 3 ] = { manifold.m_ContactPoints[ j ].m_AccumulatedImpulseN *= WARM_STARTING_RATIO,
-                  manifold.m_ContactPoints[ j ].m_AccumulatedImpulseT *= WARM_STARTING_RATIO,
-                  manifold.m_ContactPoints[ j ].m_AccumulatedImpulseBT *= WARM_STARTING_RATIO };
+               float prevLambda = manifold.m_ContactPoints[ j ].m_AccumulatedImpulseN * WARM_STARTING_RATIO;
                manifold.m_ContactPoints[ j ].m_AccumulatedImpulseN = 0.f;
+               ApplyImpulse( manifold, j, prevLambda, 0 );
+               
+               prevLambda = manifold.m_ContactPoints[ j ].m_AccumulatedImpulseT * WARM_STARTING_RATIO;
                manifold.m_ContactPoints[ j ].m_AccumulatedImpulseT = 0.f;
+               ApplyImpulse( manifold, j, prevLambda, 1 );
+               
+               prevLambda = manifold.m_ContactPoints[ j ].m_AccumulatedImpulseBT * WARM_STARTING_RATIO;
                manifold.m_ContactPoints[ j ].m_AccumulatedImpulseBT = 0.f;
-               ApplyImpulse( manifold, j, lambdas[0], 0 );
-               ApplyImpulse( manifold, j, lambdas[ 1 ], 1 );
-               ApplyImpulse( manifold, j, lambdas[ 2 ], 2 );
+               ApplyImpulse( manifold, j, prevLambda, 2 );
                }
             // Compute the corrective impulse, but don¡¦t apply it.
             float lambda = CalculateLambda(manifold, j, deltaSeconds, 0);
@@ -77,10 +79,10 @@ float RigidBodySolver::CalculateLambda( Manifold& manifold, int contactPtIdx, fl
       {
       float penDepth = axis.Dot( contact.m_PointBWS - contact.m_PointAWS );
       // ENG_LOG("Test", ToStr(penDepth));
-      numerator -= ( manifold.m_CombinedRestitution * axis.Dot( -pRBA->m_LinearVelocity - pRBA->m_AngularVelocity.Cross( contact.m_RA )
-                     + pRBB->m_LinearVelocity + pRBB->m_AngularVelocity.Cross( contact.m_RB ) )
+      numerator -= ( manifold.m_CombinedRestitution * std::min( axis.Dot( -pRBA->m_LinearVelocity - pRBA->m_AngularVelocity.Cross( contact.m_RA )
+         + pRBB->m_LinearVelocity + pRBB->m_AngularVelocity.Cross( contact.m_RB ) ) + 0.05f, 0.f )
                      + 0.2f / deltaSeconds * axis.Dot( contact.m_PointBWS - contact.m_PointAWS ) );
-                     // + ( penDepth + 0.00001f > 0.f ? 0.f : 0.2f / deltaSeconds * penDepth ) );
+                     // + std::min( 0.f , 0.2f / deltaSeconds * penDepth + 0.08f ) );
       }
    // denominator = J M-1 J^t
    Vec3 term1 = -axis * pRBA->m_InverseMass;
@@ -107,6 +109,9 @@ void RigidBodySolver::ApplyImpulse( Manifold& manifold, int contactPtIdx, float 
    float prevImpulse = accumulatedImpulse;
    // Add the corrective impulse to the accumulated impulse.
    accumulatedImpulse += lambda;
+   auto& pRBA = manifold.m_pRigidBodyA;
+   
+   auto& pRBB = manifold.m_pRigidBodyB;
    // Clamp the accumulated impulse.
    if(axisIdx == 0)
       {
@@ -122,12 +127,10 @@ void RigidBodySolver::ApplyImpulse( Manifold& manifold, int contactPtIdx, float 
    // Compute the change in the accumulated impulse using the copy from step 2.
    float deltaImpulse = accumulatedImpulse - prevImpulse;
 
-   auto& pRBA = manifold.m_pRigidBodyA;
    // Apply the impulse delta 
    pRBA->m_LinearVelocity += pRBA->m_InverseMass * -axis * deltaImpulse;
    pRBA->m_AngularVelocity += ( pRBA->m_GlobalInverseInertia * nRACrossAxis ) * deltaImpulse;
 
-   auto& pRBB = manifold.m_pRigidBodyB;
    // Apply the impulse delta 
    pRBB->m_LinearVelocity += pRBB->m_InverseMass * axis * deltaImpulse;
    pRBB->m_AngularVelocity += pRBB->m_GlobalInverseInertia * rBCrossAxis * deltaImpulse;

@@ -36,7 +36,7 @@ HumanView::HumanView( void )
       Point screenSize = g_pApp->m_EngineOptions.GetScreenSize();
       frustum.Init( ENG_PI / 4.0f, ( float ) screenSize.x / ( float ) screenSize.y, 0.1f, 1500.0f );
       
-      m_pCamera.reset( ENG_NEW CameraNode( Vec3(0.0f, 0.0f, -10.0f), // position in World Space
+      m_pCamera.reset( ENG_NEW CameraNode( Vec3(-10.0f, 0.0f, -25.0f), // position in World Space
 								Vec3( 0.0f, 0.0f, 1.0f), // look target
 								Vec3( 0.0f, 1.0f, 0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
                         , frustum ) );

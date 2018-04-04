@@ -1,0 +1,32 @@
+<ActorInstance>
+    <Data type="Floor">
+        <ActorClassResource path="actors\BoxRB1.xml" />
+    </Data>
+    <PhysicsComponent>
+        <Data>
+            <Transform>
+                <Position  />
+                <PitchYawRoll />
+                <Scale />
+            </Transform>
+            <PhysicsAttributes>
+                <Movement>
+                    <Translate />
+                    <Rotate />
+                    <Collision />
+                </Movement>
+                <SubstanceData/>
+                <ShapeData />
+                <CollisionFlags>
+                    <StaticObject  />
+                    <KinematicObject  />
+                    <NoContactResponse />
+                    <CustomMaterialCallback />
+                    <CharacterObject />
+                    <DisableVisualizeObject />
+                    <DisableSpuCollisionProcessing />
+                </CollisionFlags>
+            </PhysicsAttributes>
+        </Data>
+    </PhysicsComponent>
+</ActorClass>

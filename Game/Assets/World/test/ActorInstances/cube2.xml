@@ -40,7 +40,7 @@
                 </Light>
             </Data>
         </LightRenderComponent>
-        <LightRenderComponent>
+        <!-- <LightRenderComponent>
             <Data>
                 <Transform>
                     <Position />
@@ -51,6 +51,6 @@
                     <Diffuse />
                 </Light>
             </Data>
-        </LightRenderComponent>
+        </LightRenderComponent> -->
     </MeshRenderComponent>
 </ActorInstance>

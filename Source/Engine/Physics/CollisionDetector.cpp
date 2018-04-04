@@ -230,6 +230,9 @@ void Manifold::AddContactPoint( const ContactPoint& newPoint)
          // else if it's not valid, break
          else if( !currCP.IsValid( m_pRigidBodyA, m_pRigidBodyB ) )
          {
+         currCP.m_AccumulatedImpulseN = 0.f;
+         currCP.m_AccumulatedImpulseT = 0.f;
+         currCP.m_AccumulatedImpulseBT = 0.f;
             break;
          }
          // else then it's valid, recalculate its info?
@@ -261,6 +264,10 @@ void Manifold::AddContactPoint( const ContactPoint& newPoint)
             currCP.Update( m_pRigidBodyA, m_pRigidBodyB );
             break;
             }
+
+         currCP.m_AccumulatedImpulseN = 0.f;
+         currCP.m_AccumulatedImpulseT = 0.f;
+         currCP.m_AccumulatedImpulseBT = 0.f;
          --validIdx;
          }
       if( invalidIdx >= validIdx )
@@ -1053,8 +1060,8 @@ void CollisionDetector::EPA( shared_ptr<ICollider> pColliderA, shared_ptr<IColli
    contact.Update( pRBA, pRBB );
    float vA = ( std::dynamic_pointer_cast< RigidBody >( pRBA )->m_GlobalCentroid - contact.m_PointAWS ).LengthSq();
    float vB = ( std::dynamic_pointer_cast< RigidBody >( pRBB )->m_GlobalCentroid - contact.m_PointBWS ).LengthSq();
-   ENG_ASSERT( std::dynamic_pointer_cast<RigidBody>( pRBA )->m_InverseMass == 0.f || ( std::dynamic_pointer_cast<RigidBody>( pRBA )->m_GlobalCentroid - contact.m_PointAWS ).LengthSq() < 4.f );
-   ENG_ASSERT( std::dynamic_pointer_cast<RigidBody>( pRBB )->m_InverseMass == 0.f || ( std::dynamic_pointer_cast<RigidBody>( pRBB )->m_GlobalCentroid - contact.m_PointBWS ).LengthSq() < 4.f );
+//   ENG_ASSERT( std::dynamic_pointer_cast<RigidBody>( pRBA )->m_InverseMass == 0.f || ( std::dynamic_pointer_cast<RigidBody>( pRBA )->m_GlobalCentroid - contact.m_PointAWS ).LengthSq() < 4.f );
+//   ENG_ASSERT( std::dynamic_pointer_cast<RigidBody>( pRBB )->m_InverseMass == 0.f || ( std::dynamic_pointer_cast<RigidBody>( pRBB )->m_GlobalCentroid - contact.m_PointBWS ).LengthSq() < 4.f );
    }
 
 SupportPoint CollisionDetector::GetCSOSupportPoint( shared_ptr<ICollider> pColliderA, shared_ptr<ICollider> pColliderB, const Vec3& direction )

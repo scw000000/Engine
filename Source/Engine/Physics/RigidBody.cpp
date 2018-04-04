@@ -117,7 +117,11 @@ void RigidBody::VUpdateRigidBodyInfo( void )
    
    // compute inverse inertia tensor
    m_LocalInverseInertia = m_LocalInertia.Inverse();
-   
+   if( m_RotateFactor == Vec3::g_Zero )
+      {
+      m_GlobalInverseInertia = Mat3x3::g_Zero;
+      m_LocalInverseInertia = Mat3x3::g_Zero;
+      }
    }
 
 void RigidBody::VAddCollider( shared_ptr<ICollider> collider )

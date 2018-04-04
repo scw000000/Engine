@@ -8,13 +8,13 @@
         
      <!--   <Actor actorinstance="skmesh.xml" />-->
         
-        <Actor actorinstance="cube2.xml" />
+     <!--   <Actor actorinstance="cube2.xml" />
        
-        <Actor actorinstance="cube4.xml" />
+        <Actor actorinstance="cube4.xml" />-->
         
         <!-- <Actor actorinstance="sponza.xml"/>-->
-         <Actor actorinstance="SphereRB.xml" />
          <Actor actorinstance="BoxRB.xml" />
+         <Actor actorinstance="floor.xml" />
      <!--  <Actor actorinstance="sky.xml" />
       <Actor actorinstance="floor.xml" />-->
     </StaticActors>
